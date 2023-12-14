@@ -1,5 +1,13 @@
 This is the proposed template for all new TAIPs being added to this repository.
 
+# Title
+
+## Details
+
+| TAIP | Authors | Status | Created | Updated |
+| ---- | ------- | ------ | ------- | ------- |
+|      |         |        |         |         |
+
 ## Summary
 
 Explain _briefly_ what this TAIP aims to achieve i.e. what capability does it provide?
