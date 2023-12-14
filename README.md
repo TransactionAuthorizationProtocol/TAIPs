@@ -1,10 +1,10 @@
 # TAIPs
 
-Transaction Authorization Improvement Proposals (TAIPs) provide standards for the [Transaction Authorization Protocol (TAP)](https://rspv.tap).
+Transaction Authorization Improvement Proposals (TAIPs) provide standards for the [Transaction Authorization Protocol (TAP)](https://tap.rsvp).
 
-> [TAP](https://rspv.tap) is a decentralized protocol allowing multiple participants in real-world transactions to identify each other and collaborate with the goal of authorizing them safely.
+> [TAP](https://tap.rsvp) is a decentralized protocol allowing multiple participants in real-world transactions to identify each other and collaborate with the goal of authorizing them safely.
 
-The purpose of TAIPs is to provide the community with a means to propose enhancements to [TAP](https://rspv.tap) extending it's capabilities to unique transaction scenarios.
+The purpose of TAIPs is to provide the community with a means to propose enhancements to [TAP](https://tap.rsvp) extending it's capabilities to unique transaction scenarios.
 
 ## TAIP Statuses
 
@@ -14,4 +14,4 @@ The purpose of TAIPs is to provide the community with a means to propose enhance
 
 ## Inspiration
 
-TAIPs are heavily inspired by [CAIPs](https://github.com/ChainAgnostic/CAIPs) which in turn were heavily inspired by [bips](https://github.com/bitcoin/bips)
+TAIPs are heavily inspired by [CAIPs](https://github.com/ChainAgnostic/CAIPs) which in turn were heavily inspired by [bips](https://github.com/bitcoin/bips).
