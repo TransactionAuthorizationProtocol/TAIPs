@@ -1,6 +1,6 @@
 [book]
-authors = ["Richard Crosby"]
+authors = ["Richard Crosby", "Pelle Braendgaard"]
 language = "en"
 multilingual = false
 src = "src"
-title = "TAIPs"
+title = "Transaction Authorization Protocol (TAP)"
