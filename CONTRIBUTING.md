@@ -3,7 +3,7 @@
 1.  Review [TAIP-1](./TAIPs/taip-1.md).
 2.  Fork the repository.
 3.  Add your TAIP to your fork of the repository. There is a [template TAIP here](../taip-template.md).
-4.  Submit a Pull Request to Chain Agnostics's [TAIPs repository](https://github.com/TransactionAuthorizationProtocol/TAIPs).
+4.  Submit a Pull Request to Transaction Authorizations's [TAIPs repository](https://github.com/TransactionAuthorizationProtocol/TAIPs).
 
 Your first PR should be a first draft of the complete and implementable TAIP. 
 An editor will manually review the first PR for a new TAIP and assign it a number before merging it.

@@ -1,0 +1,9 @@
+{% assign taips=include.taips|split:"," %}
+{% for taip in taips %}
+{% if taip contains "https://" %}
+<a href="{{ taip | strip | uri_escape }}">{{ taip | strip | xml_escape }}</a>
+{% else %}
+<a href="{{taip|strip|prepend:"taip-" }}">{{taip|strip}}</a>
+{% endif %}
+{% if forloop.last == false %}, {% endif %}
+{% endfor %}

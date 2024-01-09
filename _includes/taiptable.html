@@ -1,0 +1,36 @@
+<style type="text/css">
+    .taiptable .title {
+      width: 67%;
+    }
+  
+    .taiptable .author {
+      width: 33%;
+    }
+  </style>
+  {% for status in site.data.statuses %}
+    {% assign taips = include.taips|where:"status",status|sort:"taip" %}
+    {% assign count = taips|size %}
+    {% if count > 0 %}
+      <h2 id="{{status|slugify}}">{{status}}</h2>
+      <table class="taiptable">
+        <thead>
+          {% if status == "Last Call" %}
+            <tr>
+            <th class="taipnum">Number</th><th class="date">Review ends</th><th class="title">Title</th><th class="author">Author</th></tr>
+          {% else %}
+            <tr><th class="taipnum">Number</th><th class="title">Title</th><th class="author">Author</th></tr>
+          {% endif %}
+        </thead>
+        {% for page in taips %}
+          <tr>
+            <td class="num"><a href="{{page.url|relative_url}}">{{page.taip|xml_escape}}</a></td>
+            {% if status == "Last Call" and page.last-call-deadline != undefined %}
+              <td class="date">{{ page.last-call-deadline | xml_escape }}</td>
+            {% endif %}
+            <td class="title">{{page.title|xml_escape}}</td>
+            <td class="author">{% include authorlist.html authors=page.author %}</td>
+          </tr>
+        {% endfor %}
+      </table>
+    {% endif %}
+  {% endfor %}

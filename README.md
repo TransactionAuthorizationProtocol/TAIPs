@@ -29,7 +29,7 @@ The purpose of TAIPs is to provide the community with a means to propose enhance
 
 ## Inspiration
 
-TAIPs are heavily inspired by [CAIPs](https://github.com/ChainAgnostic/CAIPs) which in turn were heavily inspired by [bips](https://github.com/bitcoin/bips).
+TAIPs are heavily inspired by [TAIPs](https://github.com/ChainAgnostic/TAIPs) which in turn were heavily inspired by [bips](https://github.com/bitcoin/bips).
 
 
 ## License

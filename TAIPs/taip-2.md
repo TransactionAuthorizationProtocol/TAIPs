@@ -1,3 +1,12 @@
+---
+taip: 2
+title: TAIP 2 - Messaging
+status: Draft
+type: Standard
+author: Pelle Braendgaard <pelle@notabene.id>, Richard Crosby <richard@notabene.id>
+created: 2024-01-09
+updated: 2024-01-09
+---
 # TAIP 2 - Messaging
 # Transaction Authorization Messaging
 
@@ -72,7 +81,7 @@ The create transfer message payload takes the following format:
 - `@type` - The [JSON-LD Type](https://www.w3.org/TR/json-ld/#specifying-the-type) for `CreateTransfer` from the active context
 - `originator` - The ultimate originator of the transaction. MUST be represented as IRIs and more specifically SHOULD be represented as a [DID](https://www.w3.org/TR/did-core/).
 - `beneficiary` - The ultimate beneficiary of the transaction. Similar to `originator` MUST be an IRI and SHOULD be a [DID](https://www.w3.org/TR/did-core/).
-- `asset` - A [CAIP-19](https://github.com/ChainAgnostic/CAIPs/blob/main/CAIPs/caip-19.md) representation of the asset being transferred.
+- `asset` - A [TAIP-19](https://github.com/ChainAgnostic/TAIPs/blob/main/TAIPs/taip-19.md) representation of the asset being transferred.
 - `amount` - A string representation of the transfer amount in the asset's respective smallest denomination
 - `agents` - A [JSON-LD Ordered List](https://www.w3.org/TR/json-ld/#lists) of transaction agents. As per [TAIP-1](./taip-1.md) each agent is represented as by a [JSON-LD Node Identifier](https://www.w3.org/TR/json-ld/#node-identifiers) that MUST be a [DID](https://www.w3.org/TR/did-core/).
 

@@ -62,7 +62,7 @@ Web DIDs have an important property that permits passive agents to be represente
 
 ### Self-Hosted Wallets
 
-Since every wallet address has a blockchain account address, self-hosted wallets should be represented as a [PKH DID](https://github.com/w3c-ccg/did-pkh/blob/main/did-pkh-method-draft.md) using [CAIP-10](https://chainagnostic.org/CAIPs/caip-10) identifiers.
+Since every wallet address has a blockchain account address, self-hosted wallets should be represented as a [PKH DID](https://github.com/w3c-ccg/did-pkh/blob/main/did-pkh-method-draft.md) using [TAIP-10](https://chainagnostic.org/TAIPs/taip-10) identifiers.
 
 For example, the Ethereum address can be represented as:
 
