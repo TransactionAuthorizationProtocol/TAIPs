@@ -1,116 +1,164 @@
-# Agents
+---
+taip: 1
+title: TAIP 1 - TAP and TAIP Purpose and Guidelines
+status: Review
+type: Meta
+author: Pelle Braendgaard <pelle@notabene.id>
+created: 2024-01-09
+updated: 2024-01-09
+---
+# TAIP 1 - TAP and TAIP Purpose and Guidelines
+
+| TAIP | Authors                                                                                                                                | Status | Created       | Updated       |
+| ---- | -------------------------------------------------------------------------------------------------------------------------------------- | ------ | ------------- | ------------- |
+| 1    | [Pelle Braendgaard](mailto:pelle@notabene.id) | Draft  | 9th of January 2024 | 9th of January 2024 |
 
 ## Details
 
-| TAIP | Authors        | Status | Created    | Updated    |
-| ---- | -------------- | ------ | ---------- | ---------- |
-| 1    | Richard Crosby | Draft  | 12/19/2023 | 12/19/2023 |
+## What is an TAIP?
 
-## Summary
+TAIP stands for Transaction Authorization Improvement Proposal and is designed as a basic building block for specifying and implementing the Transaction Authorization Protocol. A TAIP is a design document providing information to the community or describing a standard to be used for transaction authorization between multiple off-chain parties across multiple chains. 
 
-Agents are the wallets, exchanges and other services directly involved in a transaction. To authorize a transaction, the full chain of transaction participants must be represented and given an opportunity to authorize.
+The TAIP should provide a concise technical specification of the feature and a rationale for it. The TAIP author is responsible for building consensus within the community and documenting dissenting opinions.
 
-## Abstract
+## Transaction Authorization Protocol (TAP) Rationale
 
-## Motivation
+Currently there is not a good abstract and chain agnostic method for multiple parties to reason about and collaborate around blockchain transactions. As an example, in a typical blockchain transaction the only party able to authorize a transaction is the holder of a blockchain account. Smart contract based applications can implement authorization functionality within their code, but they do not work universally across different kinds of blockchains. 
+As more and more businesses and individuals work to utilize blockchains for real world applications, it becomes increasingly important to be able to manage this. See the [TAP Whitepaper](../Whitepaper.md) for more.
 
-Existing attempts at representing transaction participants authorizing crypto transactions have focused narrowly on the FATF Travel Rule originator VASP and beneficiary VASP concepts. By introducing the concept of Agents, TAP is able to capture all participants in a transaction, including ones that don't necessarily represent the ultimate originator and beneficiary.
+## TAIP Rationale
 
-Representing the full chain of agents in a transaction, enables risk management, trust and compliance through the full chain.
+Blockchain development is still under very rapid pace. Adding authorization support to new technologies requires a decentralized approach to authoring this. 
 
-## Specification
+TAIPs allows authors to focus on specific aspects of authorization and interactions with new protocols, technologies, and workflows.
 
-### Identifying Agents
+## TAIP Formats and Templates
 
-Agents are identified using Decentralized Identifiers (DIDs).
+TAIPs should be written in [markdown][] format.
+Image files should be included in a subdirectory of the `assets` folder for that TAIP as follows: `assets/taip-N` (where **N** is to be replaced with the TAIP number). When linking to an image in the TAIP, use relative links such as `../assets/taip-1/image.png`.
 
-Agents creating DIDs and implementing TAP should publish [a service](https://www.w3.org/TR/did-core/#dfn-service) to the [DIDDoc](https://www.w3.org/TR/did-core/#dfn-did-documents):
+## TAIP Header Preamble
 
-```json
-{
-  "did": "did:web:tap.rsvp",
-  ...
-  "service": [
-    {
-      "id": "did:web:tap.rsvp#tap",
-      "type": "DIDCommMessaging",
-      "serviceEndpoint":  {
-        "uri": "https://tap.rsvp/didcomm"
-      }
-    }
-  ]
-}
-```
+Each TAIP must begin with an [RFC 822](https://www.ietf.org/rfc/rfc822.txt) style header preamble, preceded and followed by three hyphens (`---`). This header is also termed ["front matter" by Jekyll](https://jekyllrb.com/docs/front-matter/). The headers must appear in the following order. Headers marked with "*" are optional and are described below. All other headers are required.
 
-### Representing Agents
+` taip:` <TAIP number> (this is determined by the TAIP editor)
 
-Agents are represented in TAP in very simple JSON-LD node syntax:
+` title:` <TAIP title>
 
-```json
-{
-  "@id": "did:web:vasp.com"
-}
-```
+` author:` <a list of the author's or authors' name(s) and/or username(s), or name(s) and email(s). Details are below.>
 
-Future TAIPs are encouraged to extend the agent model with additional functionality.
+` * discussions-to:` \<a URL pointing to the official discussion thread\>
 
-### Centralized Agents
+` status:` <Draft | Rejected | Review | Last Call | Withdrawn | Final | Superseded>
 
-Centralized agents such as VASPs, Custodial Wallet APIs, Payment Providers, or any other public service providers should use [Web DIDs](https://w3c-ccg.github.io/did-method-web/).
+`* review-period-end:` <date review period ends>
 
-Web DIDs have an important property that permits passive agents to be represented in a transaction. Since centralized agents nearly always have a domain name, other active agents using TAP may add these agents without their active involvement.
+` type:` <Standard | Informational | Meta>
 
-### Self-Hosted Wallets
+` * category:` <Core | Networking | Interface | ERC>
 
-Since every wallet address has a blockchain account address, self-hosted wallets should be represented as a [PKH DID](https://github.com/w3c-ccg/did-pkh/blob/main/did-pkh-method-draft.md) using [CAIP-10](https://chainagnostic.org/CAIPs/caip-10) identifiers.
+` created:` <date created on>
 
-For example, the Ethereum address can be represented as:
+` * updated:` <comma separated list of dates>
 
-```json
-{
-  "@id": "did:pkh:eip155:1:0xab16a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb"
-}
-```
+` * requires:` <TAIP number(s); if multiple, use `[1,2]` format to create a YAML array>
 
-### Ordering
+` * replaces:` <TAIP number(s); if multiple, use `[1,2]` format to create a YAML array>
 
-Agents should be represented as an ordered list that represents the full chain of a transaction. To do so, lists of Agents should be represented using [JSON-LD List](https://www.w3.org/TR/json-ld11/#lists) syntax:
+` * superseded-by:` <TAIP number(s) | URL of non-TAIP standard >
 
-```json
-"agents": {
-  "@list": [
-    {
-      "@id": "did:pkh:eip155:1:0xab16a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb"
-    },
-    {
-      "@id": "did:web:vasp-a.com"
-    },
-    {
-      "@id": "did:web:vasp-b.com"
-    },
-    {
-      "@id": "did:pkh:eip155:1:0x71C7656EC7ab88b098defB751B7401B5f6d8976F"
-    },
-  ]
-}
-```
+Headers that permit lists must separate elements with commas.
 
-## Rationale
+Headers requiring dates will always do so in the format of ISO 8601 (yyyy-mm-dd).
 
-Why were certain design decisions made? References to alternatives and why the proposed solution addresses the problem better should also be added here. Any notable objections/concerns should also be noted here for future reference.
+#### `author` header
 
-## Test Cases
+The `author` header optionally lists the names, email addresses or usernames of the authors/owners of the TAIP. Those who prefer anonymity may use a username only, or a first name and a username. The format of the author header value must be:
 
-Provide here any test cases that will help implementers of the TAIP to validate their implementation.
+> Random J. User &lt;address@dom.ain&gt;
 
-## Security Concerns
+or
 
-Are there any security concerns that this TAIP addresses or that implementers should be aware of?
+> Random J. User (@username)
 
-## Privacy Considerations
+if the email address or GitHub username is included, and
 
-Are there any privacy considerations that need to be considered by implementers when implementing this TAIP?
+> Random J. User
 
-## Backwards Compatibility
+if the email address is not given.
 
-Does this TAIP introduce any backwards incompatible changes?
+#### `resolution` header
+
+#### `discussions-to` header
+
+While a TAIP is a draft, a `discussions-to` header will indicate the mailing list or URL where the TAIP is being discussed.
+
+As a single exception, `discussions-to` cannot point to GitHub pull requests.
+
+#### `type` header
+
+The `type` header specifies the type of TAIP: Standard, Meta, or Informational.
+
+#### `created` header
+
+The `created` header records the date that the TAIP was assigned a number. Both headers should be in yyyy-mm-dd format, e.g. 2001-08-14.
+
+#### `updated` header
+
+The `updated` header records the date(s) when the TAIP was updated with "substantial" changes. This header is only valid for TAIPs of Draft and Active status.
+
+#### `requires` header
+
+TAIPs may have a `requires` header, indicating the TAIP(s) on which this TAIP depends. Note that if the TAIP requires multiple others, the value should be an array of integers (no `"` needed) and/or URLs (wrapped in `"`s) within square brackets (`[]`).
+
+#### `superseded-by` and `replaces` headers
+
+TAIPs may also have a `superseded-by` header indicating that a TAIP has been rendered obsolete by a later document; the value is the number of the TAIP that replaces the current document. The newer TAIP must have a `replaces` header containing the number of the TAIP that it rendered obsolete.
+
+## Auxiliary Files
+
+TAIPs may include auxiliary files such as diagrams. Such files must be named TAIP-XXXX-Y.ext, where “XXXX” is the TAIP number, “Y” is a serial number (starting at 1), and “ext” is replaced by the actual file extension (e.g. “png”).
+
+## Transferring TAIP Ownership
+
+It occasionally becomes necessary to transfer ownership of TAIPs to a new champion. In general, we'd like to retain the original author as a co-author of the transferred TAIP, but that's really up to the original author. A good reason to transfer ownership is because the original author no longer has the time or interest in updating it or following through with the TAIP process, or has fallen off the face of the 'net (i.e. is unreachable or isn't responding to email). A bad reason to transfer ownership is because you don't agree with the direction of the TAIP. We try to build consensus around a TAIP, but if that's not possible, you can always submit a competing TAIP.
+
+If you are interested in assuming ownership of a TAIP, send a message asking to take over, addressed to both the original author and the TAIP editor. If the original author doesn't respond to email in a timely manner, the TAIP editor will make a unilateral decision (it's not like such decisions can't be reversed :)).
+
+## TAIP Editors
+
+Temporarily [Notabene](https://notabene.id) will act as editors. Notabene pledges to implement a simple informal governance structure during H1 2024 to include more parties and lessent the reliance on a single company.
+
+## TAIP Editorial Process
+
+For each new TAIP that comes in, an editor does the following:
+
+- Read the TAIP to check if it is ready: sound and complete. The ideas must make technical sense, even if they don't seem likely to get to final status.
+- The title should accurately describe the content.
+- Check the TAIP for language (spelling, grammar, sentence structure, etc.), markup (Github flavored Markdown), code style.
+
+If the TAIP isn't ready, the editor will send it back to the author for revision, with specific instructions.
+
+Once the TAIP is ready for the repository, the TAIP editor will:
+
+- Assign a TAIP number (generally the PR number or, if preferred by the author, the Issue # if there was discussion in the Issues section of this repository about this TAIP)
+
+- Merge the corresponding pull request
+
+- Send a message back to the TAIP author with the next step.
+
+The editors don't pass judgment on TAIPs. We merely do the administrative & editorial part.
+
+## History
+
+This document was derived heavily from [CAIP-1](https://chainagnostic.org/CAIPs/caip-1) written by Ligi, which was derived by [Bitcoin's BIP-0001] written by Amir Taaki, which in turn was derived from [Python's PEP-0001]. In many places text was simply copied and modified. Although the PEP-0001 text was written by Barry Warsaw, Jeremy Hylton, and David Goodger, they are not responsible for its use in Transaction Authorization Improvement Proposals, and should not be bothered with technical questions specific to TAIPs. Please direct all comments to the TAIP editors. 
+
+### Bibliography
+
+[markdown]: https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet
+[Bitcoin's BIP-0001]: https://github.com/bitcoin/bips
+[Python's PEP-0001]: https://www.python.org/dev/peps/
+
+## Copyright
+
+Copyright and related rights waived via [CC0](../LICENSE).

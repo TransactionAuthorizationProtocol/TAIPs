@@ -5,7 +5,7 @@
 
 | TAIP | Authors                                                                                                                                | Status | Created       | Updated       |
 | ---- | -------------------------------------------------------------------------------------------------------------------------------------- | ------ | ------------- | ------------- |
-| 2    | [Richard Crosby](mailto:richard@notabene.id), [Andres Junge](mailto:andres@notabene.id), [Pelle Braendgaard](mailto:pelle@notabene.id) | Draft  | 12th Dec 2023 | 12th Dec 2023 |
+| 2    | [Andres Junge](mailto:andres@notabene.id), [Pelle Braendgaard](mailto:pelle@notabene.id) | Draft  | 12th Dec 2023 | 12th Dec 2023 |
 
 ## Summary
 

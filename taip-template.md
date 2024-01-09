@@ -1,45 +1,64 @@
-This is the proposed template for all new TAIPs being added to this repository.
+---
+# Every document starts with a front matter in YAML enclosed by triple dashes.
+# See https://jekyllrb.com/docs/front-matter/ to learn more about this concept.
+taip: TAIP-X <X will be changed to the PR number if accepted>
+title: <TAIP title>
+author: <a list of the author's or authors' name(s) and/or username(s), or name(s) and email(s), e.g. (use with the parentheses or triangular brackets): FirstName LastName (@GitHubUsername), FirstName LastName <foo@bar.com>, FirstName (@GitHubUsername) and GitHubUsername (@GitHubUsername)>
+discussions-to: <URL(s); if multiple, list separated by , without " or []> 
+status: Draft
+type: <Standard | Meta | Informational>
+created: <date created on, in ISO 8601 (yyyy-mm-dd) format>
+updated: <date last updated, in ISO 8601 (yyyy-mm-dd) format>
+requires (*optional): <TAIP number(s); if multiple, format as `[1,2]` array>
+replaces (*optional): <TAIP number(s); if multiple, format as `[1,2]` array>
+---
 
-# Title
+<!--You can leave these HTML comments in your merged EIP and delete the visible duplicate text guides, they will not appear and may be helpful to refer to if you edit it again. This is the suggested template for new EIPs. Note that an EIP number will be assigned by an editor. When opening a pull request to submit your EIP, please use an abbreviated title in the filename, `eip-draft_title_abbrev.md`. The title should be 44 characters or less.-->
+This is the suggested template for new TAIPs.
 
-## Details
+Note that an TAIP number will be assigned by an editor. When opening a pull request to submit your TAIP, please use an abbreviated title in the filename, `eip-draft_title_abbrev.md`.
 
-| TAIP | Authors | Status | Created | Updated |
-| ---- | ------- | ------ | ------- | ------- |
-|      |         |        |         |         |
+The title should be 42 characters or less.
 
-## Summary
-
-Explain _briefly_ what this TAIP aims to achieve i.e. what capability does it provide?
+## Simple Summary
+<!--"If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the TAIP.-->
+If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the TAIP.
 
 ## Abstract
-
-A short (~200 word) description of the technical issue that this TAIP will be solving.
+<!--A short (~200 word) description of the technical issue being addressed.-->
+A short (~200 word) description of the technical issue being addressed.
 
 ## Motivation
-
-Why is this problem worth solving? It should be clear from the motivation why existing solutions to the problem don't adequately solve the problem.
+<!--The motivation is critical for TAIP. It should clearly explain why the state of the art is inadequate to address the problem that the TAIP solves. TAIP submissions without sufficient motivation may be rejected outright.-->
+The motivation is critical for TAIP. It should clearly explain why the state of the art is inadequate to address the problem that the TAIP solves. TAIP submissions without sufficient motivation may be rejected outright.
 
 ## Specification
-
-An in-depth explanation of the technical specification of this TAIP. What functionality does this TAIP provide and how does it work precisely?
+<!--The technical specification should describe the standard in detail. The specification should be detailed enough to allow competing, interoperable implementations. -->
+The technical specification should describe the standard in detail. The specification should be detailed enough to allow competing, interoperable implementations.
 
 ## Rationale
-
-Why were certain design decisions made? References to alternatives and why the proposed solution addresses the problem better should also be added here. Any notable objections/concerns should also be noted here for future reference.
+<!--The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.-->
+The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.-->
 
 ## Test Cases
+<!--Please add diverse test cases here if applicable. Any normative definition of an interface requires test cases to be implementable. -->
 
-Provide here any test cases that will help implementers of the TAIP to validate their implementation.
-
-## Security Concerns
-
-Are there any security concerns that this TAIP addresses or that implementers should be aware of?
+## Security Considerations
+<!--Please add an explicit list of intra-actor assumptions and known risk factors if applicable. Any normative definition of an interface requires these to be implementable; assumptions and risks should be at both individual interaction/use-case scale and systemically, should the interface specified gain ecosystem-namespace adoption. -->
 
 ## Privacy Considerations
-
-Are there any privacy considerations that need to be considered by implementers when implementing this TAIP?
+<!--Please add an explicit list of intra-actor assumptions and known risk factors if applicable. Any normative definition of an interface requires these to be implementable; assumptions and risks should be at both individual interaction/use-case scale and systemically, should the interface specified gain ecosystem-namespace adoption. -->
 
 ## Backwards Compatibility
+<!--All TAIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The TAIP must explain how the author proposes to deal with these incompatibilities. TAIP submissions without a sufficient backwards compatibility treatise may be rejected outright.-->
+All TAIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The TAIP must explain how the author proposes to deal with these incompatibilities. TAIP submissions without a sufficient backwards compatibility treatise may be rejected outright.
 
-Does this TAIP introduce any backwards incompatible changes?
+## References 
+<!--Links to external resources that help understanding the TAIP better. This can e.g. be links to existing implementations. See CONTRIBUTING.md#style-guide . -->
+
+- [TAIP-1][TAIP-1] defines the TAIP document structure
+
+[TAIP-1]: https://tap.rsvp/TAIPS/taip-1
+
+## Copyright
+Copyright and related rights waived via [CC0](../LICENSE).
