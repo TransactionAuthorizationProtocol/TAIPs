@@ -1,13 +1,13 @@
 ---
 taip: 1
-title: TAIP 1 - TAP and TAIP Purpose and Guidelines
+title: TAP and TAIP Purpose and Guidelines
 status: Review
 type: Meta
 author: Pelle Braendgaard <pelle@notabene.id>
 created: 2024-01-09
 updated: 2024-01-09
 ---
-# TAIP 1 - TAP and TAIP Purpose and Guidelines
+# TAP and TAIP Purpose and Guidelines
 
 | TAIP | Authors                                                                                                                                | Status | Created       | Updated       |
 | ---- | -------------------------------------------------------------------------------------------------------------------------------------- | ------ | ------------- | ------------- |

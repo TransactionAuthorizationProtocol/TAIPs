@@ -1,6 +1,6 @@
 ---
-taip: TAIP-2
-title: TAIP 2 - Messaging
+taip: 2
+title: Messaging
 status: Draft
 type: Standard
 author: Pelle Braendgaard <pelle@notabene.id>, Richard Crosby <richard@notabene.id>
@@ -8,7 +8,7 @@ created: 2024-01-09
 updated: 2024-01-09
 discussions-to: https://github.com/TransactionAuthorizationProtocol/TAIPs/pull/4
 ---
-# TAIP 2 - Messaging
+# Messaging
 
 ## Summary
 
