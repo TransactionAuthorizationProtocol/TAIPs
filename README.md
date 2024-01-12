@@ -18,7 +18,7 @@ The purpose of TAIPs is to provide the community with a means to propose enhance
 |------|------------------------------------------------------------------------|
 | 1    | [Transaction Authorization Improvement Proposals](./TAIPS/taip-1.md)   |
 | 2    | [Messaging](./TAIPS/taip-2.md)                                         |
-| 3    | [Transaction Types](./TAIPS/taip-3.md)                                 |
+| 3    | [Transfer](./TAIPS/taip-3.md)                                 |
 | 4    | [Transaction Authorization](./TAIPS/taip-4.md)                         |
 | 5    | [Agents](./TAIPS/taip-5.md)                                            |
 | 6    | [Transaction Parties](./TAIPS/taip-6.md)                               |
@@ -29,7 +29,7 @@ The purpose of TAIPs is to provide the community with a means to propose enhance
 
 ## Inspiration
 
-TAIPs are heavily inspired by [TAIPs](https://github.com/ChainAgnostic/TAIPs) which in turn were heavily inspired by [bips](https://github.com/bitcoin/bips).
+TAIPs are heavily inspired by [TAIPs](https://github.com/ChainAgnostic/CAIPs) which in turn were heavily inspired by [bips](https://github.com/bitcoin/bips).
 
 
 ## License
