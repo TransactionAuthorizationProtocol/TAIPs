@@ -35,7 +35,7 @@ TAP messages should adhere to the [DIDComm-V2 specification](https://identity.fo
 The following attributes from DIDComm are used in TAP:
 
 * `id` - REQUIRED. The message id, must be unique to the sender.
-* `type` - REQUIRED. A URI that associates the `type` of message being sent in the body. A URI that associates the body of a plaintext message with a published and versioned schema. Core TAP Messages defined as part of TAIPs SHOULD be defined using an URI in the `http://tap.rsvp/taips/N`` namespace.
+* `type` - REQUIRED. A URI that associates the `type` of message being sent in the body. A URI that associates the body of a plaintext message with a published and versioned schema. Core TAP Messages defined as part of TAIPs SHOULD be defined using an URI in the `http://tap.rsvp/taips/N` namespace.
 * `from` - REQUIRED. The DID of the sender
 * `to` - REQUIRED. An array containing the DIDs of the recipients
 * `thd` - OPTIONAL. Thread identifier. Uniquely identifies the thread that the message belongs to. If not included, the id property of the message MUST be treated as the value of the thid. 
@@ -98,7 +98,7 @@ The following shows a minimal example of a valid DIDComm Plaintext Message follo
 
 ## Security Concerns
 
-DIDComm builds on established standards for message signing and encryption. The security of it depends primarily on the security of the underlying DID methods used to identify participants and key resolutiokn used.
+DIDComm builds on established standards for message signing and encryption. The security of it depends primarily on the security of the underlying DID methods used to identify participants and key resolution used.
 
 ## Privacy Considerations
 
