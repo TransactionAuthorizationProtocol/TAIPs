@@ -7,6 +7,7 @@ author: Pelle Braendgaard <pelle@notabene.id>
 created: 2024-01-12
 updated: 2024-01-12
 discussions-to: https://github.com/TransactionAuthorizationProtocol/TAIPs/pull/5
+requires (*optional): 2,5,6
 ---
 <!--You can leave these HTML comments in your merged EIP and delete the visible duplicate text guides, they will not appear and may be helpful to refer to if you edit it again. This is the suggested template for new EIPs. Note that an EIP number will be assigned by an editor. When opening a pull request to submit your EIP, please use an abbreviated title in the filename, `eip-draft_title_abbrev.md`. The title should be 44 characters or less.-->
 

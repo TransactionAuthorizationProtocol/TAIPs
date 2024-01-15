@@ -304,9 +304,11 @@ The beneficiary VASP authorizes the transaction by replying as a thread to the i
 	"from":"did:web:beneficiary.vasp",
 	"type": "https://tap.rsvp/schema/1.0#Authorize",
 	"thid":"ID of transfer request",
-	"to": ["did:web:originator.vasp"]
+	"to": ["did:web:originator.vasp"],
 	"body": {
-		"settlementAddress":"..." /*CAIP-2 account address */
+  		"@context": "https://tap.rsvp/schema/1.0",
+		"@type": "https://tap.rsvp/schema/1.0#Authorize",
+		"settlementAddress":"eip155:1:0x1234a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb" /*CAIP-2 account address */
 	}
 }
 ```
@@ -318,9 +320,11 @@ The originating VASP notifies the beneficiary VASP in the same thread that they 
 	"from":"did:web:originator.vasp",
 	"type": "https://tap.rsvp/schema/1.0#Settle",
 	"thid":"ID of transfer request",
-	"to": ["did:web:beneficiary.vasp"]
+	"to": ["did:web:beneficiary.vasp"],
 	"body": {
-		"txhash":"...." /* Blockchain transaction hash */
+  		"@context": "https://tap.rsvp/schema/1.0",
+		"@type": "https://tap.rsvp/schema/1.0#Settle",
+        "settlementId":"eip155:1:tx/0x3edb98c24d46d148eb926c714f4fbaa117c47b0c0821f38bfce9763604457c33",  /* Blockchain transaction hash */
 	}
 }
 ```
@@ -332,9 +336,11 @@ Any agent can always reject a transaction:
 	"from":"did:web:beneficiary.vasp",
 	"type": "https://tap.rsvp/schema/1.0#Reject",
 	"thid":"ID of transfer request",
-	"to": ["did:web:originator.vasp"]
+	"to": ["did:web:originator.vasp"],
 	"body": {
-		"reason":"...."
+		"@context": "https://tap.rsvp/schema/1.0",
+		"@type": "https://tap.rsvp/schema/1.0#Reject",
+		"reason":"Beneficiary name mismatch"
 	}
 }
 ```
