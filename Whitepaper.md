@@ -1,3 +1,11 @@
+---
+layout: default
+title: Transaction Authorization Protocol (TAP) White Paper
+author: Pelle Braendgaard <pelle@notabene.id>
+created: 2024-01-09
+updated: 2024-01-09
+---
+
 # **Transaction Authorization Protocol (TAP) White Paper**
 ## Decentralized protocol to allow multiple parties to identify each other and collaborate around authorizing real-world transactions
 ## Executive Summary
@@ -21,8 +29,8 @@ TAP emerges as a solution, bridging gaps in transaction authorization, trust, an
 At this pivotal moment in the crypto industry, with institutions, fintechs, and banks preparing for significant migration to blockchain technologies, TAP's flexibility and rapid adaptability to new technologies through Transaction Authorization Improvement Protocols (TAIPs) are crucial.
 ## Current State of Crypto Transactions
 Currently, crypto transactions are limited by their reliance on the unilateral authorization by key holders, lacking mechanisms for authorization by beneficiaries.
-```mermaid
 
+```mermaid
 sequenceDiagram
     Participant Originator
     Participant Originating Wallet
@@ -37,9 +45,10 @@ sequenceDiagram
     Blockchain ->> Beneficiary Wallet: Validated Transaction
     Beneficiary Wallet -->> Beneficiary: Notify      
 ```
-Once a transaction is authorized and submitted to the blockchain by the the originating wallet’s key holders, it is impossible by design to reverse the transaction, which represents a significant change over traditional payment systems that separate payment authorizations from underlying settlement.
-```mermaid
 
+Once a transaction is authorized and submitted to the blockchain by the the originating wallet’s key holders, it is impossible by design to reverse the transaction, which represents a significant change over traditional payment systems that separate payment authorizations from underlying settlement.
+
+```mermaid
 stateDiagram-v2
     direction lr
     [*] --> Request
@@ -59,16 +68,19 @@ stateDiagram-v2
     Confirmed --> [*]
 
 ```
+
 The above demonstrates the state machine behind all blockchain transactions. The only party able to authorize a transaction is the holder of the wallet. Once it has been submitted  to the public Mempool the wallet owner can still in some cases change it, but once confirmed it can not be reversed by anyone. 
+
 ### Implications for self-hosted wallet users
 One of the core tenets of the blockchain industry is to allow individuals to manage their own private wallets and keys. There are significant security challenges involved with this that hardware and smart contract based wallet providers are working on solving.
 There however additional risks involved to the owners of these self-hosted wallets. There has been considerable fraud involving self-hosted wallet owners accidentally authorizing transactions through phishing attacks sending funds to the wrong party. Proper authorization and counterparty identification for both retail and self-hosted wallet users is key to allow the echo system to grow.
 Since transactions on blockchains are themselves public, self-hosted wallet owners regularly expose what they expect to be their private transaction history whenever they share their blockchain addresses to anyone. This also exposes them to fraudulent incoming transactions that can lead to serious reputational risk for wallet holders and additional fraud use cases.
 Inadvertently transacting with high risk wallets or mixers, can permanently damage the possibility of interacting directly with a centralized service for example.
+
 ### Implications for Centralized Services
 Security for wallet key holders, as well as most interactions orchestrated between buyers and sellers on exchange market places are in most cases today handled by centralized services holding custody on behalf of ultimate parties to transactions.
-```mermaid
 
+```mermaid
 sequenceDiagram
     Participant Originator
     Participant Originating VASP
@@ -94,6 +106,7 @@ sequenceDiagram
     deactivate Beneficiary VASP
           
 ```
+
 These centralized services are exposed to significant risk of fraud and compliance risk, due to the lack of authorization flows on receiving sides. At the same time any party using one of these centralized services is exposed to significant counterparty risk and exposure to fraud, by relying on these services as well as not being able to identify the ultimate counterparties to their own transactions.
 
 ```mermaid
@@ -131,6 +144,7 @@ stateDiagram-v2
     }
     Released --> [*] 
 ```
+
 As many centralized services are also now facilitating transactions between FIAT payment services and blockchains, the risks start to grow exponentially.  The reversible authorization flow of a FIAT transaction, clashes with the non-reverseable characteristics of a blockchain transaction.
 The ultimate parties to a FIAT transaction are difficult to match to a blockchain transaction as blockchain transactions do not contain information about the ultimate originating and beneficiary parties. This can cause major fraud risk exposure to the centralized service performing the transaction and can lead to them having their access to FIAT payment service providers revoked. (TODO refer to cases where this has happened)
 ## Overview of TAP
@@ -304,9 +318,11 @@ The beneficiary VASP authorizes the transaction by replying as a thread to the i
 	"from":"did:web:beneficiary.vasp",
 	"type": "https://tap.rsvp/schema/1.0#Authorize",
 	"thid":"ID of transfer request",
-	"to": ["did:web:originator.vasp"]
+	"to": ["did:web:originator.vasp"],
 	"body": {
-		"settlementAddress":"..." /*CAIP-2 account address */
+  		"@context": "https://tap.rsvp/schema/1.0",
+		"@type": "https://tap.rsvp/schema/1.0#Authorize",
+		"settlementAddress":"eip155:1:0x1234a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb" /*CAIP-2 account address */
 	}
 }
 ```
@@ -318,9 +334,11 @@ The originating VASP notifies the beneficiary VASP in the same thread that they 
 	"from":"did:web:originator.vasp",
 	"type": "https://tap.rsvp/schema/1.0#Settle",
 	"thid":"ID of transfer request",
-	"to": ["did:web:beneficiary.vasp"]
+	"to": ["did:web:beneficiary.vasp"],
 	"body": {
-		"txhash":"...." /* Blockchain transaction hash */
+  		"@context": "https://tap.rsvp/schema/1.0",
+		"@type": "https://tap.rsvp/schema/1.0#Settle",
+        "settlementId":"eip155:1:tx/0x3edb98c24d46d148eb926c714f4fbaa117c47b0c0821f38bfce9763604457c33",  /* Blockchain transaction hash */
 	}
 }
 ```
@@ -332,9 +350,11 @@ Any agent can always reject a transaction:
 	"from":"did:web:beneficiary.vasp",
 	"type": "https://tap.rsvp/schema/1.0#Reject",
 	"thid":"ID of transfer request",
-	"to": ["did:web:originator.vasp"]
+	"to": ["did:web:originator.vasp"],
 	"body": {
-		"reason":"...."
+		"@context": "https://tap.rsvp/schema/1.0",
+		"@type": "https://tap.rsvp/schema/1.0#Reject",
+		"reason":"Beneficiary name mismatch"
 	}
 }
 ```

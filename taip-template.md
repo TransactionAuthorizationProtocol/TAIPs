@@ -13,7 +13,7 @@ requires (*optional): <TAIP number(s); if multiple, format as `[1,2]` array>
 replaces (*optional): <TAIP number(s); if multiple, format as `[1,2]` array>
 ---
 
-<!--You can leave these HTML comments in your merged EIP and delete the visible duplicate text guides, they will not appear and may be helpful to refer to if you edit it again. This is the suggested template for new EIPs. Note that an EIP number will be assigned by an editor. When opening a pull request to submit your EIP, please use an abbreviated title in the filename, `eip-draft_title_abbrev.md`. The title should be 44 characters or less.-->
+<!--You can leave these HTML comments in your merged TAIP and delete the visible duplicate text guides, they will not appear and may be helpful to refer to if you edit it again. This is the suggested template for new TAIP. Note that an TAIP number will be assigned by an editor. When opening a pull request to submit your TAIP, please use an abbreviated title in the filename, `taip-draft_title_abbrev.md`. The title should be 44 characters or less.-->
 This is the suggested template for new TAIPs.
 
 Note that an TAIP number will be assigned by an editor. When opening a pull request to submit your TAIP, please use an abbreviated title in the filename, `eip-draft_title_abbrev.md`.
