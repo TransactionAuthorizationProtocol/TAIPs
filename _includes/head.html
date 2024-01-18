@@ -4,16 +4,28 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   {%- seo -%}
   <link rel="stylesheet" href="{{ "/assets/main.css" | relative_url }}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+
   <style>
     pre code.language-mermaid svg {
         background-color: white;
     }
+    h4 {
+      font-size: 1.05em;
+    }
+    body {
+      font-family: "Open Sans", sans-serif;
+      font-size: 14px;
+      line-height: 1.5rem;
+    }
+    pre {
+      font-size: 14px;
+    }
   </style>
   {%- feed_meta -%}
-  {%- if jekyll.environment == 'production' and site.google_analytics -%}
-    {%- include google-analytics.html -%}
-  {%- endif -%}
-
+  
   <script type="module">
     import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
     mermaid.initialize({ 
@@ -23,6 +35,19 @@
         querySelector: 'pre code.language-mermaid',
     });
    console.log('initialized')
-</script>
+  </script>
+
+  {%- if jekyll.environment == 'production' -%}
+    <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-LR9HTF1W99"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-LR9HTF1W99');
+  </script>
+  {%- endif -%}
+
 
 </head>
