@@ -30,19 +30,19 @@ TAP messages MUST be encoded in [JSON](https://datatracker.ietf.org/doc/html/rfc
 
 ### Messaging Methodology
 
-TAP messages should adhere to the [DIDComm-V2 specification](https://identity.foundation/didcomm-messaging/spec/v2.0/) benefiting from it's security, privacy, decentralization and transport independence.
+TAP messages should adhere to the [DIDComm-V2 specification](https://identity.foundation/didcomm-messaging/spec/v2.1/) benefiting from it's security, privacy, decentralization and transport independence.
 
 The following attributes from DIDComm are used in TAP:
 
 * `id` - REQUIRED. The message id, must be unique to the sender.
-* `type` - REQUIRED. A URI that associates the `type` of message being sent in the body. A URI that associates the body of a plaintext message with a published and versioned schema. Core TAP Messages defined as part of TAIPs SHOULD be defined using an URI in the `http://tap.rsvp/taips/N` namespace.
+* `type` - REQUIRED. A URI that associates the `type` of message being sent in the body. A URI that associates the body of a plaintext message with a published and versioned schema. Core TAP Messages defined as part of TAIPs SHOULD be defined using an URI in the `https://tap.rsvp/taips/N` namespace.
 * `from` - REQUIRED. The DID of the sender
 * `to` - REQUIRED. An array containing the DIDs of the recipients
-* `thd` - OPTIONAL. Thread identifier. Uniquely identifies the thread that the message belongs to. If not included, the id property of the message MUST be treated as the value of the thid. 
-* `pthd` - OPTIONAL. Parent thread identifier. If the message is a child of a thread the pthid will uniquely identify which thread is the parent.
+* `thid` - OPTIONAL. Thread identifier. Uniquely identifies the thread that the message belongs to. If not included, the id property of the message MUST be treated as the value of the thid. 
+* `pthid` - OPTIONAL. Parent thread identifier. If the message is a child of a thread the pthid will uniquely identify which thread is the parent.
 * `body` - REQUIRED. The message body, which MUST contain a valid [JSON-LD](https://json-ld.org/) object.
-* `created-time` - REQUIRED. The message id, must be unique to the sender.
-* `expires-time` - OPTIONAL. The message id, must be unique to the sender.
+* `created_time` - REQUIRED. The message id, must be unique to the sender.
+* `expires_time` - OPTIONAL. The message id, must be unique to the sender.
 
 ### Message Signing
 

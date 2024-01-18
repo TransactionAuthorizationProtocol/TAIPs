@@ -16,16 +16,16 @@ The purpose of TAIPs is to provide the community with a means to propose enhance
 
 | TAIP | Description                                                            |
 |------|------------------------------------------------------------------------|
-| 1    | [Transaction Authorization Improvement Proposals](./TAIPS/taip-1.md)   |
-| 2    | [Messaging](./TAIPS/taip-2.md)                                         |
-| 3    | [Transfer](./TAIPS/taip-3.md)                                 |
-| 4    | [Transaction Authorization](./TAIPS/taip-4.md)                         |
-| 5    | [Agents](./TAIPS/taip-5.md)                                            |
-| 6    | [Transaction Parties](./TAIPS/taip-6.md)                               |
-| 7    | [Agent Policies](./TAIPS/taip-7.md)                                    |
-| 8    | [Selective Disclosure](./TAIPS/taip-8.md)                              |
-| 9    | [Proof of Control](./TAIPS/taip-9.md)                                  |
-| 10   |[FATF Travel Rule workflow](./TAIPS/taip-10.md)                         |
+| 1    | [Transaction Authorization Improvement Proposals](./TAIPs/taip-1.md)   |
+| 2    | [Messaging](./TAIPs/taip-2.md)                                         |
+| 3    | [Transfer](./TAIPs/taip-3.md)                                 |
+| 4    | [Transaction Authorization](./TAIPs/taip-4.md)                         |
+| 5    | [Agents](./TAIPs/taip-5.md)                                            |
+| 6    | [Transaction Parties](./TAIPs/taip-6.md)                               |
+| 7    | [Agent Policies](./TAIPs/taip-7.md)                                    |
+| 8    | [Selective Disclosure](./TAIPs/taip-8.md)                              |
+| 9    | [Proof of Control](./TAIPs/taip-9.md)                                  |
+| 10   |[FATF Travel Rule workflow](./TAIPs/taip-10.md)                         |
 
 ## Inspiration
 

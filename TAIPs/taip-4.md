@@ -23,7 +23,7 @@ This is Transaction Authorization Flow, provides the core functionality of the T
 <!--The motivation is critical for TAIP. It should clearly explain why the state of the art is inadequate to address the problem that the TAIP solves. TAIP submissions without sufficient motivation may be rejected outright.-->
 Crypto transactions and blockchains are designed to be trustless at their core and follow a strict and very limited set of guidelines implemented in the underlying blockchain protocol. This allows the fully permissionless aspect of most blockchains, which we see as a core drivers of innovation and growth in the field. This open and permissionless aspect does present business and indiiduals transacting on blockchains with several operational and risk based challenges, that need to be solved for crypto transactions and blockchains to fully take off. The Transaction Authorization Protocol (TAP) and TAIP-4 offers a way to solve this in a private way between parties, without requiring changes to the permissionless aspects of blockchains today.
 
-We will use the term *"Settlement layer"* to refer to the underlying blockchain protocol. It can refer to either Layer-1, Layer-2, or even DeFi protocols. We will use the term *"Authorization layer"* for the off-chain process handled by transactions participants prior or after settling the transaction on a blockchain. 
+We will use the term *"Settlement layer"* to refer to the underlying blockchain protocol. It can refer to either Layer-1, Layer-2, or even DeFi protocols. We will use the term *"Authorization layer"* for the off-chain process handled by transactions participants prior or after settling the transaction on a blockchain.
 
 ### Current State of Crypto Transactions
 
@@ -98,9 +98,9 @@ These are all sent as replies to an initial request by specifying the `id` of th
 
 Any agent can authorize the transaction by replying as a thread to the initial message. The following shows the attributes of the `body` object:
 
-* `@ctx` - REQUIRED the JSON-LD context `https://tap.rsvp/schema/1.0` (provisional)
-* `@type` - REQUIRED the JSON-LD type `https://tap.rsvp/schema/1.0#Authorize` (provisional)
-* `settlementAddress` - OPTIONAL string representing the intended destination address of the transaction specified in [CAIP-10](CAIP-10) format. If sent by a VASP representing the beneficiary this is REQUIRED unless the original request contains a `settlementAddress`. For all others it is OPTIONAL.
+- `@context` - REQUIRED the JSON-LD context `https://tap.rsvp/schema/1.0` (provisional)
+- `@type` - REQUIRED the JSON-LD type `https://tap.rsvp/schema/1.0#Authorize` (provisional)
+- `settlementAddress` - OPTIONAL string representing the intended destination address of the transaction specified in [CAIP-10](CAIP-10) format. If sent by a VASP representing the beneficiary this is REQUIRED unless the original request contains a `settlementAddress`. For all others it is OPTIONAL.
 
 By not providing a `settlementAddress` until after `Authorization`, beneficiary agents can for the first time reject incoming blockchain transactions.
 
@@ -145,9 +145,9 @@ The above flow demonstrates the power of multiple agents collaborating around au
 
 An originating agent notifies the other agents in the same thread that they are ready to settle the transfer. The following shows the attributes of the `body` object:
 
-* `@ctx` - REQUIRED the JSON-LD context `https://tap.rsvp/schema/1.0` (provisional)
-* `@type` - REQUIRED the JSON-LD type `https://tap.rsvp/schema/1.0#Settle` (provisional)
-* `settlementId` - OPTIONAL an identifier of the underlying settlement transaction on a blockchain. REQUIRED by at least one agent representing the originator. 
+- `@context` - REQUIRED the JSON-LD context `https://tap.rsvp/schema/1.0` (provisional)
+- `@type` - REQUIRED the JSON-LD type `https://tap.rsvp/schema/1.0#Settle` (provisional)
+- `settlementId` - OPTIONAL a [CAIP-220](https://github.com/ChainAgnostic/CAIPs/pull/221/files) identifier of the underlying settlement transaction on a blockchain. REQUIRED by at least one agent representing the originator.
 
 The following shows an simplified authorization flow with a succesfull outcome (transaction settled):
 
@@ -193,15 +193,13 @@ eg:
 eip155:1:tx/0x3edb98c24d46d148eb926c714f4fbaa117c47b0c0821f38bfce9763604457c33
 ```
 
-
 ### Reject
 
 Any agent can always reject a transaction. This does not mean another party will comply with it.
 
-* `@ctx` - REQUIRED the JSON-LD context `https://tap.rsvp/schema/1.0` (provisional)
-* `@type` - REQUIRED the JSON-LD type `https://tap.rsvp/schema/1.0#Reject` (provisional)
-* `reason` - OPTIONAL Human readable message describing why the transaction was rejected
-
+- `@context` - REQUIRED the JSON-LD context `https://tap.rsvp/schema/1.0` (provisional)
+- `@type` - REQUIRED the JSON-LD type `https://tap.rsvp/schema/1.0#Reject` (provisional)
+- `reason` - OPTIONAL Human readable message describing why the transaction was rejected
 
 The following shows a simple rejection of a Transfer by the Beneficiary Agent.
 
@@ -227,7 +225,6 @@ sequenceDiagram
     Originating Agent ->> Originating Agent: Reject
     
 ```
-
 
 ### Transaction State from the point of view of various agents
 
@@ -257,7 +254,6 @@ stateDiagram-v2
 
 ```
 
-
 ## Rationale
 <!--The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.-->
 A key aspect of this flow is the intentional lack of shared state. By focusing on a messages flow instead, it makes it more realistic to be used in permissionless blockchain applications. It also does provide more complexity on the implementing agent and their policies (see [TAIP-7][TAIP-7]).
@@ -270,15 +266,15 @@ The following are example plaintext messages. See [TAIP-2][TAIP-2] for how to si
 
 ```json
 {
-	"from":"did:web:beneficiary.vasp",
-	"type": "https://tap.rsvp/schema/1.0#Authorize",
-	"thid":"ID of transfer request",
-	"to": ["did:web:originator.vasp"],
-	"body": {
-  		"@context": "https://tap.rsvp/schema/1.0",
-		"@type": "https://tap.rsvp/schema/1.0#Authorize",
-		"settlementAddress":"eip155:1:0x1234a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb" /*CAIP-2 account address */
-	}
+ "from":"did:web:beneficiary.vasp",
+  "type": "https://tap.rsvp/schema/1.0#Authorize",
+  "thid":"ID of transfer request",
+  "to": ["did:web:originator.vasp"],
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#Authorize",
+    "settlementAddress":"eip155:1:0x1234a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb" /*CAIP-2 account address */
+  }
 }
 ```
 
@@ -286,15 +282,15 @@ The following are example plaintext messages. See [TAIP-2][TAIP-2] for how to si
 
 ```json
 {
-	"from":"did:web:originator.vasp",
-	"type": "https://tap.rsvp/schema/1.0#Settle",
-	"thid":"ID of transfer request",
-	"to": ["did:web:beneficiary.vasp"],
-	"body": {
-  		"@context": "https://tap.rsvp/schema/1.0",
-		"@type": "https://tap.rsvp/schema/1.0#Settle",
-        "settlementId":"eip155:1:tx/0x3edb98c24d46d148eb926c714f4fbaa117c47b0c0821f38bfce9763604457c33",  /* Blockchain transaction hash */
-	}
+ "from":"did:web:originator.vasp",
+ "type": "https://tap.rsvp/schema/1.0#Settle",
+ "thid":"ID of transfer request",
+ "to": ["did:web:beneficiary.vasp"],
+ "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#Settle",
+    "settlementId":"eip155:1:tx/0x3edb98c24d46d148eb926c714f4fbaa117c47b0c0821f38bfce9763604457c33",  /* Blockchain transaction hash */
+  }
 }
 ```
 
@@ -302,15 +298,15 @@ The following are example plaintext messages. See [TAIP-2][TAIP-2] for how to si
 
 ```json
 {
-	"from":"did:web:beneficiary.vasp",
-	"type": "https://tap.rsvp/schema/1.0#Reject",
-	"thid":"ID of transfer request",
-	"to": ["did:web:originator.vasp"],
-	"body": {
-		"@context": "https://tap.rsvp/schema/1.0",
-		"@type": "https://tap.rsvp/schema/1.0#Reject",
-		"reason":"Beneficiary name mismatch"
-	}
+ "from":"did:web:beneficiary.vasp",
+ "type": "https://tap.rsvp/schema/1.0#Reject",
+ "thid":"ID of transfer request",
+ "to": ["did:web:originator.vasp"],
+ "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#Reject",
+    "reason":"Beneficiary name mismatch"
+  }
 }
 ```
 
@@ -322,7 +318,7 @@ It is always the responsibility of each agent to verify the contents of each mes
 <!--Please add an explicit list of intra-actor assumptions and known risk factors if applicable. Any normative definition of an interface requires these to be implementable; assumptions and risks should be at both individual interaction/use-case scale and systemically, should the interface specified gain ecosystem-namespace adoption. -->
 The only potential PII that could potentially be shared and leaked through this flow are public blockchain addresses of specific customers. Agents can minimize this by no longer issuing blockchain addresses to individual customers and relying on more efficient omnibus accounts.
 
-## References 
+## References
 <!--Links to external resources that help understanding the TAIP better. This can e.g. be links to existing implementations. See CONTRIBUTING.md#style-guide . -->
 
 - [TAIP-2][TAIP-2] Defines the TAP Message structure
@@ -332,11 +328,12 @@ The only potential PII that could potentially be shared and leaked through this 
 - [CAIP-10][CAIP-10] Describes chainagnostic Account ID Specification
 - [CAIP-19][CAIP-19] Describes transaction parties
   
-[TAIP-2]: https://tap.rsvp/TAIPS/taip-2
-[TAIP-3]: https://tap.rsvp/TAIPS/taip-3
-[TAIP-5]: https://tap.rsvp/TAIPS/taip-5
-[TAIP-7]: https://tap.rsvp/TAIPS/taip-7
+[TAIP-2]: https://tap.rsvp/TAIPs/taip-2
+[TAIP-3]: https://tap.rsvp/TAIPs/taip-3
+[TAIP-5]: https://tap.rsvp/TAIPs/taip-5
+[TAIP-7]: https://tap.rsvp/TAIPs/taip-7
 [CAIP-10](https://chainagnostic.org/CAIPs/caip-10)
 
 ## Copyright
+
 Copyright and related rights waived via [CC0](../LICENSE).

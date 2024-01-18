@@ -58,7 +58,7 @@ All TAIPs that introduce backwards incompatibilities must include a section desc
 
 - [TAIP-1][TAIP-1] defines the TAIP document structure
 
-[TAIP-1]: https://tap.rsvp/TAIPS/taip-1
+[TAIP-1]: https://tap.rsvp/TAIPs/taip-1
 
 ## Copyright
 Copyright and related rights waived via [CC0](../LICENSE).

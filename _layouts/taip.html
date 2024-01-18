@@ -88,7 +88,7 @@ layout: default
   <p>{% include authorlist.html authors=page.author %}, "TAIP-{{ page.taip | xml_escape }}: {{ page.title | xml_escape
     }}{% if page.status == "Draft" or page.status == "Last Call" or page.status == "Abandoned" %} [DRAFT]{% endif %}," <em>Transaction Authorization Improvement Proposals</em>, no. {{
     page.taip | xml_escape }}, {{ page.created | date: "%B %Y" }}. [Online serial]. Available:
-    https://github.com/ChainAgnostic/TAIPs/blob/master/TAIPs/taip-{{ page.taip | xml_escape }}.md</p>
+    https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/master/TAIPs/taip-{{ page.taip | xml_escape }}.md</p>
 </div>
 {% comment %}
 Article schema specification:
