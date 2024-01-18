@@ -12,11 +12,11 @@ discussions-to: https://github.com/TransactionAuthorizationProtocol/TAIPs/pull/4
 
 ## Summary
 
-TAIP-2 defines the structure of messaging in the [Transaction Authorization Protocol (TAP)](https://tap.rsvp) that allows agents and parties identified through Decentralized Identifiers ([DIDs](https://www.w3.org/TR/did-core/)) to securely communicate about a digital asset transaction prior to settlement on a blockchain.
+TAIP-2 defines the structure of messaging in the [Transaction Authorization Protocol (TAP)](https://tap.rsvp) that allows agents and parties identified through Decentralized Identifiers ([DIDs][DID]) to securely communicate about a digital asset transaction prior to settlement on a blockchain.
 
 ## Abstract
 
-TAIP-2 sets up the basic method for agents identified by [DIDs](https://www.w3.org/TR/did-core/) to securely and privately communicate directly between each other. At it's core it uses [DIDComm Messaging](https://identity.foundation/didcomm-messaging/spec/v2.1/) and sets up som minimum requirements for DIDComm Messages used within the context of TAP.
+TAIP-2 sets up the basic method for agents identified by [DIDs][DID] to securely and privately communicate directly between each other. At it's core it uses [DIDComm Messaging][DIDComm] and sets up som minimum requirements for DIDComm Messages used within the context of TAP.
 
 ## Motivation
 
@@ -26,11 +26,11 @@ The primary method for communicating on blockchains today is through transaction
 
 ### Messaging Encoding
 
-TAP messages MUST be encoded in [JSON](https://datatracker.ietf.org/doc/html/rfc8259) format.
+TAP messages MUST be encoded in [JSON] format.
 
 ### Messaging Methodology
 
-TAP messages should adhere to the [DIDComm-V2 specification](https://identity.foundation/didcomm-messaging/spec/v2.1/) benefiting from it's security, privacy, decentralization and transport independence.
+TAP messages should adhere to the [DIDComm-V2 specification][DIDComm] benefiting from it's security, privacy, decentralization and transport independence.
 
 The following attributes from DIDComm are used in TAP:
 
@@ -40,13 +40,13 @@ The following attributes from DIDComm are used in TAP:
 * `to` - REQUIRED. An array containing the DIDs of the recipients
 * `thid` - OPTIONAL. Thread identifier. Uniquely identifies the thread that the message belongs to. If not included, the id property of the message MUST be treated as the value of the thid. 
 * `pthid` - OPTIONAL. Parent thread identifier. If the message is a child of a thread the pthid will uniquely identify which thread is the parent.
-* `body` - REQUIRED. The message body, which MUST contain a valid [JSON-LD](https://json-ld.org/) object.
+* `body` - REQUIRED. The message body, which MUST contain a valid [JSON-LD] object.
 * `created_time` - REQUIRED. The message id, must be unique to the sender.
 * `expires_time` - OPTIONAL. The message id, must be unique to the sender.
 
 ### Message Signing
 
-TAP messages MUST be signed using the [JSON Web Signature (JWS)](https://www.rfc-editor.org/rfc/rfc7515) standard, as specified in [DIDComm Signed Messages](https://identity.foundation/didcomm-messaging/spec/v2.1/#message-signing).
+TAP messages MUST be signed using the [JSON Web Signature (JWS)][JWS] standard, as specified in [DIDComm Signed Messages](https://identity.foundation/didcomm-messaging/spec/v2.1/#message-signing).
 
 #### Signing Algorithms
 
@@ -64,7 +64,7 @@ For illustrative purposes, this and other TAIPs will present [Plaintext Messages
 
 ### Message Encryption
 
-Certain types of messages can perform additional end-to-end encryption over transport level encryption. When encrypted TAP messages MUST be encrypted according to the [JSON Web Encryption (JWE)](https://www.rfc-editor.org/rfc/rfc7516.html) standard, using methods specified in [DIDComm Encrypted Messages](https://identity.foundation/didcomm-messaging/spec/v2.1/#message-encryption).
+Certain types of messages can perform additional end-to-end encryption over transport level encryption. When encrypted TAP messages MUST be encrypted according to the [JSON Web Encryption (JWE)][JWE] standard, using methods specified in [DIDComm Encrypted Messages](https://identity.foundation/didcomm-messaging/spec/v2.1/#message-encryption).
 
 See DIDComm specification for details on key resolutiokn throught the senders and recipients DID documents.
 
@@ -72,10 +72,12 @@ See DIDComm specification for details on key resolutiokn throught the senders an
 
 ## Rationale
 
-- [JSON Web Encryption (JWE)](https://www.rfc-editor.org/rfc/rfc7516.html) is a widely adopted method for representing encrypted JSON structures
-- [JSON Web Signature (JWS)](https://www.rfc-editor.org/rfc/rfc7515) is also widely adopted method for representing JSON structures secured with digital signatures
-- [DIDComm-V2.1 specification](https://identity.foundation/didcomm-messaging/spec/v2.1/) provides the semantics to enabled secure, private and decentralized messages between TAP participants.
-- [JSON-LD](https://www.w3.org/TR/json-ld) provides a well-adopted open standard for representing linked JSON structures that pairs well with the [TAP](https://tap.rspv) decentralized messaging standard.
+This TAIP is based on existing standards like JWE and JWS. It is designed to be decentralized and tightly tied to decentralized identifies for each party involved. While centralized services can actively play a part in TAP, it is never a requirement.
+
+- [JSON Web Encryption (JWE)][JWE] is a widely adopted method for representing encrypted JSON structures
+- [JSON Web Signature (JWS)][JWS] is also widely adopted method for representing JSON structures secured with digital signatures
+- [DIDComm Messaging][DIDComm] provides the semantics to enabled secure, private and decentralized messages between TAP participants.
+- [JSON-LD] provides a well-adopted open standard for representing linked JSON structures that pairs well with the [TAP](https://tap.rspv) decentralized messaging standard.
 
 ## Test Cases
 
@@ -106,6 +108,17 @@ DIDComm is designed to handle sensitive data such as PII in a decentralized cont
 
 Doing this evaluation is out of scope of TAIP-2 and must be handled by each participant in a TAIP-2 message. A future TAIP could be written to provide more detailed guidelines on this.
 
-## Backwards Compatibility
+## References
+<!--Links to external resources that help understanding the TAIP better. This can e.g. be links to existing implementations. See CONTRIBUTING.md#style-guide . -->
 
-Does this TAIP introduce any backwards incompatible changes?
+* [DID][DID] W3C Decentralized Identifiers
+* [DIDComm][DIDComm] DIDComm Messaging
+* [JSON][JSON] JavaScript Object Notation
+* [JSON-LD][JSON-LD] JSON Linked Data
+
+[DID]: https://www.w3.org/TR/did-core/
+[DIDComm]: https://identity.foundation/didcomm-messaging/spec/v2.1/
+[JSON]: https://datatracker.ietf.org/doc/html/rfc8259
+[JSON-LD]: https://www.w3.org/TR/json-ld
+[JWE]: https://www.rfc-editor.org/rfc/rfc7516.html
+[JWS]: https://www.rfc-editor.org/rfc/rfc7515

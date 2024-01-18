@@ -17,7 +17,7 @@ This provides the messaging details for a simple virtual asset transfer between 
 
 ## Abstract
 <!--A short (~200 word) description of the technical issue being addressed.-->
-This provides transaction related metadata about a virtual asset transaction, for use as part of the Authorization Flow in TAP. It is primarily intended to support the transfer of an amount of a fungible or non fungible token from an originator to a beneficiary. This TAIP only specifies the specifics of a Transfer and not the full Authorization Flow which can be found in [TAIP-4](TAIP-4).
+This provides transaction related metadata about a virtual asset transaction, for use as part of the Authorization Flow in TAP. It is primarily intended to support the transfer of an amount of a fungible or non fungible token from an originator to a beneficiary. This TAIP only specifies the specifics of a Transfer and not the full Authorization Flow which can be found in [TAIP-4].
 
 ## Motivation
 <!--The motivation is critical for TAIP. It should clearly explain why the state of the art is inadequate to address the problem that the TAIP solves. TAIP submissions without sufficient motivation may be rejected outright.-->
@@ -27,15 +27,15 @@ To support the widest amount of digital assets, it is based on existing [Chain A
 
 ## Specification
 <!--The technical specification should describe the standard in detail. The specification should be detailed enough to allow competing, interoperable implementations. -->
-Asset Transfers are implemented in the body of a [TAIP-2](TAIP-2) message.
+Asset Transfers are implemented in the body of a [TAIP-2] message.
 
 ### DIDComm type URI
 
-The preliminary URI to be used in the [TAIP-2](TAIP-2) type header should be `https://tap.rsvp/schema/taip-3#Transfer`.
+The preliminary URI to be used in the [TAIP-2] type header should be `https://tap.rsvp/schema/taip-3#Transfer`.
 
 ### Message Body
 
-As specified in [TAIP-2](./taip-2.md) the message body is [JSON-LD](https://www.w3.org/TR/json-ld). The following attributes are defined:
+As specified in [TAIP-2] the message body is [JSON-LD]. The following attributes are defined:
 
 * `@context` - REQUIRED the JSON-LD context `https://tap.rsvp/schema/1.0` (provisional)
 * `@type` - REQUIRED the JSON-LD type `https://tap.rsvp/schema/1.0#Transfer` (provisional)
@@ -213,28 +213,33 @@ It is important to understand that this represents a request to perform a transa
 
 ## Privacy Considerations
 <!--Please add an explicit list of intra-actor assumptions and known risk factors if applicable. Any normative definition of an interface requires these to be implementable; assumptions and risks should be at both individual interaction/use-case scale and systemically, should the interface specified gain ecosystem-namespace adoption. -->
-This message can contain PII about end-users. It is very important that agents understand the privacy duties they have under national law to safeguard their customers PII. It is recommended as part of a [TAIP-4][TAIP-4] authorization flow that a data privacy evaluation is made on each agent before sharing PII with them.
+This message can contain PII about end-users. It is very important that agents understand the privacy duties they have under national law to safeguard their customers PII. It is recommended as part of a [TAIP-4] authorization flow that a data privacy evaluation is made on each agent before sharing PII with them.
 
-It is recommended that end-user PII is minimized in this particular message, but can be encrypted to specific trusted parties or agents separately. See [TAIP-8][TAIP-8] for more.
+It is recommended that end-user PII is minimized in this particular message, but can be encrypted to specific trusted parties or agents separately. See [TAIP-8] for more.
 
 ## References
 <!--Links to external resources that help understanding the TAIP better. This can e.g. be links to existing implementations. See CONTRIBUTING.md#style-guide . -->
 
-* [TAIP-2][TAIP-2] Defines the TAP Message structure
-* [TAIP-5][TAIP-4] Defines the TAP Authorization Flow
-* [TAIP-5][TAIP-5] Describes transaction agents
-* [TAIP-6][TAIP-6] Describes transaction parties
+* [TAIP-2] Defines the TAP Message structure
+* [TAIP-4] Defines the TAP Authorization Flow
+* [TAIP-5] Describes transaction agents
+* [TAIP-6] Describes transaction parties
 * [TAIP-8] Selective disclosure of PII
-* [CAIP-10][CAIP-10] Describes chainagnostic Account ID Specification
-* [CAIP-19][CAIP-19] Describes transaction parties
-  
-[TAIP-2]: https://tap.rsvp/TAIPs/taip-2
-[TAIP-4]: https://tap.rsvp/TAIPs/taip-4
-[TAIP-5]: https://tap.rsvp/TAIPs/taip-5
-[TAIP-6]: https://tap.rsvp/TAIPs/taip-6
-[ChainAgnostic](https://chainagnostic.org)
-[CAIP-10](https://chainagnostic.org/CAIPs/caip-10)
-[CAIP-19](https://chainagnostic.org/CAIPs/caip-19)
+* [CAIP-10] Describes chainagnostic Account ID Specification
+* [CAIP-19] Describes transaction parties
+* [JSON] JavaScript Object Notation
+* [JSON-LD] JSON Linked Data
+
+[TAIP-2]: ./taip-2
+[TAIP-4]: ./taip-4
+[TAIP-5]: ./taip-5
+[TAIP-6]: ./taip-6
+[TAIP-8]: ./taip-8
+[ChainAgnostic]: https://chainagnostic.org
+[CAIP-10]: https://chainagnostic.org/CAIPs/caip-10
+[CAIP-19]: https://chainagnostic.org/CAIPs/caip-19
+[JSON]: https://datatracker.ietf.org/doc/html/rfc8259
+[JSON-LD]: https://www.w3.org/TR/json-ld  
 
 ## Copyright
 

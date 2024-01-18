@@ -7,24 +7,17 @@ author: Pelle Braendgaard <pelle@notabene.id>
 created: 2024-01-09
 updated: 2024-01-09
 ---
-# TAP and TAIP Purpose and Guidelines
+## Transaction Authorization Protocol (TAP) Rationale
 
-| TAIP | Authors                                                                                                                                | Status | Created       | Updated       |
-| ---- | -------------------------------------------------------------------------------------------------------------------------------------- | ------ | ------------- | ------------- |
-| 1    | [Pelle Braendgaard](mailto:pelle@notabene.id) | Draft  | 9th of January 2024 | 9th of January 2024 |
-
-## Details
+Currently there is not a good abstract and chain agnostic method for multiple parties to reason about and collaborate around blockchain transactions. As an example, in a typical blockchain transaction the only party able to authorize a transaction is the holder of a blockchain account. Smart contract based applications can implement authorization functionality within their code, but they do not work universally across different kinds of blockchains.
+As more and more businesses and individuals work to utilize blockchains for real world applications, it becomes increasingly important to be able to manage this. See the [TAP Whitepaper] for more.
 
 ## What is an TAIP?
 
-TAIP stands for Transaction Authorization Improvement Proposal and is designed as a basic building block for specifying and implementing the Transaction Authorization Protocol. A TAIP is a design document providing information to the community or describing a standard to be used for transaction authorization between multiple off-chain parties across multiple chains. 
+TAIP stands for Transaction Authorization Improvement Proposal and is designed as a basic building block for specifying and implementing the Transaction Authorization Protocol. A TAIP is a design document providing information to the community or describing a standard to be used for transaction authorization between multiple off-chain parties across multiple chains.
 
 The TAIP should provide a concise technical specification of the feature and a rationale for it. The TAIP author is responsible for building consensus within the community and documenting dissenting opinions.
 
-## Transaction Authorization Protocol (TAP) Rationale
-
-Currently there is not a good abstract and chain agnostic method for multiple parties to reason about and collaborate around blockchain transactions. As an example, in a typical blockchain transaction the only party able to authorize a transaction is the holder of a blockchain account. Smart contract based applications can implement authorization functionality within their code, but they do not work universally across different kinds of blockchains. 
-As more and more businesses and individuals work to utilize blockchains for real world applications, it becomes increasingly important to be able to manage this. See the [TAP Whitepaper](../Whitepaper.md) for more.
 
 ## TAIP Rationale
 
@@ -39,7 +32,7 @@ Image files should be included in a subdirectory of the `assets` folder for that
 
 ## TAIP Header Preamble
 
-Each TAIP must begin with an [RFC 822](https://www.ietf.org/rfc/rfc822.txt) style header preamble, preceded and followed by three hyphens (`---`). This header is also termed ["front matter" by Jekyll](https://jekyllrb.com/docs/front-matter/). The headers must appear in the following order. Headers marked with "*" are optional and are described below. All other headers are required.
+Each TAIP must begin with an [RFC 822] style header preamble, preceded and followed by three hyphens (`---`). This header is also termed ["front matter" by Jekyll]. The headers must appear in the following order. Headers marked with "*" are optional and are described below. All other headers are required.
 
 ` taip:` <TAIP number> (this is determined by the TAIP editor)
 
@@ -151,13 +144,17 @@ The editors don't pass judgment on TAIPs. We merely do the administrative & edit
 
 ## History
 
-This document was derived heavily from [TAIP-1](https://chainagnostic.org/TAIPs/taip-1) written by Ligi, which was derived by [Bitcoin's BIP-0001] written by Amir Taaki, which in turn was derived from [Python's PEP-0001]. In many places text was simply copied and modified. Although the PEP-0001 text was written by Barry Warsaw, Jeremy Hylton, and David Goodger, they are not responsible for its use in Transaction Authorization Improvement Proposals, and should not be bothered with technical questions specific to TAIPs. Please direct all comments to the TAIP editors. 
+This document was derived heavily from [CAIP-1] written by Ligi, which was derived by [Bitcoin's BIP-0001] written by Amir Taaki, which in turn was derived from [Python's PEP-0001]. In many places text was simply copied and modified. Although the PEP-0001 text was written by Barry Warsaw, Jeremy Hylton, and David Goodger, they are not responsible for its use in Transaction Authorization Improvement Proposals, and should not be bothered with technical questions specific to TAIPs. Please direct all comments to the TAIP editors. 
 
-### Bibliography
+### References
 
+[TAP Whitepaper]: ../Whitepaper
+[CAIP-1]: https://chainagnostic.org/TAIPs/taip-1
 [markdown]: https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet
 [Bitcoin's BIP-0001]: https://github.com/bitcoin/bips
 [Python's PEP-0001]: https://www.python.org/dev/peps/
+[RFC 822]: https://www.ietf.org/rfc/rfc822.txt
+["front matter" by Jekyll]: https://jekyllrb.com/docs/front-matter/
 
 ## Copyright
 

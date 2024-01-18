@@ -321,18 +321,19 @@ The only potential PII that could potentially be shared and leaked through this 
 ## References
 <!--Links to external resources that help understanding the TAIP better. This can e.g. be links to existing implementations. See CONTRIBUTING.md#style-guide . -->
 
-- [TAIP-2][TAIP-2] Defines the TAP Message structure
-- [TAIP-5][TAIP-4] Defines the TAP Authorization Flow
-- [TAIP-5][TAIP-5] Transaction agents
-- [TAIP-7][TAIP-7] Policies
-- [CAIP-10][CAIP-10] Describes chainagnostic Account ID Specification
-- [CAIP-19][CAIP-19] Describes transaction parties
+- [TAIP-2] Defines the TAP Message structure
+- [TAIP-4] Defines the TAP Authorization Flow
+- [TAIP-5] Transaction agents
+- [TAIP-7] Policies
+- [CAIP-10] Describes chainagnostic Account ID Specification
+- [CAIP-19] Describes transaction parties
   
 [TAIP-2]: https://tap.rsvp/TAIPs/taip-2
-[TAIP-3]: https://tap.rsvp/TAIPs/taip-3
+[TAIP-4]: https://tap.rsvp/TAIPs/taip-4
 [TAIP-5]: https://tap.rsvp/TAIPs/taip-5
 [TAIP-7]: https://tap.rsvp/TAIPs/taip-7
-[CAIP-10](https://chainagnostic.org/CAIPs/caip-10)
+[CAIP-10]: <https://chainagnostic.org/CAIPs/caip-10>
+[CAIP-19]: <https://chainagnostic.org/CAIPs/caip-19>
 
 ## Copyright
 

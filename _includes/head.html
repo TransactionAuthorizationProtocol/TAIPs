@@ -20,7 +20,7 @@
       font-size: 14px;
       line-height: 1.5rem;
     }
-    pre {
+    pre code {
       font-size: 14px;
     }
   </style>
@@ -34,7 +34,6 @@
     await mermaid.run({
         querySelector: 'pre code.language-mermaid',
     });
-   console.log('initialized')
   </script>
 
   {%- if jekyll.environment == 'production' -%}
