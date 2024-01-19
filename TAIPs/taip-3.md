@@ -43,7 +43,6 @@ As specified in [TAIP-2] the message body is [JSON-LD]. The following attributes
 * `amountSubunits` - OPTIONAL for NFTs and REQUIRED for fungible tokens. Specified as a string with the full amount in integer in the smallest subunit of a token
 * `originator` - OPTIONAL an object representing the originating (aka the sender) party (see [TAIP-6](TAIP-6))
 * `beneficiary` - OPTIONAL an object representing the beneficiary (aka the recipient) party (see [TAIP-6](TAIP-6))
-* `settlementAddress` - OPTIONAL a string representing the intended destination address of the transaction specified in [CAIP-10](CAIP-10) format. It MUST also be added with a `did:pkh:` prepended as an agent in the `agents` array.
 * `settlementId` - OPTIONAL a [CAIP-220](https://github.com/ChainAgnostic/CAIPs/pull/221/files) identifier of the underlying settlement transaction on a blockchain. For more details see below.
 * `agents` - REQUIRED an array of identity objects representing the agents who help execute the transaction. See [TAIP-5](TAIP-5) for more.
 
@@ -91,10 +90,9 @@ The following is a minimal request for a transfer of 1.23 ETH from a trading fir
  "id": "...",
  "to": ["did:pkh:eip155:1:0x1234a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb"],
  "body": {
-   "@context": "https://tap.rsvp/schema/1.0",
-   "@type": "https://tap.rsvp/schema/1.0#Transfer",
-   "asset": "eip155:1/slip44:60",
-    "settlementAddress":"eip155:1:0x1234a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb",
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#Transfer",
+    "asset": "eip155:1/slip44:60",
     "originator":{
       "@id":"did:web:originator.sample"
     },
@@ -123,7 +121,6 @@ The following is a request for a transfer of 1.23 ETH from a crypto exchange fro
     "@context": "https://tap.rsvp/schema/1.0",
     "@type": "https://tap.rsvp/schema/1.0#Transfer",
     "asset": "eip155:1/slip44:60",
-    "settlementAddress":"eip155:1:0x1234a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb",
     "originator":{
       "@id":"did:eg:bob"
     },
@@ -190,7 +187,6 @@ The following is an example of a fairly complete transaction that has already be
     },
     "asset": "eip155:1/slip44:60",
     "amountSubunits": "1230000000000000000",
-    "settlementAddress":"eip155:1:0x1234a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb",
     "settlementId":"eip155:1:tx/0x3edb98c24d46d148eb926c714f4fbaa117c47b0c0821f38bfce9763604457c33",
     "agents":[
       {
