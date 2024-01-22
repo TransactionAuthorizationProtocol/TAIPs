@@ -1,6 +1,6 @@
 ---
 taip: 4
-title: Transaction Authorization Flow
+title: Transaction Authorization Protocol
 author: Pelle Braendgaard <pelle@notabene.id>, Andrés Junge <andres@notabene.id>, Richard Crosby <richard@notabene.id>
 status: Draft
 type: Standard
@@ -17,7 +17,7 @@ This proposes a simple generic transaction authorization flow, allowing agents a
 
 ## Abstract
 <!--A short (~200 word) description of the technical issue being addressed.-->
-This is Transaction Authorization Flow, provides the core functionality of the Transaction Authorization Protocol (TAP) and is implemented using a small set of [TAIP-2 Messages][TAIP-2] between [TAIP-5 Agents][TAIP-5]. It is designed to authorize any transaction initiated through [TAIP-2] such as the [TAIP-3 Asset Transfer][TAIP-3].
+This is the Transaction Authorization Protocol, which allows [Transaction Agents][TAIP-5] acting on behalf of [Transaction Parties][TAIP-6] to Authorize a transaction such as an [Virtual Asset Transfer][TAIP-3]. It is implemented using a small set of [Messages][TAIP-2] between Agents. 
 
 ## Motivation
 <!--The motivation is critical for TAIP. It should clearly explain why the state of the art is inadequate to address the problem that the TAIP solves. TAIP submissions without sufficient motivation may be rejected outright.-->
@@ -323,14 +323,16 @@ The only potential PII that could potentially be shared and leaked through this 
 
 - [TAIP-2] Defines the TAP Message structure
 - [TAIP-3] Asset Transfer Message
-- [TAIP-5] Transaction agents
+- [TAIP-5] Transaction Agents
+- [TAIP-6] Transaction Parties
 - [TAIP-7] Policies
 - [CAIP-10] Describes chainagnostic Account ID Specification
-- [CAIP-19] Describes transaction parties
+- [CAIP-19] Describes chainagnostic Asset ID specification
   
 [TAIP-2]: ./taip-2
 [TAIP-3]: ./taip-3
 [TAIP-5]: ./taip-5
+[TAIP-6]: ./taip-6
 [TAIP-7]: ./taip-7
 [CAIP-10]: <https://chainagnostic.org/CAIPs/caip-10>
 [CAIP-19]: <https://chainagnostic.org/CAIPs/caip-19>
