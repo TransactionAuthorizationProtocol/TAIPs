@@ -927,9 +927,9 @@ The concept of TAIPs allows the community to propose enhancements and specific a
 |------|------------------------------------------------------------------------|
 | 1    | [Transaction Authorization Improvement Proposals](./TAIPs/taip-1.md)   |
 | 2    | [Messaging](./TAIPs/taip-2.md)                                         |
-| 3    | [Transfer](./TAIPs/taip-3.md)                                    |
-| 4    | [Transaction Authorization](./TAIPs/taip-4.md)                         |
-| 5    | [Agents](./TAIPs/taip-5.md)                                            |
+| 3    | [Virtual Asset Transfer](./TAIPs/taip-3.md)                            |
+| 4    | [Transaction Authorization Protocol](./TAIPs/taip-4.md)                |
+| 5    | [Transaction Agents](./TAIPs/taip-5.md)                                |
 | 6    | [Transaction Parties](./TAIPs/taip-6.md)                               |
 | 7    | [Agent Policies](./TAIPs/taip-7.md)                                    |
 | 8    | [Selective Disclosure](./TAIPs/taip-8.md)                              |

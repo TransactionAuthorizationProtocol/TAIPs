@@ -217,12 +217,12 @@ It is recommended that end-user PII is minimized in this particular message, but
 <!--Links to external resources that help understanding the TAIP better. This can e.g. be links to existing implementations. See CONTRIBUTING.md#style-guide . -->
 
 * [TAIP-2] Defines the TAP Message structure
-* [TAIP-4] Defines the TAP Authorization Flow
-* [TAIP-5] Describes transaction agents
-* [TAIP-6] Describes transaction parties
+* [TAIP-4] Defines the Transaction Authorization Protocol
+* [TAIP-5] Describes Transaction Agents
+* [TAIP-6] Describes Transaction Parties
 * [TAIP-8] Selective disclosure of PII
 * [CAIP-10] Describes chainagnostic Account ID Specification
-* [CAIP-19] Describes transaction parties
+* [CAIP-19] Describes Chainagnostic Asset ID Specification
 * [JSON] JavaScript Object Notation
 * [JSON-LD] JSON Linked Data
 
