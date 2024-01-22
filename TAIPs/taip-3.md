@@ -70,6 +70,17 @@ eg:
 eip155:1:tx/0x3edb98c24d46d148eb926c714f4fbaa117c47b0c0821f38bfce9763604457c33
 ```
 
+### Agent Roles
+
+[Agents][TAIP-5] can have specific roles that are vital to the execution of a transaction.
+
+The following two special roles can be used as attributes on Agents listed in the `agents` array:
+
+* `SettlementAddress` The blockchain wallet agent to settle a transaction to
+* `SourceAddress` The blockchain wallet agent used to send the transaction from
+
+Neither of these are required, but can be used to specify the blockchain wallets up front.
+
 ## Rationale
 <!--The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.-->
 This particular Message type is designed to be as general and chainagnostic as possible and be compatible with as little meta-data as possible together with any required meta-data useful for improving usability, safety, and record keeping for a transaction.
@@ -102,7 +113,8 @@ The following is a minimal request for a transfer of 1.23 ETH from a trading fir
         "@id":"did:web:originator.sample"
       },
       {
-        "@id":"did:pkh:eip155:1:0x1234a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb"
+        "@id":"did:pkh:eip155:1:0x1234a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb",
+        "role":"settlementAddress"
       }
     ]
   }
@@ -130,7 +142,8 @@ The following is a request for a transfer of 1.23 ETH from a crypto exchange fro
         "@id":"did:web:originator.vasp"
       },
       {
-        "@id":"did:pkh:eip155:1:0x1234a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb"
+        "@id":"did:pkh:eip155:1:0x1234a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb",
+        "role":"settlementAddress"
       }
     ]
   }
@@ -196,7 +209,8 @@ The following is an example of a fairly complete transaction that has already be
         "@id":"did:beneficiary.vasp",
       },
       {
-        "@id":"did:pkh:eip155:1:0x1234a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb"
+        "@id":"did:pkh:eip155:1:0x1234a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb",
+        "role":"settlementAddress"
       }
     ]
   }
