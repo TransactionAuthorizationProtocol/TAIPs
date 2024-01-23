@@ -62,7 +62,7 @@ The following example shows it's use in a [TAIP-3] message:
       {
         "@id":"did:pkh:eip155:1:0x1234a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb",
         "role":"SettlementAddress",
-        "controller":"did:web:originator.sample"
+        "for":"did:web:originator.sample"
       }
     ]
   }
@@ -73,8 +73,8 @@ The following are the attributes of an object in the `agents` array:
 
 - `@id` - REQUIRED the [DID] of the Agent
 - `role` - OPTIONAL a string or an array of strings as specified for the particular kind of transaction. Eg. `SettlementAddress` for [TAIP-3]
-- `controller` - OPTIONAL a [DID] of another Agent or Party that technically controls the agent in the context of this transaction
-- `policy` - OPTIONAL an array of [TAIP-7 Policies][TAIP-7]
+- `for` - OPTIONAL a [DID] of another Agent or Party that this agent acts on behalf of in this transaction.
+- `policies` - OPTIONAL an array of [TAIP-7 Policies][TAIP-7]
 
 Future TAIPs are encouraged to extend the agent model with additional functionality.
 
@@ -124,9 +124,55 @@ Different agents can have specific roles specific to a particular transaction ty
 }
 ```
 
-### Control Graphs
+### Transaction Graphs
 
-An important aspect of managing risk in a transaction is to identify the various participants to a transaction. In many cases the participants are not active parties, to a transaction like a wallet. Identifying who controls which participant helps you manage the risk better.An agent or party can be controlled by another party or another agent in a transaction. This follows the same semantics of [Controllers in the DID Spec](https://www.w3.org/TR/did-core/#identifiers).
+An important aspect of managing risk in a transaction is to identify the various participants to a transaction. Agents typically act on behalf of another identity. So 
+
+A transactions's participants can be presented as the following graph of control, showing various missing key pieces of information the Originating VASP's risk department need to discover, in particular who is the beneficiary and who controls the Settlement Address:
+
+```mermaid
+graph TD
+    Transfer(Asset Transfer) --->|originator| Customer[did:eg:bob]
+    Transfer -->|beneficiary| Beneficiary[/???/]
+    Transfer -->|SourceAddress| CustodialWallet
+    OriginatingVASP[Originating VASP] -->|for| Customer
+    CustodialWallet -->|for| OriginatingVASP
+    Transfer -->|SettlementAddress| Wallet[Beneficiary Wallet]
+    Wallet -->|for| Unknown[/???/]
+
+```
+
+After discovering more about the Asset Transfer we find out it is a transaction to a third-party beneficiary at another exchange, which uses a wallet api service the graph looks like this and we are able to manage risk much better:
+
+```mermaid
+graph TD
+    Transfer(Asset Transfer) --->|originator| Customer[did:eg:bob]
+    Transfer -->|beneficiary| Beneficiary
+    Transfer -->|SourceAddress| CustodialWallet
+    OriginatingVASP[Originating VASP] -->|for| Customer
+    CustodialWallet -->|for| OriginatingVASP
+    Transfer -->|SettlementAddress| Wallet[Beneficiary Wallet]
+    Wallet -->|for| WalletAPI[MPC Wallet API]
+    WalletAPI -->|for| BeneficiaryVASP
+    BeneficiaryVASP[Beneficiary VASP] -->|for| Beneficiary
+
+```
+
+If we instead discovered that the transaction was a withdrawal to our customers own self-hosted wallet the control graph looks like this:
+
+```mermaid
+graph TD
+    Transfer(Asset Transfer) --->|originator| Customer[did:eg:bob]
+    Transfer -->|beneficiary| Customer
+    Transfer -->|SettlementAddress| Wallet[Self-hosted Wallet]
+    Transfer -->|SourceAddress| CustodialWallet
+    OriginatingVASP[Originating VASP] -->|for| Customer
+    CustodialWallet -->|for| OriginatingVASP
+    Wallet -->|for| Customer
+```
+
+One of the primary jobs of [TAP][TAIP-4] is to discover and identify the various controllers behind the parties and agents involved in a transaction to be able to manage risk regarding them and ensure that the correct beneficiary receives a transaction.
+
 
 ### Policies
 
@@ -248,7 +294,6 @@ See the following [TAIP-3] message outlining a typical Asset Transfer where a cu
     "@type": "https://tap.rsvp/schema/1.0#Transfer",
     "originator":{
       "@id":"did:eg:bob",
-      "controller":"did:web:originator.vasp"
     },
     "asset": "eip155:1/slip44:60",
     "amountSubunits": "1230000000000000000",
@@ -256,6 +301,7 @@ See the following [TAIP-3] message outlining a typical Asset Transfer where a cu
     "agents":[
       {
         "@id":"did:web:originator.vasp",
+        "for":"did:eg:bob"
       },
       {
         "@id":"did:pkh:eip155:1:0x1234a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb",
@@ -264,20 +310,6 @@ See the following [TAIP-3] message outlining a typical Asset Transfer where a cu
     ]
   }
 }
-```
-
-The above transactions's participants can be presented as the following graph of control, showing various missing key pieces of information the Originating VASP's risk department need to discover, in particular who is the beneficiary and who controls the Settlement Address:
-
-```mermaid
-graph TD
-    Transfer(Asset Transfer) --->|originator| Customer[did:eg:bob]
-    Transfer -->|beneficiary| Beneficiary[/???/]
-    Transfer -->|SourceAddress| CustodialWallet
-    Customer -->|controller| OriginatingVASP[Originating VASP]
-    CustodialWallet -->|controller| OriginatingVASP
-    Transfer -->|SettlementAddress| Wallet[Beneficiary Wallet]
-    Wallet -->|controller| Unknown[/???/]
-
 ```
 
 #### Complete example showing VASP to VASP third party Asset Transfer
@@ -295,11 +327,9 @@ After completing the discovery aspects  of TAP the Asset Transfer could look lik
     "@type": "https://tap.rsvp/schema/1.0#Transfer",
     "originator":{
       "@id":"did:eg:bob",
-      "controller":"did:eg:bob"
     },
     "beneficiary":{
-      "@id":"did:eg:alice",
-      "controller":"did:web:beneficiary.vasp"
+      "@id":"did:eg:alice"
     },
     "asset": "eip155:1/slip44:60",
     "amountSubunits": "1230000000000000000",
@@ -307,38 +337,29 @@ After completing the discovery aspects  of TAP the Asset Transfer could look lik
     "agents":[
       {
         "@id":"did:pkh:eip155:1:0xabcda96D359eC26a11e2C2b3d8f8B8942d5Bfcdb",
-        "controller":"did:web:originator.vasp",
+        "for":"did:web:originator.vasp",
         "role":"SourceAddress"
       },
       {
         "@id":"did:web:originator.vasp",
+        "for":"did:eg:bob",
       },
       {
         "@id":"did:web:beneficiary.vasp",
+        "for":"did:eg:alice"
+      },
+      {
+        "@id":"did:web:walletapi.sample",
+        "for":"did:web:beneficiary.vasp"
       },
       {
         "@id":"did:pkh:eip155:1:0x1234a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb",
-        "controller":"did:web:beneficiary.vasp",
+        "for":"did:web:walletapi.sample",
         "role":"SettlementAddress"
       }
     ]
   }
 }
-```
-
-The above transactions's participants can be presented as the following graph of control:
-
-```mermaid
-graph TD
-    Transfer(Asset Transfer) --->|originator| Customer[did:eg:bob]
-    Transfer -->|beneficiary| Beneficiary
-    Transfer -->|SettlementAddress| Wallet[Beneficiary Wallet]
-    Transfer -->|SourceAddress| CustodialWallet
-    Customer -->|controller| OriginatingVASP[Originating VASP]
-    Wallet -->|controller| BeneficiaryVASP
-    CustodialWallet -->|controller| OriginatingVASP
-    Beneficiary -->|controller| BeneficiaryVASP[Beneficiary VASP]
-
 ```
 
 #### Complete example showing VASP to first party self-hosted wallet Asset Transfer
@@ -356,7 +377,6 @@ After completing the discovery aspects of TAP we discover the Asset Transfer goe
     "@type": "https://tap.rsvp/schema/1.0#Transfer",
     "originator":{
       "@id":"did:eg:bob",
-      "controller":"did:eg:bob"
     },
     "beneficiary":{
       "@id":"did:eg:bob",
@@ -367,15 +387,16 @@ After completing the discovery aspects of TAP we discover the Asset Transfer goe
     "agents":[
       {
         "@id":"did:pkh:eip155:1:0xabcda96D359eC26a11e2C2b3d8f8B8942d5Bfcdb",
-        "controller":"did:web:originator.vasp",
+        "for":"did:web:originator.vasp",
         "role":"SourceAddress"
       },
       {
         "@id":"did:web:originator.vasp",
+        "for":"did:eg:bob"
       },
       {
         "@id":"did:pkh:eip155:1:0x1234a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb",
-        "controller":"did:eg:bob",
+        "for":"did:eg:bob",
         "role":"SettlementAddress"
       }
     ]
@@ -383,20 +404,6 @@ After completing the discovery aspects of TAP we discover the Asset Transfer goe
 }
 ```
 
-The above transactions's participants can be presented as the following graph of control:
-
-```mermaid
-graph TD
-    Transfer(Asset Transfer) --->|originator| Customer[did:eg:bob]
-    Transfer -->|beneficiary| Customer
-    Transfer -->|SettlementAddress| Wallet
-    Transfer -->|SourceAddress| CustodialWallet
-    Customer -->|controller| OriginatingVASP[Originating VASP]
-    Wallet -->|controller| Customer
-    CustodialWallet -->|controller| OriginatingVASP
-```
-
-One of the primary jobs of [TAP][TAIP-4] is to discover and identify the various controllers behind the parties and agents involved in a transaction to be able to manage risk regarding them and ensure that the correct beneficiary receives a transaction.
 
 ### Agent Meta Data Messages
 
@@ -416,10 +423,11 @@ The following are example plaintext messages. See [TAIP-2] for how to sign the m
     "agents":[
       {
         "@id":"did:web:originator.vasp",
+        "for":"did:eg:bob"
       },
       {
         "@id":"did:pkh:eip155:1:0x1234a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb",
-        "controller":"did:eg:bob",
+        "for":"did:eg:bob",
         "role":"SettlementAddress"
       }
     ]
@@ -441,7 +449,7 @@ The following are example plaintext messages. See [TAIP-2] for how to sign the m
     "original":"did:web:originator.vasp",
     "replacement": {
       "@id":"did:pkh:eip155:1:0x1234a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb",
-      "controller":"did:eg:bob",
+      "for":"did:eg:bob",
       "role":"SettlementAddress"
     }
   }
