@@ -7,7 +7,7 @@ type: Standard
 created: 2024-01-23
 updated: 2024-01-23
 discussions-to: https://github.com/TransactionAuthorizationProtocol/TAIPs/pull/8
-requires: 2, 4
+requires: 2, 4, 5, 6
 ---
 
 <!--You can leave these HTML comments in your merged EIP and delete the visible duplicate text guides, they will not appear and may be helpful to refer to if you edit it again. This is the suggested template for new EIPs. Note that an EIP number will be assigned by an editor. When opening a pull request to submit your EIP, please use an abbreviated title in the filename, `eip-draft_title_abbrev.md`. The title should be 44 characters or less.-->
