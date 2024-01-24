@@ -65,7 +65,7 @@ Since a policy is defined by it's [JSON-LD] Type it can contain additional requi
 - `fromRole` - OPTIONAL a string or an array of strings of `role` as specified for the particular kind of transaction. Eg. `SettlementAddress` for [TAIP-3]
 - `fromAgent` - OPTIONAL from an Agent representing a party in the transaction. Eg. `originator` or `beneficiary` in [TAIP-3]
 
-### `RequireAuthorization`
+#### `RequireAuthorization`
 
 An agent requires an `authorize` action before they will settle a transaction. If no additional parameters are provided, it requires each agent to `authorize` a transaction. They can use `from`, `fromRole`, or `fromAgent` as defined above to limit this requirement.
 
@@ -74,7 +74,6 @@ An agent requires an `authorize` action before they will settle a transaction. I
 - `fromRole` - OPTIONAL a string or an array of strings of `role` as specified for the particular kind of transaction. Eg. `SettlementAddress` for [TAIP-3]
 - `fromAgent` - OPTIONAL from an Agent representing a party in the transaction. Eg. `originator` or `beneficiary` in [TAIP-3]
 
-
 ```json
 {
   "@type":"RequireAuthorization",
@@ -82,7 +81,7 @@ An agent requires an `authorize` action before they will settle a transaction. I
 }
 ```
 
-### `RequirePresentation`
+#### `RequirePresentation`
 
 This is a generic way of requesting a selected [Verifiable Presentation][VP] from another agent in the transaction of a particular identity information regarding a party or agent.
 
@@ -93,6 +92,7 @@ This is a generic way of requesting a selected [Verifiable Presentation][VP] fro
 - `aboutAgent` - OPTIONAL Requesting presentation about a specific Agent representing a party in the transaction. Eg. `originator` or `beneficiary` in [TAIP-3]
 - `credentials` - REQUIRED [JSON-LD] Object containing requested credentials for each accepted `@type` of party
 
+The `credentials` object has key's for each acceptable [JSON-LD] Type together with an array of required attributes as strings.
 
 ```json
 {
@@ -102,44 +102,30 @@ This is a generic way of requesting a selected [Verifiable Presentation][VP] fro
   "aboutParty":"originator",
   "credentials": {
     "Person": ["firstName","lastName","nationalId"],
-    "Entity": ["LEI"]
+    "Entity": ["leiCode"]
   }
 }
 ```
 
-
 See [TAIP-8] for more details about how the requested presentation is presented.
 
+#### `RequireProofOfControl`
 
-### `RequireProofOfControl`
-
-An agent likely on the originator side could require that prior to settling funds to a customer or providing originator PII, that an beneficiary performs an address ownership proof, and what standard to use. For illustrative purposes this could be presented using a message `proof-of-control`.
+An Agent can request any other Agent signs a message proving they control a given agent. In most cases this would be useful to verify that a `SettlementAddress` is controlled by the Beneficiary or an Agent on behalf of the Beneficiary. This ensures that funds are sent to the correct address for the beneficiary to avoid loss of funds. It can also be used for an Agent to verify their relationship to a transaction, before receiving sensitive PII from another agent.
 
 - `@type` - REQUIRED `RequireProofOfControl`
 - `from` - OPTIONAL a string or an array of [DID]s representing parties or agent in a transaction
 - `fromRole` - OPTIONAL a string or an array of strings of `role` as specified for the particular kind of transaction. Eg. `SettlementAddress` for [TAIP-3]
 - `fromAgent` - OPTIONAL from an Agent representing a party in the transaction. Eg. `originator` or `beneficiary` in [TAIP-3]
+- `nonce` - REQUIRED Randomized token to prevent signature replay attacks.
 
+See [TAIP-9] for more details on how the proof is performed and shared.
 
-See [TAIP-9] for more details.
+### `UpdatePolicy` message
 
-### Agent Policy Object
+In parallel with the [Authorization Flow][TAIP-4] agents can send [TAIP-2] messages to other agents to update their policy. This allows them to dynamically update requirements based on changing risk in real-time.
 
-In parallel with the [Authorization Flow][TAIP-4] agents can send [TAIP-2] messages to other participants to provide or prove additional details about themselves or other participants. This allows agents to collaborate together to fulfill each others policies, so the can succesfully authorize a transaction.
-
-Please note that like any [TAIP-2] messages, these are just messages sent by an agent. For security purposes a receiving Agent MUST determine if they can trust the sender for the information provided.
-
-Any Agent can send one of the following messages:
-
-- `AddAgents` - Adds one or more additional agents to the transaction
-- `ReplaceAgent` - Replace an agent with another agent
-- `RemoveAgent` - Removes an agent from transaction
-
-#### UpdatePolicy
-
-In parallel with the [Authorization Flow][TAIP-4] agents can send [TAIP-2] messages to other participants to provide or prove additional details about their policy. This allows them to dynamically update requirements based on changing risk in real-time.
-
-Please note that like any [TAIP-2] messages, these are just messages sent by an agent. For security purposes a receiving Agent MUST determine if they can trust the sender for the information provided.
+Please note that like any [TAIP-2] messages, these are just messages sent by an agent. For security purposes a receiving Agent MUST determine if they can trust the sender for the information provided. Agents MUST only send `UpdatePolicy` on their own behalf. Other agents in a transaction MUST ignore `UpdatePolicy` messages from agents not know to be part of a transaction.
 
 Any agent can add additional agents to a transaction by replying as a thread to the initial message. The following shows the attributes of the `body` object:
 
@@ -147,12 +133,9 @@ Any agent can add additional agents to a transaction by replying as a thread to 
 - `@type` - REQUIRED the JSON-LD type `https://tap.rsvp/schema/1.0#UpdatePolicy` (provisional)
 - `policies` - REQUIRED an array of Policies to replace the current set of policies
 
-If an existing transaction agent is included in the list of `agents` an Agent SHOULD update their internal record for this agent with any additional data provided in this message.
-
-Any new agents added should be included in the `to` recipient list of the message.
-
 ## Rationale
 
+Having centrally managed policies as found in most centralized payment systems, is not a good option for the decentralized aspect of crypto currency settlement. Allowing each Agent to declare their own policies and enforce them collaboratively is important for continued innovation in the space.
 
 ## Test Cases
 
@@ -160,158 +143,103 @@ Provide here any test cases that will help implementers of the TAIP to validate 
 
 ### Specific Policies
 
-### TAIP-3 Asset Transfers
+#### `RequireAuthorization` Examples
 
-#### Missing Nodes
-
-See the following [TAIP-3] message outlining a typical Asset Transfer where a customer is asking to transfer funds to a blockchain address:
+This policy requires that all agents in a [TAIP-3] transaction authorizes a transaction prior to settlement.
 
 ```json
 {
-  "from":"did:web:originator.vasp",
-  "type": "https://tap.rsvp/schema/1.0#Transfer",
-  "id": "...",
-  "to": ["did:web:beneficiary.vasp", "did:pkh:eip155:1:0x1234a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb"],
-  "body": {
-    "@context": "https://tap.rsvp/schema/1.0",
-    "@type": "https://tap.rsvp/schema/1.0#Transfer",
-    "originator":{
-      "@id":"did:eg:bob",
-    },
-    "asset": "eip155:1/slip44:60",
-    "amountSubunits": "1230000000000000000",
-    "settlementId":"eip155:1:tx/0x3edb98c24d46d148eb926c714f4fbaa117c47b0c0821f38bfce9763604457c33",
-    "agents":[
-      {
-        "@id":"did:web:originator.vasp",
-        "for":"did:eg:bob"
-      },
-      {
-        "@id":"did:pkh:eip155:1:0x1234a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb",
-        "role":"SettlementAddress"
-      }
-    ]
+  "@type":"RequireAuthorization"
+}
+```
+
+This policy requires that a specific agent in a [TAIP-3] transaction authorizes a transaction prior to settlement.
+
+```json
+{
+  "@type":"RequireAuthorization",
+  "from":["did:web:beneficiary.vasp"]
+}
+```
+
+This policy requires the direct agent of the beneficiary party in a [TAIP-3] transaction to authorize a transaction prior to settlement.
+
+```json
+{
+  "@type":"RequireAuthorization",
+  "fromAgent":"beneficiary"
+}
+```
+
+#### `RequirePresentation` examples
+
+This example requests verified information about the `originator` party from the Agent of the `originator`. The specific data requested is `firstName`, `lastName`, and `nationalId` for natural persons and an `leiCode` for legal entities:
+
+```json
+{
+  "@type":"RequirePresentation",
+  "@context":["https://schema.org/Person", "https://www.gleif.org/ontology/Base/Entity"],
+  "fromAgent":"originator",
+  "aboutParty":"originator",
+  "credentials": {
+    "Person": ["firstName","lastName","nationalId"],
+    "Entity": ["leiCode"]
   }
 }
 ```
 
-#### Complete example showing VASP to VASP third party Asset Transfer
-
-After completing the discovery aspects  of TAP the Asset Transfer could look like this with a third party beneficiary and a VASP controlling the Settlement Address:
+This example requests verified information about the Agent of the `originator` from themselves. `country` and`leiCode` is requested:
 
 ```json
 {
-  "from":"did:web:originator.vasp",
-  "type": "https://tap.rsvp/schema/1.0#Transfer",
-  "id": "...",
-  "to": ["did:web:beneficiary.vasp", "did:pkh:eip155:1:0x1234a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb"],
-  "body": {
-    "@context": "https://tap.rsvp/schema/1.0",
-    "@type": "https://tap.rsvp/schema/1.0#Transfer",
-    "originator":{
-      "@id":"did:eg:bob",
-    },
-    "beneficiary":{
-      "@id":"did:eg:alice"
-    },
-    "asset": "eip155:1/slip44:60",
-    "amountSubunits": "1230000000000000000",
-    "settlementId":"eip155:1:tx/0x3edb98c24d46d148eb926c714f4fbaa117c47b0c0821f38bfce9763604457c33",
-    "agents":[
-      {
-        "@id":"did:pkh:eip155:1:0xabcda96D359eC26a11e2C2b3d8f8B8942d5Bfcdb",
-        "for":"did:web:originator.vasp",
-        "role":"SourceAddress"
-      },
-      {
-        "@id":"did:web:originator.vasp",
-        "for":"did:eg:bob",
-      },
-      {
-        "@id":"did:web:beneficiary.vasp",
-        "for":"did:eg:alice"
-      },
-      {
-        "@id":"did:web:walletapi.sample",
-        "for":"did:web:beneficiary.vasp"
-      },
-      {
-        "@id":"did:pkh:eip155:1:0x1234a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb",
-        "for":"did:web:walletapi.sample",
-        "role":"SettlementAddress"
-      }
-    ]
+  "@type":"RequirePresentation",
+  "@context":["https://schema.org/Person", "https://www.gleif.org/ontology/Base/Entity"],
+  "fromAgent":"originator",
+  "aboutAgent":"originator",
+  "credentials": {
+    "Entity": ["leiCode", "country"]
   }
 }
 ```
 
-#### Complete example showing VASP to first party self-hosted wallet Asset Transfer
-
-After completing the discovery aspects of TAP we discover the Asset Transfer goes to the customer's own self-hosted wallet address:
+#### `RequireProofOfControl` examples
 
 ```json
 {
-  "from":"did:web:originator.vasp",
-  "type": "https://tap.rsvp/schema/1.0#Transfer",
-  "id": "...",
-  "to": ["did:web:beneficiary.vasp", "did:pkh:eip155:1:0x1234a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb"],
-  "body": {
-    "@context": "https://tap.rsvp/schema/1.0",
-    "@type": "https://tap.rsvp/schema/1.0#Transfer",
-    "originator":{
-      "@id":"did:eg:bob",
-    },
-    "beneficiary":{
-      "@id":"did:eg:bob",
-    },
-    "asset": "eip155:1/slip44:60",
-    "amountSubunits": "1230000000000000000",
-    "settlementId":"eip155:1:tx/0x3edb98c24d46d148eb926c714f4fbaa117c47b0c0821f38bfce9763604457c33",
-    "agents":[
-      {
-        "@id":"did:pkh:eip155:1:0xabcda96D359eC26a11e2C2b3d8f8B8942d5Bfcdb",
-        "for":"did:web:originator.vasp",
-        "role":"SourceAddress"
-      },
-      {
-        "@id":"did:web:originator.vasp",
-        "for":"did:eg:bob"
-      },
-      {
-        "@id":"did:pkh:eip155:1:0x1234a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb",
-        "for":"did:eg:bob",
-        "role":"SettlementAddress"
-      }
-    ]
-  }
+  "@type":"RequireProofOfControl",
+  "fromRole":"SettlementAddress",
+  "nonce": 32891756
 }
 ```
-
 
 ### UpdatePolicy Messages
 
 The following are example plaintext messages. See [TAIP-2] for how to sign the messages.
 
-#### AddAgents
-
 ```json
 {
- "from":"did:web:beneficiary.vasp",
+  "from":"did:web:beneficiary.vasp",
   "type": "https://tap.rsvp/schema/1.0#UpdatePolicy",
   "thid":"ID of transfer request",
   "to": ["did:web:originator.vasp"],
   "body": {
     "@context": "https://tap.rsvp/schema/1.0",
     "@type": "https://tap.rsvp/schema/1.0#UpdatePolicy",
-    "agents":[
+    "policies":[
       {
-        "@id":"did:web:originator.vasp",
-        "for":"did:eg:bob"
+        "@type":"RequirePresentation",
+        "@context":["https://schema.org/Person", "https://www.gleif.org/ontology/Base/Entity"],
+        "fromAgent":"originator",
+        "aboutParty":"originator",
+        "credentials": {
+          "Person": ["firstName","lastName","nationalId"],
+          "Entity": ["leiCode"]
+        }
       },
       {
-        "@id":"did:pkh:eip155:1:0x1234a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb",
-        "for":"did:eg:bob",
-        "role":"SettlementAddress"
+        "@type":"RequireProofOfControl",
+        "fromRole":"SourceAddress",
+        "nonce": 32891756
       }
     ]
   }
