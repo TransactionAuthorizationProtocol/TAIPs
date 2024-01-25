@@ -13,7 +13,7 @@ requires: 2, 5, 6, 7
 <!--You can leave these HTML comments in your merged EIP and delete the visible duplicate text guides, they will not appear and may be helpful to refer to if you edit it again. This is the suggested template for new EIPs. Note that an EIP number will be assigned by an editor. When opening a pull request to submit your EIP, please use an abbreviated title in the filename, `eip-draft_title_abbrev.md`. The title should be 44 characters or less.-->
 ## Simple Summary
 <!--"If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the TAIP.-->
-Provides a simple and secure method for Transaction Agents to share private information about themselves or Transaction Parties to help comply with their policies.
+Provides a simple and secure method for Transaction Agents to share Verifiable Credentials Identifying themselves or Transaction Parties to help comply with their policies.
 
 ## Abstract
 <!--A short (~200 word) description of the technical issue being addressed.-->
