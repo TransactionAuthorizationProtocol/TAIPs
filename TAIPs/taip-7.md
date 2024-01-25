@@ -6,7 +6,7 @@ status: Draft
 type: Standard
 created: 2024-01-23
 updated: 2024-01-23
-discussions-to: https://github.com/TransactionAuthorizationProtocol/TAIPs/pull/8
+discussions-to: https://github.com/TransactionAuthorizationProtocol/TAIPs/pull/9
 requires: 2, 4, 5, 6
 ---
 
