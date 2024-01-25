@@ -97,7 +97,7 @@ additional agents to a transaction by replying as a thread to the initial messag
 
 * `@context` - REQUIRED the JSON-LD context `https://tap.rsvp/schema/1.0` (provisional)
 * `@type` - REQUIRED the JSON-LD type `https://tap.rsvp/schema/1.0#UpdateParty` (provisional)
-* `party-type` - REQUIRED a string indicating the type of party to be updated. Eg. for [TAIP-3] this could be `originator` or `beneficiary`
+* `partyType` - REQUIRED a string indicating the type of party to be updated. Eg. for [TAIP-3] this could be `originator` or `beneficiary`
 * `party` - REQUIRED a Party Object to be added to the transaction.
 
 If an existing transaction party is already included in the transaction an Agent SHOULD update their internal record for this party with any additional data provided in this message.
@@ -250,7 +250,7 @@ The following are example plaintext messages. See [TAIP-2] for how to sign the m
   "body": {
     "@context": "https://tap.rsvp/schema/1.0",
     "@type": "https://tap.rsvp/schema/1.0#UpdateParty",
-    "party-type":"beneficiary",
+    "partyType":"beneficiary",
     "party": {
       "@context":{"iso":"https://schema.org/addressCountry"},
       "@id":"did:eg:bob",
