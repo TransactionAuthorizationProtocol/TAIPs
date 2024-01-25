@@ -6,7 +6,7 @@ status: Draft
 type: Standard
 created: 2024-01-23
 updated: 2024-01-23
-discussions-to: https://github.com/TransactionAuthorizationProtocol/TAIPs/pull/8
+discussions-to: https://github.com/TransactionAuthorizationProtocol/TAIPs/pull/9
 requires: 2, 4, 5, 6
 ---
 
@@ -64,6 +64,8 @@ Since a policy is defined by it's [JSON-LD] Type it can contain additional requi
 - `from` - OPTIONAL a string or an array of [DID]s representing parties or agent in a transaction
 - `fromRole` - OPTIONAL a string or an array of strings of `role` as specified for the particular kind of transaction. Eg. `SettlementAddress` for [TAIP-3]
 - `fromAgent` - OPTIONAL from an Agent representing a party in the transaction. Eg. `originator` or `beneficiary` in [TAIP-3]
+- `purpose` - OPTIONAL Human readable string about what the purpose is for this requirement
+
 
 #### `RequireAuthorization`
 
@@ -73,13 +75,8 @@ An agent requires an `authorize` action before they will settle a transaction. I
 - `from` - OPTIONAL a string or an array of [DID]s representing parties or agent in a transaction
 - `fromRole` - OPTIONAL a string or an array of strings of `role` as specified for the particular kind of transaction. Eg. `SettlementAddress` for [TAIP-3]
 - `fromAgent` - OPTIONAL from an Agent representing a party in the transaction. Eg. `originator` or `beneficiary` in [TAIP-3]
+- `purpose` - OPTIONAL Human readable string about what the purpose is for this requirement
 
-```json
-{
-  "@type":"RequireAuthorization",
-  "fromAgent":"beneficiary"
-}
-```
 
 #### `RequirePresentation`
 
@@ -90,22 +87,10 @@ This is a generic way of requesting a selected [Verifiable Presentation][VP] fro
 - `about` - OPTIONAL Requesting presentation about a string or an array of [DID]s representing specific parties or agent in a transaction.
 - `aboutParty` - OPTIONAL Requesting presentation about a specific party in the transaction. Eg. `originator` or `beneficiary` in [TAIP-3]
 - `aboutAgent` - OPTIONAL Requesting presentation about a specific Agent representing a party in the transaction. Eg. `originator` or `beneficiary` in [TAIP-3]
+- `purpose` - OPTIONAL Human readable string about what the purpose is for this requirement
 - `credentials` - REQUIRED [JSON-LD] Object containing requested credentials for each accepted `@type` of party
 
 The `credentials` object has key's for each acceptable [JSON-LD] Type together with an array of required attributes as strings.
-
-```json
-{
-  "@type":"RequirePresentation",
-  "@context":["https://schema.org/Person", "https://www.gleif.org/ontology/Base/Entity"],
-  "fromAgent":"originator",
-  "aboutParty":"originator",
-  "credentials": {
-    "Person": ["firstName","lastName","nationalId"],
-    "Entity": ["leiCode"]
-  }
-}
-```
 
 See [TAIP-8] for more details about how the requested presentation is presented.
 
@@ -118,6 +103,7 @@ An Agent can request any other Agent signs a message proving they control a give
 - `fromRole` - OPTIONAL a string or an array of strings of `role` as specified for the particular kind of transaction. Eg. `SettlementAddress` for [TAIP-3]
 - `fromAgent` - OPTIONAL from an Agent representing a party in the transaction. Eg. `originator` or `beneficiary` in [TAIP-3]
 - `nonce` - REQUIRED Randomized token to prevent signature replay attacks.
+- `purpose` - OPTIONAL Human readable string about what the purpose is for this requirement
 
 See [TAIP-9] for more details on how the proof is performed and shared.
 
@@ -158,7 +144,8 @@ This policy requires that a specific agent in a [TAIP-3] transaction authorizes 
 ```json
 {
   "@type":"RequireAuthorization",
-  "from":["did:web:beneficiary.vasp"]
+  "from":["did:web:beneficiary.vasp"],
+  "purpose":"FATF Travel Rule Compliance",
 }
 ```
 
@@ -181,6 +168,7 @@ This example requests verified information about the `originator` party from the
   "@context":["https://schema.org/Person", "https://www.gleif.org/ontology/Base/Entity"],
   "fromAgent":"originator",
   "aboutParty":"originator",
+  "purpose":"EU TFR Compliance",
   "credentials": {
     "Person": ["firstName","lastName","nationalId"],
     "Entity": ["leiCode"]
@@ -196,6 +184,7 @@ This example requests verified information about the Agent of the `originator` f
   "@context":["https://schema.org/Person", "https://www.gleif.org/ontology/Base/Entity"],
   "fromAgent":"originator",
   "aboutAgent":"originator",
+  "purpose":"GDPR compliance",
   "credentials": {
     "Entity": ["leiCode", "country"]
   }
@@ -208,6 +197,7 @@ This example requests verified information about the Agent of the `originator` f
 {
   "@type":"RequireProofOfControl",
   "fromRole":"SettlementAddress",
+  "purpose":"GDPR compliance",
   "nonce": 32891756
 }
 ```
