@@ -1,5 +1,5 @@
 ---
-taip: 
+taip: 8
 title: Selective Disclosure
 author: Pelle Braendgaard <pelle@notabene.id>, Andrés Junge <andres@notabene.id>, Richard Crosby <richard@notabene.id>
 status: Draft
