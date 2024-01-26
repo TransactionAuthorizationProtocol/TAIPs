@@ -96,6 +96,7 @@ graph TD
 We'll use the following notation to express the certainty of a relationship. This certainty is going to be different from the point of view of different actors:
 
 ```mermaid
+graph LR
   Agent -.-> Unconfirmed[Unconfirmed Relationship]
   Agent --> Confirmed[Confirmed Relationship]
   Agent ==> Proven[Proven Relationship]
@@ -133,7 +134,7 @@ graph TD
 
  Another stricter approach would be for the Settlement Address to provide an additional cryptographical proof that they are controlled by the Beneficiary VASP, which would cryptographically prove the relationship:
 
- ```mermaid
+```mermaid
 graph TD
     Transfer(Asset Transfer) ==>|originator| Customer[did:eg:bob]
     Transfer -->|beneficiary| Beneficiary
@@ -141,8 +142,8 @@ graph TD
     OriginatingVASP[Originating VASP] ==>|for| Customer
     CustodialWallet ==>|for| OriginatingVASP
     Transfer -->|SettlementAddress| Wallet[Beneficiary Wallet]
-    Wallet ===>|for| BeneficiaryVASP
-    BeneficiaryVASP[Beneficiary VASP] -.->|for| Beneficiary
+    Wallet ==>|for| BeneficiaryVASP[Beneficiary VASP]
+    BeneficiaryVASP -.->|for| Beneficiary
 ```
 
 In the case of a transaction from an Exchange to their customers own self-hosted wallet, the following graph shows the relationships which are strong for anything the Exchange itself controls. They do not know if their customer actually controls the wallet:
