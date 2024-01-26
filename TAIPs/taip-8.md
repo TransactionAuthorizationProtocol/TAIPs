@@ -81,7 +81,7 @@ Provide here any test cases that will help implementers of the TAIP to validate 
 
 ### `RequirePresentation` examples
 
-This example requests verified information about the `originator` party from the Agent of the `originator`. The specific data requested is `firstName`, `lastName`, and `nationalId` for natural persons and an `leiCode` for legal entities:
+This example requests verified information about the `originator` party from the Agent of the `originator`. The specific data requested is specified in [PExDef]:
 
 ```json
 {
@@ -90,8 +90,8 @@ This example requests verified information about the `originator` party from the
   "fromAgent":"originator",
   "aboutParty":"originator",
   "credentials": {
-    "Person": ["firstName","lastName","nationalId"],
-    "Entity": ["leiCode"]
+    "Person": "... URL for Presentation Definition for Natural Person",
+    "Entity": "... URL for Presentation Definition for Legal Persons"
   }
 }
 ```
@@ -228,7 +228,7 @@ Privacy legislations, such as the General Data Protection Regulation (GDPR) and 
 
 [DID]: <https://www.w3.org/TR/did-core/>
 [DIDComm]: https://identity.foundation/didcomm-messaging/spec/v2.1/
-[PEx]: https://identity.foundation/presentation-exchange/spec/v2.0.0/#presentation-definition
+[PExDef]: https://identity.foundation/presentation-exchange/spec/v2.0.0/#presentation-definition
 [WACIPEx]: <https://identity.foundation/waci-didcomm/>
 [VCModel]: <https://www.w3.org/TR/vc-data-model-2.0/>
 [VC]: <https://www.w3.org/TR/vc-data-model-2.0/#credentials>

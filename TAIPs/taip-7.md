@@ -90,7 +90,7 @@ This is a generic way of requesting a selected [Verifiable Presentation][VP] fro
 - `purpose` - OPTIONAL Human readable string about what the purpose is for this requirement
 - `credentials` - REQUIRED [JSON-LD] Object containing requested credentials for each accepted `@type` of party
 
-The `credentials` object has key's for each acceptable [JSON-LD] Type together with an array of required attributes as strings.
+The `credentials` object has key's for each acceptable [JSON-LD] Type together with an URL to a [Presentation Definition][PExDef] defining required information
 
 See [TAIP-8] for more details about how the requested presentation is presented.
 
@@ -170,8 +170,8 @@ This example requests verified information about the `originator` party from the
   "aboutParty":"originator",
   "purpose":"EU TFR Compliance",
   "credentials": {
-    "Person": ["firstName","lastName","nationalId"],
-    "Entity": ["leiCode"]
+    "Person": "... URL for Presentation Definition for Natural Person",
+    "Entity": "... URL for Presentation Definition for Legal Persons"
   }
 }
 ```
@@ -186,7 +186,7 @@ This example requests verified information about the Agent of the `originator` f
   "aboutAgent":"originator",
   "purpose":"GDPR compliance",
   "credentials": {
-    "Entity": ["leiCode", "country"]
+    "Entity": "... URL for Presentation Definition for Legal Persons"
   }
 }
 ```
@@ -263,6 +263,8 @@ TODO specify in more detail
 - [DIDComm] DIDComm Messaging
 - [DIDCommTransports] DIDComm Transports
 - [DIDCommOOB] DIDComm Out-of-Band
+- [PEx] Presentation Exchange
+- [PExDef] Presentation Exchange - Presentation Definition
 - [VCModel] W3C Verifiable Credentials Data Model
 - [VC] Verifiable Credentials
 - [VP] Verifiable Presentation
@@ -281,6 +283,8 @@ TODO specify in more detail
 [DIDComm]: https://identity.foundation/didcomm-messaging/spec/v2.1/
 [DIDCommTransports]: <https://identity.foundation/didcomm-messaging/spec/v2.1/#transports>
 [DIDCommOOB]: <https://identity.foundation/didcomm-messaging/spec/v2.1/#out-of-band-messages>
+[PEx]: <https://identity.foundation/presentation-exchange/spec/v2.0.0/>
+[PExDef]: <https://identity.foundation/presentation-exchange/spec/v2.0.0/#presentation-definition>
 [VCModel]: <https://www.w3.org/TR/vc-data-model-2.0/>
 [VC]: <https://www.w3.org/TR/vc-data-model-2.0/#credentials>
 [VP]: <https://www.w3.org/TR/vc-data-model-2.0/#presentations>
