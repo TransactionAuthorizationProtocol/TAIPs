@@ -88,9 +88,7 @@ This is a generic way of requesting a selected [Verifiable Presentation][VP] fro
 - `aboutParty` - OPTIONAL Requesting presentation about a specific party in the transaction. Eg. `originator` or `beneficiary` in [TAIP-3]
 - `aboutAgent` - OPTIONAL Requesting presentation about a specific Agent representing a party in the transaction. Eg. `originator` or `beneficiary` in [TAIP-3]
 - `purpose` - OPTIONAL Human readable string about what the purpose is for this requirement
-- `credentials` - REQUIRED [JSON-LD] Object containing requested credentials for each accepted `@type` of party
-
-The `credentials` object has key's for each acceptable [JSON-LD] Type together with an array of required attributes as strings.
+- `presentationDefinition` - REQUIRED a URL to a [Presentation Definition][PExDef] defining required information
 
 See [TAIP-8] for more details about how the requested presentation is presented.
 
@@ -160,7 +158,7 @@ This policy requires the direct agent of the beneficiary party in a [TAIP-3] tra
 
 #### `RequirePresentation` examples
 
-This example requests verified information about the `originator` party from the Agent of the `originator`. The specific data requested is `firstName`, `lastName`, and `nationalId` for natural persons and an `leiCode` for legal entities:
+This example requests verified information about the `originator` party from the Agent of the `originator`. The specifics of what is requested is defined in a URL to [Presentation Definition][PExDef]. These could be used to pre-define requirements under certain national regulations or be customized:
 
 ```json
 {
@@ -169,14 +167,11 @@ This example requests verified information about the `originator` party from the
   "fromAgent":"originator",
   "aboutParty":"originator",
   "purpose":"EU TFR Compliance",
-  "credentials": {
-    "Person": ["firstName","lastName","nationalId"],
-    "Entity": ["leiCode"]
-  }
+  "presentationDefinition": "https://tap.rsvp/presentation-definitions/ivms-101/eu/tfr"
 }
 ```
 
-This example requests verified information about the Agent of the `originator` from themselves. `country` and`leiCode` is requested:
+This example requests verified information about the Agent of the `originator` from themselves.The specifics of what is requested is defined in a URL to [Presentation Definition][PExDef]:
 
 ```json
 {
@@ -185,9 +180,7 @@ This example requests verified information about the Agent of the `originator` f
   "fromAgent":"originator",
   "aboutAgent":"originator",
   "purpose":"GDPR compliance",
-  "credentials": {
-    "Entity": ["leiCode", "country"]
-  }
+  "presentationDefinition": "https://tap.rsvp/presentation-definitions/eu/gdpr/dpa"
 }
 ```
 
@@ -263,6 +256,8 @@ TODO specify in more detail
 - [DIDComm] DIDComm Messaging
 - [DIDCommTransports] DIDComm Transports
 - [DIDCommOOB] DIDComm Out-of-Band
+- [PEx] Presentation Exchange
+- [PExDef] Presentation Exchange - Presentation Definition
 - [VCModel] W3C Verifiable Credentials Data Model
 - [VC] Verifiable Credentials
 - [VP] Verifiable Presentation
@@ -281,6 +276,8 @@ TODO specify in more detail
 [DIDComm]: https://identity.foundation/didcomm-messaging/spec/v2.1/
 [DIDCommTransports]: <https://identity.foundation/didcomm-messaging/spec/v2.1/#transports>
 [DIDCommOOB]: <https://identity.foundation/didcomm-messaging/spec/v2.1/#out-of-band-messages>
+[PEx]: <https://identity.foundation/presentation-exchange/spec/v2.0.0/>
+[PExDef]: <https://identity.foundation/presentation-exchange/spec/v2.0.0/#presentation-definition>
 [VCModel]: <https://www.w3.org/TR/vc-data-model-2.0/>
 [VC]: <https://www.w3.org/TR/vc-data-model-2.0/#credentials>
 [VP]: <https://www.w3.org/TR/vc-data-model-2.0/#presentations>
