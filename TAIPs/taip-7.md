@@ -107,16 +107,16 @@ An Agent can request any other Agent signs a message proving they control a give
 
 See [TAIP-9] for more details on how the proof is performed and shared.
 
-### `UpdatePolicy` message
+### `UpdatePolicies` message
 
 In parallel with the [Authorization Flow][TAIP-4] agents can send [TAIP-2] messages to other agents to update their policy. This allows them to dynamically update requirements based on changing risk in real-time.
 
-Please note that like any [TAIP-2] messages, these are just messages sent by an agent. For security purposes a receiving Agent MUST determine if they can trust the sender for the information provided. Agents MUST only send `UpdatePolicy` on their own behalf. Other agents in a transaction MUST ignore `UpdatePolicy` messages from agents not know to be part of a transaction.
+Please note that like any [TAIP-2] messages, these are just messages sent by an agent. For security purposes a receiving Agent MUST determine if they can trust the sender for the information provided. Agents MUST only send `UpdatePolicies` on their own behalf. Other agents in a transaction MUST ignore `UpdatePolicies` messages from agents not know to be part of a transaction.
 
 Any agent can add additional agents to a transaction by replying as a thread to the initial message. The following shows the attributes of the `body` object:
 
 - `@context` - REQUIRED the JSON-LD context `https://tap.rsvp/schema/1.0` (provisional)
-- `@type` - REQUIRED the JSON-LD type `https://tap.rsvp/schema/1.0#UpdatePolicy` (provisional)
+- `@type` - REQUIRED the JSON-LD type `https://tap.rsvp/schema/1.0#UpdatePolicies` (provisional)
 - `policies` - REQUIRED an array of Policies to replace the current set of policies
 
 ## Rationale
@@ -202,19 +202,19 @@ This example requests verified information about the Agent of the `originator` f
 }
 ```
 
-### UpdatePolicy Messages
+### UpdatePolicies Messages
 
 The following are example plaintext messages. See [TAIP-2] for how to sign the messages.
 
 ```json
 {
   "from":"did:web:beneficiary.vasp",
-  "type": "https://tap.rsvp/schema/1.0#UpdatePolicy",
+  "type": "https://tap.rsvp/schema/1.0#UpdatePolicies",
   "thid":"ID of transfer request",
   "to": ["did:web:originator.vasp"],
   "body": {
     "@context": "https://tap.rsvp/schema/1.0",
-    "@type": "https://tap.rsvp/schema/1.0#UpdatePolicy",
+    "@type": "https://tap.rsvp/schema/1.0#UpdatePolicies",
     "policies":[
       {
         "@type":"RequirePresentation",
