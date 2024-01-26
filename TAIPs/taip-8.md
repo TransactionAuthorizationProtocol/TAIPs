@@ -21,7 +21,7 @@ Transaction Agents may have a requirement to identify certain aspects of another
 
 ## Motivation
 <!--The motivation is critical for TAIP. It should clearly explain why the state of the art is inadequate to address the problem that the TAIP solves. TAIP submissions without sufficient motivation may be rejected outright.-->
-There are strong regulatory requirements for exchanging PII of transaction parties within the context of a transaction, such as complying with Sanctions Name Screening requirements and FATF's Travel Rule. Highlighting the identity of the parties and providing the data to the counterparties of the transaction, also improves UX, reduces risk of fraud, and ties transactions into business workflows such as payroll and e-commerce.
+There are strong regulatory requirements for exchanging PII of transaction parties within the context of a transaction, such as complying with Sanctions Name Screening requirements, FATF's Travel Rule and various international data protection legislations. Highlighting the identity of the parties and providing the data to the counterparties of the transaction, also improves UX, reduces risk of fraud, and ties transactions into business workflows such as payroll and e-commerce.
 
 Many other Transaction Authorization Protocols including [iso20022], and most Crypto Travel Rule Protocols based on [IVMS-101] exchange transmit the PII inline with the transfer request itself, which lends themselves to major risk of PII exposure. This is not only bad for end-users, but can expose significant legal liability for Transaction Agents handling this.
 
@@ -200,7 +200,7 @@ When receiving any Presentation Proof it is important to perform the following:
 
 ## Privacy Considerations
 <!--Please add an explicit list of intra-actor assumptions and known risk factors if applicable. Any normative definition of an interface requires these to be implementable; assumptions and risks should be at both individual interaction/use-case scale and systemically, should the interface specified gain ecosystem-namespace adoption. -->
-TODO Update this with GDPR
+Privacy legislations, such as the General Data Protection Regulation (GDPR) and the California Consumer Privacy Act (CCPA), enforce well-established privacy principles such as 'Data Minimization' and 'Purpose Limitation.' In the context of analyzing Personally Identifiable Information (PII) to comply with the Financial Action Task Force's (FATF) travel rule requirements, each agent must only process the minimum amount of data required for this purpose. TAIP-8 supports data protection legislations by giving each agent granular control over their PII requests and provides travel rule creators with increased control to carefully consider whether it's safe to share PII with a counterparty. <TBC>
 
 ## References
 <!--Links to external resources that help understanding the TAIP better. This can e.g. be links to existing implementations. See CONTRIBUTING.md#style-guide . -->
