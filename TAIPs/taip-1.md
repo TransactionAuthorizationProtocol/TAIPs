@@ -34,31 +34,18 @@ Image files should be included in a subdirectory of the `assets` folder for that
 
 Each TAIP must begin with an [RFC 822] style header preamble, preceded and followed by three hyphens (`---`). This header is also termed ["front matter" by Jekyll]. The headers must appear in the following order. Headers marked with "*" are optional and are described below. All other headers are required.
 
-` taip:` <TAIP number> (this is determined by the TAIP editor)
-
-` title:` <TAIP title>
-
-` author:` <a list of the author's or authors' name(s) and/or username(s), or name(s) and email(s). Details are below.>
-
-` * discussions-to:` \<a URL pointing to the official discussion thread\>
-
-` status:` <Draft | Rejected | Review | Last Call | Withdrawn | Final | Superseded>
-
-`* review-period-end:` <date review period ends>
-
-` type:` <Standard | Informational | Meta>
-
-` * category:` <Core | Networking | Interface | ERC>
-
-` created:` <date created on>
-
-` * updated:` <comma separated list of dates>
-
-` * requires:` <TAIP number(s); if multiple, use `[1,2]` format to create a YAML array>
-
-` * replaces:` <TAIP number(s); if multiple, use `[1,2]` format to create a YAML array>
-
-` * superseded-by:` <TAIP number(s) | URL of non-TAIP standard >
+* `taip:` TAIP number (this is determined by the TAIP editor)
+* `title:` TAIP title
+* `author:` a list of the author's or authors' name(s) and/or username(s), or name(s) and email(s). Details are below.
+* `discussions-to: *` URL pointing to the official discussion thread
+* `status:` `Draft`, `Rejected`, `Review`, `Last Call`, `Withdrawn`, `Final`, `Superseded`
+* `review-period-end: *` date review period ends
+* `type:` `Standard`, `Informational`, `Meta`
+* `created:` date created on
+* `updated: *` comma separated list of dates
+* `requires: *` TAIP number(s); if multiple, use `1, 2` format to create a YAML array
+* `replaces: *` TAIP number(s); if multiple, use `1, 2` format to create a YAML array
+* `superseded-by: *` TAIP number(s) or URL of non-TAIP standard
 
 Headers that permit lists must separate elements with commas.
 

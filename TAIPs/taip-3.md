@@ -13,17 +13,24 @@ requires: 2, 5, 6
 
 ## Simple Summary
 <!--"If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the TAIP.-->
-This provides the messaging details for a simple virtual asset transfer between two parties as part of a Transaction Authorization Protocol flow.
+
+This specification provides the messaging details for a simple virtual asset transfer between two parties as part of a Transaction Authorization Protocol flow.
 
 ## Abstract
 <!--A short (~200 word) description of the technical issue being addressed.-->
-This provides transaction related metadata about a virtual asset transaction, for use as part of the Authorization Flow in TAP. It is primarily intended to support the transfer of an amount of a fungible or non fungible token from an originator to a beneficiary. This TAIP only specifies the specifics of a Transfer and not the full Authorization Flow which can be found in [TAIP-4].
+This TAIP contains a specification for a metadata message about a virtual asset transaction for use as part of the Authorization Flow in TAP.
+
+The primary type of transaction this defines supports the transfer of an amount of a fungible or non-fungible token from an originator to a beneficiary.
+
+This TAIP only specifies the specifics of a Transfer rather than the complete Authorization Flow, as defined in [TAIP-4].
 
 ## Motivation
 <!--The motivation is critical for TAIP. It should clearly explain why the state of the art is inadequate to address the problem that the TAIP solves. TAIP submissions without sufficient motivation may be rejected outright.-->
 The Asset Transfer is a simple chain-agnostic representation of a typical virtual asset transaction and its parties. The vast majority of transactions performed by both custodial services and self-hosted wallets fall under this classification.
 
-To support the widest amount of digital assets, it is based on existing [Chain Agnostic standards][ChainAgnostic] such as [CAIP-10 Account Identifiers][CAIP-10] and [CAIP-19 Asset Identifiers][CAIP-19]. For developers of new blockchain protocols and token standards, make sure that you implement these and list them on the [Chainagnostic Namespaces](https://namespaces.chainagnostic.org) page for reference.
+This specification builds on existing [Chain Agnostic standards][ChainAgnostic] such as [CAIP-10 Account Identifiers][CAIP-10] and [CAIP-19 Asset Identifiers][CAIP-19].
+
+For developers of new blockchain protocols and token standards, make sure that you implement these and list them on the [Chainagnostic Namespaces](https://namespaces.chainagnostic.org) page for reference.
 
 ## Specification
 <!--The technical specification should describe the standard in detail. The specification should be detailed enough to allow competing, interoperable implementations. -->
@@ -50,7 +57,7 @@ Many of the attributes are optional and through the process of authorization can
   
 #### Transfer Amounts
 
-The amount of a transfer is specified as `amountSubunits` as it is the most precise representation of an amount and is in most cases the same as used in the underlying blockchain protocol. For many application developers this can be error prone. It is the responsibility of library and tool developers to help educate and help convert between commonly used decimal amounts and the underlying sub unit.
+The amount of a transfer is specified as `amountSubunits` as it is the most precise representation of an amount and is, in most cases, the same as used in the underlying blockchain protocol. For many application developers, this can be error-prone. It is the responsibility of library and tool developers to help educate and help convert between commonly used decimal amounts and the underlying sub-unit.
 
 As an example `ETH 1.23` should be encoded as `1230000000000000000`.
 
@@ -72,22 +79,22 @@ eip155:1:tx/0x3edb98c24d46d148eb926c714f4fbaa117c47b0c0821f38bfce9763604457c33
 
 ### Agent Roles
 
-[Agents][TAIP-5] can have specific roles that are vital to the execution of a transaction.
+[Agents][TAIP-5] can have specific roles vital to the execution of a transaction.
 
-The following two special roles can be used as attributes on Agents listed in the `agents` array:
+The following two roles can be used as attributes on Agents listed in the agents array:
 
-* `SettlementAddress` The blockchain wallet agent to settle a transaction to
+* `SettlementAddress`, The blockchain wallet agent to settle a transaction to
 * `SourceAddress` The blockchain wallet agent used to send the transaction from
 
-Neither of these are required, but can be used to specify the blockchain wallets up front.
+Neither of these is required but can be used to specify the blockchain wallets up front.
 
 ## Rationale
 <!--The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.-->
-This particular Message type is designed to be as general and chainagnostic as possible and be compatible with as little meta-data as possible together with any required meta-data useful for improving usability, safety, and record keeping for a transaction.
+This message type is designed to be as general and chain agnostic as possible and compatible with as little meta-data as possible, together with any required meta-data, that is useful for improving usability, safety, and record-keeping for a transaction.
 
-Note this is designed to be used as an initial request message. The `body` attirbutes can be used a representation of internal state of a transaction by an agent, but do intentionally not represent shared state.
+Note this is designed to be used as an initial request message. The body attributes can be used as a representation of the internal state of a transaction by an agent, but do intentionally not represent the shared state.
 
-It is also not intended to cover more complex transaction use cases, such as non token transfer related smart contract calls. It is encouraged that this TAIP be cloned and modified to create similar requests for Swaps, lending, and other common use cases.
+It is also not intended to cover more complex transaction use cases, such as non-token transfer-related smart contract calls. This TAIP is encouraged to be forked and modified to create similar requests for Swaps, lending, and other everyday use cases.
 
 ## Test Cases
 <!--Please add diverse test cases here if applicable. Any normative definition of an interface requires test cases to be implementable. -->
@@ -150,7 +157,7 @@ The following is a request for a transfer of 1.23 ETH from a crypto exchange fro
 }
 ```
 
-The following is a request for a transfer of 1.23 ETH from a crypto exchange from a customer to a customer at another hosted wallet, which doesn't include any settlement information. This allows the parties negotiate settlement as part of the authorization flow:
+The following is a request for a transfer of 1.23 ETH from a crypto exchange from a customer to a customer at another hosted wallet, which does not include settlement information. This allows the parties negotiate settlement as part of the authorization flow:
 
 ```json
 {
@@ -181,7 +188,7 @@ The following is a request for a transfer of 1.23 ETH from a crypto exchange fro
 }
 ```
 
-The following is an example of a fairly complete transaction that has already been settled. This could be used to start the process of backfilling information about an already settled transaction.
+The following is an example of a reasonably complete transaction already settled. An Agent could create these to backfill information about an already settled transaction.
 
 ```json
 {
@@ -219,13 +226,13 @@ The following is an example of a fairly complete transaction that has already be
 
 ## Security Considerations
 <!--Please add an explicit list of intra-actor assumptions and known risk factors if applicable. Any normative definition of an interface requires these to be implementable; assumptions and risks should be at both individual interaction/use-case scale and systemically, should the interface specified gain ecosystem-namespace adoption. -->
-It is important to understand that this represents a request to perform a transaction, and requires all parties to verify all information in it to safely authorize and settle a transaction. It is the responsibility of the agents to verify this information, even post settlement.
+It is essential to understand that this represents a request to perform a transaction, and requires all parties to verify all information in it to authorize and settle a transaction safely. The agents are responsible for confirming this information, even post-settlement.
 
 ## Privacy Considerations
 <!--Please add an explicit list of intra-actor assumptions and known risk factors if applicable. Any normative definition of an interface requires these to be implementable; assumptions and risks should be at both individual interaction/use-case scale and systemically, should the interface specified gain ecosystem-namespace adoption. -->
-This message can contain PII about end-users. It is very important that agents understand the privacy duties they have under national law to safeguard their customers PII. It is recommended as part of a [TAIP-4] authorization flow that a data privacy evaluation is made on each agent before sharing PII with them.
+This message can contain PII about end-users. Agents must understand their privacy duties under national law to safeguard their customers' PII. As part of a [TAIP-4] authorization flow, agents SHOULD evaluate the data privacy of any other agent before sharing PII with them.
 
-It is recommended that end-user PII is minimized in this particular message, but can be encrypted to specific trusted parties or agents separately. See [TAIP-8] for more.
+Agents SHOULD minimize the use of end-user PII in this message, but it can be encrypted to specific trusted parties or agents separately. See [TAIP-8] for more.
 
 ## References
 <!--Links to external resources that help understanding the TAIP better. This can e.g. be links to existing implementations. See CONTRIBUTING.md#style-guide . -->
