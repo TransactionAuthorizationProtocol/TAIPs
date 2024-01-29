@@ -13,25 +13,25 @@ requires: 2
 <!--You can leave these HTML comments in your merged EIP and delete the visible duplicate text guides, they will not appear and may be helpful to refer to if you edit it again. This is the suggested template for new EIPs. Note that an EIP number will be assigned by an editor. When opening a pull request to submit your EIP, please use an abbreviated title in the filename, `eip-draft_title_abbrev.md`. The title should be 44 characters or less.-->
 ## Simple Summary
 <!--"If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the TAIP.-->
-Agents are services involved in executing a transactions. They can be commercial services such as exchanges and custodial wallet services. They could also be wallets, blockchain addresses, DeFi Protocols, bridges, and other services directly involved in a transaction.
+Agents are services involved in executing transactions. They can be commercial services such as exchanges and custodial wallet services. They could also be wallets, blockchain addresses, DeFi Protocols, bridges, and other services directly involved in a transaction.
 
 ## Abstract
 <!--A short (~200 word) description of the technical issue being addressed.-->
-This is specifies how agents can represent themselves in a [Transaction Authorization Protocol Flow][TAIP-4], update details about themselves and interact implemented using a small set of [TAIP-2 Messages][TAIP-2] between each others.
+This specification defines how agents can represent themselves in a [Transaction Authorization Protocol Flow][TAIP-4], update details about themselves, and interact implemented using a small set of TAIP-2 Messages][TAIP-2] between each other.
 
 Agents can be centralized services, software applications running on end-user devices, or decentralized protocols such as DEXes and Bridges.
 
 ## Motivation
 <!--The motivation is critical for TAIP. It should clearly explain why the state of the art is inadequate to address the problem that the TAIP solves. TAIP submissions without sufficient motivation may be rejected outright.-->
-Traditional payment authorization protocols such as [ISO-20022] or [ISO-8583] only support centralized financial institutions as agents and do not work well with self-hosted or decentralized participants.
+Traditional payment authorization protocols such as [ISO-20022] or [ISO-8583] only support centralized financial institutions as agents and must work better with self-hosted or decentralized participants.
 
-For virtual asset transactions to become a core part of the worlds financial infrastructure, it is vital that all three kinds of agents can participate equally in the authorization flow of a transaction.
+For virtual asset transactions to truly become a core part of the world's financial infrastructure, all three types of agents can participate equally in the authorization flow of a transaction.
 
 ## Specification
 
 ### Representing Agents
 
-Agents are identified using [Decentralized Identifiers (DIDs)][DID]. This provides a very useful identifier that can identify both centralized services, as well as blockchain specific services such as wallets and DeFi protocols. Agents are represented in TAP in very simple JSON-LD node syntax:
+Agents are identified using [Decentralized Identifiers (DIDs)][DID]. These identifiers have specific properties of being created by the Agent and support both authenticated and end-to-end encryption. DIDs can equally identify centralized and blockchain-native services such as wallets and DeFi protocols. Agents are represented in TAP in straightforward JSON-LD node syntax:
 
 ```json
 {
@@ -39,7 +39,7 @@ Agents are identified using [Decentralized Identifiers (DIDs)][DID]. This provid
 }
 ```
 
-The following example shows it's use in a [TAIP-3] message:
+The following example shows its use in a [TAIP-3] message:
 
 ```json
 {
@@ -83,7 +83,7 @@ Future TAIPs are encouraged to extend the agent model with additional functional
 There are three primary ways of interacting with agents:
 
 - Centralized Agents, who can interact in real-time with [TAIP-2 DIDComm Messages][TAIP-2] through a server endpoint defined in the [DIDComm Transports][DIDCommTransports]
-- End-user controlled software such as self-hosted wallets, that can receive [TAIP-2 DIDComm Messages][TAIP-2] in an interactive User Interface using [DIDComm Out of Band][DIDCommOOB]
+- End-user-controlled software, such as self-hosted wallets, can receive [TAIP-2 DIDComm Messages][TAIP-2] in an interactive User Interface using [DIDComm Out of Band][DIDCommOOB]
 - Decentralized Protocol agents, such as DeFi protocols that can only communicate through blockchain transactions, possibly through an implementation of [CAIP-74]
 
 ### Identifying Agents
@@ -91,7 +91,7 @@ There are three primary ways of interacting with agents:
 DID Methods, implement different ways of creating and modifying Decentralized Identifiers. The recommendation is to use the following two DID Methods:
 
 - [WEB-DID] For centralized services, allowing them to be identified by their domain name.
-- [PKH-DID] For agent identified by a [CAIP-10] blockchain address. As an example these could be both self-hosted and custodial wallets, but also allows us to identify DeFi protocols
+- [PKH-DID] For agent identified by a [CAIP-10] blockchain address. For example, these could be both self-hosted and custodial wallets but also allow us to identify DeFi protocols.
 
 ### Web DID for Centralized Services
 
@@ -115,7 +115,7 @@ For example, the Ethereum address can be represented as:
 
 ### Roles
 
-Different agents can have specific roles specific to a particular transaction type. For example `settlementAddress` is a role in a [TAIP-3] message indicating where settlement of the transaction should be sent.
+Different agents can have specific roles specific to a particular transaction type. For example `settlementAddress` is a role in a [TAIP-3] message indicating how a transaction should be settled.
 
 ```json
 {
@@ -126,9 +126,9 @@ Different agents can have specific roles specific to a particular transaction ty
 
 ### Transaction Graphs
 
-An important aspect of managing risk in a transaction is to identify the various participants to a transaction. Agents typically act on behalf of another identity. So 
+An essential aspect of managing risk in a transaction is to identify the various participants in a transaction. Agents typically act on behalf of another identity.
 
-A transactions's participants can be presented as the following graph of control, showing various missing key pieces of information the Originating VASP's risk department need to discover, in particular who is the beneficiary and who controls the Settlement Address:
+A transaction’s participants can be presented as the following graph of control, showing various missing vital pieces of information the Originating VASP’s risk department needs to discover, in particular, who is the beneficiary and who controls the Settlement Address:
 
 ```mermaid
 graph TD
@@ -142,7 +142,7 @@ graph TD
 
 ```
 
-After discovering more about the Asset Transfer we find out it is a transaction to a third-party beneficiary at another exchange, which uses a wallet api service the graph looks like this and we are able to manage risk much better:
+After discovering more about the Asset Transfer, we found it is a transaction to a third-party beneficiary at another exchange using a wallet API service. The graph looks like this, and we can manage risk better:
 
 ```mermaid
 graph TD
@@ -158,7 +158,7 @@ graph TD
 
 ```
 
-If we instead discovered that the transaction was a withdrawal to our customers own self-hosted wallet the control graph looks like this:
+If we instead discovered that the transaction was a withdrawal to our customer's self-hosted wallet, the control graph would look like this:
 
 ```mermaid
 graph TD
@@ -171,8 +171,7 @@ graph TD
     Wallet -->|for| Customer
 ```
 
-One of the primary jobs of [TAP][TAIP-4] is to discover and identify the various controllers behind the parties and agents involved in a transaction to be able to manage risk regarding them and ensure that the correct beneficiary receives a transaction.
-
+One of the primary jobs of [TAP][TAIP-4] is to discover and identify the various controllers behind the parties and agents involved in a transaction to manage risk regarding them and ensure that the correct beneficiary receives a transaction.
 
 ### Policies
 
@@ -180,9 +179,9 @@ Each agent can declare policies about different requirements that they need fulf
 
 ### Agent meta data messages
 
-In parallel with the [Authorization Flow][TAIP-4] agents can send [TAIP-2] messages to other participants to provide or prove additional details about themselves or other participants. This allows agents to collaborate together to fulfill each others policies, so the can succesfully authorize a transaction.
+In parallel with the [Authorization Flow][TAIP-4], agents can send [TAIP-2] messages to other participants to provide or prove additional details about themselves or other participants. The messages allow agents to collaborate to fulfill each other's policies so they can successfully and swiftly authorize a transaction.
 
-Please note that like any [TAIP-2] messages, these are just messages sent by an agent. For security purposes a receiving Agent MUST determine if they can trust the sender for the information provided.
+Please note that, like any [TAIP-2] messages, these are just messages sent by an agent. For security purposes, a receiving Agent MUST determine if they can trust the sender for the information provided.
 
 Any Agent can send one of the following messages:
 
@@ -198,40 +197,40 @@ Any agent can add additional agents to a transaction by replying as a thread to 
 - `@type` - REQUIRED the JSON-LD type `https://tap.rsvp/schema/1.0#AddAgents` (provisional)
 - `agents` - REQUIRED an array of Agents to add to the transactions Agents list
 
-If an existing transaction agent is included in the list of `agents` an Agent SHOULD update their internal record for this agent with any additional data provided in this message.
+If an existing transaction agent is included in the list of `agents`, an Agent SHOULD update their internal record for this Agent with any additional data provided in this message.
 
-Any new agents added should be included in the `to` recipient list of the message.
+Any new agents added should be included in the recipient list of the message.
 
 #### ReplaceAgent
 
-Any agent can authorize the transaction by replying as a thread to the initial message. The following shows the attributes of the `body` object:
+Any agent can replace themselves in a transaction by replying to the initial message as a thread. The following shows the attributes of the `body` object:
 
 - `@context` - REQUIRED the JSON-LD context `https://tap.rsvp/schema/1.0` (provisional)
 - `@type` - REQUIRED the JSON-LD type `https://tap.rsvp/schema/1.0#ReplaceAgent` (provisional)
 - `original` - REQUIRED the [DID] of the Agent to be replaced
 - `replacement` - REQUIRED an Agent to add to the transactions Agents list
 
-If a receiving Agent does not have a record for the Agent specified in `original`, it SHOULD ignore this message.
+If a receiving Agent does not have a record for the Agent specified in the `original`, it SHOULD ignore this message.
 
-The sender of the message SHOULD include the Agent specified in `original` on `to` recipient list so they can maintain a record that they are no longer part of this transaction.
+The message's sender SHOULD include the Agent specified in the `original` on the recipient list so they can maintain a record that they are no longer part of this transaction.
 
 #### RemoveAgent
 
-Any agent can authorize the transaction by replying as a thread to the initial message. The following shows the attributes of the `body` object:
+Any agent can propose removing another agent from the transaction by replying as a thread to the initial message. The following shows the attributes of the `body` object:
 
 - `@context` - REQUIRED the JSON-LD context `https://tap.rsvp/schema/1.0` (provisional)
 - `@type` - REQUIRED the JSON-LD type `https://tap.rsvp/schema/1.0#RemoveAgent` (provisional)
 - `agent` - REQUIRED the [DID] of the Agent to be removed
 
-If a receiving Agent does not have a record for the Agent specified in `agent`, it SHOULD ignore this message.
+If a receiving Agent does not have a record for the Agent specified in the agent `agent` attribute, it SHOULD ignore this message.
 
-The sender of the message SHOULD include the Agent specified in `agent` on `to` recipient list so they can maintain a record that they are no longer part of this transaction.
+The message's sender SHOULD include the Agent specified in `agent` on the recipient list so they can maintain a record that they are no longer part of this transaction.
 
 ## Rationale
 
-A Transaction may be requested with fairly minimal information that an Agent must fill out to be able to manage risk on behalf of themselves and customers.
+An end-user may request a transaction with fairly minimal information about its participants. The end-user's Agent must fill out the list of agents to manage risk on behalf of themselves and their customers.
 
-The Agent structure provides an abstract method for multiple different types of agents to collaborate to discover the required information to Authorize a transaction using [TAIP-4].
+The Agent structure provides an abstract method for multiple types of agents to collaborate to discover the required information to authorize a transaction using [TAIP-4].
 
 ## Test Cases
 

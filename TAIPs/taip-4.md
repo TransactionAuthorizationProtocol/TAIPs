@@ -13,21 +13,23 @@ requires: 2, 5
 <!--You can leave these HTML comments in your merged EIP and delete the visible duplicate text guides, they will not appear and may be helpful to refer to if you edit it again. This is the suggested template for new EIPs. Note that an EIP number will be assigned by an editor. When opening a pull request to submit your EIP, please use an abbreviated title in the filename, `eip-draft_title_abbrev.md`. The title should be 44 characters or less.-->
 ## Simple Summary
 <!--"If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the TAIP.-->
-This proposes a simple generic transaction authorization flow, allowing agents acting on behalf of transaction parties to collaborate around authorizing or rejecting it.
+A simple generic transaction authorization flow allows agents acting on behalf of transaction parties to collaborate around authorizing or rejecting it.
 
 ## Abstract
 <!--A short (~200 word) description of the technical issue being addressed.-->
-This is the Transaction Authorization Protocol, which allows [Transaction Agents][TAIP-5] acting on behalf of [Transaction Parties][TAIP-6] to Authorize a transaction such as an [Virtual Asset Transfer][TAIP-3]. It is implemented using a small set of [Messages][TAIP-2] between Agents. 
+This specification defines the Transaction Authorization Protocol, which allows [Transaction Agents][TAIP-5] acting on behalf of [Transaction Parties][TAIP-6] to Authorize a transaction such as an [Virtual Asset Transfer][TAIP-3]. The specification defines a small set of [Messages][TAIP-2] between Agents.
 
 ## Motivation
 <!--The motivation is critical for TAIP. It should clearly explain why the state of the art is inadequate to address the problem that the TAIP solves. TAIP submissions without sufficient motivation may be rejected outright.-->
-Crypto transactions and blockchains are designed to be trustless at their core and follow a strict and very limited set of guidelines implemented in the underlying blockchain protocol. This allows the fully permissionless aspect of most blockchains, which we see as a core drivers of innovation and growth in the field. This open and permissionless aspect does present business and indiiduals transacting on blockchains with several operational and risk based challenges, that need to be solved for crypto transactions and blockchains to fully take off. The Transaction Authorization Protocol (TAP) and TAIP-4 offers a way to solve this in a private way between parties, without requiring changes to the permissionless aspects of blockchains today.
+Crypto transactions and blockchains are trustless and follow strict guidelines implemented in the underlying blockchain protocol. This trustlessness allows most blockchains to be permissionless and function without centralized control, one of the core drivers behind innovation and growth in the field.
 
-We will use the term *"Settlement layer"* to refer to the underlying blockchain protocol. It can refer to either Layer-1, Layer-2, or even DeFi protocols. We will use the term *"Authorization layer"* for the off-chain process handled by transactions participants prior or after settling the transaction on a blockchain.
+Unfortunately, it presents businesses and individuals transacting on blockchains with several operational and risk-based challenges that must be solved for crypto transactions and blockchains to take off fully. The Transaction Authorization Protocol (TAP) and TAIP-4 offer a way to solve this privately between parties without requiring changes to the permissionless aspects of blockchains today.
+
+We will use the term *"Settlement layer"* to refer to the underlying blockchain protocol. It can refer to either Layer-1, Layer-2, or even DeFi protocols. We will use the term *"Authorization layer"* for the off-chain process handled by transaction participants before or after settling the transaction on a blockchain.
 
 ### Current State of Crypto Transactions
 
-Currently, crypto transactions are limited by their reliance on the unilateral authorization by key holders, lacking mechanisms for authorization by beneficiaries.
+Currently, crypto transactions are limited by their reliance on unilateral authorization by key holders, lacking mechanisms for authorization by beneficiaries.
 
 ```mermaid
 
@@ -46,7 +48,7 @@ sequenceDiagram
     Beneficiary Wallet -->> Beneficiary: Notify      
 ```
 
-Once a transaction is authorized and submitted to the blockchain by the the originating wallet’s key holders, it is impossible by design to reverse the transaction, which represents a significant change over traditional payment systems that separate payment authorizations from underlying settlement.
+Once a transaction is authorized and submitted to the blockchain by the originating wallet’s key holders, it is impossible by design to reverse the transaction, representing a significant change over traditional payment systems that separate payment authorizations from the underlying settlement.
 
 ```mermaid
 
@@ -70,29 +72,29 @@ stateDiagram-v2
 
 ```
 
-The above demonstrates the state machine behind all blockchain transactions. The only party able to authorize a transaction is the holder of the wallet. Once it has been submitted  to the public Mempool the wallet owner can still in some cases change it, but once confirmed it can no longer be reversed by anyone.
+The above demonstrates the state machine behind all blockchain transactions. The only party able to authorize a transaction is the wallet holder. Once it has been submitted to the public Mempool, the wallet owner can still, in some cases, change it, but once confirmed, no one can reverse it.
 
 ### Travel Rule Protocols
 
-Most protocols implementing the FATF Travel Rule for crypto transactions have also implemented a two party authorization flow between an originator and beneficiary institution. These are all implemented through a deterministic message flow. Each agent or party to a transaction is expected to perform a set of actions in a particular sequence. The reality is that in most cases they don’t do that, but implement the travel rule somewhat haphazardly or not at all, causing most parties customers to not complete a successful authorization flow of a transaction.
+Most protocols implementing the FATF Travel Rule for crypto transactions have also implemented a two-party authorization flow between an originator and beneficiary institution. These are all implemented through a deterministic message flow. Each agent or party to a transaction is expected to perform a set of actions in a particular sequence. In most cases, they don’t do that but implement the travel rule somewhat haphazardly or not at all, causing most parties' customers to not complete a successful authorization flow of a transaction.
 
 ### Non-deterministic multi-party authorization
 
-TAP proposes a non-deterministic message flow instead allowing each party to negotiate for their required information and use game theoretical principles to encourage their counterparties to help them implement their own policy around transactions. An institution can force some consensus around the state of the payment, by withholding settlement or not sharing a settlement address until sufficient risk has been mitigated by all the participating agents.
+TAP proposes a non-deterministic message flow, allowing each party to negotiate for their required information and use game theoretical principles to encourage counterparties to help them implement their policy around transactions. An institution can force some consensus around the state of the payment by withholding settlement or not sharing a settlement address until all the participating agents have mitigated sufficient risk.
 
 ## Specification
 <!--The technical specification should describe the standard in detail. The specification should be detailed enough to allow competing, interoperable implementations. -->
-Messages follow [TAIP-2 Messaging][TAIP-2] and are sent between [TAIP-5 Agents][TAIP-5] after an initial transaction request such as [TAIP-3 Asset Transfer][TAIP-3] has been sent. Authorization messages MUST include the ID of the original transaction request in the `thid` attribute of there message.
+Messages implement [TAIP-2] and are sent between [TAIP-5 Agents][TAIP-5] after an initial transaction request, such as a [TAIP-3 Asset Transfer][TAIP-3]. Authorization messages MUST include the `id` of the original transaction request in the `thid` attribute of the message.
 
-It is important to understand, that this is strictly speaking a messaging standard. There is no shared state implied between agents, with the exception of the ultimate settlement on a blockchain.
+It is essential to understand that this is, strictly speaking, a messaging standard. No shared state is implied between agents except the ultimate settlement on a blockchain.
 
-There are 3 primary actions an agent can take:
+There are three primary actions an agent can take:
 
-- `Settle` - They are sending the transaction to the blockchain. This is the only action that ultimately matters on the blockchain
-- `Authorize` - Authorize or signal to other agents that they are free to `settle` a transaction
+- `Settle` - They announce they will send the transaction to the blockchain.
+- `Authorize` - Authorize or signal to other agents that they are free to `settle` a transaction.
 - `Reject` - Signal to other agents that they reject the transaction.
 
-These are all sent as replies to an initial request by specifying the `id` of the original request in the `thid` attribute.
+All messages are sent as replies to an initial request by specifying the `id` of the original request in the `thid` attribute.
 
 ### Authorize
 
@@ -102,7 +104,7 @@ Any agent can authorize the transaction by replying as a thread to the initial m
 - `@type` - REQUIRED the JSON-LD type `https://tap.rsvp/schema/1.0#Authorize` (provisional)
 - `settlementAddress` - OPTIONAL string representing the intended destination address of the transaction specified in [CAIP-10](CAIP-10) format. If sent by a VASP representing the beneficiary this is REQUIRED unless the original request contains a `settlementAddress`. For all others it is OPTIONAL.
 
-By not providing a `settlementAddress` until after `Authorization`, beneficiary agents can for the first time reject incoming blockchain transactions.
+By not providing a `settlementAddress` until after `Authorization`, beneficiary agents can reject incoming blockchain transactions for the first time.
 
 An example Authorization flow using two agents where the `settlementAddress` was included in the original `Transfer` message:
 
@@ -139,7 +141,7 @@ sequenceDiagram
     Beneficiary WalletAPI ->> Originating Agent: Authorize [settlementAddress]
 ```
 
-The above flow demonstrates the power of multiple agents collaborating around authorizing a transaction. Both the Beneficiary Agent and WalletAPI maintain their own risk profiles and can independently authorize the transaction. In most cases the Wallet API will defer to their customer the Beneficiary Agent, and can use the signal that their customer Authorizes it to Authorize it and present the `settlementAddress` to the originating agent.
+The above flow demonstrates the power of multiple agents collaborating around authorizing a transaction. The Beneficiary Agent and WalletAPI maintain their risk profiles and can independently authorize the transaction. In most cases, the Wallet API will defer to their customer, the Beneficiary Agent, and can use the signal that their customer Authorizes it to Authorize it and present the `settlementAddress` to the originating agent.
 
 ### Settle
 
@@ -175,7 +177,7 @@ sequenceDiagram
     Originating WalletAPI ->> Beneficiary Agent: Settle [settlementId]
 ```
 
-The above flow also demonstrates the power of multiple agents collaborating around authorizing a transaction. Both the Originating Agent and WalletAPI maintain their own risk profiles and can independently authorize the transaction for Settlement. In most cases the Wallet API will defer to their customer the Originating Agent, and can use the signal that their customer sends a Settle message to actually settle it on the blockchain and present the `settlementId` to the other agents.
+The above flow also demonstrates the power of multiple agents collaborating to authorize a transaction. The Originating Agent and WalletAPI maintain their risk profiles and can independently authorize the transaction for settlement. In most cases, the Wallet API will defer to their customer, the Originating Agent, and can use the signal that their customer sends a Settle message to settle it on the blockchain and present the `settlementId` to the other agents.
 
 #### SettlementID
 
@@ -256,7 +258,7 @@ stateDiagram-v2
 
 ## Rationale
 <!--The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.-->
-A key aspect of this flow is the intentional lack of shared state. By focusing on a messages flow instead, it makes it more realistic to be used in permissionless blockchain applications. It also does provide more complexity on the implementing agent and their policies (see [TAIP-7]).
+A vital aspect of this flow is the intentional lack of a shared state. Focusing on a message flow instead makes it more realistic to use in permissionless blockchain applications. It also does provide more complexity for the implementing agent and their policies (see [TAIP-7]).
 
 ## Test Cases
 <!--Please add diverse test cases here if applicable. Any normative definition of an interface requires test cases to be implementable. -->
@@ -316,7 +318,7 @@ It is always the responsibility of each agent to verify the contents of each mes
 
 ## Privacy Considerations
 <!--Please add an explicit list of intra-actor assumptions and known risk factors if applicable. Any normative definition of an interface requires these to be implementable; assumptions and risks should be at both individual interaction/use-case scale and systemically, should the interface specified gain ecosystem-namespace adoption. -->
-The only potential PII that could potentially be shared and leaked through this flow are public blockchain addresses of specific customers. Agents can minimize this by no longer issuing blockchain addresses to individual customers and relying on more efficient omnibus accounts.
+The only potential PII that could be shared and leaked through this flow are public blockchain addresses of specific customers. Agents can minimize this by no longer issuing blockchain addresses to individual customers and relying on more efficient omnibus accounts.
 
 ## References
 <!--Links to external resources that help understanding the TAIP better. This can e.g. be links to existing implementations. See CONTRIBUTING.md#style-guide . -->

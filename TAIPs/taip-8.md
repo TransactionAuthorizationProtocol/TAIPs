@@ -13,19 +13,21 @@ requires: 2, 5, 6, 7
 <!--You can leave these HTML comments in your merged EIP and delete the visible duplicate text guides, they will not appear and may be helpful to refer to if you edit it again. This is the suggested template for new EIPs. Note that an EIP number will be assigned by an editor. When opening a pull request to submit your EIP, please use an abbreviated title in the filename, `eip-draft_title_abbrev.md`. The title should be 44 characters or less.-->
 ## Simple Summary
 <!--"If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the TAIP.-->
-Provides a simple and secure method for Transaction Agents to share Verifiable Credentials Identifying themselves or Transaction Parties to help comply with their policies.
+Provides a simple and secure method for transaction agents to share verified credentials identifying themselves or transaction parties to help comply with their policies.
 
 ## Abstract
 <!--A short (~200 word) description of the technical issue being addressed.-->
-Transaction Agents may have a requirement to identify certain aspects of another Transaction Participant before they can Authorize or Settle a transactions according to the [Transaction Authorization Flow][TAIP-4]. They present these as [TAIP-7 Agent Policies][TAIP-7]. This provides a simple method to securely share required information as [Verified Presentations][VP] over End-to-End encrypted [DIDComm].
+Transaction Agents may have a requirement to identify specific aspects of another Transaction Participant before they can Authorize or Settle transactions according to the [Transaction Authorization Flow][TAIP-4]. They present these as [TAIP-7 Agent Policies][TAIP-7]. This provides a simple method to securely share required information as [Verified Presentations][VP] over End-to-End encrypted [DIDComm].
 
 ## Motivation
 <!--The motivation is critical for TAIP. It should clearly explain why the state of the art is inadequate to address the problem that the TAIP solves. TAIP submissions without sufficient motivation may be rejected outright.-->
-There are strong regulatory requirements for exchanging PII of transaction parties within the context of a transaction, such as complying with Sanctions Name Screening requirements, FATF's Travel Rule and various international data protection legislations. Highlighting the identity of the parties and providing the data to the counterparties of the transaction, also improves UX, reduces risk of fraud, and ties transactions into business workflows such as payroll and e-commerce.
+There are strict regulatory requirements for exchanging PII of transaction parties within the context of a transaction, such as complying with Sanctions Name Screening requirements, FATF’s Travel Rule, and various international data protection legislation.
 
-Many other Transaction Authorization Protocols including [iso20022], and most Crypto Travel Rule Protocols based on [IVMS-101] exchange transmit the PII inline with the transfer request itself, which lends themselves to major risk of PII exposure. This is not only bad for end-users, but can expose significant legal liability for Transaction Agents handling this.
+Highlighting the identity of the parties and providing the data to the transaction counterparties also improves UX, reduces the risk of fraud, and ties transactions into business workflows such as payroll and e-commerce.
+Many other Transaction Authorization Protocols, including [iso20022], and most Crypto Travel Rule Protocols based on [IVMS-101] exchange transmit the PII in line with the transfer request itself, which lends themselves to a significant risk of PII exposure.
 
-The approach taken here is to remove any PII from the core transaction meta-data that all agents require, and only exchange the minimum required information directly between the specific Agents that have a requirement for it. By allowing Transaction Agents to publish their policies up-front through [TAIP-7], other Agents can separately take a risk-based approach to complying and exchanging the PII. It allows Agents to asses privacy policies, regulations etc for the Agent requiring the PII before exchanging it.
+This is bad for end-users and can expose significant legal liability for Transaction Agents handling this.
+The approach taken here is to remove any PII from the core transaction meta-data that all agents require, and only exchange the minimum required information directly between the specific Agents requiring it. By allowing transaction agents to publish their policies up-front through [TAIP-7], other agents can take a risk-based approach to comply with and exchange the PII separately. It allows Agents to asses privacy policies, regulations, etc, for the Agent requiring the PII before exchanging it.
 
 ## Specification
 
@@ -207,11 +209,11 @@ TODO Make sure this works correctly
 
 ## Security Considerations
 <!--Please add an explicit list of intra-actor assumptions and known risk factors if applicable. Any normative definition of an interface requires these to be implementable; assumptions and risks should be at both individual interaction/use-case scale and systemically, should the interface specified gain ecosystem-namespace adoption. -->
-The underlying technical security of this depends on the security of the underlying [DID] model and [DIDComm] itself. Applying this to real-world use cases it is intended to be used in an adversarial world with untrusted participants.
+The underlying technical security of this depends on the security of the underlying [DID] model and [DIDComm] itself. It is intended to be used in an adversarial world with untrusted participants.
 
-Before exchanging any PII you MUST trust this party enough to be able to share that information. What is the legal purpose for sharing the information? Is this actually the Agent you expect it to be.
+Before exchanging any PII, you MUST trust this party enough to be able to share that information. What is the legal purpose for sharing the information? Is this the Agent you expect it to be?
 
-When receiving any Presentation Proof it is important to perform the following:
+When receiving any Presentation Proof, it is essential to perform the following:
 
 * The **Verifier** MUST Verify the signature of the message
 * The **Verifier** MUST Verify the signer of the DIDComm Message belongs to the DID of the Agent expected to Present the information to you.
@@ -220,7 +222,9 @@ When receiving any Presentation Proof it is important to perform the following:
 
 ## Privacy Considerations
 <!--Please add an explicit list of intra-actor assumptions and known risk factors if applicable. Any normative definition of an interface requires these to be implementable; assumptions and risks should be at both individual interaction/use-case scale and systemically, should the interface specified gain ecosystem-namespace adoption. -->
-Privacy legislations, such as the General Data Protection Regulation (GDPR) and the California Consumer Privacy Act (CCPA), enforce well-established privacy principles such as 'Data Minimization' and 'Purpose Limitation.' In the context of analyzing Personally Identifiable Information (PII) to comply with the Financial Action Task Force's (FATF) travel rule requirements, each agent must only process the minimum amount of data required for this purpose. TAIP-8 supports data protection legislations by giving each agent granular control over their PII requests and provides travel rule creators with increased control to carefully consider whether it's safe to share PII with a counterparty. <TBC>
+Privacy legislation, such as the General Data Protection Regulation (GDPR) and the California Consumer Privacy Act (CCPA), enforce well-established privacy principles such as ‘Data Minimization’ and ‘Purpose Limitation.’
+
+In analyzing Personally Identifiable Information (PII) to comply with the Financial Action Task Force’s (FATF) travel rule requirements, each Agent must only process the minimum amount of data required. TAIP-8 supports data protection legislation by giving each Agent granular control over their PII requests and provides travel rule creators with increased control to carefully consider whether it’s safe to share PII with a counterparty.
 
 ## References
 <!--Links to external resources that help understanding the TAIP better. This can e.g. be links to existing implementations. See CONTRIBUTING.md#style-guide . -->

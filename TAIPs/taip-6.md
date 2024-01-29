@@ -13,23 +13,23 @@ requires: 2
 <!--You can leave these HTML comments in your merged EIP and delete the visible duplicate text guides, they will not appear and may be helpful to refer to if you edit it again. This is the suggested template for new EIPs. Note that an EIP number will be assigned by an editor. When opening a pull request to submit your EIP, please use an abbreviated title in the filename, `eip-draft_title_abbrev.md`. The title should be 44 characters or less.-->
 ## Simple Summary
 <!--"If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the TAIP.-->
-Parties are the real-world entities involved with a transaction. It could be either legal or natural persons. Parties can control Agents who are part of performing a transaction, but are themselves distinct from for example a software wallet that they control.
+Parties are the real-world entities involved with a transaction. It could be either legal or natural persons. Parties can control Agents who are part of performing a transaction but are distinct from, for example, a software wallet they control.
 
 ## Abstract
 <!--A short (~200 word) description of the technical issue being addressed.-->
-This is specifies how parties can be represented in a [Transaction Authorization Protocol Flow][TAIP-4] and be related to one or more agents.
+This specification defines how parties are represented in a [Transaction Authorization Protocol Flow][TAIP-4] and their relationships with one or more agents.
 
 ## Motivation
 <!--The motivation is critical for TAIP. It should clearly explain why the state of the art is inadequate to address the problem that the TAIP solves. TAIP submissions without sufficient motivation may be rejected outright.-->
-Blockchain often use blockchain addresses instead of the ultimate parties to a transaction. They are missing the context required to tie a transaction into a real-world use-case such as an e-commerce payment, payroll, or other such transactions requiring record keeping, legal recourse, as well as risk mitigation based on real-world counterparties.
+Blockchains often use blockchain addresses instead of the ultimate parties to a transaction. They are missing the context required to tie a transaction into a real-world use case, such as an e-commerce payment, payroll, or other transactions requiring record keeping, legal recourse, and risk mitigation based on real-world counterparties.
 
 ## Specification
 
 ### Representing Parties
 
-Parties are identified using an [IRI] as the `@id` attribute in a [JSON-LD] object. IRIs are the internationalized updated version of URI's that most people know today. IRI's typically used as identifiers today are represent [email addresses][MAILTO] and [phone numbers][SMS]. Recommended are also modern [Decentralized Identifiers (DIDs)][DID] that allow users to create and manage their own identities in a decentralized manner.
+Parties are identified using an [IRI] as the @id attribute in a [JSON-LD] object. IRIs are the internationalized updated version of URIs that most people know today. IRI’s typically used as identifiers today represent [email addresses][MAILTO] and [phone numbers][SMS]. Modern [Decentralized Identifiers (DIDs)][DID], which allow users to create and manage their own identities in a decentralized manner, are also recommended.
 
-Parties represented in [TAIP-2] messages using a very simple JSON-LD node syntax with the following attributes:
+Parties represented in [TAIP-2] messages using a straightforward [JSON-LD] node syntax with the following attributes
 
 * `@id` - REQUIRED the [IRI] of the Party
 
@@ -41,7 +41,7 @@ Parties represented in [TAIP-2] messages using a very simple JSON-LD node syntax
 
 #### Specifying additional information about a party
 
-Additional details can be submitted within a party object, using [JSON-LD] to add additional meta-data. Please note this should not be used for providing private verified information about a legal person such as that obtained through a KYC process. See Privacy Considerations section below for more. This information can be requested and exchanged using [TAIP-8 Selective Disclosure][TAIP-8].
+Additional details can be submitted within a party object, using [JSON-LD] to add other meta-data. This MUST not be used to provide private verified information about a natural person such as that obtained through a KYC process. See the Privacy Considerations section below for more. This information can be requested and exchanged using [TAIP-8 Selective Disclosure][TAIP-8].
 
 As an example you could add information about the country of a party like this:
 
@@ -92,8 +92,7 @@ Any Agent can send one of the following messages:
 
 #### UpdateParty
 
-Any agent can 
-additional agents to a transaction by replying as a thread to the initial message. The following shows the attributes of the `body` object:
+Any agent can update a party to a transaction by replying as a thread to the initial message. The following shows the attributes of the `body` object:
 
 * `@context` - REQUIRED the JSON-LD context `https://tap.rsvp/schema/1.0` (provisional)
 * `@type` - REQUIRED the JSON-LD type `https://tap.rsvp/schema/1.0#UpdateParty` (provisional)
@@ -104,9 +103,7 @@ If an existing transaction party is already included in the transaction an Agent
 
 ## Rationale
 
-A Transaction may be requested with fairly minimal information that an Agent must fill out to be able to manage risk on behalf of themselves and customers.
-
-The Agent structure provides an abstract method for multiple different types of agents to collaborate to discover the required information to Authorize a transaction using [TAIP-4].
+TODO
 
 ## Test Cases
 
@@ -116,7 +113,7 @@ Provide here any test cases that will help implementers of the TAIP to validate 
 
 #### Missing Beneficiary Information
 
-See the following [TAIP-3] message outlining a typical Asset Transfer where a customer is asking to transfer funds to a blockchain address. It misses information around who the beneficiary is, which has to be discovered to complete the transaction:
+See the following [TAIP-3] message outlining a typical Asset Transfer where a customer asks to transfer funds to a blockchain address. It misses information about who the beneficiary is, which has to be discovered to complete the transaction::
 
 ```json
 {
@@ -147,9 +144,9 @@ See the following [TAIP-3] message outlining a typical Asset Transfer where a cu
 }
 ```
 
-#### Complete example showing VASP to VASP third party Asset Transfer
+#### Complete example showing VASP to VASP third-party Asset Transfer
 
-After completing the discovery aspects  of TAP the Asset Transfer could look like this with a third party beneficiary and a VASP controlling the Settlement Address. It now has all the required information to complete it:
+After completing the discovery aspects of TAP, the Asset Transfer could look like this with a third-party beneficiary and a VASP controlling the Settlement Address. It now has all the required information to complete it:
 
 ```json
 {
@@ -193,9 +190,9 @@ After completing the discovery aspects  of TAP the Asset Transfer could look lik
 }
 ```
 
-#### Complete example showing VASP to first party self-hosted wallet Asset Transfer
+#### Complete example showing VASP to first-party self-hosted wallet Asset Transfer
 
-After completing the discovery aspects of TAP we discover the Asset Transfer goes to the customer's own self-hosted wallet address:
+After completing the discovery aspects of TAP, we discover the Asset Transfer goes to the customer’s self-hosted wallet address:
 
 ```json
 {
@@ -265,11 +262,13 @@ The following are example plaintext messages. See [TAIP-2] for how to sign the m
 <!--Please add an explicit list of intra-actor assumptions and known risk factors if applicable. Any normative definition of an interface requires these to be implementable; assumptions and risks should be at both individual interaction/use-case scale and systemically, should the interface specified gain ecosystem-namespace adoption. -->
 As in any decentralized messaging protocol, it is paramount that the recipient of messages trust the senders in the context of a particular transaction.
 
-TODO specify in more detail
+TODO specify in more detail.
 
 ## Privacy Considerations
 <!--Please add an explicit list of intra-actor assumptions and known risk factors if applicable. Any normative definition of an interface requires these to be implementable; assumptions and risks should be at both individual interaction/use-case scale and systemically, should the interface specified gain ecosystem-namespace adoption. -->
-Since parties are intended to represent real-world entities, both natural and legal persons, it is important to take privacy concerns very seriously. [TAIP-2] does support encrypted messages and the message content can be end-to-end encrypted, it is not always that all recipients of messages have access to the PII of an ultimate party to a transaction. We are proposing a privacy preserving Selective Disclosure scheme in [TAIP-8] that is designed to minimize the exposure of PII to a minimum, and also take into account managing process of requesting and responding to required PII.
+Parties represent real-world entities, both natural and legal persons. For this reason, it is essential to take privacy concerns very seriously. [TAIP-2] supports encrypted messages, and the message content can be end-to-end encrypted. Not all recipients need access to the PII of an ultimate party to a transaction.
+
+We are proposing a privacy-preserving Selective Disclosure scheme in [TAIP-8] designed to minimize the exposure of PII to a minimum and also consider the managing process of requesting and responding to required PII.
 
 ## References
 <!--Links to external resources that help understanding the TAIP better. This can e.g. be links to existing implementations. See CONTRIBUTING.md#style-guide . -->

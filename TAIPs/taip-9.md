@@ -13,19 +13,21 @@ requires: 2, 5, 7
 <!--You can leave these HTML comments in your merged EIP and delete the visible duplicate text guides, they will not appear and may be helpful to refer to if you edit it again. This is the suggested template for new EIPs. Note that an EIP number will be assigned by an editor. When opening a pull request to submit your EIP, please use an abbreviated title in the filename, `eip-draft_title_abbrev.md`. The title should be 44 characters or less.-->
 ## Simple Summary
 <!--"If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the TAIP.-->
-Provides a method to prove relationships both self-hosted and hosted wallet addresses and their respective transaction participants.
+A method to prove the relationships of transaction participants.
 
 ## Abstract
 <!--A short (~200 word) description of the technical issue being addressed.-->
-Provides a method for agents to confirm their relationship with another agent or party. It allows for two-sided confirmation as well as cryptographically verified confirmation. It is primarily designed to support the verification of control of both self-hosted and custodial wallets by specific agents or parties.
+Provides a method for agents to confirm their relationship with another agent or party. It allows for one or two-sided confirmation as well as cryptographically verified confirmation.
+
+The primary use case is to verify who controls self-hosted and custodial wallets.
 
 ## Motivation
 <!--The motivation is critical for TAIP. It should clearly explain why the state of the art is inadequate to address the problem that the TAIP solves. TAIP submissions without sufficient motivation may be rejected outright.-->
-The Transaction Agent model allows Agents to declare whom they are acting on behalf of. In some cases more than declaration is needed and either a confirmation by the other party or cryptographically signed proof will increase the certainty of the original statement.
+The Transaction Agent model allows Agents to declare whom they are acting on behalf of. In some cases, more than a declaration is needed, and either a confirmation by the other party or cryptographically signed proof will increase the certainty of the original statement.
 
 The primary use-cases today are:
 
-* Prove that the indended beneficiary to a transaction controls a blockchain wallet address to ensure the transaction reaches its intended beneficiary
+* Prove that the intended beneficiary to a transaction controls a blockchain wallet address to ensure the transaction reaches its intended beneficiary
 * Prove that a known party controls a blockchain wallet address for KYC and Sanctions Screening purposes
 * Prove that an Agent controls a blockchain wallet address to ensure the exchange of PII to the correct agent in the context of a Travel Rule compliant transaction
 
@@ -93,7 +95,7 @@ graph TD
     BeneficiaryVASP[Beneficiary VASP] -.->|for| Beneficiary
 ```
 
-We'll use the following notation to express the certainty of a relationship. This certainty is going to be different from the point of view of different actors:
+We’ll use the following notation to express the certainty of a relationship. This certainty is going to be different from the point of view of other agents:
 
 ```mermaid
 graph LR
@@ -102,7 +104,7 @@ graph LR
   Agent ==> Proven[Proven Relationship]
 ```
 
-Other agents can confirm different aspects of it. For example if the Beneficiary VASP sends an `Authorize` method using [TAIP-4] and you trust them, they have confirmed their parts of the transaction and it looks like this:
+Other agents can confirm different aspects of it. For example, if the Beneficiary VASP sends an `Authorize` method using [TAIP-4] and you trust them, they have confirmed their parts of the transaction, and it looks like this:
 
 ```mermaid
 graph TD
@@ -116,9 +118,9 @@ graph TD
     BeneficiaryVASP[Beneficiary VASP] -->|for| Beneficiary
 ```
 
-If you trust them less you may want to have specific agents provve aspects of their relationship. For example prior to sharing PII using [TAIP-8] you may have a policy for a Beneficiary VASP to prove or confirm their relationship with the Settlement Address.
+If you trust them less, you should have specific agents prove aspects of their relationship. For example, prior to sharing PII using [TAIP-8], you may have a policy for a Beneficiary VASP to verify or confirm their relationship with the Settlement Address.
 
-One approach would be for the Beneficiary VASP to send a message to the Originating VASP confirming their control of the Settlement Address. This would still require you to trust them so it is just `Confirmed`:
+One approach would be for the Beneficiary VASP to send a message to the Originating VASP confirming their control of the Settlement Address. This would still require you to trust them, so it is just `Confirmed`:
 
 ```mermaid
 graph TD
@@ -132,7 +134,7 @@ graph TD
     BeneficiaryVASP[Beneficiary VASP] -.->|for| Beneficiary
 ```
 
- Another stricter approach would be for the Settlement Address to provide an additional cryptographical proof that they are controlled by the Beneficiary VASP, which would cryptographically prove the relationship:
+ Another stricter approach would be for the Settlement Address to provide additional cryptographical proof that they are controlled by the Beneficiary VASP, which would cryptographically prove the relationship
 
 ```mermaid
 graph TD
@@ -146,7 +148,7 @@ graph TD
     BeneficiaryVASP -.->|for| Beneficiary
 ```
 
-In the case of a transaction from an Exchange to their customers own self-hosted wallet, the following graph shows the relationships which are strong for anything the Exchange itself controls. They do not know if their customer actually controls the wallet:
+In the case of a transaction from an Exchange to their customers' self-hosted wallet, the following graph shows the strong relationships for anything the Exchange itself controls. They do not know if their customer controls the wallet:
 
 ```mermaid
 graph TD
@@ -159,7 +161,7 @@ graph TD
     Wallet -.->|for| Customer
 ```
 
-If they trust the customer enough and are able to manage risk in other ways they could just ask the Customer to confirm the ownership in their UX, which leads to the following graph:
+If they trust the customer enough and can manage risk in other ways, they could just ask the Customer to confirm the ownership in their UX, which leads to the following graph:
 
 ```mermaid
 graph TD
@@ -172,7 +174,7 @@ graph TD
     Wallet -->|for| Customer
 ```
 
-Alternatively they could also obtain a cryptographic signature proving the relationship between their customer and their wallet resulting in the following stronger relationship graph:
+Alternatively, they could also obtain a cryptographic signature proving the relationship between their customer and their wallet, resulting in the following more robust relationship graph:
 
 ```mermaid
 graph TD
@@ -187,11 +189,11 @@ graph TD
 
 ### Cryptographic Verification
 
-All [DID] methods publish a verification method that can be used to verify the signature of a message. All messages sent via [TAIP-2] are already cryptographically signed by the [DID] in the `from` attribute of the message. Thus any [TAIP-2] message SHOULD be assumed to be confirmed by that [DID].
+All [DID] methods publish a verification method that can be used to verify the signature of a message. All messages sent via [TAIP-2] are already cryptographically signed by the DID in the fr1om attribute of the message. Thus, any [TAIP-2] message SHOULD be assumed to be confirmed by that [DID].
 
-Many self-hosted and multi-sig wallets in common useage today by retail users are not able to sign [TAIP-2] messages directly. Instead they can sign a [CACAO Capability Object][CAIP-74] which is a Chain Agnostic method of presenting a plain text message to a self-hosted wallet for signing.
+Many self-hosted and multi-sig wallets in everyday use today by retail users cannot sign [TAIP-2] messages directly. Instead, they can sign a [CACAO Capability Object][CAIP-74], a Chain Agnostic method of presenting a plain text message to a self-hosted wallet for signing.
 
-The resulting signed message can be attached to a [TAIP-2] message by another agent. This can be used to perform a double confirmed cryptographically signed message for extra verification.
+The resulting signed message can be attached to a [TAIP-2] message by another agent. This can be used to perform a double-confirmed cryptographically signed message for extra verification.
 
 ## Specification
 

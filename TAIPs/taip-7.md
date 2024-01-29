@@ -13,19 +13,21 @@ requires: 2, 4, 5, 6
 <!--You can leave these HTML comments in your merged EIP and delete the visible duplicate text guides, they will not appear and may be helpful to refer to if you edit it again. This is the suggested template for new EIPs. Note that an EIP number will be assigned by an editor. When opening a pull request to submit your EIP, please use an abbreviated title in the filename, `eip-draft_title_abbrev.md`. The title should be 44 characters or less.-->
 ## Simple Summary
 <!--"If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the TAIP.-->
-Agents as specified in [TAIP-5] are services, often run by businesses who have business, contractual, and regulatory reasons for managing risk regarding transactions. Individuals may also create their own policies to protect themselves from unwanted liability and security risks. As part of [TAIP-4] they can declare their own requirements for authorizing a transaction as policies.
+As specified in [TAIP-5], agents are services often run by businesses that have business, contractual, and regulatory reasons for managing risk regarding transactions. Individuals may also create policies to protect themselves from unwanted liability and security risks. As part of [TAIP-4] they can declare their requirements for authorizing a transaction as policies.
 
 ## Abstract
 <!--A short (~200 word) description of the technical issue being addressed.-->
-This allows [TAIP-5 Agents][TAIP-5] to specify their requirements  to authorize a transaction as part of the [Transaction Authorization Protocol Flow][TAIP-4]. These policies can be used to negotiate the exchange of information each Agent requires to be able to swiftly authorize or reject a transaction.
+This specification allows [TAIP-5 Agents][TAIP-5] to specify their requirements to authorize a transaction as part of the [Transaction Authorization Protocol Flow][TAIP-4]. These policies are used to negotiate the exchange of information each Agent requires to be able to authorize or reject a transaction swiftly.
 
 ## Motivation
 <!--The motivation is critical for TAIP. It should clearly explain why the state of the art is inadequate to address the problem that the TAIP solves. TAIP submissions without sufficient motivation may be rejected outright.-->
-Traditional centrally managed Payment Associations issue shared guidelines and policies as part of their membership agreements, that makes sure information requirements are standardized regionally and globally. [TAP][TAIP-4] was designed to work in a decentralized ecosystem based on public blockchains, with no centralized association to design a set of policies.
+Traditional centrally managed Payment Associations issue shared guidelines and policies as part of their membership agreements, ensuring information requirements are standardized regionally and globally. [TAP][TAIP-4] was designed to work in a decentralized ecosystem based on public blockchains, with no centralized association to create a set of policies.
 
-Use cases and regulation is rapidly expanding around the world, and some jurisdictions have stricter requirements than others. E-commerce and trading use-cases also have different requirements, so can't be standardized in a global set of policies for everyone to implement.
+Use cases and regulations are rapidly expanding worldwide, and some jurisdictions have stricter requirements than others. E-commerce and trading use cases also have different requirements, so they can’t be standardized in a global set of policies for everyone to implement.
 
-The approach proposed here allows each agent to declare their policies, and allow each agent to decide if they want to comply with them based on balancing risk and business value. This allows a market based approach to rolling out policies, instead of a top down policy by a national or trans-national organization.
+The approach proposed here allows each agent to declare their policies and will enable each agent to decide if they want to comply with them based on balancing risk and business value.
+
+This method allows a market-based approach to rolling out policies instead of a top-down policy by a national or transnational organization.
 
 ## Specification
 
