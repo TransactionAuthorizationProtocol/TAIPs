@@ -6,15 +6,18 @@ created: 2024-01-09
 updated: 2024-01-09
 ---
 
-# **Transaction Authorization Protocol (TAP) White Paper**
+# Transaction Authorization Protocol (TAP) White Paper
 
 ## Decentralized protocol to allow multiple parties to identify each other and collaborate around authorizing real-world transactions
 
 ## Executive Summary
 
 The Transaction Authorization Protocol (TAP) represents a the first practical approach at creating a method for handling complex transaction authorizations for critical and complex real world use-cases such as cross-border payments, specifically designed for use for settlement on blockchains.
+
 Designed to facilitate complex payments across a range of centralized and decentralized intermediaries, TAP addresses the critical need for robust, multi-layered transaction authorization in an increasingly digital economy.
+
 The protocol is agnostic to the specific blockchain type and can work for real-world transactions composed of multiple underlying settlement transactions across multiple blockchains and fiat payment gateways.
+
 Specific use-cases to be addressed from day one include:
 
 - Both retail and institutional custodial to custodial transfers
@@ -28,10 +31,15 @@ Specific use-cases to be addressed from day one include:
 ## Introduction
 
 Public blockchains provide an order of magnitude better solutions for settlement of both complex and simple transactions between untrusted counterparties. Transactions typically exist within a single blockchain transaction on a single network and the entire authorization mechanism is handled by the holders of the keys to the originating account.
+
 This means beneficiaries are currently unable to authorize or reject a transaction. In many real world transactions there may be multiple steps involved in a transactions. Real world transactions can also include a combination of multiple blockchain transactions across multiple blockchains, with optionally centralized steps such as conversion from or to FIAT or providing of liquidity.
+
 Besides providing a mapping between real world transactions one or more orchestrated blockchain transactions, each party involved needs to manage risks such as counterparty risk, loss of funds through security or fraud, as well as manage compliance duties to limit financial crime.
+
 With the entrance of a next generation of startups and traditional financial institutions entering the digital asset space, it is critical that the industry works together to build out a messaging and authorization messaging system, similar in many ways to ISO20022, but native to the intricacies of blockchain transactions.
+
 TAP emerges as a solution, bridging gaps in transaction authorization, trust, and compliance in the digital asset industry. This document outlines the protocol's design, goals, and its significance for a varied audience, including developers, financial institutions, and regulatory bodies.
+
 At this pivotal moment in the crypto industry, with institutions, fintechs, and banks preparing for significant migration to blockchain technologies, TAP's flexibility and rapid adaptability to new technologies through Transaction Authorization Improvement Protocols (TAIPs) are crucial.
 
 ## Current State of Crypto Transactions
@@ -82,8 +90,11 @@ The above demonstrates the state machine behind all blockchain transactions. The
 ### Implications for self-hosted wallet users
 
 One of the core tenets of the blockchain industry is to allow individuals to manage their own private wallets and keys. There are significant security challenges involved with this that hardware and smart contract based wallet providers are working on solving.
+
 There however additional risks involved to the owners of these self-hosted wallets. There has been considerable fraud involving self-hosted wallet owners accidentally authorizing transactions through phishing attacks sending funds to the wrong party. Proper authorization and counterparty identification for both retail and self-hosted wallet users is key to allow the echo system to grow.
+
 Since transactions on blockchains are themselves public, self-hosted wallet owners regularly expose what they expect to be their private transaction history whenever they share their blockchain addresses to anyone. This also exposes them to fraudulent incoming transactions that can lead to serious reputational risk for wallet holders and additional fraud use cases.
+
 Inadvertently transacting with high risk wallets or mixers, can permanently damage the possibility of interacting directly with a centralized service for example.
 
 ### Implications for Centralized Services
@@ -156,12 +167,15 @@ stateDiagram-v2
 ```
 
 As many centralized services are also now facilitating transactions between FIAT payment services and blockchains, the risks start to grow exponentially.  The reversible authorization flow of a FIAT transaction, clashes with the non-reverseable characteristics of a blockchain transaction.
+
 The ultimate parties to a FIAT transaction are difficult to match to a blockchain transaction as blockchain transactions do not contain information about the ultimate originating and beneficiary parties. This can cause major fraud risk exposure to the centralized service performing the transaction and can lead to them having their access to FIAT payment service providers revoked. (TODO refer to cases where this has happened)
 
 ## Overview of TAP
 
 TAP introduces a new authorization messaging layer for centralized and decentralized services to coordinate the execution of real-world transactions using blockchain transactions. It supports many similar use cases to ISO20022 and even allows a future compatibility layer to be created.
+
 Where it differs from ISO20022 is its first class support for blockchain transactions, blockchain accounts, complex decentralized protocols built using Smart Contracts and is extensible to support future technologies. At the same time it can handle the interoperability between FIAT payment systems as well.
+
 In addition due to the decentralized and often chaotic aspects of blockchain ecosystems, it also relies on game theoretical aspects for each party or agent to reach eventual finalization of a transaction across multiple steps.
 
 ## Design Principles of TAP
@@ -199,6 +213,7 @@ In addition due to the decentralized and often chaotic aspects of blockchain eco
 ## Messaging
 
 TAP relies on the existing [DIDComm](https://didcomm.org) protocol as a messaging spec. DIDComm presents a secure method for both trusted and untrusted agents implemented using DIDs to communicate together through a simple email like protocol.
+
 It supports low latency communication between servers without a centralized messaging broker and supports encryption, digital signatures and many other features.
 
 A basic DIDComm message looks like this:
@@ -218,6 +233,7 @@ A basic DIDComm message looks like this:
 ```
 
 DIDComm is based on tried and true IETF standards such as [IETF RFC-7515 JWS](https://www.rfc-editor.org/rfc/rfc7515) and  [IETF RFC-7516 JWE](https://www.rfc-editor.org/rfc/rfc7516.html) for encrypting and signing data.
+
 Server based agents can include their public keys and a DIDComm https end point in their DID document in a fully decentralized manner. Interactive agents such as mobile or desktop wallets can interact either through a trusted service or through encoding the messages in URL’s and/or QR codes through [DIDComm’s Out-of-Band](https://identity.foundation/didcomm-messaging/spec/#out-of-band-messages) functionality.
 
 ### Message Identifiers and Threads
@@ -235,7 +251,9 @@ It is assumed that all DIDComm endpoints are already encrypted using TLS or simi
 ## Transaction Types
 
 From a high level this protocol should be workable with many different real-world transaction types that involve one or more underlying blockchain transactions.
+
 From the outset the most important transaction to support is a regular crypto token transfer. From a naming point of view, these should be nouns that indicate the object regardless of the underlying state. Eg. transfer instead of transfer-request. The data model should be useable to backfill existing data to recreate it.
+
 Basic TAIPs describing specific core transaction types will be defined from the beginning. Additional TAIPs can be proposed by anyone to support  both new and existing transaction types.
 
 | Type            | TAIP | Description                                                  |
@@ -280,26 +298,35 @@ Parties are specified using IRIs, but Decentralized Identifiers (DIDs) are prefe
 ## Agents
 
 Agents are the wallets, exchanges, and other services directly involved with a transaction. Each party can be represented by one or more agents. Some agents are direct intermediaries in a transaction, without having a direct relationship with any of the parties to a transaction.
+
 Some agents are commercial centralized services. Some are Apps or other pieces of software running on one of the parties devices. Finally smart contracts running on blockchains could also be agents.
+
 Each agent can publish or manage their own policy and authorize or reject transactions. To do this [W3C Decentralized Identifiers](https://www.w3.org/TR/did-core/) (DIDs) are required. DIDs are based on different DID methods, that specify public keys and service endpoints that are required to securely communicate, between agents.
+
 Agents are specified by DID’s in JSON-LD blocks. The order is significant and indicates the flow of funds. Meaning the first agent is the originating side and the final agent is the beneficiary side. Agents can replace themselves, or insert other agents directly before or after themselves to help discovery of relevant agents.
+
 Agents can also be listed with specific policies they require other agents to comply with as well as potentially information about what role they perform.
 
 ### Centralized agents
 
 Centralized agents such as VASPs, Custodial Wallet API’s, Payment Providers, or other service providers should use [Web DIDs](https://w3c-ccg.github.io/did-method-web/). These are based on a well known domain name of the business. A DID document containing public keys and endpoints for messaging can be placed on any website.
+
 An important benefit of Web DIDs is that they can be created on behalf of any service with an existing domain name. They do not have to actively do anything to be identified as a passive agent, but can easily activate it once they have compliance or business requirements to do so. This aspect forms an important feature allowing TAP to be rolled out without all agents actively supporting it.
+
 Services typically require a method to communicate securely with other agents thus adding a messaging endpoint is important for them to participate.
 
 ### Self-hosted wallets as agents
 
 Any wallet address already has a blockchain account address, which acts as an identifier. This can be turned into a [CAIP-10](https://chainagnostic.org/CAIPs/caip-10) identifier, which in turn can be prepended with `did:pkh:` to create a [PKH-DID](https://github.com/w3c-ccg/did-pkh/blob/main/did-pkh-method-draft.md) for the address. Similarly to web-dids these can be used with existing account identifiers that are used within the underlying settlement process.
+
 Example: The main net Ethereum address `0xab16a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb` is encoded as CAIP-10 to `eip155:1:0xab16a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb`, which in turn becomes `did:pkh:eip155:1:0xab16a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb`.
+
 Most blockchain accounts are based on public keys that can also be used to securely sign messages.
 
 ### Smart contracts as agents
 
 In most smart contract based blockchains, smart contracts have addresses similar to those of regular wallets. Thus the above [PKH-DID](https://github.com/w3c-ccg/did-pkh/blob/main/did-pkh-method-draft.md) method can also be used.
+
 While Smart Contracts do not themselves have public keys, [ERC-1271: Standard Signature Validation Method for Contracts](https://eips.ethereum.org/EIPS/eip-1271) or future methods could be adapted in a future TAIP to allow them to accept or reject transactions.
 
 ### Actions Modifying list of agents
@@ -325,6 +352,7 @@ sequenceDiagram
 ### Discovering agents
 
 A typical problem found in implementing the Travel Rule is discovering the VASP behind a wallet address.
+
 This can be handled by existing agents adding one or more agents
 
 ## Transaction Authorization Mechanism
@@ -334,8 +362,11 @@ This part of the white paper describes the intricate process of transaction auth
 ### Non-deterministic multi-party authorization
 
 Most travel rule protocols have a deterministic message flow. Each agent or party to a transaction is expected to perform a set of actions in a particular sequence.
+
 The reality is that in most cases they don’t do that, but implement the travel rule somewhat haphazardly or not at all, causing most of our customers to not have a successful flow.
+
 By designing it as a non-deterministic message protocol instead allowing each party to negotiate for their required information and use game theoretical principles to force their counterparties to follow the rules that their national regulator or risk department requires. It also elegantly handles the sunrise period, where companies can create and modify policies as the industry and regulation changes.
+
 An institution can force some consensus around the state of the payment, by withholding settlement or not sharing a settlement address until sufficient risk has been mitigated by counterparties.
 
 ### Actions
@@ -474,9 +505,13 @@ sequenceDiagram
 ## Policies
 
 Any agent maintains their own set of policies to manage their own compliance and risk procedures. Notabene helps their customers authorize or cancel transactions based on their policies.
+
 This allows us for example to eliminate PII completely from a flow in the case where a DID is already identified, or that I as a business don’t require it (EG. I don’t have Travel Rule requirements).
+
 Policies also allow an agent to signal to counterparties what they require to either settle funds on behalf of the originator or credit funds to the beneficiary.
+
 Policies could be included in DID documents or specified on a case by case basis as part of the transaction flow.
+
 An agent can add a policy to the transaction through the following message:
 
 ```json
@@ -501,6 +536,7 @@ An agent requires an `authorize` action from either the final agent in the list 
 ### `require-presentation`
 
 This is a generic way of requesting a selected Verifiable Presentation of a particular credential.
+
 This could be used to request information about any party to a transaction including agents. This could be implemented using a `present-credentials` message (see Selective Disclosure of Verifiable Credentials below).
 
 ### `require-proof-of-control`
@@ -510,6 +546,7 @@ An agent likely on the originator side could require that prior to settling fund
 ## Selective Disclosure of Verifiable Credentials
 
 In some cases, such as when implementing the FATF Travel Rule, e-commerce flows, or as part of management of counterparty risk in certain institutional use cases identifying information may be requested and exchanged by agents surrounding either themselves or the ultimate parties to the underlying transaction.
+
 In these cases agents can specify a `require-presentation` policy to request for example the name or shipping address of a party. The negotiation and exchange of verifiable credentials can be negotiated using [WACI](https://identity.foundation/waci-didcomm/v1.0/) or similar. Different TAIPs can specify this in more detail.
 
 ## Example Use Cases
@@ -519,18 +556,20 @@ Illustrative use cases are presented here to demonstrate TAP's versatility and a
 ### Legacy digital asset transfer authorization
 
 This implements an authorization scheme between two custodial wallet services with a known beneficiary wallet address.
-**Parties**
+
+#### Parties
 
 - `did:eg:bob`
 - `did:eg:alice`
 
-**Agents**
+#### Agents
 
 - `did:eg:originator.vasp`
 - `did:eg:beneficiary.vasp`
 - `did:pkh:eip155:1:0xabcdef`
 
 Bob wants to send 1 ETH to Alice using his wallet at `originator.vasp` to beneficiary address `0xabcdef`.
+
 For legacy transfers like this the sending VASP must lookup who the beneficiary VASP is or ask Bob to ask Alice for the details. The details of how this works is out of scope.
 
 ```mermaid
@@ -602,6 +641,7 @@ The beneficiary VASP authorizes the transaction by replying as a thread to the i
 ```
 
 The originating VASP notifies the beneficiary VASP in the same thread that they are settling the transfer like this:
+
 The beneficiary VASP can authorize the transaction by replying as a thread to the initial message:
 
 ```json
@@ -619,8 +659,11 @@ The beneficiary VASP can authorize the transaction by replying as a thread to th
 #### Using policies to support the FATF Travel Rule
 
 The FATF Travel Rule requires the originating VASP to collect information about the beneficiary customer and transmit both that and PII about their customer along to the beneficiary VASP.
+
 This allows the beneficiary VASP to confirm that the beneficiary is indeed the correct customer as well as allowing both sides to perform name sanctions screening on the counterparties customer for third-party transfers.
+
 Due to the sensitive nature of customer PII, agents could present a policy of requiring `proof-of-control` of an address before sharing information.
+
 In addition to providing the beneficiary address, Bob also now needs to provide Alice’s name to his VASP.
 
 ```mermaid
@@ -742,16 +785,19 @@ Now since all the policies are fulfilled beneficiary can perform the `Authorize`
 ### Modern digital asset transfer authorization
 
 This implements an authorization scheme between two custodial wallet services on behalf of their customers. The beneficiary wallet address is not shared until after any authorization has been performed.
-**Parties**
+
+#### Parties
 
 - `did:eg:bob`
 - `did:eg:alice`
 
-**Agents**
+#### Agents
 
 - `did:eg:originator.vasp`
 - `did:eg:beneficiary.vasp`
+
 Bob wants to send 1 ETH to Alice using his wallet at `originator.vasp` to Alice’s account at beneficiary VASP. Instead of presenting the beneficiary address, the beneficiary VASP provides a TransferRequest signed by the Beneficiary VASP, containing her identifier. She can then share this with Bob instead of a beneficiary address.
+
 This can not only ensure considerably better UX for retail users than is available today, it also allows the beneficiary VASP to require that originating VASP allows them to perform an authorization step.
 
 ```mermaid
@@ -842,9 +888,13 @@ The beneficiary VASP authorizes the transaction by replying as a thread to the `
 #### Using policies to support the FATF Travel Rule
 
 As mentioned in the legacy transfer flow, the FATF Travel Rule requires the originating VASP to collect information about the beneficiary customer and transmit both that and PII about their customer along to the beneficiary VASP.
+
 Using the modern TAP flow implementing the Travel Rule can be done without adding additional steps, thus it is much simpler.
+
 Also since the beneficiary wallet is no longer a core part of the flow, there is no longer a requirement for obtaining proof of control, eliminating this step completely.
+
 The sequence diagram does not change to implement the Travel Rule, but each party adds additional data and policies to the request to verify it.
+
 The initial TransferRequest message adds beneficiary name information which can be displayed to the sending customer providing better UX:
 
 ```json
@@ -933,8 +983,7 @@ The concept of TAIPs allows the community to propose enhancements and specific a
 | 6    | [Transaction Parties](./TAIPs/taip-6.md)                               |
 | 7    | [Agent Policies](./TAIPs/taip-7.md)                                    |
 | 8    | [Selective Disclosure](./TAIPs/taip-8.md)                              |
-| 9    | [Proof of Relationship](./TAIPs/taip-9.md)                                  |
-| 10   |[FATF Travel Rule workflow](./TAIPs/taip-10.md)                         |
+| 9    | [Proof of Relationship](./TAIPs/taip-9.md)                             |
 
 ## Implementation and Integration
 
