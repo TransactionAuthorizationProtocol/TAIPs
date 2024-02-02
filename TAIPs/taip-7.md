@@ -50,7 +50,7 @@ In the following example an Agent has included their policies:
       "fromAgent":"beneficiary"
     },
     {
-      "@type":"RequireProofOfControl",
+      "@type":"RequireRelationshipConfirmation",
       "fromRole":"SettlementAddress"
     }
   ]
@@ -94,11 +94,11 @@ This is a generic way of requesting a selected [Verifiable Presentation][VP] fro
 
 See [TAIP-8] for more details about how the requested presentation is presented.
 
-#### `RequireProofOfControl`
+#### `RequireRelationshipConfirmation`
 
 An Agent can request any other Agent signs a message proving they control a given agent. In most cases this would be useful to verify that a `SettlementAddress` is controlled by the Beneficiary or an Agent on behalf of the Beneficiary. This ensures that funds are sent to the correct address for the beneficiary to avoid loss of funds. It can also be used for an Agent to verify their relationship to a transaction, before receiving sensitive PII from another agent.
 
-- `@type` - REQUIRED `RequireProofOfControl`
+- `@type` - REQUIRED `RequireRelationshipConfirmation`
 - `from` - OPTIONAL a string or an array of [DID]s representing parties or agent in a transaction
 - `fromRole` - OPTIONAL a string or an array of strings of `role` as specified for the particular kind of transaction. Eg. `SettlementAddress` for [TAIP-3]
 - `fromAgent` - OPTIONAL from an Agent representing a party in the transaction. Eg. `originator` or `beneficiary` in [TAIP-3]

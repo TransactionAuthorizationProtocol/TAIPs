@@ -136,7 +136,7 @@ This document was derived heavily from [CAIP-1] written by Ligi, which was deriv
 ### References
 
 [TAP Whitepaper]: ../Whitepaper
-[CAIP-1]: https://chainagnostic.org/TAIPs/taip-1
+[CAIP-1]: https://chainagnostic.org/CAIPs/caip-1
 [markdown]: https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet
 [Bitcoin's BIP-0001]: https://github.com/bitcoin/bips
 [Python's PEP-0001]: https://www.python.org/dev/peps/
