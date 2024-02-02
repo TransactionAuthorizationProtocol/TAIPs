@@ -197,15 +197,6 @@ The resulting signed message can be attached to a [TAIP-2] message by another ag
 
 ## Specification
 
-## Roles
-
-[TAIP-5 Agents][TAIP-5] can be agents for either another agent or a party to transaction. This is represented by the `for` attribute in the Agent object.
-
-```mermaid
-graph LR
-    Agent --->|for| Client
-```
-
 ### `ConfirmRelationship` Message
 
 The following message is sent
@@ -218,12 +209,13 @@ The following message is sent
 * `body` - REQUIRED. An object containing the payload below
 * `attachments` - OPTIONAL. An array containing at most one [CAIP-74] message.
 
-The Confirmation payload is:
+The Confirmation payload matches the `Agent` payload:
 
 * `@context` - REQUIRED the JSON-LD context `https://tap.rsvp/schema/1.0` (provisional)
-* `@type` - REQUIRED the JSON-LD type `https://tap.rsvp/schema/1.0#ConfirmRelationship` (provisional)
-* `relationship` - REQUIRED a string containing either `Agent` or `Client` from the point-of-view of the [DID] in the `from` field
-* `subject` - REQUIRED the [DID] of the entity being confirmed
+* `@type` - REQUIRED the JSON-LD type `https://tap.rsvp/schema/1.0#Agent` (provisional)
+* `@id` - REQUIRED the [DID] of the agent
+* `role` - OPTIONAL the role agent in the transaction
+* `for` - REQUIRED the [DID] of the entity the agent acts on behalf of
 
 ### CACAO Signature for Self-hosted wallet support
 
@@ -235,25 +227,50 @@ TODO Specify format of CACAO Signature
 
 Provide here any test cases that will help implementers of the TAIP to validate their implementation.
 
-### ConfirmRelationship Test Case
+### ConfirmRelationship Test Cases
+
+The following case the beneficiary vasp confirms that the settlement address acts on their behalf:
 
 ```json
 {
   "id": "abcdefg",
-  "type": "https://tap.rvsp/messages/example",
+  "type": "https://tap.rsvp/schema/1.0#ConfirmRelationship",
   "from":"did:web:beneficiary.vasp",
   "to": ["did:web:originator.vasp"],
   "created_time": 1516269022,
   "expires_time": 1516385931,
   "body": {
     "@context":"https://tap.rvsp/schema/1.0",
-    "@type":"https://tap.rsvp/schema/1.0#ConfirmRelationship",
-    "relationship":"agent",
-    "subject":"did:pkh:eip155:1:0x1234a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb"
+    "@type":"https://tap.rsvp/schema/1.0#Agent",
+    "@id":"did:pkh:eip155:1:0x1234a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb",
+    "for":"did:web:beneficiary.vasp",
+    "role":"SettlementAddress"
+  }
+  "attachments":[
+    // CACAO payload signed by "did:pkh:eip155:1:0x1234a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb" confirming the relationship
+  ]
+}
+```
+In addition to this, they 
+
+The following case the beneficiary vasp confirms that they are acting on behalf of the beneficiary customer:
+
+```json
+{
+  "id": "abcdefg",
+  "type": "https://tap.rsvp/schema/1.0#ConfirmRelationship",
+  "from":"did:web:beneficiary.vasp",
+  "to": ["did:web:originator.vasp"],
+  "created_time": 1516269022,
+  "expires_time": 1516385931,
+  "body": {
+    "@context":"https://tap.rvsp/schema/1.0",
+    "@type":"https://tap.rsvp/schema/1.0#Agent",
+    "@id":"did:web:beneficiary.vasp",
+    "for":"did:eg:bob"
   }
 }
 ```
-
 
 ## Security Considerations
 <!--Please add an explicit list of intra-actor assumptions and known risk factors if applicable. Any normative definition of an interface requires these to be implementable; assumptions and risks should be at both individual interaction/use-case scale and systemically, should the interface specified gain ecosystem-namespace adoption. -->
