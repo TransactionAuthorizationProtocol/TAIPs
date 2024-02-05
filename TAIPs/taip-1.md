@@ -99,6 +99,37 @@ TAIPs may also have a `superseded-by` header indicating that a TAIP has been ren
 
 TAIPs may include auxiliary files such as diagrams. Such files must be named TAIP-XXXX-Y.ext, where “XXXX” is the TAIP number, “Y” is a serial number (starting at 1), and “ext” is replaced by the actual file extension (e.g. “png”).
 
+## Design Principles of for TAIPs
+
+- Follow the ~[Robustness Principle](https://en.wikipedia.org/wiki/Robustness_principle)~
+  - *“be conservative in what you do, be liberal in what you accept from others”*
+- It should be message based and support peer 2 peer messaging
+- It should support self-hosted wallets under the direct control of an ultimate party
+- Avoid reliance on centralized gateways or associations to impose trust by utilizing Decentralized Identifiers (DIDs) for all parties and agents involved.
+- Certain workflows such as the Travel Rule flow, should be able to be implemented even if one services to participates actively in the flow, but should encourage and help push more services to be active participants
+- Any agent to the transaction should be able to initiate a transaction
+- There is no strict message flow defined, but strict flows can be added through TAIPs
+- To be able to support a transition for companies adopting it, it should be possible to create messages after the fact outlining the meta-data for an exiting crypto transaction
+- Modern blockchain transactions often include multiple individual real world transactions, such as Bitcoin UTXO transactions or airdrop transactions. Several kinds of real world transactions are also implemented through multiple blockchain transactions such as multi-sigs and many kinds of transactions requiring pre-authorization. Thus transactions in TAP could have a many to many relationship with blockchain transactions.
+- Separate out the exchange of sensitive PII information between agents to be fully end-to-end encrypted and handled through the messaging flow on a need to know policy based basis
+- Allow each agent to be able to authorize or reject a transfer, while understanding that for blockchain transactions only the agent holding the keys ultimately authorizes a transaction
+- Support discovery of relevant agents to the flow, by allowing each agent to be able to inject an intermediary agent
+- Allow each agent to be able to replace themselves from the transaction with another DID, e.g. redirect the transaction to another legal entity or a custodial service provider
+- Built primarily on existing open standards
+  - Flexible message encoding default, but default to [JSON-LD](https://json-ld.org)
+  - Use [Chain Agnostic standards](https://chainagnostic.org) whenever possible for blockchain relevant standards, such as:
+    - References to blockchain assets should rely on [CAIP-19](https://chainagnostic.org/CAIPs/caip-19)
+    - References to blockchain accounts should rely on [CAIP-10](https://chainagnostic.org/CAIPs/caip-10)
+  - Identifiers for parties should use [RFC-3987 IRIs](https://datatracker.ietf.org/doc/html/rfc3987), but more specifically [W3C Decentralized Identifiers](https://www.w3.org/TR/did-core/) (DIDs) are recommended
+  - Identifiers for agents should use [W3C Decentralized Identifiers](https://www.w3.org/TR/did-core/) (DIDs)
+
+- References to agents or other services should also use DID’s, but prefer DID methods that can immediately be used to identify it. Eg. [PKH-DID](https://github.com/w3c-ccg/did-pkh/blob/main/did-pkh-method-draft.md) methods for blockchain wallets or smart contracts and [Web DIDs](https://w3c-ccg.github.io/did-method-web/) for centralized services
+- Messaging and Encryption should be based on proven digital signature and encryption standards:
+  - [IETF RFC-7515 JWS](https://www.rfc-editor.org/rfc/rfc7515) for signed data between agents
+  - [IETF RFC-7516 JWE](https://www.rfc-editor.org/rfc/rfc7516.html) for encrypted data between agents
+  - [DID-Comm V2](https://identity.foundation/didcomm-messaging/spec/v2.0/) semantics for decentralized messaging between services
+- Allow anyone to build their own agent implementing the protocol
+
 ## Transferring TAIP Ownership
 
 It occasionally becomes necessary to transfer ownership of TAIPs to a new champion. In general, we'd like to retain the original author as a co-author of the transferred TAIP, but that's really up to the original author. A good reason to transfer ownership is because the original author no longer has the time or interest in updating it or following through with the TAIP process, or has fallen off the face of the 'net (i.e. is unreachable or isn't responding to email). A bad reason to transfer ownership is because you don't agree with the direction of the TAIP. We try to build consensus around a TAIP, but if that's not possible, you can always submit a competing TAIP.
