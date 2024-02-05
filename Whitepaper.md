@@ -243,7 +243,9 @@ This message type is designed to be as general and chain agnostic as possible an
 
 It is not intended to cover more complex transaction use cases, such as non-token transfer-related smart contract calls. This TAIP is encouraged to be forked and modified to create similar requests for Swaps, lending, and other everyday use cases.
 
-## Transaction Parties
+## Transaction Participants
+
+### Parties
 
 Parties are the real-world entities involved with a transaction. It could be either legal or natural persons. Parties can control [Agents](#agents) who are part of performing a transaction but are distinct from, for example, a software wallet they control.
 
@@ -253,7 +255,7 @@ Parties are identified using an [IRI] as the @id attribute in a [JSON-LD] object
 
 [TAIP-6] provides detailed technical specifications for Parties.
 
-## Agents
+### Agents
 
 Agents are the wallets, exchanges, and other services directly involved with a transaction. Each party can be represented by one or more agents. Some agents are direct intermediaries in a transaction, without having a direct relationship with any of the parties to a transaction.
 
@@ -267,7 +269,7 @@ Each agent can publish or manage their own policy and authorize or reject transa
 
 [TAIP-5] provides detailed technical specifications for Agents.
 
-### Representing Agents
+#### Representing Agents
 
 Agents are identified using [Decentralized Identifiers (DIDs)][DID]. These identifiers have specific properties of being created by the Agent and support both authenticated and end-to-end encryption. DIDs can equally identify centralized and blockchain-native services such as wallets and DeFi protocols.
 
@@ -293,7 +295,7 @@ In most smart contract based blockchains, smart contracts have addresses similar
 
 While Smart Contracts do not themselves have public keys, [ERC-1271: Standard Signature Validation Method for Contracts](https://eips.ethereum.org/EIPS/eip-1271) or future methods could be adapted in a future TAIP to allow them to accept or reject transactions.
 
-## Transaction Participant Graph
+### Transaction Participant Graph
 
 A blockchain is a graph of transactions between addresses. In this world a Transaction is simply an edge between an originator and a beneficiary node.
 
@@ -301,6 +303,17 @@ A blockchain is a graph of transactions between addresses. In this world a Trans
 graph LR
     SourceAddress[/Originating Wallet/] ==>|SourceAddress| Transaction[[Blockchain Transaction]]
     Transaction ==>|SettlementAddress| SettlementAddress[/Beneficiary Wallet/]
+```
+
+We will use the following notation to show the relationship between different parties:
+
+```mermaid
+graph TD
+    Originator((Party)) ==>|party to| Transfer[TAP Transaction]
+    Wallet[/Agent/] ==>|for| Originator
+
+    Transfer ==>|settlement| Transaction[[Blockchain Transaction]]
+    Transaction ==>|SettlementAddress| Wallet[/Beneficiary Wallet/]
 ```
 
 In TAP a transaction is on the other hand a graph between the real-world participants. The following shows very minimal TAP graph, without any information required to actually execute the transaction:
@@ -575,7 +588,7 @@ There are strict regulatory requirements for exchanging PII of transaction parti
 
 Highlighting the identity of the parties and providing the data to the transaction counterparties also improves UX, reduces the risk of fraud, and ties transactions into business workflows such as payroll and e-commerce.
 
-Many other Transaction Authorization Protocols, including [iso20022], and most Crypto Travel Rule Protocols based on [IVMS-101] exchange transmit the PII in line with the transfer request itself, which lends themselves to a significant risk of PII exposure.
+Many other Transaction Authorization Protocols, including [ISO-20022], and most Crypto Travel Rule Protocols based on [IVMS-101] exchange transmit the PII in line with the transfer request itself, which lends themselves to a significant risk of PII exposure.
 
 This is bad for end-users and can expose significant legal liability for Transaction Agents handling this.
 
