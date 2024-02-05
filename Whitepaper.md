@@ -331,34 +331,33 @@ While Smart Contracts do not themselves have public keys, [ERC-1271: Standard Si
 A blockchain is a graph of transactions between addresses. In this world a Transaction is simply an edge between an originator and a beneficiary node.
 
 ```mermaid
-graph TD
-    SourceAddress[Originating Wallet] ==>|SourceAddress| Transaction(Asset Transfer)
-    Transaction ==>|SettlementAddress| SettlementAddress[Beneficiary Wallet]
+graph LR
+    SourceAddress[/Originating Wallet/] ==>|SourceAddress| Transaction[[Blockchain Transaction]]
+    Transaction ==>|SettlementAddress| SettlementAddress[/Beneficiary Wallet/]
 ```
 
 In TAP a transaction is on the other hand a graph between the real-world participants. The following shows very minimal TAP graph, without any information required to actually execute the transaction:
 
 ```mermaid
-graph TD
-    Originator[Alice] ==>|originator| Transfer(Asset Transfer)
-    Transfer ==>|beneficiary| Beneficiary[Bob]
+graph LR
+    Originator((Alice)) ==>|originator| Transfer[Asset Transfer]
+    Transfer ==>|beneficiary| Beneficiary((Bob))
 ```
 
 To be able to fully execute a transaction we need to expand it to include all the different participants. The following shows an example where Alice is sending funds to Bob from her exchange account to his self-hosted wallet.
 
 ```mermaid
 graph TD
-    
-    Originator[Alice] ==>|originator| Transfer(Asset Transfer)
-    Transfer ==>|beneficiary| Beneficiary
+    Originator((Alice)) ==>|originator| Transfer[Asset Transfer]
+    Transfer ==>|beneficiary| Beneficiary((Bob))
 
-    OriginatingVASP[Exchange] ==>|for| Alice
-    CustodialWallet[Custodial Wallet] ==>|for| OriginatingVASP
-    Wallet[Self-hosted Wallet] ==>|for| Bob
+    OriginatingVASP[/Exchange/] ==>|for| Originator
+    CustodialWallet[/Custodial Wallet/] ==>|for| OriginatingVASP
+    Wallet[/Self-hosted Wallet/] ==>|for| Beneficiary
 
     Transfer ==>|settlement| Transaction
-    CustodialWallet ==>|SourceAddress| Transaction(Blockchain Transaction)
-    Transaction ==>|SettlementAddress| Wallet[Beneficiary Wallet]
+    CustodialWallet ==>|SourceAddress| Transaction[[Blockchain Transaction]]
+    Transaction ==>|SettlementAddress| Wallet[/Beneficiary Wallet/]
 ```
 
 ### Discovery of participants
@@ -370,37 +369,38 @@ End-users may not know all the agents involved in a transaction from the outset.
 In this example Bob's Wallet creates a Transfer request that he can send to Alice requesting payment.
 
 ```mermaid
-graph TD
-    Originator[Alice] ==>|originator| Transfer(Asset Transfer)
-    Transfer ==>|beneficiary| Beneficiary
-    Wallet[Self-hosted Wallet] ==>|for| Bob
+graph LR
+    Originator((Alice)) ==>|originator| Transfer[Asset Transfer]
+    Transfer ==>|beneficiary| Beneficiary((Bob))
+    Wallet[/Self-hosted Wallet/] ==>|for| Beneficiary
 ```
 
 Alice opens it in her exchanges mobile wallet, which inserts itself and sends a message to Bob's wallet with the additional details and asking it to Authorize the transaction.
 
 ```mermaid
-graph TD 
-    Originator[Alice] ==>|originator| Transfer(Asset Transfer)
-    Transfer ==>|beneficiary| Beneficiary
+graph LR
+    Originator((Alice)) ==>|originator| Transfer[Asset Transfer]
+    Transfer ==>|beneficiary| Beneficiary((Bob))
 
-    OriginatingVASP[Exchange] ==>|for| Alice
-    Wallet[Self-hosted Wallet] ==>|for| Bob
+    OriginatingVASP[/Exchange/] ==>|for| Originator
+    Wallet[/Self-hosted Wallet/] ==>|for| Beneficiary
 ```
 
 Bob's wallet authorizes the transaction and sends the Exchange his address. Now the Transfer is complete and can be settled by the Exchange.
 
 ```mermaid
 graph TD
-    Originator[Alice] ==>|originator| Transfer(Asset Transfer)
-    Transfer ==>|beneficiary| Beneficiary
+    Originator((Alice)) ==>|originator| Transfer[Asset Transfer]
+    Transfer ==>|beneficiary| Beneficiary((Bob))
 
-    OriginatingVASP[Exchange] ==>|for| Alice
-    CustodialWallet[Custodial Wallet] ==>|for| OriginatingVASP
-    Wallet[Self-hosted Wallet] ==>|for| Bob
+    OriginatingVASP[/Exchange/] ==>|for| Originator
+    CustodialWallet[/Custodial Wallet/] ==>|for| OriginatingVASP
+    Wallet[/Self-hosted Wallet/] ==>|for| Beneficiary
 
     Transfer ==>|settlement| Transaction
-    CustodialWallet ==>|SourceAddress| Transaction(Blockchain Transaction)
-    Transaction ==>|SettlementAddress| Wallet[Beneficiary Wallet]
+    CustodialWallet ==>|SourceAddress| Transaction[[Blockchain Transaction]]
+    Transaction ==>|SettlementAddress| Wallet[/Beneficiary Wallet/]
+
 ```
 
 #### Bob sends Alice his blockchain address (Legacy)
@@ -409,8 +409,8 @@ Today most wallets and exchanges use blockchain addresses to send to
 
 ```mermaid
 graph TD
-    SourceAddress[Originating Wallet] ==>|SourceAddress| Transaction(Asset Transfer)
-    Transaction ==>|SettlementAddress| SettlementAddress[Beneficiary Wallet]
+    SourceAddress[/Originating Wallet/] ==>|SourceAddress| Transaction[[Asset Transfer]]
+    Transaction ==>|SettlementAddress| SettlementAddress[/Beneficiary Wallet/]
 ```
 
 TODO expand this example
