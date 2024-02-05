@@ -656,10 +656,6 @@ The concept of TAIPs allows the community to propose enhancements and specific a
 | 8    | [Selective Disclosure](./TAIPs/taip-8.md)                              |
 | 9    | [Proof of Relationship](./TAIPs/taip-9.md)                             |
 
-## Implementation and Integration
-
-Guidelines for the implementation of TAP are provided in this section, along with insights into integrating the protocol with existing payment systems and blockchain networks.
-
 ## Glossary
 
 ## References
