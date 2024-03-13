@@ -27,7 +27,6 @@ The purpose of TAIPs is to provide the community with a means to propose enhance
 | 7    | [Agent Policies](./TAIPs/taip-7.md)                                    |
 | 8    | [Selective Disclosure](./TAIPs/taip-8.md)                              |
 | 9    | [Proof of Relationship](./TAIPs/taip-9.md)                                  |
-| 10   |[FATF Travel Rule workflow](./TAIPs/taip-10.md)                         |
 
 ## Inspiration
 
