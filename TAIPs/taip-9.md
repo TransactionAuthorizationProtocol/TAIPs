@@ -51,7 +51,7 @@ As an example see the following [TAIP-3] object:
       "@id":"did:eg:alice"
     },
     "asset": "eip155:1/slip44:60",
-    "amountSubunits": "1230000000000000000",
+    "amount": "1.23",
     "settlementId":"eip155:1:tx/0x3edb98c24d46d148eb926c714f4fbaa117c47b0c0821f38bfce9763604457c33",
     "agents":[
       {

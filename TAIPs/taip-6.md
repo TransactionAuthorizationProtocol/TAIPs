@@ -128,7 +128,7 @@ See the following [TAIP-3] message outlining a typical Asset Transfer where a cu
       "@id":"did:eg:bob",
     },
     "asset": "eip155:1/slip44:60",
-    "amountSubunits": "1230000000000000000",
+    "amount": "1.23",
     "settlementId":"eip155:1:tx/0x3edb98c24d46d148eb926c714f4fbaa117c47b0c0821f38bfce9763604457c33",
     "agents":[
       {
@@ -164,7 +164,7 @@ After completing the discovery aspects of TAP, the Asset Transfer could look lik
       "@id":"did:eg:alice",
     },
     "asset": "eip155:1/slip44:60",
-    "amountSubunits": "1230000000000000000",
+    "amount": "1.23",
     "settlementId":"eip155:1:tx/0x3edb98c24d46d148eb926c714f4fbaa117c47b0c0821f38bfce9763604457c33",
     "agents":[
       {
@@ -210,7 +210,7 @@ After completing the discovery aspects of TAP, we discover the Asset Transfer go
       "@id":"did:eg:bob",
     },
     "asset": "eip155:1/slip44:60",
-    "amountSubunits": "1230000000000000000",
+    "amount": "1.23",
     "settlementId":"eip155:1:tx/0x3edb98c24d46d148eb926c714f4fbaa117c47b0c0821f38bfce9763604457c33",
     "agents":[
       {
