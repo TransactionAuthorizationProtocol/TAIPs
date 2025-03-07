@@ -46,10 +46,12 @@ As specified in [TAIP-2] the message body is [JSON-LD]. The following attributes
 
 * `@context` - REQUIRED the JSON-LD context `https://tap.rsvp/schema/1.0` (provisional)
 * `@type` - REQUIRED the JSON-LD type `https://tap.rsvp/schema/1.0#Transfer` (provisional)
-* `asset` - REQUIRED the [CAIP-19](CAIP-19) identifier of the asset
+* `asset` - REQUIRED - A string representing the asset identifier in one of these formats:
+  * [CAIP-19](https://github.com/ChainAgnostic/CAIPs/blob/master/CAIPs/caip-19.md) chain/asset identifier (e.g., `eip155:1/erc20:0x6b175474e89094c44da98b954eedeac495271d0f`)
+  * [DTI](https://www.iso.org/obp/ui/en/#iso:std:iso:24165:-1:ed-1:v1:en) Digital Token Identifier (e.g., `4H95J0R2X0` for Bitcoin)
 * `amount` - OPTIONAL for NFTs and REQUIRED for fungible tokens. Specified as a string with the full amount as a decimal representation of the token
-* `originator` - OPTIONAL an object representing the originating (aka the sender) party (see [TAIP-6](TAIP-6))
-* `beneficiary` - OPTIONAL an object representing the beneficiary (aka the recipient) party (see [TAIP-6](TAIP-6))
+* `originator` - REQUIRED an object representing the originating (aka the sender) party (see [TAIP-6](TAIP-6))
+* `beneficiary` - REQUIRED an object representing the beneficiary (aka the recipient) party (see [TAIP-6](TAIP-6))
 * `settlementId` - OPTIONAL a [CAIP-220](https://github.com/ChainAgnostic/CAIPs/pull/221/files) identifier of the underlying settlement transaction on a blockchain. For more details see below.
 * `agents` - REQUIRED an array of identity objects representing the agents who help execute the transaction. See [TAIP-5](TAIP-5) for more.
 
