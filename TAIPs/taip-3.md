@@ -46,7 +46,7 @@ As specified in [TAIP-2] the message body is [JSON-LD]. The following attributes
 
 * `@context` - REQUIRED the JSON-LD context `https://tap.rsvp/schema/1.0`
 * `@type` - REQUIRED the JSON-LD type `https://tap.rsvp/schema/1.0#Transfer`
-* `asset` - REQUIRED the [CAIP-19](CAIP-19) identifier of the asset
+* `asset` - REQUIRED the [CAIP-19](CAIP-19) or [DTI] identifier of the asset
 * `amount` - OPTIONAL for NFTs and REQUIRED for fungible tokens. Specified as a string with the full amount as a decimal representation of the token
 * `originator` - REQUIRED an object representing the originating (aka the sender) party (see [TAIP-6](TAIP-6))
 * `beneficiary` - OPTIONAL an object representing the beneficiary (aka the recipient) party if different than the `originator` (see [TAIP-6](TAIP-6))
@@ -252,6 +252,7 @@ Agents SHOULD minimize the use of end-user PII in this message, but it can be en
 * [TAIP-8] Selective disclosure of PII
 * [CAIP-10] Describes chainagnostic Account ID Specification
 * [CAIP-19] Describes Chainagnostic Asset ID Specification
+* [DTI] Digital Token Identifier standard
 * [JSON] JavaScript Object Notation
 * [JSON-LD] JSON Linked Data
 
@@ -263,6 +264,7 @@ Agents SHOULD minimize the use of end-user PII in this message, but it can be en
 [ChainAgnostic]: https://chainagnostic.org
 [CAIP-10]: https://chainagnostic.org/CAIPs/caip-10
 [CAIP-19]: https://chainagnostic.org/CAIPs/caip-19
+[DTI]: https://www.iso.org/obp/ui/en/#iso:std:iso:24165:-1:ed-1:v1:en
 [JSON]: https://datatracker.ietf.org/doc/html/rfc8259
 [JSON-LD]: https://www.w3.org/TR/json-ld  
 
