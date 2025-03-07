@@ -193,8 +193,8 @@ Any Agent can send one of the following messages:
 
 Any agent can add additional agents to a transaction by replying as a thread to the initial message. The following shows the attributes of the `body` object:
 
-- `@context` - REQUIRED the JSON-LD context `https://tap.rsvp/schema/1.0` (provisional)
-- `@type` - REQUIRED the JSON-LD type `https://tap.rsvp/schema/1.0#AddAgents` (provisional)
+- `@context` - REQUIRED the JSON-LD context `https://tap.rsvp/schema/1.0`
+- `@type` - REQUIRED the JSON-LD type `https://tap.rsvp/schema/1.0#AddAgents`
 - `agents` - REQUIRED an array of Agents to add to the transactions Agents list
 
 If an existing transaction agent is included in the list of `agents`, an Agent SHOULD update their internal record for this Agent with any additional data provided in this message.
@@ -205,8 +205,8 @@ Any new agents added should be included in the recipient list of the message.
 
 Any agent can replace themselves in a transaction by replying to the initial message as a thread. The following shows the attributes of the `body` object:
 
-- `@context` - REQUIRED the JSON-LD context `https://tap.rsvp/schema/1.0` (provisional)
-- `@type` - REQUIRED the JSON-LD type `https://tap.rsvp/schema/1.0#ReplaceAgent` (provisional)
+- `@context` - REQUIRED the JSON-LD context `https://tap.rsvp/schema/1.0`
+- `@type` - REQUIRED the JSON-LD type `https://tap.rsvp/schema/1.0#ReplaceAgent`
 - `original` - REQUIRED the [DID] of the Agent to be replaced
 - `replacement` - REQUIRED an Agent to add to the transactions Agents list
 
@@ -218,8 +218,8 @@ The message's sender SHOULD include the Agent specified in the `original` on the
 
 Any agent can propose removing another agent from the transaction by replying as a thread to the initial message. The following shows the attributes of the `body` object:
 
-- `@context` - REQUIRED the JSON-LD context `https://tap.rsvp/schema/1.0` (provisional)
-- `@type` - REQUIRED the JSON-LD type `https://tap.rsvp/schema/1.0#RemoveAgent` (provisional)
+- `@context` - REQUIRED the JSON-LD context `https://tap.rsvp/schema/1.0`
+- `@type` - REQUIRED the JSON-LD type `https://tap.rsvp/schema/1.0#RemoveAgent`
 - `agent` - REQUIRED the [DID] of the Agent to be removed
 
 If a receiving Agent does not have a record for the Agent specified in the agent `agent` attribute, it SHOULD ignore this message.

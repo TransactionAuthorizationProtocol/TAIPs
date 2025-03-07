@@ -115,8 +115,8 @@ Please note that like any [TAIP-2] messages, these are just messages sent by an 
 
 Any agent can add additional agents to a transaction by replying as a thread to the initial message. The following shows the attributes of the `body` object:
 
-- `@context` - REQUIRED the JSON-LD context `https://tap.rsvp/schema/1.0` (provisional)
-- `@type` - REQUIRED the JSON-LD type `https://tap.rsvp/schema/1.0#UpdatePolicies` (provisional)
+- `@context` - REQUIRED the JSON-LD context `https://tap.rsvp/schema/1.0`
+- `@type` - REQUIRED the JSON-LD type `https://tap.rsvp/schema/1.0#UpdatePolicies`
 - `policies` - REQUIRED an array of Policies to replace the current set of policies
 
 ## Rationale

@@ -94,8 +94,8 @@ Any Agent can send one of the following messages:
 
 Any agent can update a party to a transaction by replying as a thread to the initial message. The following shows the attributes of the `body` object:
 
-* `@context` - REQUIRED the JSON-LD context `https://tap.rsvp/schema/1.0` (provisional)
-* `@type` - REQUIRED the JSON-LD type `https://tap.rsvp/schema/1.0#UpdateParty` (provisional)
+* `@context` - REQUIRED the JSON-LD context `https://tap.rsvp/schema/1.0`
+* `@type` - REQUIRED the JSON-LD type `https://tap.rsvp/schema/1.0#UpdateParty`
 * `partyType` - REQUIRED a string indicating the type of party to be updated. Eg. for [TAIP-3] this could be `originator` or `beneficiary`
 * `party` - REQUIRED a Party Object to be added to the transaction.
 
