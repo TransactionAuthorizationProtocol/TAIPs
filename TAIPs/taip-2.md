@@ -1,11 +1,11 @@
 ---
 taip: 2
 title: Messaging
-status: Draft
+status: Review
 type: Standard
 author: Pelle Braendgaard <pelle@notabene.id>, Richard Crosby <richard@notabene.id>
 created: 2024-01-09
-updated: 2024-01-09
+updated: 2025-03-07
 discussions-to: https://github.com/TransactionAuthorizationProtocol/TAIPs/pull/4
 ---
 # Messaging

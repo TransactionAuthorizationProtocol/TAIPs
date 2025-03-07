@@ -2,10 +2,10 @@
 taip: 4
 title: Transaction Authorization Protocol
 author: Pelle Braendgaard <pelle@notabene.id>, Andrés Junge <andres@notabene.id>, Richard Crosby <richard@notabene.id>
-status: Draft
+status: Review
 type: Standard
 created: 2024-01-12
-updated: 2024-01-12
+updated: 2025-03-07
 discussions-to: https://github.com/TransactionAuthorizationProtocol/TAIPs/pull/6
 requires: 2, 5
 ---
@@ -102,7 +102,7 @@ Any agent can authorize the transaction by replying as a thread to the initial m
 
 - `@context` - REQUIRED the JSON-LD context `https://tap.rsvp/schema/1.0` (provisional)
 - `@type` - REQUIRED the JSON-LD type `https://tap.rsvp/schema/1.0#Authorize` (provisional)
-- `settlementAddress` - OPTIONAL string representing the intended destination address of the transaction specified in [CAIP-10](CAIP-10) format. If sent by a VASP representing the beneficiary this is REQUIRED unless the original request contains a `settlementAddress`. For all others it is OPTIONAL.
+- `settlementAddress` - OPTIONAL string representing the intended destination address of the transaction specified in [CAIP-10](CAIP-10) format. If sent by a VASP representing the beneficiary this is REQUIRED unless the original request contains an agent with the `settlementAddress` role. For all others it is OPTIONAL.
 
 By not providing a `settlementAddress` until after `Authorization`, beneficiary agents can reject incoming blockchain transactions for the first time.
 
@@ -147,8 +147,8 @@ The above flow demonstrates the power of multiple agents collaborating around au
 
 An originating agent notifies the other agents in the same thread that they are ready to settle the transfer. The following shows the attributes of the `body` object:
 
-- `@context` - REQUIRED the JSON-LD context `https://tap.rsvp/schema/1.0` (provisional)
-- `@type` - REQUIRED the JSON-LD type `https://tap.rsvp/schema/1.0#Settle` (provisional)
+- `@context` - REQUIRED the JSON-LD context `https://tap.rsvp/schema/1.0`
+- `@type` - REQUIRED the JSON-LD type `https://tap.rsvp/schema/1.0#Settle`
 - `settlementId` - OPTIONAL a [CAIP-220](https://github.com/ChainAgnostic/CAIPs/pull/221/files) identifier of the underlying settlement transaction on a blockchain. REQUIRED by at least one agent representing the originator.
 
 The following shows an simplified authorization flow with a succesfull outcome (transaction settled):

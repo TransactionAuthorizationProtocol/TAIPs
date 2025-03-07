@@ -5,7 +5,7 @@ author: Pelle Braendgaard <pelle@notabene.id>
 status: Draft
 type: Standard
 created: 2024-01-25
-updated: 2024-01-25
+updated: 2025-03-07
 discussions-to: https://github.com/TransactionAuthorizationProtocol/TAIPs/pull/12
 requires: 2, 5, 7
 ---
