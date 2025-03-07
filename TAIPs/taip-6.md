@@ -241,7 +241,7 @@ The following are example plaintext messages. See [TAIP-2] for how to sign the m
 ```json
 {
  "from":"did:web:beneficiary.vasp",
-  "type": "https://tap.rsvp/schema/1.0#AddAgents",
+  "type": "https://tap.rsvp/schema/1.0#UpdateParty",
   "thid":"ID of transfer request",
   "to": ["did:web:originator.vasp"],
   "body": {
