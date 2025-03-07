@@ -21,6 +21,8 @@ This proposal introduces an optional **hashed name** field for originator and be
 
 FATF's Travel Rule (Recommendation 16) mandates that VASPs **collect, verify, and exchange** specific customer information (e.g. names of originators and beneficiaries) before a virtual asset transfer [FATF-R16]. Traditionally, this means transmitting personal data (PII) as part of the transaction message. However, sharing PII in cleartext raises privacy and security concerns, and may conflict with data protection laws [TAIP-8]. Existing Travel Rule protocols often include names and other PII directly in the transfer request, which **risks exposing sensitive data** to intermediaries or breaches [TAIP-8].
 
+At the time of writing most virtual asset transactions are first-party transfers and originator and beneficiary only need to confirm it is indeed the same person. This eliminates the need for the customers PII to be sent as both sides have performed KYC on their mutual customer and thus already have access to their PII. Third party transfers still do require full Travel Rule exchange of Originator and Beneficiary data since they do not have access to that data and will need it for sanctions screening and record keeping purposes.
+
 Several industry solutions have emerged to reconcile compliance and privacy. For example, VerifyVASP's network uses encrypted or hashed identity data to **securely verify customer information without revealing it** [VerifyVASP]. Binance's Global Travel Rule (GTR) alliance similarly follows FATF guidelines while only disclosing **minimal required customer data** on a need-to-know basis [GTR]. These approaches show that it's possible to comply with the Travel Rule in a privacy-preserving way.
 
 **Hashed names** offer a simple but effective solution: instead of sending a customer's actual name, VASPs exchange a cryptographic hash of the name. This enables the receiving VASP to confirm a match against their records, fulfilling the "verify and exchange customer information" requirement, but **without transmitting the name itself in plaintext**. It improves privacy (no directly identifiable name is shared) and still allows compliance checks (the hash can be compared to the beneficiary's KYC data). It also reduces friction in cross-platform interoperability – if all parties use the same hashing method, verification can be automated across different Travel Rule solutions.
@@ -37,7 +39,7 @@ In summary, [TAIP-12] is motivated by the need to **protect PII** during Travel 
 
 - **Data Model:** The `nameHash` field is defined as an **additional attribute** in the JSON-LD party object structure defined by TAIP-6. As noted in TAIP-6, party objects can be extended with extra data as long as they are properly contextualized [TAIP-6]. For interoperability and to avoid context confusion, this proposal uses the canonical field name `nameHash` (no custom context URI is required beyond the TAP default context). This field, when present, MUST be interpreted as the SHA-256 hash of that party's name, normalized as described above. It applies to both natural persons and legal persons: for individuals, the name should include given and surname (and any middle names) concatenated without spaces; for entities, the full legal name should be used (and any internal spaces removed). **No other transformations (such as removing punctuation or special characters)** are applied by this standard, to keep the algorithm simple – aside from whitespace removal and case folding – so VASPs should ensure the name is recorded consistently. (If two VASPs have minor differences in punctuation or formatting of the name, they may need to coordinate or use policy-based alternatives to resolve mismatches.)
 
-- **Example:** An example Asset Transfer message with hashed names included is shown below. This assumes a transfer of 100 tokens from an originator customer "Alice Lee" at ExampleVASP to a beneficiary customer "Bob Smith" at OtherVASP. Both VASPs support TAIP-12. The message includes each party's DID (`@id`) and their `nameHash`.
+- **First-party Example:** An example Asset Transfer message with hashed names included is shown below. This assumes a transfer of 100 tokens from an originator customer "Alice Lee" at ExampleVASP their account at OtherVASP. Both VASPs support TAIP-12. The message includes each party's DID (`@id`) and their `nameHash`.
 
 ```json
 {
@@ -45,6 +47,43 @@ In summary, [TAIP-12] is motivated by the need to **protect PII** during Travel 
   "@type": "https://tap.rsvp/schema/1.0#Transfer",
   "asset": "eip155:1/slip44:60",  
   "amount": "100.00",
+  "originator": {
+    "@id": "did:web:examplevasp.com:alice123",
+    "nameHash": "b117f44426c9670da91b563db728cd0bc8bafa7d1a6bb5e764d1aad2ca25032e"
+  },
+  "agents": [
+    {
+      "@id": "did:web:examplevasp.com",
+      "policies": [
+        {
+          "@type":"RequireAuthorization",
+          "fromAgent":"beneficiary"
+        }
+      ]
+    },
+    {
+      "@id": "did:web:othervasp.com"
+    },
+    {
+      "@id":"did:pkh:eip155:1:0x1234a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb",
+      "role":"settlementAddress"
+    }
+  ]
+}
+```
+
+In this JSON example, the `nameHash` value is the SHA-256 hashes of "ALICELEE". Upon receiving this information, OtherVASP can compare the provided originator hash to the hash of the beneficiary owner of the blockchain address `0x1234a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb`. If the hashes match the names each VASP has on file, the transaction can proceed without ever exposing the actual names in the message. If there is a mismatch, the VASPs may request additional information through an `UpdatePolicies` [TAIP-7] message containing a `RequirePresentation` [TAIP-8] policy to obtain more detailed name for further verification or simply reject the transfer per their compliance procedures.
+
+
+- **Third-party Example:** An example Asset Transfer message with hashed names included is shown below. This assumes a transfer of 100 tokens from an originator customer "Alice Lee" at ExampleVASP to a beneficiary customer "Bob Smith" at OtherVASP. Both VASPs support TAIP-12. The message includes each party's DID (`@id`) and their `nameHash`.
+
+```json
+{
+  "@context": "https://tap.rsvp/schema/1.0",
+  "@type": "https://tap.rsvp/schema/1.0#Transfer",
+  "asset": "eip155:1/slip44:60",  
+  "amount": "100.00",
+  "settlementAddress":"eip155:1:0x1234a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb", /*CAIP-2 account address */
   "originator": {
     "@id": "did:web:examplevasp.com:alice123",
     "nameHash": "b117f44426c9670da91b563db728cd0bc8bafa7d1a6bb5e764d1aad2ca25032e"
@@ -65,7 +104,7 @@ In summary, [TAIP-12] is motivated by the need to **protect PII** during Travel 
 }
 ```
 
-In this JSON example, the `nameHash` values are the SHA-256 hashes of "ALICELEE" and "BOBSMITH" respectively. Upon receiving this information, OtherVASP can compare the provided originator hash to the hash of the name on Alice's account sent by ExampleVASP. Likewise, ExampleVASP can verify that the beneficiary's hash matches "Bob Smith" (the expected beneficiary name) by asking their user or via prior agreement. If the hashes match the names each VASP has on file, the transaction can proceed without ever exposing the actual names in the message. If there is a mismatch, the VASPs may request additional information or reject the transfer per their compliance procedures.
+In this JSON example, the `nameHash` values are the SHA-256 hashes of "ALICELEE" and "BOBSMITH" respectively. Upon receiving this information, OtherVASP can compare the provided originator hash to the hash of the name on Alice's account sent by ExampleVASP. Likewise, ExampleVASP can verify that the beneficiary's hash matches "Bob Smith" (the expected beneficiary name) by asking their user or via prior agreement. If the hashes match the names each VASP has on file, the transaction can proceed without ever exposing the actual names in the message. If there is a mismatch, the VASPs may request additional information through an `UpdatePolicies` [TAIP-7] message containing a `RequirePresentation` [TAIP-8] policy to obtain more detailed name for further verification or simply reject the transfer per their compliance procedures
 
 **Optional but Policy-Controlled:** Including `nameHash` is not mandatory in all cases; it is an opt-in enhancement. However, an agent (VASPs acting as originator or beneficiary) **can require hashed names via policy**. [TAIP-7] allows agents to declare requirements/policies for a transaction. For instance, a VASP concerned about privacy might advertise a policy that **hashed names must be provided** before it will authorize a transfer. This proposal does not define a new policy type in [TAIP-7], but such a requirement could be implemented via a custom policy or through bilateral agreement. An example policy could be a boolean flag like `RequireHashedName` in the agent's policy list, indicating that the counterparty should include the `nameHash` field for their customer. If the counterparty cannot comply (e.g. they have not implemented [TAIP-12]), the initiating agent may refuse to proceed or fall back to requesting the full name via a secure channel (such as [TAIP-8] selective disclosure).
 
