@@ -92,6 +92,7 @@ There are three primary actions an agent can take:
 
 - `Settle` - They announce they will send the transaction to the blockchain.
 - `Authorize` - Authorize or signal to other agents that they are free to `settle` a transaction.
+- `Cancel` - Signal to other agents that they are canceling the transaction.
 - `Reject` - Signal to other agents that they reject the transaction.
 
 All messages are sent as replies to an initial request by specifying the `id` of the original request in the `thid` attribute.
@@ -100,8 +101,8 @@ All messages are sent as replies to an initial request by specifying the `id` of
 
 Any agent can authorize the transaction by replying as a thread to the initial message. The following shows the attributes of the `body` object:
 
-- `@context` - REQUIRED the JSON-LD context `https://tap.rsvp/schema/1.0` (provisional)
-- `@type` - REQUIRED the JSON-LD type `https://tap.rsvp/schema/1.0#Authorize` (provisional)
+- `@context` - REQUIRED the JSON-LD context `https://tap.rsvp/schema/1.0`
+- `@type` - REQUIRED the JSON-LD type `https://tap.rsvp/schema/1.0#Authorize`
 - `settlementAddress` - OPTIONAL string representing the intended destination address of the transaction specified in [CAIP-10](CAIP-10) format. If sent by a VASP representing the beneficiary this is REQUIRED unless the original request contains an agent with the `settlementAddress` role. For all others it is OPTIONAL.
 
 By not providing a `settlementAddress` until after `Authorization`, beneficiary agents can reject incoming blockchain transactions for the first time.
@@ -197,10 +198,10 @@ eip155:1:tx/0x3edb98c24d46d148eb926c714f4fbaa117c47b0c0821f38bfce9763604457c33
 
 ### Reject
 
-Any agent can always reject a transaction. This does not mean another party will comply with it.
+Any agent can always reject a transaction. This does not mean another agent will comply with it.
 
-- `@context` - REQUIRED the JSON-LD context `https://tap.rsvp/schema/1.0` (provisional)
-- `@type` - REQUIRED the JSON-LD type `https://tap.rsvp/schema/1.0#Reject` (provisional)
+- `@context` - REQUIRED the JSON-LD context `https://tap.rsvp/schema/1.0`
+- `@type` - REQUIRED the JSON-LD type `https://tap.rsvp/schema/1.0#Reject`
 - `reason` - OPTIONAL Human readable message describing why the transaction was rejected
 
 The following shows a simple rejection of a Transfer by the Beneficiary Agent.
@@ -215,7 +216,7 @@ sequenceDiagram
     
 ```
 
-Any participants can `Reject` a Transfer. Even after others have authorized it. As an example an originating agent could reject a transaction authorized by the beneficiary agent, after the `settlementAddress` had too high a risk score.
+Any agent can `Reject` a Transfer. Even after others have authorized it. As an example an originating agent could reject a transaction authorized by the beneficiary agent, after the `settlementAddress` had too high a risk score.
 
 ```mermaid
 sequenceDiagram
@@ -228,6 +229,44 @@ sequenceDiagram
     
 ```
 
+### Cancel
+
+An agent directly on behalf of any party to the transaction can cancel a message. This does not mean another agent will comply with it.
+
+An example purpose for this could be allowing an originator to cancel a Transfer for example because the Authorization was taking too long.
+
+The difference between a `Cancel` and a `Reject` is that a `Cancel` is intended as an action of one of the parties. Where `Reject` is a signal of a rejection of a specific agent for for example fraud, compliance or security purposes.
+
+- `@context` - REQUIRED the JSON-LD context `https://tap.rsvp/schema/1.0`
+- `@type` - REQUIRED the JSON-LD type `https://tap.rsvp/schema/1.0#Cancel`
+- `by` - REQUIRED the party of the transaction wishing to cancel it. (In case of a Transfer [TAIP3]  `originator` or `beneficiary`)
+- `reason` - OPTIONAL Human readable message describing why the transaction was cancelled
+
+The following shows a simple cancel of a Transfer by the Originator Agent.
+
+```mermaid
+sequenceDiagram
+    Participant Originating Agent
+    Participant Beneficiary Agent
+
+    Originating Agent ->> Beneficiary Agent: Transfer
+    Originating Agent ->> Originating Agent: Cancel    
+```
+
+Any party can `Cancel` a Transfer through an agent acting on their behalf. Even after others have authorized it. As an example an originating cancel could reject a transaction authorized by the beneficiary agent because it took too long to authorize.
+
+```mermaid
+sequenceDiagram
+    Participant Originating Agent
+    Participant Beneficiary Agent
+
+    Originating Agent ->> Beneficiary Agent: Transfer
+    Beneficiary Agent ->> Originating Agent: Authorize [settlementAddress]
+    Originating Agent ->> Originating Agent: Cancel
+    
+```
+
+
 ### Transaction State from the point of view of various agents
 
 This is a potential state machine from the point of view of the originating agent (remember there is no shared state between agents, and each agent must maintain their own state):
@@ -238,6 +277,7 @@ stateDiagram-v2
     [*] --> Request : Transfer
     Request --> Authorized : Authorize
     Request --> Rejected : Reject
+    Request --> Cancelled : Cancel
     Authorized --> Settled : Settle
     Settled --> [*]
 
@@ -251,10 +291,12 @@ stateDiagram-v2
     [*] --> Received : Transfer
     Received --> Authorized : Authorize
     Received --> Rejected : Reject
+    Received --> Cancelled : Cancel
     Authorized --> Settled : Settle
     Settled --> [*]
 
 ```
+
 
 ## Rationale
 <!--The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.-->
