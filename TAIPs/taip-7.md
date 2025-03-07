@@ -46,7 +46,7 @@ In the following example an Agent has included their policies:
       "fromAgent":"beneficiary"
     },
     {
-      "@type":"RequirePresentation",
+      "@type":"RequireBeneficiaryCheck",
       "fromAgent":"beneficiary"
     },
     {

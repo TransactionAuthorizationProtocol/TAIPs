@@ -48,7 +48,7 @@ As specified in [TAIP-2] the message body is [JSON-LD]. The following attributes
 * `@type` - REQUIRED the JSON-LD type `https://tap.rsvp/schema/1.0#Transfer` (provisional)
 * `asset` - REQUIRED - A string representing the asset identifier in one of these formats:
   * [CAIP-19](https://github.com/ChainAgnostic/CAIPs/blob/master/CAIPs/caip-19.md) chain/asset identifier (e.g., `eip155:1/erc20:0x6b175474e89094c44da98b954eedeac495271d0f`)
-  * Crypto symbol: 2-10 uppercase alphanumeric characters (e.g., `BTC`, `ETH`, `USDT`)
+  * [DTI](https://www.iso.org/obp/ui/en/#iso:std:iso:24165:-1:ed-1:v1:en) Digital Token Identifier (e.g., `4H95J0R2X0` for Bitcoin)
 * `amount` - OPTIONAL for NFTs and REQUIRED for fungible tokens. Specified as a string with the full amount as a decimal representation of the token
 * `originator` - REQUIRED an object representing the originating (aka the sender) party (see [TAIP-6](TAIP-6))
 * `beneficiary` - REQUIRED an object representing the beneficiary (aka the recipient) party (see [TAIP-6](TAIP-6))
@@ -141,7 +141,7 @@ The following is a request for a transfer of 1.23 ETH from a crypto exchange fro
   "body": {
     "@context": "https://tap.rsvp/schema/1.0",
     "@type": "https://tap.rsvp/schema/1.0#Transfer",
-    "asset": "ETH",
+    "asset": "eip155:1/slip44:60",
     "originator":{
       "@id":"did:eg:bob"
     },
