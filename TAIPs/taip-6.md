@@ -2,10 +2,10 @@
 taip: 6
 title: Transaction Parties
 author: Pelle Braendgaard <pelle@notabene.id>, Andrés Junge <andres@notabene.id>, Richard Crosby <richard@notabene.id>
-status: Draft
+status: Review
 type: Standard
 created: 2024-01-22
-updated: 2024-01-22
+updated: 2025-03-07
 discussions-to: https://github.com/TransactionAuthorizationProtocol/TAIPs/pull/8
 requires: 2
 ---
@@ -80,7 +80,7 @@ Future TAIPs can define additional types of parties. Examples.
 
 * `issuer` of a real world asset
 * `trustee`, `grantor`, `beneficiary` for a trust
-* `buyer`, `seller` for a sales contract
+* `customer`, `merchant` for a sales contract
  
 ### Agents for Parties
 
@@ -94,8 +94,8 @@ Any Agent can send one of the following messages:
 
 Any agent can update a party to a transaction by replying as a thread to the initial message. The following shows the attributes of the `body` object:
 
-* `@context` - REQUIRED the JSON-LD context `https://tap.rsvp/schema/1.0` (provisional)
-* `@type` - REQUIRED the JSON-LD type `https://tap.rsvp/schema/1.0#UpdateParty` (provisional)
+* `@context` - REQUIRED the JSON-LD context `https://tap.rsvp/schema/1.0`
+* `@type` - REQUIRED the JSON-LD type `https://tap.rsvp/schema/1.0#UpdateParty`
 * `partyType` - REQUIRED a string indicating the type of party to be updated. Eg. for [TAIP-3] this could be `originator` or `beneficiary`
 * `party` - REQUIRED a Party Object to be added to the transaction.
 
@@ -103,7 +103,7 @@ If an existing transaction party is already included in the transaction an Agent
 
 ## Rationale
 
-TODO
+Parties are the real world identities that are parties to a transaction. Current Virtual Asset Transactions do not have a good way method for these parties to identify each other. In a typical use case they do identify themselves to the Agents ([TAIP-5]) such as VASPs and banks that they use to transact. TAP helps Agents verifiy parties between each other, that ultimately help the parties to the transaction verify and identify each other.
 
 ## Test Cases
 
@@ -241,7 +241,7 @@ The following are example plaintext messages. See [TAIP-2] for how to sign the m
 ```json
 {
  "from":"did:web:beneficiary.vasp",
-  "type": "https://tap.rsvp/schema/1.0#AddAgents",
+  "type": "https://tap.rsvp/schema/1.0#UpdateParty",
   "thid":"ID of transfer request",
   "to": ["did:web:originator.vasp"],
   "body": {
@@ -260,9 +260,9 @@ The following are example plaintext messages. See [TAIP-2] for how to sign the m
 
 ## Security Considerations
 <!--Please add an explicit list of intra-actor assumptions and known risk factors if applicable. Any normative definition of an interface requires these to be implementable; assumptions and risks should be at both individual interaction/use-case scale and systemically, should the interface specified gain ecosystem-namespace adoption. -->
-As in any decentralized messaging protocol, it is paramount that the recipient of messages trust the senders in the context of a particular transaction.
+As in any decentralized messaging protocol, it is paramount that the recipient of messages trust the senders in the context of a particular transaction. The TAP protocol allows parties to use trusted Agents ([TAIP-5]) to identify the parties to the transaction.
 
-TODO specify in more detail.
+A pre-existing trusted relationship between a party and an agent is expected, but the definition of how that happens is out of scope of this proposal. See [TAIP-5] for more on how Agents need to also build up a trusted relationship for the entire flow to be trusted.
 
 ## Privacy Considerations
 <!--Please add an explicit list of intra-actor assumptions and known risk factors if applicable. Any normative definition of an interface requires these to be implementable; assumptions and risks should be at both individual interaction/use-case scale and systemically, should the interface specified gain ecosystem-namespace adoption. -->

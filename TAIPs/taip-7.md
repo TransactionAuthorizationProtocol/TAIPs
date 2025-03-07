@@ -2,10 +2,10 @@
 taip: 7
 title: Agent Policies
 author: Pelle Braendgaard <pelle@notabene.id>, Andrés Junge <andres@notabene.id>, Richard Crosby <richard@notabene.id>
-status: Draft
+status: Review
 type: Standard
 created: 2024-01-23
-updated: 2024-01-23
+updated: 2025-03-07
 discussions-to: https://github.com/TransactionAuthorizationProtocol/TAIPs/pull/9
 requires: 2, 4, 5, 6
 ---
@@ -115,8 +115,8 @@ Please note that like any [TAIP-2] messages, these are just messages sent by an 
 
 Any agent can add additional agents to a transaction by replying as a thread to the initial message. The following shows the attributes of the `body` object:
 
-- `@context` - REQUIRED the JSON-LD context `https://tap.rsvp/schema/1.0` (provisional)
-- `@type` - REQUIRED the JSON-LD type `https://tap.rsvp/schema/1.0#UpdatePolicies` (provisional)
+- `@context` - REQUIRED the JSON-LD context `https://tap.rsvp/schema/1.0`
+- `@type` - REQUIRED the JSON-LD type `https://tap.rsvp/schema/1.0#UpdatePolicies`
 - `policies` - REQUIRED an array of Policies to replace the current set of policies
 
 ## Rationale
@@ -233,9 +233,9 @@ The following are example plaintext messages. See [TAIP-2] for how to sign the m
 
 ## Security Considerations
 <!--Please add an explicit list of intra-actor assumptions and known risk factors if applicable. Any normative definition of an interface requires these to be implementable; assumptions and risks should be at both individual interaction/use-case scale and systemically, should the interface specified gain ecosystem-namespace adoption. -->
-As in any decentralized messaging protocol, it is paramount that the recipient of messages trust the senders in the context of a particular transaction.
+As in any decentralized messaging protocol, it is paramount that the recipient of messages trust the senders in the context of a particular transaction. See [TAIP-5] for more details about how Agents build trust with each other.
 
-TODO specify in more detail
+The Policies specified here are paramount for building that trust in a scalable and automated way and should be seen as tools to help Agents gather and verify data to use within their own internal risk and security management frameworks.
 
 ## Privacy Considerations
 <!--Please add an explicit list of intra-actor assumptions and known risk factors if applicable. Any normative definition of an interface requires these to be implementable; assumptions and risks should be at both individual interaction/use-case scale and systemically, should the interface specified gain ecosystem-namespace adoption. -->

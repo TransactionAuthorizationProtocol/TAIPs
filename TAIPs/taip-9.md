@@ -5,7 +5,7 @@ author: Pelle Braendgaard <pelle@notabene.id>
 status: Draft
 type: Standard
 created: 2024-01-25
-updated: 2024-01-25
+updated: 2025-03-07
 discussions-to: https://github.com/TransactionAuthorizationProtocol/TAIPs/pull/12
 requires: 2, 5, 7
 ---
@@ -211,8 +211,8 @@ The following message is sent
 
 The Confirmation payload matches the `Agent` payload:
 
-* `@context` - REQUIRED the JSON-LD context `https://tap.rsvp/schema/1.0` (provisional)
-* `@type` - REQUIRED the JSON-LD type `https://tap.rsvp/schema/1.0#Agent` (provisional)
+* `@context` - REQUIRED the JSON-LD context `https://tap.rsvp/schema/1.0`
+* `@type` - REQUIRED the JSON-LD type `https://tap.rsvp/schema/1.0#Agent`
 * `@id` - REQUIRED the [DID] of the agent
 * `role` - OPTIONAL the role agent in the transaction
 * `for` - REQUIRED the [DID] of the entity the agent acts on behalf of

@@ -2,10 +2,10 @@
 taip: 4
 title: Transaction Authorization Protocol
 author: Pelle Braendgaard <pelle@notabene.id>, Andrés Junge <andres@notabene.id>, Richard Crosby <richard@notabene.id>
-status: Draft
+status: Review
 type: Standard
 created: 2024-01-12
-updated: 2024-01-12
+updated: 2025-03-07
 discussions-to: https://github.com/TransactionAuthorizationProtocol/TAIPs/pull/6
 requires: 2, 5
 ---
@@ -92,7 +92,9 @@ There are three primary actions an agent can take:
 
 - `Settle` - They announce they will send the transaction to the blockchain.
 - `Authorize` - Authorize or signal to other agents that they are free to `settle` a transaction.
+- `Cancel` - Signal to other agents that they are canceling the transaction.
 - `Reject` - Signal to other agents that they reject the transaction.
+- `Revert` - Request a Reversal of the transaction.
 
 All messages are sent as replies to an initial request by specifying the `id` of the original request in the `thid` attribute.
 
@@ -100,9 +102,9 @@ All messages are sent as replies to an initial request by specifying the `id` of
 
 Any agent can authorize the transaction by replying as a thread to the initial message. The following shows the attributes of the `body` object:
 
-- `@context` - REQUIRED the JSON-LD context `https://tap.rsvp/schema/1.0` (provisional)
-- `@type` - REQUIRED the JSON-LD type `https://tap.rsvp/schema/1.0#Authorize` (provisional)
-- `settlementAddress` - OPTIONAL string representing the intended destination address of the transaction specified in [CAIP-10](CAIP-10) format. If sent by a VASP representing the beneficiary this is REQUIRED unless the original request contains a `settlementAddress`. For all others it is OPTIONAL.
+- `@context` - REQUIRED the JSON-LD context `https://tap.rsvp/schema/1.0`
+- `@type` - REQUIRED the JSON-LD type `https://tap.rsvp/schema/1.0#Authorize`
+- `settlementAddress` - OPTIONAL string representing the intended destination address of the transaction specified in [CAIP-10](CAIP-10) format. If sent by a VASP representing the beneficiary this is REQUIRED unless the original request contains an agent with the `settlementAddress` role. For all others it is OPTIONAL.
 
 By not providing a `settlementAddress` until after `Authorization`, beneficiary agents can reject incoming blockchain transactions for the first time.
 
@@ -147,8 +149,8 @@ The above flow demonstrates the power of multiple agents collaborating around au
 
 An originating agent notifies the other agents in the same thread that they are ready to settle the transfer. The following shows the attributes of the `body` object:
 
-- `@context` - REQUIRED the JSON-LD context `https://tap.rsvp/schema/1.0` (provisional)
-- `@type` - REQUIRED the JSON-LD type `https://tap.rsvp/schema/1.0#Settle` (provisional)
+- `@context` - REQUIRED the JSON-LD context `https://tap.rsvp/schema/1.0`
+- `@type` - REQUIRED the JSON-LD type `https://tap.rsvp/schema/1.0#Settle`
 - `settlementId` - OPTIONAL a [CAIP-220](https://github.com/ChainAgnostic/CAIPs/pull/221/files) identifier of the underlying settlement transaction on a blockchain. REQUIRED by at least one agent representing the originator.
 
 The following shows an simplified authorization flow with a succesfull outcome (transaction settled):
@@ -197,10 +199,10 @@ eip155:1:tx/0x3edb98c24d46d148eb926c714f4fbaa117c47b0c0821f38bfce9763604457c33
 
 ### Reject
 
-Any agent can always reject a transaction. This does not mean another party will comply with it.
+Any agent can always reject a transaction. This does not mean another agent will comply with it.
 
-- `@context` - REQUIRED the JSON-LD context `https://tap.rsvp/schema/1.0` (provisional)
-- `@type` - REQUIRED the JSON-LD type `https://tap.rsvp/schema/1.0#Reject` (provisional)
+- `@context` - REQUIRED the JSON-LD context `https://tap.rsvp/schema/1.0`
+- `@type` - REQUIRED the JSON-LD type `https://tap.rsvp/schema/1.0#Reject`
 - `reason` - OPTIONAL Human readable message describing why the transaction was rejected
 
 The following shows a simple rejection of a Transfer by the Beneficiary Agent.
@@ -215,7 +217,7 @@ sequenceDiagram
     
 ```
 
-Any participants can `Reject` a Transfer. Even after others have authorized it. As an example an originating agent could reject a transaction authorized by the beneficiary agent, after the `settlementAddress` had too high a risk score.
+Any agent can `Reject` a Transfer. Even after others have authorized it. As an example an originating agent could reject a transaction authorized by the beneficiary agent, after the `settlementAddress` had too high a risk score.
 
 ```mermaid
 sequenceDiagram
@@ -228,6 +230,83 @@ sequenceDiagram
     
 ```
 
+### Cancel
+
+An agent directly on behalf of any party to the transaction can cancel a message. This does not mean another agent will comply with it.
+
+An example purpose for this could be allowing an originator to cancel a Transfer for example because the Authorization was taking too long.
+
+The difference between a `Cancel` and a `Reject` is that a `Cancel` is intended as an action of one of the parties. Where `Reject` is a signal of a rejection of a specific agent for for example fraud, compliance or security purposes.
+
+- `@context` - REQUIRED the JSON-LD context `https://tap.rsvp/schema/1.0`
+- `@type` - REQUIRED the JSON-LD type `https://tap.rsvp/schema/1.0#Cancel`
+- `by` - REQUIRED the party of the transaction wishing to cancel it. (In case of a Transfer [TAIP3]  `originator` or `beneficiary`)
+- `reason` - OPTIONAL Human readable message describing why the transaction was cancelled
+
+The following shows a simple cancel of a Transfer by the Originator Agent.
+
+```mermaid
+sequenceDiagram
+    Participant Originating Agent
+    Participant Beneficiary Agent
+
+    Originating Agent ->> Beneficiary Agent: Transfer
+    Originating Agent ->> Originating Agent: Cancel    
+```
+
+Any party can `Cancel` a Transfer through an agent acting on their behalf. Even after others have authorized it. As an example an originating cancel could reject a transaction authorized by the beneficiary agent because it took too long to authorize.
+
+```mermaid
+sequenceDiagram
+    Participant Originating Agent
+    Participant Beneficiary Agent
+
+    Originating Agent ->> Beneficiary Agent: Transfer
+    Beneficiary Agent ->> Originating Agent: Authorize [settlementAddress]
+    Originating Agent ->> Originating Agent: Cancel
+    
+```
+
+### Revert
+
+Agents acting on behalf of customers may need to request reversal of a transaction after it has been settled. This could be as part of a dispute resolution, post-transaction compliance checks or other reasons. 
+
+A `Revert` message could be `Settled`, `Authorized` or `Rejected` or simply ignored by the other agents involved.
+
+- `@context` - REQUIRED the JSON-LD context `https://tap.rsvp/schema/1.0`
+- `@type` - REQUIRED the JSON-LD type `https://tap.rsvp/schema/1.0#Revert`
+- `settlementAddress` - REQUIRED the proposed settlement address as [CAIP-10] to return the funds to
+- `reason` - REQUIRED Human readable message describing why the transaction reversal is being requested
+
+The following shows a simple Reversal request of a Transfer by the Originating Agent.
+
+```mermaid
+sequenceDiagram
+    Participant Originating Agent
+    Participant Beneficiary Agent
+
+    Originating Agent ->> Beneficiary Agent: Transfer
+    Beneficiary Agent ->> Originating Agent: Authorize
+    Originating Agent ->> Beneficiary Agent: Settle [settlementId]
+    Originating Agent ->> Beneficiary Agent: Revert
+    Beneficiary Agent ->> Originating Agent: Settle
+```
+
+The following shows a simple Reversal request of a Transfer by the Beneficiary Agent where the Originating Agent specifies a different settlementAddress.
+
+```mermaid
+sequenceDiagram
+    Participant Originating Agent
+    Participant Beneficiary Agent
+
+    Originating Agent ->> Beneficiary Agent: Transfer
+    Beneficiary Agent ->> Originating Agent: Authorize
+    Originating Agent ->> Beneficiary Agent: Settle [settlementId]
+    Beneficiary Agent ->> Originating Agent: Revert
+    Originating Agent ->> Beneficiary Agent: Authorize [settlementAddress]
+    Beneficiary Agent ->> Originating Agent: Settle
+```
+
 ### Transaction State from the point of view of various agents
 
 This is a potential state machine from the point of view of the originating agent (remember there is no shared state between agents, and each agent must maintain their own state):
@@ -238,7 +317,11 @@ stateDiagram-v2
     [*] --> Request : Transfer
     Request --> Authorized : Authorize
     Request --> Rejected : Reject
+    Request --> Cancelled : Cancel
     Authorized --> Settled : Settle
+    Settled -> ReversalRequested: Revert
+    ReversalRequested -> Reversed: Settle
+    ReversalRequested -> Settled: Reject
     Settled --> [*]
 
 ```
@@ -251,14 +334,25 @@ stateDiagram-v2
     [*] --> Received : Transfer
     Received --> Authorized : Authorize
     Received --> Rejected : Reject
+    Received --> Cancelled : Cancel
     Authorized --> Settled : Settle
+    Settled -> ReversalRequested: Revert
+    ReversalRequested -> ReversalAuthorized: Authorize
+    ReversalAuthorized -> Reversed: Settle
+    ReversalRequested -> Settled: Reject
     Settled --> [*]
 
 ```
 
+
 ## Rationale
-<!--The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.-->
+
+A standard messaging flow between participants in transactions is needed for virtual asset transactions to support regular business and retails use cases.
+
 A vital aspect of this flow is the intentional lack of a shared state. Focusing on a message flow instead makes it more realistic to use in permissionless blockchain applications. It also does provide more complexity for the implementing agent and their policies (see [TAIP-7]).
+
+It is very important to understand that messages are just messages. Agents may or may not act on the messages, which is why it's important that trust is built between agents. See [TAIP-5] and [TAIP-8].
+
 
 ## Test Cases
 <!--Please add diverse test cases here if applicable. Any normative definition of an interface requires test cases to be implementable. -->
@@ -308,6 +402,40 @@ The following are example plaintext messages. See [TAIP-2] for how to sign the m
     "@context": "https://tap.rsvp/schema/1.0",
     "@type": "https://tap.rsvp/schema/1.0#Reject",
     "reason":"Beneficiary name mismatch"
+  }
+}
+```
+
+
+### Cancel
+
+```json
+{
+ "from":"did:web:beneficiary.vasp",
+ "type": "https://tap.rsvp/schema/1.0#Reject",
+ "thid":"ID of transfer request",
+ "to": ["did:web:originator.vasp"],
+ "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#Cancel",
+    "reason":"Transfer took too long"
+  }
+}
+```
+
+### Revert
+
+```json
+{
+ "from":"did:web:beneficiary.vasp",
+ "type": "https://tap.rsvp/schema/1.0#Revert",
+ "thid":"ID of transfer request",
+ "to": ["did:web:originator.vasp"],
+ "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#Revert",
+    "settlementAddress":"eip155:1:0x1234a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb",
+    "reason":"Insufficient Originator Information"
   }
 }
 ```

@@ -5,7 +5,7 @@ author: Pelle Braendgaard <pelle@notabene.id>, Andrés Junge <andres@notabene.id
 status: Draft
 type: Standard
 created: 2024-01-24
-updated: 2024-01-24
+updated: 2025-03-07
 discussions-to: https://github.com/TransactionAuthorizationProtocol/TAIPs/pull/10
 requires: 2, 5, 6, 7
 ---
@@ -146,7 +146,7 @@ The following is a presentation definition for an IVMS-101 name for a natural pe
 
 ### Present Proof Test Case
 
-TODO Make sure this works correctly
+TODO Create real test vectors
 
 ```json
 {

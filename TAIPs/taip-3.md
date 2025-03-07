@@ -1,11 +1,11 @@
 ---
 taip: 3
 title: Asset Transfer
-status: Draft
+status: Review
 type: Standard
 author: Pelle Braendgaard <pelle@notabene.id>
 created: 2024-01-12
-updated: 2024-01-12
+updated: 2025-03-07
 discussions-to: https://github.com/TransactionAuthorizationProtocol/TAIPs/pull/5
 requires: 2, 5, 6
 ---
@@ -44,14 +44,16 @@ The preliminary URI to be used in the [TAIP-2] type header should be `https://ta
 
 As specified in [TAIP-2] the message body is [JSON-LD]. The following attributes are defined:
 
-* `@context` - REQUIRED the JSON-LD context `https://tap.rsvp/schema/1.0` (provisional)
-* `@type` - REQUIRED the JSON-LD type `https://tap.rsvp/schema/1.0#Transfer` (provisional)
-* `asset` - REQUIRED the [CAIP-19](CAIP-19) identifier of the asset
+* `@context` - REQUIRED the JSON-LD context `https://tap.rsvp/schema/1.0`
+* `@type` - REQUIRED the JSON-LD type `https://tap.rsvp/schema/1.0#Transfer`
+* `asset` - REQUIRED the [CAIP-19](CAIP-19) or [DTI] identifier of the asset
 * `amount` - OPTIONAL for NFTs and REQUIRED for fungible tokens. Specified as a string with the full amount as a decimal representation of the token
-* `originator` - OPTIONAL an object representing the originating (aka the sender) party (see [TAIP-6](TAIP-6))
-* `beneficiary` - OPTIONAL an object representing the beneficiary (aka the recipient) party (see [TAIP-6](TAIP-6))
+* `originator` - REQUIRED an object representing the originating (aka the sender) party (see [TAIP-6](TAIP-6))
+* `beneficiary` - OPTIONAL an object representing the beneficiary (aka the recipient) party if different than the `originator` (see [TAIP-6](TAIP-6))
 * `settlementId` - OPTIONAL a [CAIP-220](https://github.com/ChainAgnostic/CAIPs/pull/221/files) identifier of the underlying settlement transaction on a blockchain. For more details see below.
 * `agents` - REQUIRED an array of identity objects representing the agents who help execute the transaction. See [TAIP-5](TAIP-5) for more.
+* `memo` - OPTIONAL a human readable UTF-8 string to be provided as-is by the originator to the beneficiary about the transfer
+
 
 Many of the attributes are optional and through the process of authorization can be expanded and modified collaboratively by the agents of a transaction.
   
@@ -77,6 +79,12 @@ eg:
 eip155:1:tx/0x3edb98c24d46d148eb926c714f4fbaa117c47b0c0821f38bfce9763604457c33
 ```
 
+### First and Third party transfers
+
+If the `originator` is moving funds on their own behalf between their own wallets or accounts at different providers it is known as a first-party transfer. In this case only the `originator` is REQUIRED. The `beneficiary` can still OPTIONALLY be included for first-party transfers to indicate additional information such as account identifiers useful to the beneficiary institution.
+
+If `originator` and `beneficiary` are different it is known as a third-party transfer. 
+
 ### Agent Roles
 
 [Agents][TAIP-5] can have specific roles vital to the execution of a transaction.
@@ -99,7 +107,7 @@ It is also not intended to cover more complex transaction use cases, such as non
 ## Test Cases
 <!--Please add diverse test cases here if applicable. Any normative definition of an interface requires test cases to be implementable. -->
 
-The following is a minimal request for a transfer of 1.23 ETH from a trading firm to the ethereum wallet with the address `0x1234a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb`:
+The following is a minimal first-party request for a transfer of 1.23 ETH from a trading firm to the ethereum wallet with the address `0x1234a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb`:
 
 ```json
 {
@@ -128,7 +136,7 @@ The following is a minimal request for a transfer of 1.23 ETH from a trading fir
 }
 ```
 
-The following is a request for a transfer of 1.23 ETH from a crypto exchange from a customer to the ethereum wallet with the address `0x1234a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb`:
+The following is a request for a first-party transfer of 1.23 ETH from a crypto exchange from a customer to the ethereum wallet with the address `0x1234a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb`:
 
 ```json
 {
@@ -157,7 +165,7 @@ The following is a request for a transfer of 1.23 ETH from a crypto exchange fro
 }
 ```
 
-The following is a request for a transfer of 1.23 ETH from a crypto exchange from a customer to a customer at another hosted wallet, which does not include settlement information. This allows the parties negotiate settlement as part of the authorization flow:
+The following is a request for a third-party transfer of 1.23 ETH from a crypto exchange from a customer to a customer at another hosted wallet, which does not include settlement information. This allows the parties negotiate settlement as part of the authorization flow:
 
 ```json
 {
@@ -188,7 +196,7 @@ The following is a request for a transfer of 1.23 ETH from a crypto exchange fro
 }
 ```
 
-The following is an example of a reasonably complete transaction already settled. An Agent could create these to backfill information about an already settled transaction.
+The following is an example of a reasonably complete third-party transfer already that was already settled on the blockchain. An Agent could create these to backfill information about an already settled transaction.
 
 ```json
 {
@@ -244,6 +252,7 @@ Agents SHOULD minimize the use of end-user PII in this message, but it can be en
 * [TAIP-8] Selective disclosure of PII
 * [CAIP-10] Describes chainagnostic Account ID Specification
 * [CAIP-19] Describes Chainagnostic Asset ID Specification
+* [DTI] Digital Token Identifier standard
 * [JSON] JavaScript Object Notation
 * [JSON-LD] JSON Linked Data
 
@@ -255,6 +264,7 @@ Agents SHOULD minimize the use of end-user PII in this message, but it can be en
 [ChainAgnostic]: https://chainagnostic.org
 [CAIP-10]: https://chainagnostic.org/CAIPs/caip-10
 [CAIP-19]: https://chainagnostic.org/CAIPs/caip-19
+[DTI]: https://www.iso.org/obp/ui/en/#iso:std:iso:24165:-1:ed-1:v1:en
 [JSON]: https://datatracker.ietf.org/doc/html/rfc8259
 [JSON-LD]: https://www.w3.org/TR/json-ld  
 

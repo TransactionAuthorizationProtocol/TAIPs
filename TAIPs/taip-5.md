@@ -2,10 +2,10 @@
 taip: 5
 title: Transaction Agents
 author: Pelle Braendgaard <pelle@notabene.id>, Andrés Junge <andres@notabene.id>, Richard Crosby <richard@notabene.id>
-status: Draft
+status: Review
 type: Standard
 created: 2024-01-22
-updated: 2024-01-22
+updated: 2025-03-07
 discussions-to: https://github.com/TransactionAuthorizationProtocol/TAIPs/pull/7
 requires: 2
 ---
@@ -193,8 +193,8 @@ Any Agent can send one of the following messages:
 
 Any agent can add additional agents to a transaction by replying as a thread to the initial message. The following shows the attributes of the `body` object:
 
-- `@context` - REQUIRED the JSON-LD context `https://tap.rsvp/schema/1.0` (provisional)
-- `@type` - REQUIRED the JSON-LD type `https://tap.rsvp/schema/1.0#AddAgents` (provisional)
+- `@context` - REQUIRED the JSON-LD context `https://tap.rsvp/schema/1.0`
+- `@type` - REQUIRED the JSON-LD type `https://tap.rsvp/schema/1.0#AddAgents`
 - `agents` - REQUIRED an array of Agents to add to the transactions Agents list
 
 If an existing transaction agent is included in the list of `agents`, an Agent SHOULD update their internal record for this Agent with any additional data provided in this message.
@@ -205,8 +205,8 @@ Any new agents added should be included in the recipient list of the message.
 
 Any agent can replace themselves in a transaction by replying to the initial message as a thread. The following shows the attributes of the `body` object:
 
-- `@context` - REQUIRED the JSON-LD context `https://tap.rsvp/schema/1.0` (provisional)
-- `@type` - REQUIRED the JSON-LD type `https://tap.rsvp/schema/1.0#ReplaceAgent` (provisional)
+- `@context` - REQUIRED the JSON-LD context `https://tap.rsvp/schema/1.0`
+- `@type` - REQUIRED the JSON-LD type `https://tap.rsvp/schema/1.0#ReplaceAgent`
 - `original` - REQUIRED the [DID] of the Agent to be replaced
 - `replacement` - REQUIRED an Agent to add to the transactions Agents list
 
@@ -218,8 +218,8 @@ The message's sender SHOULD include the Agent specified in the `original` on the
 
 Any agent can propose removing another agent from the transaction by replying as a thread to the initial message. The following shows the attributes of the `body` object:
 
-- `@context` - REQUIRED the JSON-LD context `https://tap.rsvp/schema/1.0` (provisional)
-- `@type` - REQUIRED the JSON-LD type `https://tap.rsvp/schema/1.0#RemoveAgent` (provisional)
+- `@context` - REQUIRED the JSON-LD context `https://tap.rsvp/schema/1.0`
+- `@type` - REQUIRED the JSON-LD type `https://tap.rsvp/schema/1.0#RemoveAgent`
 - `agent` - REQUIRED the [DID] of the Agent to be removed
 
 If a receiving Agent does not have a record for the Agent specified in the agent `agent` attribute, it SHOULD ignore this message.
@@ -473,9 +473,18 @@ The following are example plaintext messages. See [TAIP-2] for how to sign the m
 
 ## Security Considerations
 <!--Please add an explicit list of intra-actor assumptions and known risk factors if applicable. Any normative definition of an interface requires these to be implementable; assumptions and risks should be at both individual interaction/use-case scale and systemically, should the interface specified gain ecosystem-namespace adoption. -->
-As in any decentralized messaging protocol, it is paramount that the recipient of messages trust the senders in the context of a particular transaction.
+As in any decentralized messaging protocol, it is paramount that the recipient of messages trust the senders in the context of a particular transaction. The DIDComm Messaging defined in [TAIP-2] verifies that messages are created by a specific agent. This does not mean you can necessarily trust their statements. 
 
-TODO specify in more detail
+As an example a message from `did:web:originator.vasp` proves that someone allowed access to creating files the website at the domain `originator.vasp` created a [WEB-DID] with the public keys. But leaves a lot of other questions open:
+
+* Do they have strong security policies to ensure only authorized staff can update that file?
+* Is `originator.vasp` the correct domain for `Originator VASP AG` in Switzerland as specified on the web site and not a fake?
+* Is `Originator VASP AG` regulated in Switzerland and by whom?
+* Can I trust they have performed KYC at the required level if they are providing me with Travel Rule related PII about their customer?
+* If I need to exchange my customers PII with them, can I do so under my countries privacy regime
+* Can I trust that they will answer correctly to any messages I send them?
+
+As such internal and external trust tools need to be handled. This is out of scope of this proposal.
 
 ## Privacy Considerations
 <!--Please add an explicit list of intra-actor assumptions and known risk factors if applicable. Any normative definition of an interface requires these to be implementable; assumptions and risks should be at both individual interaction/use-case scale and systemically, should the interface specified gain ecosystem-namespace adoption. -->
