@@ -28,6 +28,7 @@ The purpose of TAIPs is to provide the community with a means to propose enhance
 | 8    | [Selective Disclosure](./TAIPs/taip-8.md)                              |
 | 9    | [Proof of Relationship](./TAIPs/taip-9.md)                             |
 | 10   | [IVMS101 for Travel Rule](./TAIPs/taip-10.md)                          |
+| 11   | [Legal Entity Identifier (LEI) to Identify institutional participants in TAP Messages](./TAIPs/taip-11.md)                          |
 
 ## Inspiration
 
