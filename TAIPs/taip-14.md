@@ -106,23 +106,25 @@ sequenceDiagram
     participant Customer
     participant Blockchain
 
-    Merchant->>MerchantWallet: Create PaymentRequest (amount, address, requirements)
-    MerchantWallet-->>CustomerWallet: Send **PaymentRequest** (asset/currency, amount, address, requirePresentation policies)
-    CustomerWallet->>Customer: Display request (amount & details; prompt for required info)
+    Merchant->>MerchantWallet: Create PaymentRequest
+    MerchantWallet-->>CustomerWallet: Send PaymentRequest
+    CustomerWallet->>Customer: Display request details
+    
     alt Merchant requires KYC/Info
-        Customer-->>CustomerWallet: Provide requested info (e.g. email, shipping address)
-        CustomerWallet-->>MerchantWallet: **Verifiable Presentation** (credentials as per requirePresentation)
-        MerchantWallet->>MerchantWallet: Verify customer info (check credentials)
+        Customer->>CustomerWallet: Provide requested info
+        CustomerWallet->>MerchantWallet: Send Verifiable Presentation
+        MerchantWallet->>MerchantWallet: Verify customer info
     end
-    %% Merchant may optionally send an Authorize message if using multi-step approval
+
     opt Merchant approves transaction
-        MerchantWallet-->>CustomerWallet: **Authorize** (payment approved, proceed)
+        MerchantWallet-->>CustomerWallet: Send Authorize message
     end
-    Customer-->>CustomerWallet: Approve and send payment
-    CustomerWallet->>Blockchain: **Settle** (submit on-chain transaction)
-    Blockchain->>MerchantWallet: Payment transaction confirmed
-    MerchantWallet-->>Merchant: Notify payment received (with transaction details)
-    Merchant->>Merchant: Fulfill order (e.g. ship goods or confirm service access)
+
+    Customer->>CustomerWallet: Approve payment
+    CustomerWallet->>Blockchain: Submit transaction
+    Blockchain->>MerchantWallet: Confirm transaction
+    MerchantWallet->>Merchant: Notify payment received
+    Merchant->>Merchant: Fulfill order
 ```
 
 *Description:* This detailed sequence involves the **Merchant's agent (MerchantWallet)** and **Customer's agent (CustomerWallet)** exchanging messages. The merchant's wallet first sends a PaymentRequest to the customer's wallet, including a blockchain **address**, the **amount**, and a policy requiring additional information (for example, an email for receipt, and shipping address for delivery). The Customer's wallet alerts the **Customer** (user) with the details and asks for the required information. The user provides the info, which the wallet packages into a **Verifiable Presentation** (per TAIP-8) and returns to the merchant's wallet. The merchant's wallet verifies the credentials (ensuring they meet policy). Once satisfied, the merchant's wallet (or the merchant) can optionally send an **Authorize** message indicating everything is in order. The **Customer** then approves the payment, prompting the Customer's wallet to submit the blockchain transaction to the **Blockchain** network (this is depicted as a `Settle` action and the actual on-chain transfer). When the blockchain confirms the payment, the Merchant's wallet is notified (by listening to the blockchain or via an event). Finally, the **Merchant** is informed and can now consider the payment complete—at which point they deliver the product or service to the customer (this last step occurs off-chain, but is triggered by the confirmed payment).
