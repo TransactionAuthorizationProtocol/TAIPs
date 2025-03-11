@@ -69,6 +69,8 @@ Initiates a virtual asset transfer between parties.
 | agents | array of [Agent](#agent) | Yes | Review ([TAIP-3]) | Array of Agents |
 | settlementId | string | No | Review ([TAIP-3]) | CAIP-220 identifier of settlement transaction |
 | memo | string | No | Review ([TAIP-3]) | Human readable message about the transfer |
+| purpose | string | No | Draft ([TAIP-13]) | ISO 20022 purpose code indicating the reason for the transfer |
+| categoryPurpose | string | No | Draft ([TAIP-13]) | ISO 20022 category purpose code for high-level classification |
 
 #### Examples
 
@@ -557,8 +559,8 @@ Updates policies for a transaction.
       },
       {
         "@type": "RequirePurpose",
-        "purpose": "SALA",
-        "categoryPurpose": "CORT"
+        "fromAgent": "originator",
+        "fields": ["purpose", "categoryPurpose"]
       }
     ]
   }
@@ -666,8 +668,10 @@ Represents a service involved in executing transactions.
 | Attribute | Type | Required | Status | Description |
 |-----------|------|----------|---------|-------------|
 | @type | string | Yes | Review ([TAIP-7]) | "[RequirePurpose](#requirepurpose)" |
-| purpose | string | Yes | Review ([TAIP-7]) | ISO 20022 purpose code |
-| categoryPurpose | string | No | Review ([TAIP-7]) | ISO 20022 category purpose code |
+| fields | array | Yes | Draft ([TAIP-13]) | Array of required fields: ["purpose"] and/or ["categoryPurpose"] |
+| fromAgent | string | No | Draft ([TAIP-13]) | Agent required to provide the purpose code(s) |
+
+The `RequirePurpose` policy allows an agent to require that a purpose code and/or category purpose code be included in the transaction. The `fields` array specifies which codes are required. If both are needed, include both in the array. The `fromAgent` field (typically "originator") indicates which party's agent must provide the codes.
 
 ## Message Flow Examples
 
@@ -718,6 +722,11 @@ Represents a service involved in executing transactions.
         "fromAgent": "originator",
         "aboutParty": "originator",
         "presentationDefinition": "https://tap.rsvp/presentation-definitions/ivms-101/eu/tfr"
+      },
+      {
+        "@type": "RequirePurpose",
+        "fromAgent": "originator",
+        "fields": ["purpose", "categoryPurpose"]
       }
     ]
   }
@@ -798,8 +807,8 @@ Represents a service involved in executing transactions.
 [TAIP-5]: ./TAIPs/taip-5
 [TAIP-6]: ./TAIPs/taip-6
 [TAIP-7]: ./TAIPs/taip-7
-[TAIP-7]: ./TAIPs/taip-7
 [TAIP-8]: ./TAIPs/taip-8
 [TAIP-9]: ./TAIPs/taip-9
 [TAIP-10]: ./TAIPs/taip-10
-[TAIP-11]: ./TAIPs/taip-11 
+[TAIP-11]: ./TAIPs/taip-11
+[TAIP-13]: ./TAIPs/taip-13 
