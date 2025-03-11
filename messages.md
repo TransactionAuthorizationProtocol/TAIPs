@@ -3,38 +3,40 @@
 ## Table of Contents
 
 - [Common DIDComm Message Structure](#common-didcomm-message-structure)
-- [Core Data Structures](#core-data-structures)
-  - [Party Object](#party-object)
-  - [Agent Object](#agent-object)
-  - [Policy Objects](#policy-objects)
+- [Transaction Message](#transaction-message)
+  - [Transfer](#transfer)
+- [Authorization Flow Messages](#authorization-flow-messages)
+  - [Authorize](#authorize)
+  - [Settle](#settle)
+  - [Reject](#reject)
+  - [Cancel](#cancel)
+  - [Revert](#revert)
+- [Participant Management Messages](#participant-management-messages)
+  - [UpdateAgent](#updateagent)
+  - [UpdateParty](#updateparty)
+  - [AddAgents](#addagents)
+  - [ReplaceAgent](#replaceagent)
+  - [RemoveAgent](#removeagent)
+- [Relationship proofs](#relationship-proofs)
+  - [ConfirmRelationship](#confirmrelationship)
+- [Policy messages](#policy-messages)
+  - [UpdatePolicies](#updatepolicies)
+- [Data Elements](#data-elements)
+  - [Party](#party)
+  - [Agent](#agent)
+  - [Policy](#policy)
     - [RequirePresentation](#requirepresentation)
     - [RequirePurpose](#requirepurpose)
-- [Message Types](#message-types)
-  - [Authorization Flow Messages](#authorization-flow-messages)
-    - [Transfer Message](#transfer-message)
-    - [Authorize Message](#authorize-message)
-    - [Reject Message](#reject-message)
-    - [Cancel Message](#cancel-message)
-    - [Revert Message](#revert-message)
-    - [Settle Message](#settle-message)
-  - [Participant Management Messages](#participant-management-messages)
-    - [UpdateAgent Message](#updateagent-message)
-    - [UpdateParty Message](#updateparty-message)
-    - [AddAgents Message](#addagents-message)
-    - [ReplaceAgent Message](#replaceagent-message)
-    - [RemoveAgent Message](#removeagent-message)
-  - [Relationship proofs](#relationship-proofs)
-    - [ConfirmRelationship Message](#confirmrelationship-message)
-  - [Policy Messages](#policy-messages)
-    - [UpdatePolicies Message](#updatepolicies-message)
 - [Message Flow Examples](#message-flow-examples)
   - [Basic Transfer Flow](#basic-transfer-flow)
   - [Transfer with LEI and Purpose Code](#transfer-with-lei-and-purpose-code)
 
 ## Introduction
+
 This document defines the message types and data structures used in the Transaction Authorization Protocol (TAP). All messages follow the [DIDComm Messaging](https://identity.foundation/didcomm-messaging/spec/v2.1/) specification and use JSON-LD for data representation. See [TAIP-2].
 
 ## Common DIDComm Message Structure
+
 All TAP messages follow the DIDComm v2 message structure with these common attributes:
 
 | Attribute | Type | Required | Description |
@@ -49,9 +51,11 @@ All TAP messages follow the DIDComm v2 message structure with these common attri
 | created_time | number | Yes | Unix timestamp of message creation |
 | expires_time | number | No | Unix timestamp when message expires |
 
-# Transaction Message
+## Transaction Message
 
-### Transfer Message ([TAIP-3] - Review)
+### Transfer
+[TAIP-3] - Review
+
 Initiates a virtual asset transfer between parties.
 
 | Attribute | Type | Required | Status | Description |
@@ -60,16 +64,16 @@ Initiates a virtual asset transfer between parties.
 | @type | string | Yes | Review ([TAIP-3]) | JSON-LD type "https://tap.rsvp/schema/1.0#Transfer" |
 | asset | string | Yes | Review ([TAIP-3]) | CAIP-19 identifier of the asset |
 | amount | string | Yes | Review ([TAIP-3]) | Decimal amount of the asset |
-| originator | object | Yes | Review ([TAIP-3]) | Party object for the sender |
-| beneficiary | object | No | Review ([TAIP-3]) | Party object for the recipient |
-| agents | array | Yes | Review ([TAIP-3]) | Array of Agent objects |
+| originator | [Party](#party) | Yes | Review ([TAIP-3]) | Party for the sender |
+| beneficiary | [Party](#party) | No | Review ([TAIP-3]) | Party for the recipient |
+| agents | array of [Agent](#agent) | Yes | Review ([TAIP-3]) | Array of Agents |
 | settlementId | string | No | Review ([TAIP-3]) | CAIP-220 identifier of settlement transaction |
 | memo | string | No | Review ([TAIP-3]) | Human readable message about the transfer |
 
 #### Examples
 
+##### Simple first-party transfer
 ```json
-// Simple first-party transfer
 {
   "id": "123e4567-e89b-12d3-a456-426614174000",
   "type": "https://tap.rsvp/schema/1.0#Transfer",
@@ -94,8 +98,11 @@ Initiates a virtual asset transfer between parties.
     ]
   }
 }
+```
 
-// Third-party transfer with LEI
+
+##### Third-party transfer with LEI
+```json
 {
   "id": "123e4567-e89b-12d3-a456-426614174001",
   "type": "https://tap.rsvp/schema/1.0#Transfer",
@@ -133,7 +140,9 @@ Initiates a virtual asset transfer between parties.
 
 ## Authorization Flow Messages
 
-### Authorize Message ([TAIP-4] - Review)
+### Authorize
+[TAIP-4] - Review
+
 Approves a transfer for execution.
 
 | Attribute | Type | Required | Status | Description |
@@ -163,95 +172,9 @@ Approves a transfer for execution.
 }
 ```
 
-### Reject Message ([TAIP-4] - Review)
-Rejects a proposed transfer.
+### Settle
+[TAIP-4] - Review
 
-| Attribute | Type | Required | Status | Description |
-|-----------|------|----------|---------|-------------|
-| @context | string | Yes | Review ([TAIP-4]) | JSON-LD context "https://tap.rsvp/schema/1.0" |
-| @type | string | Yes | Review ([TAIP-4]) | JSON-LD type "https://tap.rsvp/schema/1.0#Reject" |
-| transfer | object | Yes | Review ([TAIP-4]) | Reference to the Transfer message being rejected |
-| reason | string | Yes | Review ([TAIP-4]) | Reason for rejection |
-
-#### Examples
-
-```json
-{
-  "id": "123e4567-e89b-12d3-a456-426614174003",
-  "type": "https://tap.rsvp/schema/1.0#Reject",
-  "from": "did:web:beneficiary.vasp",
-  "to": ["did:web:originator.vasp"],
-  "thid": "123e4567-e89b-12d3-a456-426614174000",
-  "body": {
-    "@context": "https://tap.rsvp/schema/1.0",
-    "@type": "https://tap.rsvp/schema/1.0#Reject",
-    "transfer": {
-      "@id": "123e4567-e89b-12d3-a456-426614174000"
-    },
-    "reason": "Beneficiary account is not active"
-  }
-}
-```
-
-### Cancel Message ([TAIP-4] - Review)
-Allows a party to cancel a transaction.
-
-| Attribute | Type | Required | Status | Description |
-|-----------|------|----------|---------|-------------|
-| @context | string | Yes | Review ([TAIP-4]) | JSON-LD context "https://tap.rsvp/schema/1.0" |
-| @type | string | Yes | Review ([TAIP-4]) | JSON-LD type "https://tap.rsvp/schema/1.0#Cancel" |
-| by | string | Yes | Review ([TAIP-4]) | The party cancelling the transaction (e.g. 'originator' or 'beneficiary') |
-| reason | string | No | Review ([TAIP-4]) | Human readable message describing why the transaction was cancelled |
-
-#### Examples
-
-```json
-{
-  "id": "123e4567-e89b-12d3-a456-426614174004",
-  "type": "https://tap.rsvp/schema/1.0#Cancel",
-  "from": "did:web:originator.vasp",
-  "to": ["did:web:beneficiary.vasp"],
-  "thid": "123e4567-e89b-12d3-a456-426614174000",
-  "body": {
-    "@context": "https://tap.rsvp/schema/1.0",
-    "@type": "https://tap.rsvp/schema/1.0#Cancel",
-    "by": "originator",
-    "reason": "Customer requested cancellation"
-  }
-}
-```
-
-### Revert Message ([TAIP-4] - Review)
-Requests a reversal of the transaction.
-
-| Attribute | Type | Required | Status | Description |
-|-----------|------|----------|---------|-------------|
-| @context | string | Yes | Review ([TAIP-4]) | JSON-LD context "https://tap.rsvp/schema/1.0" |
-| @type | string | Yes | Review ([TAIP-4]) | JSON-LD type "https://tap.rsvp/schema/1.0#Revert" |
-| transfer | object | Yes | Review ([TAIP-4]) | Reference to the Transfer message being reverted |
-| reason | string | No | Review ([TAIP-4]) | Optional reason for requesting the revert |
-
-#### Examples
-
-```json
-{
-  "id": "123e4567-e89b-12d3-a456-426614174005",
-  "type": "https://tap.rsvp/schema/1.0#Revert",
-  "from": "did:web:beneficiary.vasp",
-  "to": ["did:web:originator.vasp"],
-  "thid": "123e4567-e89b-12d3-a456-426614174000",
-  "body": {
-    "@context": "https://tap.rsvp/schema/1.0",
-    "@type": "https://tap.rsvp/schema/1.0#Revert",
-    "transfer": {
-      "@id": "123e4567-e89b-12d3-a456-426614174000"
-    },
-    "reason": "Wrong beneficiary account"
-  }
-}
-```
-
-### Settle Message ([TAIP-4] - Review)
 Confirms the on-chain settlement of a transfer.
 
 | Attribute | Type | Required | Status | Description |
@@ -281,9 +204,106 @@ Confirms the on-chain settlement of a transfer.
 }
 ```
 
+### Reject
+[TAIP-4] - Review
+
+Rejects a proposed transfer.
+
+| Attribute | Type | Required | Status | Description |
+|-----------|------|----------|---------|-------------|
+| @context | string | Yes | Review ([TAIP-4]) | JSON-LD context "https://tap.rsvp/schema/1.0" |
+| @type | string | Yes | Review ([TAIP-4]) | JSON-LD type "https://tap.rsvp/schema/1.0#Reject" |
+| transfer | object | Yes | Review ([TAIP-4]) | Reference to the Transfer message being rejected |
+| reason | string | Yes | Review ([TAIP-4]) | Reason for rejection |
+
+#### Examples
+
+```json
+{
+  "id": "123e4567-e89b-12d3-a456-426614174003",
+  "type": "https://tap.rsvp/schema/1.0#Reject",
+  "from": "did:web:beneficiary.vasp",
+  "to": ["did:web:originator.vasp"],
+  "thid": "123e4567-e89b-12d3-a456-426614174000",
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#Reject",
+    "transfer": {
+      "@id": "123e4567-e89b-12d3-a456-426614174000"
+    },
+    "reason": "Beneficiary account is not active"
+  }
+}
+```
+
+### Cancel
+[TAIP-4] - Review
+
+Allows a party to cancel a transaction.
+
+| Attribute | Type | Required | Status | Description |
+|-----------|------|----------|---------|-------------|
+| @context | string | Yes | Review ([TAIP-4]) | JSON-LD context "https://tap.rsvp/schema/1.0" |
+| @type | string | Yes | Review ([TAIP-4]) | JSON-LD type "https://tap.rsvp/schema/1.0#Cancel" |
+| by | string | Yes | Review ([TAIP-4]) | The party cancelling the transaction (e.g. 'originator' or 'beneficiary') |
+| reason | string | No | Review ([TAIP-4]) | Human readable message describing why the transaction was cancelled |
+
+#### Examples
+
+```json
+{
+  "id": "123e4567-e89b-12d3-a456-426614174004",
+  "type": "https://tap.rsvp/schema/1.0#Cancel",
+  "from": "did:web:originator.vasp",
+  "to": ["did:web:beneficiary.vasp"],
+  "thid": "123e4567-e89b-12d3-a456-426614174000",
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#Cancel",
+    "by": "originator",
+    "reason": "Customer requested cancellation"
+  }
+}
+```
+
+### Revert
+[TAIP-4] - Review
+
+Requests a reversal of a settled transaction. This could be part of a dispute resolution, post-transaction compliance checks, or other reasons. The reversal request can be Settled, Authorized, Rejected, or simply ignored by other agents.
+
+| Attribute | Type | Required | Status | Description |
+|-----------|------|----------|---------|-------------|
+| @context | string | Yes | Review ([TAIP-4]) | JSON-LD context "https://tap.rsvp/schema/1.0" |
+| @type | string | Yes | Review ([TAIP-4]) | JSON-LD type "https://tap.rsvp/schema/1.0#Revert" |
+| transfer | object | Yes | Review ([TAIP-4]) | Reference to the Transfer message being reverted |
+| settlementAddress | string | Yes | Review ([TAIP-4]) | CAIP-10 identifier of the proposed settlement address to return the funds to |
+| reason | string | Yes | Review ([TAIP-4]) | Human readable message describing why the transaction reversal is being requested |
+
+#### Examples
+
+```json
+{
+  "id": "123e4567-e89b-12d3-a456-426614174005",
+  "type": "https://tap.rsvp/schema/1.0#Revert",
+  "from": "did:web:beneficiary.vasp",
+  "to": ["did:web:originator.vasp"],
+  "thid": "123e4567-e89b-12d3-a456-426614174000",
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#Revert",
+    "transfer": {
+      "@id": "123e4567-e89b-12d3-a456-426614174000"
+    },
+    "settlementAddress": "eip155:1:0x1234a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb",
+    "reason": "Insufficient Originator Information"
+  }
+}
+```
+
 ## Participant Management Messages
 
-### UpdateAgent Message ([TAIP-5] - Review)
+### UpdateAgent
+[TAIP-5] - Review
 
 Updates information about an agent.
 
@@ -291,7 +311,7 @@ Updates information about an agent.
 |-----------|------|----------|---------|-------------|
 | @context | string | Yes | Review ([TAIP-5]) | JSON-LD context "https://tap.rsvp/schema/1.0" |
 | @type | string | Yes | Review ([TAIP-5]) | JSON-LD type "https://tap.rsvp/schema/1.0#UpdateAgent" |
-| agent | object | Yes | Review ([TAIP-5]) | Updated Agent object |
+| agent | [Agent](#agent) | Yes | Review ([TAIP-5]) | Updated Agent |
 
 #### Examples
 
@@ -314,7 +334,8 @@ Updates information about an agent.
 }
 ```
 
-### UpdateParty Message ([TAIP-6] - Review)
+### UpdateParty
+[TAIP-6] - Review
 
 Updates information about a party.
 
@@ -322,7 +343,7 @@ Updates information about a party.
 |-----------|------|----------|---------|-------------|
 | @context | string | Yes | Review ([TAIP-6]) | JSON-LD context "https://tap.rsvp/schema/1.0" |
 | @type | string | Yes | Review ([TAIP-6]) | JSON-LD type "https://tap.rsvp/schema/1.0#UpdateParty" |
-| party | object | Yes | Review ([TAIP-6]) | Updated Party object |
+| party | [Party](#party) | Yes | Review ([TAIP-6]) | Updated Party |
 
 #### Examples
 
@@ -348,14 +369,16 @@ Updates information about a party.
 }
 ```
 
-### AddAgents Message ([TAIP-5] - Review)
+### AddAgents
+[TAIP-5] - Review
+
 Adds one or more additional agents to the transaction.
 
 | Attribute | Type | Required | Status | Description |
 |-----------|------|----------|---------|-------------|
 | @context | string | Yes | Review ([TAIP-5]) | JSON-LD context "https://tap.rsvp/schema/1.0" |
 | @type | string | Yes | Review ([TAIP-5]) | JSON-LD type "https://tap.rsvp/schema/1.0#AddAgents" |
-| agents | array | Yes | Review ([TAIP-5]) | Array of Agent objects to add to the transaction |
+| agents | array of [Agent](#agent) | Yes | Review ([TAIP-5]) | Array of Agents to add to the transaction |
 
 #### Examples
 
@@ -380,7 +403,9 @@ Adds one or more additional agents to the transaction.
 }
 ```
 
-### ReplaceAgent Message ([TAIP-5] - Review)
+### ReplaceAgent
+[TAIP-5] - Review
+
 Replaces an agent with another agent in the transaction.
 
 | Attribute | Type | Required | Status | Description |
@@ -388,7 +413,7 @@ Replaces an agent with another agent in the transaction.
 | @context | string | Yes | Review ([TAIP-5]) | JSON-LD context "https://tap.rsvp/schema/1.0" |
 | @type | string | Yes | Review ([TAIP-5]) | JSON-LD type "https://tap.rsvp/schema/1.0#ReplaceAgent" |
 | original | string | Yes | Review ([TAIP-5]) | DID of the Agent to be replaced |
-| replacement | object | Yes | Review ([TAIP-5]) | Agent object to replace the original agent |
+| replacement | [Agent](#agent) | Yes | Review ([TAIP-5]) | Agent to replace the original agent |
 
 #### Examples
 
@@ -412,7 +437,9 @@ Replaces an agent with another agent in the transaction.
 }
 ```
 
-### RemoveAgent Message ([TAIP-5] - Review)
+### RemoveAgent
+[TAIP-5] - Review
+
 Removes an agent from the transaction.
 
 | Attribute | Type | Required | Status | Description |
@@ -440,14 +467,16 @@ Removes an agent from the transaction.
 
 ## Relationship proofs
 
-### ConfirmRelationship Message ([TAIP-9] - Draft)
+### ConfirmRelationship
+[TAIP-9] - Draft
+
 Confirms a relationship between an agent and the entity it acts on behalf of. Can include cryptographic proof via CACAO signatures for self-hosted wallets.
 
 | Attribute | Type | Required | Status | Description |
 |-----------|------|----------|---------|-------------|
 | @context | string | Yes | Draft ([TAIP-9]) | JSON-LD context "https://tap.rsvp/schema/1.0" |
 | @type | string | Yes | Draft ([TAIP-9]) | JSON-LD type "https://tap.rsvp/schema/1.0#ConfirmRelationship" |
-| body | object | Yes | Draft ([TAIP-9]) | Agent object containing the relationship details |
+| body | [Agent](#agent) | Yes | Draft ([TAIP-9]) | Agent containing the relationship details |
 | attachments | array | No | Draft ([TAIP-9]) | Optional array containing at most one CAIP-74 message for cryptographic proof |
 
 The body object must contain:
@@ -495,14 +524,16 @@ The body object must contain:
 
 ## Policy messages
 
-### UpdatePolicies Message ([TAIP-7] - Review)
+### UpdatePolicies
+[TAIP-7] - Review
+
 Updates policies for a transaction.
 
 | Attribute | Type | Required | Status | Description |
 |-----------|------|----------|---------|-------------|
 | @context | string | Yes | Review ([TAIP-7]) | JSON-LD context "https://tap.rsvp/schema/1.0" |
 | @type | string | Yes | Review ([TAIP-7]) | JSON-LD type "https://tap.rsvp/schema/1.0#UpdatePolicies" |
-| policies | array | Yes | Review ([TAIP-7]) | Array of policy objects |
+| policies | array of [Policy](#policy) ([RequirePresentation](#requirepresentation) or [RequirePurpose](#requirepurpose)) | Yes | Review ([TAIP-7]) | Array of Policy |
 
 #### Examples
 
@@ -536,16 +567,78 @@ Updates policies for a transaction.
 
 ## Data Elements
 
-### Party Object ([TAIP-6] - Review)
+### Party
+[TAIP-6] - Review
+
 Represents a participant in a transaction (originator or beneficiary).
 
 | Attribute | Type | Required | Status | Description |
 |-----------|------|----------|---------|-------------|
 | @id | string | Yes | Review ([TAIP-6]) | DID or IRI of the party |
-| lei:leiCode | string | No | Draft ([TAIP-11]) | LEI code for legal entities |
+| lei:leiCode | string | No | Draft ([TAIP-11]) | LEI code for legal entities. Must be a 20-character alpha-numeric string conforming to ISO 17442 |
 | name | string | No | Review ([TAIP-6]) | Human-readable name |
+| nameHash | string | No | Draft ([TAIP-12]) | SHA-256 hash of the normalized name (uppercase, no whitespace) |
 
-### Agent Object ([TAIP-5] - Review)
+When including an LEI, the Party MUST include the appropriate JSON-LD context:
+
+```json
+{
+  "@context": { "lei": "https://schema.org/leiCode" },
+  "@id": "did:web:example.vasp.com",
+  "lei:leiCode": "5493001KJTIIGC8Y1R12"
+}
+```
+
+If a customer (originator or beneficiary) is a legal entity and has an LEI, that LEI SHOULD be included in their Party. For institutions (VASPs), if they have an LEI, they MUST include it in their Party.
+
+#### Example with LEI and Agent Relationship
+
+```json
+{
+  "@context": {
+    "@vocab": "https://tap.rsvp/schema/1.0",
+    "lei": "https://schema.org/leiCode"
+  },
+  "@type": "https://tap.rsvp/schema/1.0#Transfer",
+  "asset": "eip155:1/slip44:60",
+  "amount": "100.00",
+  "originator": {
+    "@id": "did:org:acmecorp",
+    "lei:leiCode": "3M5E1GQKGL17HI8CPN20",
+    "name": "ACME Corporation"
+  },
+  "agents": [
+    {
+      "@id": "did:web:originator.vasp",
+      "for": "did:org:acmecorp",
+      "policies": [
+        {
+          "@type": "RequirePresentation",
+          "@context": [
+            "https://schema.org/Organization",
+            "https://www.gleif.org/ontology/Base/Entity"
+          ],
+          "fromAgent": "beneficiary",
+          "aboutAgent": "beneficiary",
+          "purpose": "Require beneficiary institution LEI for compliance",
+          "presentationDefinition": "https://tap.rsvp/definitions/lei/v1"
+        }
+      ]
+    }
+  ]
+}
+```
+
+The example above shows:
+1. A Party for a legal entity (ACME Corporation) with its LEI
+2. An Agent representing that party (the VASP)
+3. A policy requiring the beneficiary to present their LEI credentials
+
+Note: Future versions may support verifiable LEIs (vLEIs) through the standard credential presentation mechanism defined in [TAIP-8].
+
+### Agent
+[TAIP-5] - Review
+
 Represents a service involved in executing transactions.
 
 | Attribute | Type | Required | Status | Description |
@@ -554,28 +647,32 @@ Represents a service involved in executing transactions.
 | role | string | No | Review ([TAIP-5]) | Role of the agent (e.g., "SettlementAddress", "SourceAddress") |
 | for | string | No | Review ([TAIP-5]) | Reference to the Party this agent represents |
 
-### Policy Objects ([TAIP-7] - Review)
+### Policy
+[TAIP-7] - Review
 
-#### RequirePresentation Policy
+#### RequirePresentation
+
 | Attribute | Type | Required | Status | Description |
 |-----------|------|----------|---------|-------------|
-| @type | string | Yes | Review ([TAIP-7]) | "RequirePresentation" |
+| @type | string | Yes | Review ([TAIP-7]) | "[RequirePresentation](#requirepresentation)" |
 | @context | array | Yes | Review ([TAIP-7]) | Array of context URIs |
 | fromAgent | string | Yes | Review ([TAIP-7]) | Agent to present the information |
 | aboutParty | string | No | Review ([TAIP-7]) | Party the presentation is about |
 | aboutAgent | string | No | Review ([TAIP-7]) | Agent the presentation is about |
 | presentationDefinition | string | Yes | Review ([TAIP-7]) | URL to presentation definition |
 
-#### RequirePurpose Policy
+#### RequirePurpose
+
 | Attribute | Type | Required | Status | Description |
 |-----------|------|----------|---------|-------------|
-| @type | string | Yes | Review ([TAIP-7]) | "RequirePurpose" |
+| @type | string | Yes | Review ([TAIP-7]) | "[RequirePurpose](#requirepurpose)" |
 | purpose | string | Yes | Review ([TAIP-7]) | ISO 20022 purpose code |
 | categoryPurpose | string | No | Review ([TAIP-7]) | ISO 20022 category purpose code |
 
 ## Message Flow Examples
 
 ### Basic Transfer Flow
+
 ```json
 // 1. Transfer Message
 {
@@ -659,6 +756,7 @@ Represents a service involved in executing transactions.
 ```
 
 ### Transfer with LEI and Purpose Code
+
 ```json
 {
   "id": "transfer-124",
@@ -700,4 +798,8 @@ Represents a service involved in executing transactions.
 [TAIP-5]: ./TAIPs/taip-5
 [TAIP-6]: ./TAIPs/taip-6
 [TAIP-7]: ./TAIPs/taip-7
+[TAIP-7]: ./TAIPs/taip-7
+[TAIP-8]: ./TAIPs/taip-8
+[TAIP-9]: ./TAIPs/taip-9
+[TAIP-10]: ./TAIPs/taip-10
 [TAIP-11]: ./TAIPs/taip-11 
