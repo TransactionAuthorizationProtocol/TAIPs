@@ -8,6 +8,10 @@ Please read the [TAP Whitepaper](https://docs.google.com/document/d/1z16nPRjiCFG
 
 The purpose of TAIPs is to provide the community with a means to propose enhancements to [TAP](https://tap.rsvp) extending it's capabilities to unique transaction scenarios.
 
+## Documentation
+
+- [Message Types and Data Structures](./messages.md) - Comprehensive documentation of all TAP message types and data structures
+
 ## TAIP Statuses
 
 - **Draft** - A TAIP currently in development
@@ -28,7 +32,8 @@ The purpose of TAIPs is to provide the community with a means to propose enhance
 | 8    | [Selective Disclosure](./TAIPs/taip-8.md)                              |
 | 9    | [Proof of Relationship](./TAIPs/taip-9.md)                             |
 | 10   | [IVMS101 for Travel Rule](./TAIPs/taip-10.md)                          |
-| 11   | [Legal Entity Identifier (LEI) to Identify institutional participants in TAP Messages](./TAIPs/taip-11.md)                          |
+| 11   | [Legal Entity Identifier (LEI) to Identify institutional participants in TAP Messages](./TAIPs/taip-11.md) |
+| 13   | [Transaction Purpose Codes](./TAIPs/taip-13.md)                         |
 
 ## Inspiration
 
