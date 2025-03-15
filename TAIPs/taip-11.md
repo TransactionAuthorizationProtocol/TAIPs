@@ -18,7 +18,7 @@ This proposal introduces the use of the Legal Entity Identifier (LEI) within TAP
 
 ## Motivation
 
-Global regulatory standards and industry best practices increasingly emphasize the need for reliable identification of financial institutions in digital transactions. The **Legal Entity Identifier (LEI)**, endorsed by the G20 and regulated through the Global LEI System, has emerged as the only global standard for legal entity identification [GLEIF]. Over **2 million LEIs** have been issued worldwide, and more than *200 regulations* now require or reference LEIs in various financial domains [RapidLEI]. In the context of cryptocurrency transactions and the FATF Travel Rule, VASPs (Virtual Asset Service Providers) must exchange originator and beneficiary institution information. Adopting LEIs in TAP provides a uniform, verifiable way to identify these institutions without ambiguity. 
+Global regulatory standards and industry best practices increasingly emphasize the need for reliable identification of financial institutions in digital transactions. The **Legal Entity Identifier (LEI)**, endorsed by the G20 and regulated through the Global LEI System, has emerged as the only global standard for legal entity identification [GLEIF]. Over **2 million LEIs** have been issued worldwide, and more than *200 regulations* now require or reference LEIs in various financial domains [RapidLEI]. In the context of cryptocurrency transactions and the FATF Travel Rule, VASPs (Virtual Asset Service Providers) must exchange originator and beneficiary institution information. Adopting LEIs in TAP provides a uniform, verifiable way to identify these institutions without ambiguity.
 
 Unlike free-form names or local identifiers, LEIs are globally unique and can be cross-checked against an open data registry for details about the entity ("who is who" and "who owns whom" in corporate structures) [GLEIF]. This improves interoperability and reduces errors or confusion in identifying counterparties. It also streamlines compliance processes: for example, the Financial Stability Board (FSB) has identified the LEI as a key component for enhancing cross-border payment processes and recommended its inclusion in payment messaging standards [FSB]. By using LEIs, a receiving institution can automatically recognize the sending institution (and vice versa), facilitate due diligence (e.g. sanction screening by entity), and satisfy regulatory reporting requirements.
 
@@ -59,7 +59,8 @@ An Agent can declare a policy that it requires the counterparty's institution to
   "id": "123e4567-e89b-12d3-a456-426614174000",
   "type": "https://tap.rsvp/schema/1.0#UpdatePolicies",
   "thid": "123e4567-e89b-12d3-a456-426614174000",
-  "to": ["did:web:beneficiary.vasp.com"], 
+  "from":"did:web:originator.vasp.com",
+  "to": ["did:web:beneficiary.vasp.com"],
   "body": {
     "@context": "https://tap.rsvp/schema/1.0",
     "@type": "https://tap.rsvp/schema/1.0#UpdatePolicies",
@@ -93,14 +94,14 @@ When initiating a transaction, if the originator's institution or the originator
   "from": "did:web:originator.vasp.com",
   "to": [
     "did:web:beneficiary.vasp.com",
-    "did:pkh:eip155:1:0xabc123...fdef" 
+    "did:pkh:eip155:1:0xabc123...fdef"
   ],
   "body": {
     "@context": "https://tap.rsvp/schema/1.0",
     "@type": "https://tap.rsvp/schema/1.0#Transfer",
     "originator": {
       "@context": { "lei": "https://schema.org/leiCode" },
-      "@id": "did:org:acmecorp-123", 
+      "@id": "did:org:acmecorp-123",
       "lei:leiCode": "3M5E1GQKGL17HI8CPN20",
       "name": "ACME Corporation"
     },
@@ -125,7 +126,7 @@ Continuing the Example 1 scenario: the originator's VASP requested the beneficia
 {
   "id": "123e4567-e89b-12d3-a456-426614174002",
   "type": "https://didcomm.org/present-proof/3.0/presentation",
-  "thid": "123e4567-e89b-12d3-a456-426614174000", 
+  "thid": "123e4567-e89b-12d3-a456-426614174000",
   "body": {
     "presentation": {
       "@context": [
@@ -169,7 +170,7 @@ In the context of TAP, future adoption of vLEIs would allow parties not only to 
 
 - *Delegated Authority:* The vLEI ecosystem not only verifies the entity but also can include the *roles/authority* of individuals acting on the entity's behalf [AusPayNet-Trust]. In practice, this means a vLEI credential could assert that "Alice is an authorized Compliance Officer of Bank XYZ (LEI: ...)" In TAP workflows, this could eventually allow not just machine-to-machine assurance, but also human-to-human trust (e.g., a compliance analyst at one institution trusting that the person they're dealing with at the counterparty is legitimately representing that firm). This level of detail is beyond the scope of basic TAP message exchange, but it indicates how vLEI could enhance the broader trust framework around TAP messages.
 
-**Anticipated usage in TAP:** Once vLEI credentials become available and widely adopted, TAP agents could incorporate vLEI presentation as a standard step during the initialization of a transaction or during policy compliance checks. For instance, an agent's policy might directly request a "vLEI credential presentation" from the counterparty's agent, rather than just the raw LEI code. The exchange would then use the `RequirePresentation` mechanism to obtain a W3C Verifiable Presentation containing the vLEI. Because this is all based on open standards (DIDComm, W3C VC), it fits neatly into the existing TAP framework defined by TAIP-7 and TAIP-8.
+**Anticipated usage in TAP:** Once vLEI credentials become available and widely adopted, TAP agents could incorporate vLEI presentation as a standard step during the initialization of a transaction or during policy compliance checks. For instance, an agent's policy might directly request a "vLEI credential presentation" from the counterparty's agent, rather than just the raw LEI code. The exchange would then use the `RequirePresentation` mechanism to obtain a W3C Verifiable Presentation containing the vLEI. Because this is all based on open standards (DIDComm, W3C VC), it fits neatly into the existing TAP framework defined by [TAIP-7] and [TAIP-8].
 
 It's expected that early on, not all institutions will have vLEIs. During that transition, some TAP transactions may use plain LEIs (possibly verified manually or via database lookups), while others use vLEIs where available. Over time, as regulators and industry bodies encourage vLEI usage, TAP could progressively move toward preferring verifiable credentials. This TAIP is designed to accommodate that evolution: it establishes the LEI as the identifier now, and is forward-compatible with exchanging that identifier in verifiable form. In summary, **vLEIs will greatly strengthen identity assurance in TAP** by providing cryptographic proof of an institution's identity and authority, building on the foundation of LEI introduced in this specification.
 
@@ -185,7 +186,7 @@ In summary, the introduction of LEIs does not weaken TAP security; rather, it pr
 
 This proposal aligns with TAP's privacy-preserving approach by **limiting the exposure of personal data**. An LEI identifies a legal entity (organization), not a natural person, and is drawn from a public registry [GLEIF]. Including an LEI in a message therefore does not directly reveal personal information about any individual. It does, however, disclose the involvement of a particular institution in a transaction, which could be considered sensitive in certain business contexts (for example, a competitor learning that a company is transacting with a certain bank). TAP messages are generally exchanged privately between the parties involved in a transaction (over encrypted DIDComm channels), so this risk is minimal. Both sides of a TAP exchange are already aware of each other's identities by virtue of initiating the connection (e.g. through directory lookup or prior agreement), and the LEI simply formalizes that knowledge in a standard way.
 
-By removing the need to send full IVMS101 datasets (which include names, physical addresses, ID numbers, etc.), using LEIs significantly reduces the amount of personally identifiable information shared in the transaction flow. This supports the principle of **data minimization** – only the necessary identity information (the institution's identifier) is shared by default, and anything beyond that (e.g. personal data about customers) is only shared selectively if required by policy [TAIP-8]. In jurisdictions with strict privacy laws (GDPR, CCPA, etc.), this approach helps TAP implementers avoid sending or storing unnecessary personal data, thereby reducing compliance burden and potential liability. 
+By removing the need to send full IVMS101 datasets (which include names, physical addresses, ID numbers, etc.), using LEIs significantly reduces the amount of personally identifiable information shared in the transaction flow. This supports the principle of **data minimization** – only the necessary identity information (the institution's identifier) is shared by default, and anything beyond that (e.g. personal data about customers) is only shared selectively if required by policy [TAIP-8]. In jurisdictions with strict privacy laws (GDPR, CCPA, etc.), this approach helps TAP implementers avoid sending or storing unnecessary personal data, thereby reducing compliance burden and potential liability.
 
 One consideration is that if a customer of a VASP is a legal entity and its LEI is shared, information about that customer (like its registered name, jurisdiction, etc.) can be looked up by the counterparty via the LEI. Again, since that information is public corporate data, this is usually acceptable and even desirable for due diligence. Organizations typically do not object to sharing their LEI, as it facilitates trust. Nevertheless, if there were a case where an entity's involvement needed to be kept confidential, the parties would need to handle that out-of-band, because TAP by design favors transparency of institutional identity for compliance reasons.
 
