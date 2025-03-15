@@ -25,7 +25,7 @@ Traditional on-chain transactions are push-only and irreversible [TAIP-4], makin
 
 **Improved Compliance and Data Privacy:** Merchants often need additional customer details (for compliance with regulations like the Travel Rule, or for business purposes like shipping). Instead of including personally identifiable information in the payment request (which would risk exposure to other parties) [TAIP-8], the merchant can declare a `RequirePresentation` policy (as per [TAIP-8]) in the PaymentRequest. This signals that the customer's wallet must present certain credentials (e.g. proof of identity, email, shipping address) privately to the merchant's agent before or alongside payment. By leveraging [TAIP-8] selective disclosure, sensitive data is exchanged **only** between the requesting merchant and the customer, minimizing privacy risks.
 
-**Partial Payments Handling:** In some cases a customer may not be able to pay the full amount at once or may accidentally underpay. Originally, an `allowPartial` flag in the request indicated whether partial payments were permitted. We remove this flag to simplify the protocol—**partial payments are implicitly possible** and whether to accept them is determined by the customer's wallet and the merchant's policy. This change reflects that ultimately a wallet (originator's agent) decides if it will allow sending a partial amount (and possibly follow up with additional payments) to fulfill the total. Removing `allowPartial` avoids confusion and duplication of policy logic between parties.
+**Partial Payments Handling:** In some cases a customer may not be able to pay the full amount at once or may accidentally underpay. **partial payments are implicitly possible** and whether to accept them is determined by the customer's wallet and the merchant's policy. This change reflects that ultimately a wallet (originator's agent) decides if it will allow sending a partial amount (and possibly follow up with additional payments) to fulfill the total.
 
 **Cancellation Capability:** Real-world payment flows allow either party to cancel an invoice or payment before completion (e.g. a customer abandons checkout, or a merchant voids an order). On blockchains, once a transaction is broadcast, it cannot be reversed [TAIP-4], but before settlement there should be a way to abort the process. We introduce a **Cancel** message in [TAIP-4] so that any agent involved can signal termination of the PaymentRequest thread. The `Cancel` action complements these by allowing a voluntary cancellation (distinct from a policy-based rejection). For example, a customer's wallet can send Cancel if the user declines to proceed, or a merchant's system can Cancel if the payment window expired or the order was invalidated. This improves the user experience by explicitly closing the loop in failure cases, informing both sides that no payment will occur.
 
@@ -33,16 +33,16 @@ Traditional on-chain transactions are push-only and irreversible [TAIP-4], makin
 
 ### PaymentRequest Message
 
-A **PaymentRequest** is a DIDComm message (per TAIP-2) initiated by the merchant's agent and sent to the customer's agent to request a blockchain payment. It MUST include either an **`asset`** or a **`currency`** to denominate the payment, along with the amount and recipient information. The message structure is defined as follows (fields in **bold** are required):
+A **PaymentRequest** is a [DIDComm] message (per [TAIP-2]) initiated by the merchant's agent and sent to the customer's agent to request a blockchain payment. It MUST include either an **`asset`** or a **`currency`** to denominate the payment, along with the amount and recipient information. The message structure is defined as follows (fields in **bold** are required):
 
 - **`@type`** – Type identifier of the message, e.g. `"PaymentRequest"` (in context of TAIP message types).
 - **`asset`** – *Optional*, **string** formatted as a CAIP-19 asset identifier [CAIP-19] or [DTI] specifying the exact crypto asset to be paid (including chain and asset details, e.g. `"eip155:1/erc20:0x...USDC"` for USDC on Ethereum). **Must be present if `currency` is not provided.**
-- **`currency`** – *Optional*, **string** ISO 4217 currency code specifying a fiat currency for the requested amount (e.g. `"USD"` for US Dollars). **Must be present if `asset` is not provided.**
+- **`currency`** – *Optional*, **string** ISO 4217 currency code specifying a fiat currency for the requested amount (e.g. `"USD"` for US Dollars). **MUST be present if `asset` is not provided.**
 - **`amount`** – **Required**, **number or string** indicating the amount requested. This amount is interpreted in the context of the provided `asset` or `currency`. For a fiat `currency`, this is a decimal currency amount (e.g. `100.00` if currency is USD). For an `asset`, it may be in the minimal unit of that asset or a decimal string, depending on asset's conventions.
 - **`supportedAssets`** – *Optional*, **array of strings** ([CAIP-19] or [DTI] asset identifiers). If `currency` is given (fiat-denominated request), this field can list which crypto assets are acceptable to settle that currency amount. Each entry is an asset the merchant will accept as payment for the given fiat amount. For example, a PaymentRequest might specify `"currency": "EUR", "amount": "50.00", "supportedAssets": ["eip155:1/erc20:0xA0b86991..."]` to indicate €50.00 can be paid in USDC on Ethereum (asset listed) or potentially other listed stablecoins. If `supportedAssets` is omitted for a fiat request, it implies the customer's wallet may choose any asset to settle that amount, subject to the merchant and wallet's out-of-band agreement or policy.
 - **`invoice`** - *Optional*, **URI** URL to an invoice
 - **`expiry`** – *Optional*, **timestamp** indicating an expiration time for the request. After this time the merchant may no longer honor the payment (e.g. if exchange rates or inventory changed). The customer's wallet SHOULD treat an expired PaymentRequest as invalid and not allow payment. If omitted, the request is considered valid until canceled or fulfilled.
-- **`merchant`** – **Required**, **object** containing information about the merchant (the payment beneficiary) and any policies or requirements for this transaction. This object represents the merchant's **Party** as defined in TAIP-6 (with real-world identity as a DID or IRI). It MAY include:
+- **`merchant`** – **Required**, **object** containing information about the merchant (the payment beneficiary) and any policies or requirements for this transaction. This object represents the merchant's **Party** as defined in [TAIP-6] (with real-world identity as a DID or IRI). It MAY include:
   - **`@id`** – **string** URI/IRI for the merchant's identity (e.g. a DID or business registry identifier). This identifies the merchant party in a standard way [TAIP-6].
   - *Other identifying details* – *Optional*, any additional public information about the merchant, such as a display `name`, logo, or description. (This data should be non-sensitive; see Privacy Considerations.)
   - **`requirePresentation`** – *Optional*, **array** of policy objects each of type `RequirePresentation`. This specifies that the merchant requires certain verifiable information from the customer before or alongside payment. Each entry is a request for a verifiable presentation as defined in **TAIP-8**. For example, a merchant might include a policy: `{ "@type": "RequirePresentation", "fromAgent": "originator", "about": "...", "credentialType": "email" }` to require the customer's agent (originator) to present an email credential. In general, a `RequirePresentation` policy will indicate **which party's agent** must present data (e.g. `fromAgent: "originator"` meaning the customer's side) and **what data** is needed (either by specifying credential type, or a schema, etc.) [TAIP-8]. The exact format and additional fields for these policies follow TAIP-8 and TAIP-7 (Agent Policies). When a PaymentRequest contains `requirePresentation` entries, the customer's wallet MUST prompt the user to provide the requested credentials or proofs, and return them to the merchant's agent (see Flow below). The merchant's agent will verify the provided information (e.g. check the credentials' validity) before authorizing the payment to proceed.
@@ -51,17 +51,37 @@ A **PaymentRequest** is a DIDComm message (per TAIP-2) initiated by the merchant
 
 ### Payment Authorization Flow
 
-Once a PaymentRequest is sent by the merchant's agent, the transaction can progress through various states as messages are exchanged and the on-chain payment is executed. PaymentRequests operate within the **Transaction Authorization Protocol** defined in [TAIP-4]. In particular, the PaymentRequest message serves as the initial transaction request to which subsequent authorization messages (Authorize, Settle, Reject, Cancel) will refer via the `thid` (thread ID).
+Once a PaymentRequest is sent by the merchant's agent, the transaction can progress through various states as messages are exchanged and the on-chain payment is executed. PaymentRequests operate within the **Transaction Authorization Protocol** defined in [TAIP-4]. In particular, the PaymentRequest message serves as the initial transaction request to which subsequent authorization messages (Authorize, Settle, Reject, Cancel, Revert) will refer via the `thid` (thread ID).
 
 Any agent that is part of the transaction (customer's or merchant's) can send [TAIP-4] authorization messages in response to the PaymentRequest:
 - **Authorize:** Signals approval or readiness. (In a simple two-party payment, this may be optional. The merchant's agent might send an Authorize after receiving required info, or the customer's agent might implicitly consider the request authorized by the user's acceptance.)
 - **Settle:** Indicates an agent is sending the transaction to the blockchain for settlement [TAIP-4]. In practice, the customer's wallet will perform the actual settlement (broadcast the payment). It may send a `Settle` message to inform the merchant that it is doing so or has done so.
 - **Reject:** Indicates an agent rejects the transaction (e.g. due to policy or error) [TAIP-4]. For instance, if the merchant's compliance checks fail after seeing the customer's info, the merchant's agent could reject the payment request, refusing to accept funds.
-- **Cancel:** Indicates an agent is voluntarily cancelling the PaymentRequest. This is newly introduced with this proposal. Either party can issue `Cancel` to abort the process when it's not going to proceed. For example, the customer's wallet can send Cancel if the user declines to pay or takes too long, or the merchant can send Cancel if the invoice is no longer valid or they choose to revoke it. When a Cancel is sent, the expectation is that no further authorization messages or payments for that request should occur. (Cancellation is essentially a polite *handshake* to terminate the thread, whereas a Reject might be used to convey a compliance or error-based refusal.)
+- **Cancel:** Indicates a party or agent is voluntarily cancelling the PaymentRequest. This is newly introduced with this proposal. Either party can issue `Cancel` to abort the process when it's not going to proceed. For example, the customer's wallet can send Cancel if the user declines to pay or takes too long, or the merchant can send Cancel if the invoice is no longer valid or they choose to revoke it. When a Cancel is sent, the expectation is that no further authorization messages or payments for that request should occur. (Cancellation is essentially a polite *handshake* to terminate the thread, whereas a Reject might be used to convey a compliance or error-based refusal.)
+- **Revert:** Indicates an party requests the reversal of the transaction [TAIP-4], which is a key aspect of building customer trust in a merchant payment system.
 
-The following diagrams illustrate the payment flows. **Figure 1** is a high-level overview of a successful PaymentRequest flow between a merchant and customer. **Figure 2** shows a more detailed sequence with the involvement of each party's wallet and an example where the merchant requires additional customer information (per TAIP-8) before payment. **Figure 3** shows an example failure scenario where the customer cancels the PaymentRequest. (Other failure scenarios, such as merchant cancellation or rejection for policy reasons, follow a similar message pattern, with the merchant's agent sending a Cancel or Reject.)
+See **Figure 1** for a potential statemachine
 
-#### Figure 1: High-Level Payment Request Flow (Success Scenario)
+#### Figure 1: State machine from the point of view of merchant
+
+```mermaid
+stateDiagram-v2
+    direction lr
+    [*] --> Request : PaymentRequest
+    Request --> Authorized : Authorize
+    Request --> Rejected : Reject
+    Request --> Cancelled : Cancel
+    Authorized --> Settled : Settle
+    Settled -> ReversalRequested: Revert
+    ReversalRequested -> Reversed: Settle
+    ReversalRequested -> Settled: Reject
+    Settled --> [*]
+```
+
+The following diagrams illustrate the payment flows. **Figure 2** is a high-level overview of a successful PaymentRequest flow between a merchant and customer. **Figure 3** shows a more detailed sequence with the involvement of each party's wallet and an example where the merchant requires additional customer information (per TAIP-8) before payment. **Figure 4** shows an example failure scenario where the customer cancels the PaymentRequest. (Other failure scenarios, such as merchant cancellation or rejection for policy reasons, follow a similar message pattern, with the merchant's agent sending a Cancel or Reject.)
+
+
+#### Figure 2: High-Level Payment Request Flow (Success Scenario)
 
 ```mermaid
 sequenceDiagram
@@ -76,7 +96,7 @@ sequenceDiagram
 
 *Description:* In the high-level flow, the **Merchant** sends a PaymentRequest to the **Customer** for a certain amount. The Customer (via their wallet) sends the payment to the merchant's blockchain address. Once the payment is confirmed, the merchant fulfills the order (delivers the product or service). This diagram omits the low-level messaging and focuses on the core intent and outcome.
 
-#### Figure 2: Detailed Payment Flow with Required Presentation (Successful Payment)
+#### Figure 3: Detailed Payment Flow with Required Presentation (Successful Payment)
 
 ```mermaid
 sequenceDiagram
@@ -109,7 +129,7 @@ sequenceDiagram
 
 **Notes:** In this flow, if any required presentation was missing or invalid, the merchant's agent could send a **Reject** instead of Authorize, or simply not authorize the payment (the customer might then choose not to pay). The optional Authorize step can be omitted in a simple implementation; the customer could directly send the transaction once they've provided the required info (implying consent). The `Authorize` message is more relevant in multi-agent scenarios or where the merchant wants to explicitly signal readiness. Also note that partial payments are not explicitly shown – if the customer decided to send only a portion of the amount, the CustomerWallet would still do a Settle with that amount. The merchant's wallet would detect a shortfall and could either treat it as a partial (awaiting the rest) or send a Reject (if partial not acceptable), according to its policy.
 
-#### Figure 3: Payment Request Flow with Cancellation (Failure Scenario)
+#### Figure 4: Payment Request Flow with Cancellation (Failure Scenario)
 
 ```mermaid
 sequenceDiagram
@@ -151,7 +171,7 @@ PaymentRequests are designed to minimize unnecessary exposure of personal data b
 
 - **Traceability and Records:** The PaymentRequest itself could be stored by either party for record-keeping (e.g. the merchant might save the invoice details, the customer might save proof of what was requested). These records might include pseudonymous identifiers (DIDs, addresses) and amounts. Implementers should treat these records with care, especially if they include any personal data. For instance, if the customer's DID can be tied to an identity, it should be protected. We recommend following data protection best practices for any logging of PaymentRequests, and scrubbing or encrypting sensitive fields at rest.
 
-- **Regulatory Compliance:** In some jurisdictions, requesting certain information (like government ID) may invoke privacy laws. TAIP-8 and this specification allow for compliance with regulations (e.g. Travel Rule) in a privacy-preserving way. Only the required info is exchanged, and possibly in a hashed or reference form if supported (for example, using identity proxies or proof of KYC status instead of full data). Parties should ensure that any personal data exchange through `RequirePresentation` adheres to applicable privacy regulations and that they only request what is necessary for the transaction's purpose.
+- **Regulatory Compliance:** In some jurisdictions, requesting certain information (like government ID) may invoke privacy laws. [TAIP-8] and this specification allow for compliance with regulations by VASPs and PSPs (e.g. Travel Rule) in a privacy-preserving way. Only the required info is exchanged, and possibly in a hashed or reference form if supported (for example, using identity proxies or proof of KYC status instead of full data). Parties should ensure that any personal data exchange through `RequirePresentation` adheres to applicable privacy regulations and that they only request what is necessary for the transaction's purpose.
 
 By incorporating selective disclosure and unique payment addresses, the PaymentRequest protocol seeks to balance **traceability** (for businesses and compliance) with **privacy** for customers. Each party only learns what they need to know to complete the transaction, and nothing more. Any data that is exchanged is kept off the public ledger and shared directly between the relevant agents, reducing the risk of leakage or unwanted correlation.
 
