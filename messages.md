@@ -1006,6 +1006,86 @@ Note that all messages in this flow share the same thread ID (`payment-123`) to 
 }
 ```
 
+#### 4. Transfer with LEI and Purpose Codes
+```json
+{
+  "id": "transfer-456",
+  "type": "https://tap.rsvp/schema/1.0#Transfer",
+  "from": "did:web:originator.vasp",
+  "to": ["did:web:beneficiary.vasp"],
+  "body": {
+    "@context": [
+      "https://tap.rsvp/schema/1.0",
+      { "lei": "https://schema.org/leiCode" }
+    ],
+    "@type": "https://tap.rsvp/schema/1.0#Transfer",
+    "asset": "eip155:1/slip44:60",
+    "amount": "1000.00",
+    "purpose": "SALA",
+    "categoryPurpose": "CASH",
+    "originator": {
+      "@id": "did:web:originator.vasp:alice",
+      "lei:leiCode": "5493001KJTIIGC8Y1R12",
+      "nameHash": "b117f44426c9670da91b563db728cd0bc8bafa7d1a6bb5e764d1aad2ca25032e"
+    },
+    "beneficiary": {
+      "@id": "did:web:beneficiary.vasp:bob",
+      "lei:leiCode": "7245001KJTIIGC8Y1R34",
+      "nameHash": "5432e86b4d4a3a2b4be57b713b12c5c576c88459fe1cfdd760fd6c99a0e06686"
+    }
+  }
+}
+```
+
+#### 5. Payment Request Example
+```json
+{
+  "id": "payment-789",
+  "type": "https://tap.rsvp/schema/1.0#PaymentRequest",
+  "from": "did:web:merchant.vasp",
+  "to": ["did:web:customer.wallet"],
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#PaymentRequest",
+    "currency": "USD",
+    "amount": "100.00",
+    "supportedAssets": [
+      "eip155:1/erc20:0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+      "eip155:1/erc20:0x6B175474E89094C44Da98b954EedeAC495271d0F"
+    ],
+    "expiry": "2024-03-22T15:00:00Z",
+    "invoice": "https://merchant.example/invoice/123",
+    "merchant": {
+      "@id": "did:web:merchant.vasp",
+      "name": "Example Merchant",
+      "requirePresentation": [
+        {
+          "@type": "RequirePresentation",
+          "fromAgent": "originator",
+          "credentialType": "email"
+        }
+      ]
+    }
+  }
+}
+```
+
+#### 6. Payment Request Cancel
+```json
+{
+  "id": "cancel-123",
+  "type": "https://tap.rsvp/schema/1.0#Cancel",
+  "from": "did:web:customer.wallet",
+  "to": ["did:web:merchant.vasp"],
+  "thid": "payment-789",
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#Cancel",
+    "reason": "User declined payment request"
+  }
+}
+```
+
 [TAIP-2]: ./TAIPs/taip-2
 [TAIP-3]: ./TAIPs/taip-3
 [TAIP-4]: ./TAIPs/taip-4
