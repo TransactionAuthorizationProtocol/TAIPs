@@ -5,6 +5,7 @@
 - [Common DIDComm Message Structure](#common-didcomm-message-structure)
 - [Transaction Message](#transaction-message)
   - [Transfer](#transfer)
+  - [PaymentRequest](#paymentrequest)
 - [Authorization Flow Messages](#authorization-flow-messages)
   - [Authorize](#authorize)
   - [Settle](#settle)
@@ -30,6 +31,7 @@
 - [Message Flow Examples](#message-flow-examples)
   - [Basic Transfer Flow](#basic-transfer-flow)
   - [Transfer with LEI and Purpose Code](#transfer-with-lei-and-purpose-code)
+  - [Payment Request Flow](#payment-request-flow)
 
 ## Introduction
 
@@ -100,7 +102,6 @@ Initiates a virtual asset transfer between parties.
 }
 ```
 
-
 ##### Third-party transfer with LEI
 ```json
 {
@@ -132,6 +133,82 @@ Initiates a virtual asset transfer between parties.
       {
         "@id": "did:web:beneficiary.vasp",
         "for": "did:eg:alice"
+      }
+    ]
+  }
+}
+```
+
+### PaymentRequest
+[TAIP-14] - Draft
+
+Initiates a payment request from a merchant to a customer.
+
+| Attribute | Type | Required | Status | Description |
+|-----------|------|----------|---------|-------------|
+| @context | string | Yes | Draft ([TAIP-14]) | JSON-LD context "https://tap.rsvp/schema/1.0" |
+| @type | string | Yes | Draft ([TAIP-14]) | JSON-LD type "https://tap.rsvp/schema/1.0#PaymentRequest" |
+| asset | string | No | Draft ([TAIP-14]) | CAIP-19 identifier of the asset to be paid. Must be present if currency is not provided. |
+| currency | string | No | Draft ([TAIP-14]) | ISO 4217 currency code for fiat amount. Must be present if asset is not provided. |
+| amount | string | Yes | Draft ([TAIP-14]) | Amount requested in the specified asset or currency |
+| supportedAssets | array | No | Draft ([TAIP-14]) | Array of CAIP-19 asset identifiers that can be used to settle a fiat currency amount |
+| invoice | string | No | Draft ([TAIP-14]) | URI to an invoice |
+| expiry | string | No | Draft ([TAIP-14]) | ISO 8601 timestamp when the request expires |
+| merchant | [Party](#party) | Yes | Draft ([TAIP-14]) | Party for the merchant (beneficiary) |
+| customer | [Party](#party) | No | Draft ([TAIP-14]) | Party for the customer (originator) |
+| requirePresentation | array | No | Draft ([TAIP-14]) | Array of [RequirePresentation](#requirepresentation) policies |
+
+#### Examples
+
+##### Simple crypto payment request
+```json
+{
+  "id": "123e4567-e89b-12d3-a456-426614174014",
+  "type": "https://tap.rsvp/schema/1.0#PaymentRequest",
+  "from": "did:web:merchant.vasp",
+  "to": ["did:web:customer.vasp"],
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#PaymentRequest",
+    "asset": "eip155:1/erc20:0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+    "amount": "100.00",
+    "merchant": {
+      "@id": "did:web:merchant.vasp",
+      "name": "Example Store"
+    },
+    "invoice": "https://example.com/invoice/123"
+  }
+}
+```
+
+##### Fiat payment request with supported assets
+```json
+{
+  "id": "123e4567-e89b-12d3-a456-426614174015",
+  "type": "https://tap.rsvp/schema/1.0#PaymentRequest",
+  "from": "did:web:merchant.vasp",
+  "to": ["did:web:customer.vasp"],
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#PaymentRequest",
+    "currency": "USD",
+    "amount": "50.00",
+    "supportedAssets": [
+      "eip155:1/erc20:0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+      "eip155:1/erc20:0x6B175474E89094C44Da98b954EedeAC495271d0F"
+    ],
+    "merchant": {
+      "@id": "did:web:merchant.vasp",
+      "name": "Example Store"
+    },
+    "expiry": "2024-04-21T12:00:00Z",
+    "requirePresentation": [
+      {
+        "@type": "RequirePresentation",
+        "@context": ["https://schema.org/Person"],
+        "fromAgent": "originator",
+        "aboutParty": "originator",
+        "presentationDefinition": "https://tap.rsvp/presentation-definitions/email/v1"
       }
     ]
   }
@@ -673,8 +750,16 @@ Represents a service involved in executing transactions.
 
 ### Basic Transfer Flow
 
+This flow demonstrates a basic transfer between parties with compliance requirements:
+1. The originator initiates a transfer
+2. The beneficiary requests additional information via policies
+3. After receiving the required information, the beneficiary authorizes the transfer
+4. The originator settles the transfer on-chain
+
+Note that all messages share the same thread ID to link them together.
+
+#### 1. Initial Transfer Request
 ```json
-// 1. Transfer Message
 {
   "id": "transfer-123",
   "type": "https://tap.rsvp/schema/1.0#Transfer",
@@ -701,13 +786,16 @@ Represents a service involved in executing transactions.
     ]
   }
 }
+```
 
-// 2. UpdatePolicies Message
+#### 2. Beneficiary's Policy Requirements
+```json
 {
   "id": "policies-123",
   "type": "https://tap.rsvp/schema/1.0#UpdatePolicies",
   "from": "did:web:beneficiary.vasp",
   "to": ["did:web:originator.vasp"],
+  "thid": "transfer-123",
   "body": {
     "@context": "https://tap.rsvp/schema/1.0",
     "@type": "https://tap.rsvp/schema/1.0#UpdatePolicies",
@@ -722,13 +810,16 @@ Represents a service involved in executing transactions.
     ]
   }
 }
+```
 
-// 3. Authorize Message
+#### 3. Beneficiary's Authorization
+```json
 {
   "id": "auth-123",
   "type": "https://tap.rsvp/schema/1.0#Authorize",
   "from": "did:web:beneficiary.vasp",
   "to": ["did:web:originator.vasp"],
+  "thid": "transfer-123",
   "body": {
     "@context": "https://tap.rsvp/schema/1.0",
     "@type": "https://tap.rsvp/schema/1.0#Authorize",
@@ -737,13 +828,16 @@ Represents a service involved in executing transactions.
     }
   }
 }
+```
 
-// 4. Settle Message
+#### 4. Originator's Settlement Confirmation
+```json
 {
   "id": "settle-123",
   "type": "https://tap.rsvp/schema/1.0#Settle",
   "from": "did:web:originator.vasp",
   "to": ["did:web:beneficiary.vasp"],
+  "thid": "transfer-123",
   "body": {
     "@context": "https://tap.rsvp/schema/1.0",
     "@type": "https://tap.rsvp/schema/1.0#Settle",
@@ -757,6 +851,12 @@ Represents a service involved in executing transactions.
 
 ### Transfer with LEI and Purpose Code
 
+This example shows a transfer that includes:
+- Legal Entity Identifier (LEI) for the originator
+- ISO 20022 purpose codes for payment classification
+- Corporate transfer between institutions
+
+#### Corporate Transfer with LEI and Purpose Codes
 ```json
 {
   "id": "transfer-124",
@@ -792,6 +892,111 @@ Represents a service involved in executing transactions.
 }
 ```
 
+### Payment Request Flow
+
+This flow demonstrates a complete payment request process from a merchant to a customer, including:
+1. A merchant initiates by sending a PaymentRequest for $100 USD, accepting USDC as payment
+2. The customer responds with a Transfer message, choosing to pay in USDC
+3. The merchant authorizes the transfer after verifying the details match their request
+4. The customer settles the payment on-chain and notifies the merchant with the transaction ID
+
+Note that all messages in this flow share the same thread ID (`payment-123`) to link them together. The merchant can use this to track the payment status and match it to their original request.
+
+#### 1. Initial PaymentRequest from Merchant
+```json
+{
+  "id": "payment-123",
+  "type": "https://tap.rsvp/schema/1.0#PaymentRequest",
+  "from": "did:web:merchant.vasp",
+  "to": ["did:web:customer.vasp"],
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#PaymentRequest",
+    "currency": "USD",
+    "amount": "100.00",
+    "supportedAssets": [
+      "eip155:1/erc20:0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+    ],
+    "merchant": {
+      "@id": "did:web:merchant.vasp",
+      "name": "Example Store"
+    },
+    "expiry": "2024-04-21T12:00:00Z"
+  }
+}
+```
+
+#### 2. Customer's Transfer Response
+```json
+{
+  "id": "transfer-123",
+  "type": "https://tap.rsvp/schema/1.0#Transfer",
+  "from": "did:web:customer.vasp",
+  "to": ["did:web:merchant.vasp"],
+  "thid": "payment-123",
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#Transfer",
+    "asset": "eip155:1/erc20:0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+    "amount": "100.00",
+    "originator": {
+      "@id": "did:web:customer"
+    },
+    "beneficiary": {
+      "@id": "did:web:merchant.vasp",
+      "name": "Example Store"
+    },
+    "agents": [
+      {
+        "@id": "did:web:customer.vasp",
+        "for": "did:web:customer"
+      },
+      {
+        "@id": "did:web:merchant.vasp",
+        "for": "did:web:merchant.vasp"
+      }
+    ]
+  }
+}
+```
+
+#### 3. Merchant's Authorization
+```json
+{
+  "id": "auth-123",
+  "type": "https://tap.rsvp/schema/1.0#Authorize",
+  "from": "did:web:merchant.vasp",
+  "to": ["did:web:customer.vasp"],
+  "thid": "payment-123",
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#Authorize",
+    "transfer": {
+      "@id": "transfer-123"
+    }
+  }
+}
+```
+
+#### 4. Customer's Settlement Confirmation
+```json
+{
+  "id": "settle-123",
+  "type": "https://tap.rsvp/schema/1.0#Settle",
+  "from": "did:web:customer.vasp",
+  "to": ["did:web:merchant.vasp"],
+  "thid": "payment-123",
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#Settle",
+    "transfer": {
+      "@id": "transfer-123"
+    },
+    "settlementId": "eip155:1:tx/0x3edb98c24d46d148eb926c714f4fbaa117c47b0c0821f38bfce9763604457c33"
+  }
+}
+```
+
 [TAIP-2]: ./TAIPs/taip-2
 [TAIP-3]: ./TAIPs/taip-3
 [TAIP-4]: ./TAIPs/taip-4
@@ -802,4 +1007,5 @@ Represents a service involved in executing transactions.
 [TAIP-9]: ./TAIPs/taip-9
 [TAIP-10]: ./TAIPs/taip-10
 [TAIP-11]: ./TAIPs/taip-11
-[TAIP-12]: ./TAIPs/taip-12 
+[TAIP-12]: ./TAIPs/taip-12
+[TAIP-14]: ./TAIPs/taip-14
