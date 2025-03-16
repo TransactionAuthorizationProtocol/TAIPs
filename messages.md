@@ -71,6 +71,8 @@ Initiates a virtual asset transfer between parties.
 | agents | array of [Agent](#agent) | Yes | Review ([TAIP-3]) | Array of Agents |
 | settlementId | string | No | Review ([TAIP-3]) | CAIP-220 identifier of settlement transaction |
 | memo | string | No | Review ([TAIP-3]) | Human readable message about the transfer |
+| purpose | string | No | Draft ([TAIP-13]) | ISO 20022 purpose code indicating the reason for the transfer |
+| categoryPurpose | string | No | Draft ([TAIP-13]) | ISO 20022 category purpose code for high-level classification |
 
 #### Examples
 
@@ -634,8 +636,8 @@ Updates policies for a transaction.
       },
       {
         "@type": "RequirePurpose",
-        "purpose": "SALA",
-        "categoryPurpose": "CORT"
+        "fromAgent": "originator",
+        "fields": ["purpose", "categoryPurpose"]
       }
     ]
   }
@@ -743,8 +745,10 @@ Represents a service involved in executing transactions.
 | Attribute | Type | Required | Status | Description |
 |-----------|------|----------|---------|-------------|
 | @type | string | Yes | Review ([TAIP-7]) | "[RequirePurpose](#requirepurpose)" |
-| purpose | string | Yes | Review ([TAIP-7]) | ISO 20022 purpose code |
-| categoryPurpose | string | No | Review ([TAIP-7]) | ISO 20022 category purpose code |
+| fields | array | Yes | Draft ([TAIP-13]) | Array of required fields: ["purpose"] and/or ["categoryPurpose"] |
+| fromAgent | string | No | Draft ([TAIP-13]) | Agent required to provide the purpose code(s) |
+
+The `RequirePurpose` policy allows an agent to require that a purpose code and/or category purpose code be included in the transaction. The `fields` array specifies which codes are required. If both are needed, include both in the array. The `fromAgent` field (typically "originator") indicates which party's agent must provide the codes.
 
 ## Message Flow Examples
 
@@ -806,6 +810,11 @@ Note that all messages share the same thread ID to link them together.
         "fromAgent": "originator",
         "aboutParty": "originator",
         "presentationDefinition": "https://tap.rsvp/presentation-definitions/ivms-101/eu/tfr"
+      },
+      {
+        "@type": "RequirePurpose",
+        "fromAgent": "originator",
+        "fields": ["purpose", "categoryPurpose"]
       }
     ]
   }
@@ -997,6 +1006,86 @@ Note that all messages in this flow share the same thread ID (`payment-123`) to 
 }
 ```
 
+#### 4. Transfer with LEI and Purpose Codes
+```json
+{
+  "id": "transfer-456",
+  "type": "https://tap.rsvp/schema/1.0#Transfer",
+  "from": "did:web:originator.vasp",
+  "to": ["did:web:beneficiary.vasp"],
+  "body": {
+    "@context": [
+      "https://tap.rsvp/schema/1.0",
+      { "lei": "https://schema.org/leiCode" }
+    ],
+    "@type": "https://tap.rsvp/schema/1.0#Transfer",
+    "asset": "eip155:1/slip44:60",
+    "amount": "1000.00",
+    "purpose": "SALA",
+    "categoryPurpose": "CASH",
+    "originator": {
+      "@id": "did:web:originator.vasp:alice",
+      "lei:leiCode": "5493001KJTIIGC8Y1R12",
+      "nameHash": "b117f44426c9670da91b563db728cd0bc8bafa7d1a6bb5e764d1aad2ca25032e"
+    },
+    "beneficiary": {
+      "@id": "did:web:beneficiary.vasp:bob",
+      "lei:leiCode": "7245001KJTIIGC8Y1R34",
+      "nameHash": "5432e86b4d4a3a2b4be57b713b12c5c576c88459fe1cfdd760fd6c99a0e06686"
+    }
+  }
+}
+```
+
+#### 5. Payment Request Example
+```json
+{
+  "id": "payment-789",
+  "type": "https://tap.rsvp/schema/1.0#PaymentRequest",
+  "from": "did:web:merchant.vasp",
+  "to": ["did:web:customer.wallet"],
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#PaymentRequest",
+    "currency": "USD",
+    "amount": "100.00",
+    "supportedAssets": [
+      "eip155:1/erc20:0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+      "eip155:1/erc20:0x6B175474E89094C44Da98b954EedeAC495271d0F"
+    ],
+    "expiry": "2024-03-22T15:00:00Z",
+    "invoice": "https://merchant.example/invoice/123",
+    "merchant": {
+      "@id": "did:web:merchant.vasp",
+      "name": "Example Merchant",
+      "requirePresentation": [
+        {
+          "@type": "RequirePresentation",
+          "fromAgent": "originator",
+          "credentialType": "email"
+        }
+      ]
+    }
+  }
+}
+```
+
+#### 6. Payment Request Cancel
+```json
+{
+  "id": "cancel-123",
+  "type": "https://tap.rsvp/schema/1.0#Cancel",
+  "from": "did:web:customer.wallet",
+  "to": ["did:web:merchant.vasp"],
+  "thid": "payment-789",
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#Cancel",
+    "reason": "User declined payment request"
+  }
+}
+```
+
 [TAIP-2]: ./TAIPs/taip-2
 [TAIP-3]: ./TAIPs/taip-3
 [TAIP-4]: ./TAIPs/taip-4
@@ -1008,4 +1097,5 @@ Note that all messages in this flow share the same thread ID (`payment-123`) to 
 [TAIP-10]: ./TAIPs/taip-10
 [TAIP-11]: ./TAIPs/taip-11
 [TAIP-12]: ./TAIPs/taip-12
+[TAIP-13]: ./TAIPs/taip-13
 [TAIP-14]: ./TAIPs/taip-14
