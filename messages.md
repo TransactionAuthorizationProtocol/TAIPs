@@ -798,8 +798,8 @@ Represents a service involved in executing transactions.
 [TAIP-5]: ./TAIPs/taip-5
 [TAIP-6]: ./TAIPs/taip-6
 [TAIP-7]: ./TAIPs/taip-7
-[TAIP-7]: ./TAIPs/taip-7
 [TAIP-8]: ./TAIPs/taip-8
 [TAIP-9]: ./TAIPs/taip-9
 [TAIP-10]: ./TAIPs/taip-10
-[TAIP-11]: ./TAIPs/taip-11 
+[TAIP-11]: ./TAIPs/taip-11
+[TAIP-12]: ./TAIPs/taip-12 
