@@ -175,6 +175,19 @@ By incorporating selective disclosure and unique payment addresses, the PaymentR
 
 ## References
 
+* [TAIP-2] TAP Messaging
+* [TAIP-3] Asset Transfer
+* [TAIP-4] Transaction Authorization Protocol
+* [TAIP-6] Transaction Parties
+* [TAIP-7] Agent Policies
+* [TAIP-8] Selective Disclosure
+* [TAIP-9] Proof of Relationship
+* [CAIP-19] Asset Type and Asset ID Specification
+* [BIP-70] Payment Protocol
+* [BIP-75] Out of Band Address Exchange using Payment Protocol Encryption
+* [DTI] Digital Token Identifier
+* [ISO-4217] Currency Codes
+
 [TAIP-2]: ./taip-2 "TAP Messaging"
 [TAIP-3]: ./taip-3 "Asset Transfer"
 [TAIP-4]: ./taip-4 "Transaction Authorization Protocol"

@@ -194,18 +194,29 @@ In summary, leveraging LEIs in TAP strikes a good balance between **transparency
 
 ## References
 
-[TAIP-2]: ./taip-2 "TAP Messaging"
-[TAIP-3]: ./taip-3 "Asset Transfer"
-[TAIP-5]: ./taip-5 "Transaction Agents"
-[TAIP-6]: ./taip-6 "Transaction Parties"
-[TAIP-7]: ./taip-7 "Agent Policies"
-[TAIP-8]: ./taip-8 "Selective Disclosure"
-[GLEIF]: https://www.gleif.org/en/about-lei/introducing-the-legal-entity-identifier-lei "GLEIF - Introducing the Legal Entity Identifier"
-[RapidLEI]: https://rapidlei.com/vlei/ "RapidLEI - Verifiable LEI Overview"
-[FSB]: https://www.fsb.org/2020/10/enhancing-cross-border-payments-stage-3-roadmap/ "FSB - Enhancing Cross-border Payments"
-[AusPayNet]: https://www.auspaynet.com.au/insights/blog/LEI "AusPayNet - LEI Trust Framework"
-[CAIP-10]: https://chainagnostic.org/CAIPs/caip-10 "Chain Agnostic Account ID Specification"
-[CC0]: ../LICENSE "Creative Commons CC0 License"
+* [TAIP-2] TAP Messaging
+* [TAIP-3] Asset Transfer
+* [TAIP-6] Transaction Parties
+* [TAIP-7] Agent Policies
+* [TAIP-8] Selective Disclosure
+* [GLEIF] Global Legal Entity Identifier Foundation
+* [RapidLEI] RapidLEI Documentation
+* [FSB] Financial Stability Board Cross-border Payments
+* [AusPayNet-Trust] AusPayNet LEI Trust Framework
+* [CAIP-10] Chain Agnostic Account ID Specification
+* [CC0] Creative Commons CC0 License
+
+[TAIP-2]: ./taip-2
+[TAIP-3]: ./taip-3
+[TAIP-6]: ./taip-6
+[TAIP-7]: ./taip-7
+[TAIP-8]: ./taip-8
+[GLEIF]: https://www.gleif.org/en/about-lei/introducing-the-legal-entity-identifier-lei
+[RapidLEI]: https://rapidlei.com/vlei/
+[FSB]: https://www.fsb.org/2020/10/enhancing-cross-border-payments-stage-3-roadmap/
+[AusPayNet-Trust]: https://www.auspaynet.com.au/insights/blog/LEI
+[CAIP-10]: https://chainagnostic.org/CAIPs/caip-10
+[CC0]: ../LICENSE
 
 ## Copyright
 

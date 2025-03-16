@@ -159,6 +159,19 @@ By following this reference implementation approach, developers can add hashed n
 
 ## References
 
+* [TAIP-2] TAP Messaging
+* [TAIP-3] Asset Transfer
+* [TAIP-6] Transaction Parties
+* [TAIP-7] Agent Policies
+* [TAIP-8] Selective Disclosure
+* [TAIP-12] Hashed Name Information
+* [IVMS-101] InterVASP IVMS-101 Standard
+* [VerifyVASP] VerifyVASP Travel Rule Solution
+* [GTR] Global Travel Rule Documentation
+* [FATF-R16] FATF Recommendation 16
+* [SHA-256] SHA-2 Wikipedia
+* [CC0] Creative Commons CC0 License
+
 [TAIP-2]: ./taip-2 "TAP Messaging"
 [TAIP-3]: ./taip-3 "Asset Transfer"
 [TAIP-6]: ./taip-6 "Transaction Parties"
