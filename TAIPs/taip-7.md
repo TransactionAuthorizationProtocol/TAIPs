@@ -35,6 +35,8 @@ This method allows a market-based approach to rolling out policies instead of a 
 
 Policies are listed in the optional `policies` attribute of a [TAIP-5] object. Policies are implemented as [JSON-LD] objects with a specific type. This allows future Policies to easily be expanded and linked to.
 
+Be sure to include the context for the policies. For these standard policies the context is `https://tap.rsvp/schema/1.0`.
+
 In the following example an Agent has included their policies:
 
 ```json
@@ -62,10 +64,10 @@ A policy is a [JSON-LD] object and has the following required attribute:
 - `@type` - REQUIRED the Type of the policy, which should be defined in a context defined in the containing [JSON-LD] document. The TAP Vocabulary contains a few standard ones to be covered below
 
 Since a policy is defined by it's [JSON-LD] Type it can contain additional required or optional attributes. The standard TAP Vocabulary contains the following:
-  
-- `from` - OPTIONAL a string or an array of [DID]s representing parties or agent in a transaction
-- `fromRole` - OPTIONAL a string or an array of strings of `role` as specified for the particular kind of transaction. Eg. `SettlementAddress` for [TAIP-3]
-- `fromAgent` - OPTIONAL from an Agent representing a party in the transaction. Eg. `originator` or `beneficiary` in [TAIP-3]
+
+- `from` - OPTIONAL a string or an array of [DID]s representing parties or agent in a transaction. The Policy is required from that DID.
+- `fromRole` - OPTIONAL a string or an array of strings of `role` as specified for the particular kind of transaction. The Policy is required from the agent with that role. Eg. `SettlementAddress` for [TAIP-3]
+- `fromAgent` - OPTIONAL from an Agent representing a party in the transaction.  The Policy is required from the agent representing that party. Eg. `originator` or `beneficiary` in [TAIP-3]
 - `purpose` - OPTIONAL Human readable string about what the purpose is for this requirement
 
 
@@ -74,9 +76,9 @@ Since a policy is defined by it's [JSON-LD] Type it can contain additional requi
 An agent requires an `authorize` action before they will settle a transaction. If no additional parameters are provided, it requires each agent to `authorize` a transaction. They can use `from`, `fromRole`, or `fromAgent` as defined above to limit this requirement.
 
 - `@type` - REQUIRED `RequireAuthorization`
-- `from` - OPTIONAL a string or an array of [DID]s representing parties or agent in a transaction
-- `fromRole` - OPTIONAL a string or an array of strings of `role` as specified for the particular kind of transaction. Eg. `SettlementAddress` for [TAIP-3]
-- `fromAgent` - OPTIONAL from an Agent representing a party in the transaction. Eg. `originator` or `beneficiary` in [TAIP-3]
+- `from` - OPTIONAL a string or an array of [DID]s representing parties or agent in a transaction. The Policy is required from that DID.
+- `fromRole` - OPTIONAL a string or an array of strings of `role` as specified for the particular kind of transaction. The Policy is required from the agent with that role. Eg. `SettlementAddress` for [TAIP-3]
+- `fromAgent` - OPTIONAL from an Agent representing a party in the transaction.  The Policy is required from the agent representing that party. Eg. `originator` or `beneficiary` in [TAIP-3]
 - `purpose` - OPTIONAL Human readable string about what the purpose is for this requirement
 
 
@@ -85,7 +87,9 @@ An agent requires an `authorize` action before they will settle a transaction. I
 This is a generic way of requesting a selected [Verifiable Presentation][VP] from another agent in the transaction of a particular identity information regarding a party or agent.
 
 - `@type` - REQUIRED `RequirePresentation`
-- `fromAgent` - REQUIRED Requesting presentation from an Agent representing the party in the transaction. Eg. `originator` or `beneficiary` in [TAIP-3]
+- `from` - OPTIONAL a string or an array of [DID]s representing parties or agent in a transaction. The Policy is required from that DID.
+- `fromRole` - OPTIONAL a string or an array of strings of `role` as specified for the particular kind of transaction. The Policy is required from the agent with that role. Eg. `SettlementAddress` for [TAIP-3]
+- `fromAgent` - OPTIONAL from an Agent representing a party in the transaction.  The Policy is required from the agent representing that party. Eg. `originator` or `beneficiary` in [TAIP-3]
 - `about` - OPTIONAL Requesting presentation about a string or an array of [DID]s representing specific parties or agent in a transaction.
 - `aboutParty` - OPTIONAL Requesting presentation about a specific party in the transaction. Eg. `originator` or `beneficiary` in [TAIP-3]
 - `aboutAgent` - OPTIONAL Requesting presentation about a specific Agent representing a party in the transaction. Eg. `originator` or `beneficiary` in [TAIP-3]
@@ -99,9 +103,9 @@ See [TAIP-8] for more details about how the requested presentation is presented.
 An Agent can request any other Agent signs a message proving they control a given agent. In most cases this would be useful to verify that a `SettlementAddress` is controlled by the Beneficiary or an Agent on behalf of the Beneficiary. This ensures that funds are sent to the correct address for the beneficiary to avoid loss of funds. It can also be used for an Agent to verify their relationship to a transaction, before receiving sensitive PII from another agent.
 
 - `@type` - REQUIRED `RequireRelationshipConfirmation`
-- `from` - OPTIONAL a string or an array of [DID]s representing parties or agent in a transaction
-- `fromRole` - OPTIONAL a string or an array of strings of `role` as specified for the particular kind of transaction. Eg. `SettlementAddress` for [TAIP-3]
-- `fromAgent` - OPTIONAL from an Agent representing a party in the transaction. Eg. `originator` or `beneficiary` in [TAIP-3]
+- `from` - OPTIONAL a string or an array of [DID]s representing parties or agent in a transaction. The Policy is required from that DID.
+- `fromRole` - OPTIONAL a string or an array of strings of `role` as specified for the particular kind of transaction. The Policy is required from the agent with that role. Eg. `SettlementAddress` for [TAIP-3]
+- `fromAgent` - OPTIONAL from an Agent representing a party in the transaction.  The Policy is required from the agent representing that party. Eg. `originator` or `beneficiary` in [TAIP-3]
 - `nonce` - REQUIRED Randomized token to prevent signature replay attacks.
 - `purpose` - OPTIONAL Human readable string about what the purpose is for this requirement
 
@@ -115,7 +119,7 @@ Please note that like any [TAIP-2] messages, these are just messages sent by an 
 
 Any agent can add additional agents to a transaction by replying as a thread to the initial message. The following shows the attributes of the `body` object:
 
-- `@context` - REQUIRED the JSON-LD context `https://tap.rsvp/schema/1.0`
+- `@context` - OPTIONAL the JSON-LD context `https://tap.rsvp/schema/1.0`
 - `@type` - REQUIRED the JSON-LD type `https://tap.rsvp/schema/1.0#UpdatePolicies`
 - `policies` - REQUIRED an array of Policies to replace the current set of policies
 
@@ -265,7 +269,7 @@ The Policies specified here are paramount for building that trust in a scalable 
 - [VP] Verifiable Presentation
 - [PKH-DID] `did:pkh` specification
 - [WEB-DID] `did:web` specification
-  
+
 [TAIP-2]: ./taip-2
 [TAIP-3]: ./taip-3
 [TAIP-4]: ./taip-4
