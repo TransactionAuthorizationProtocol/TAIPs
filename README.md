@@ -35,6 +35,7 @@ The purpose of TAIPs is to provide the community with a means to propose enhance
 | 11   | [Legal Entity Identifier (LEI) to Identify institutional participants in TAP Messages](./TAIPs/taip-11.md) |
 | 12   | [Hashed Participant Name sharing in TAP messages](./TAIPs/taip-12.md)  |
 | 13   | [Transaction Purpose Codes](./TAIPs/taip-13.md)                        |
+| 14   | [Payment Requests](./TAIPs/taip-14.md)                                 |
 
 ## Inspiration
 
