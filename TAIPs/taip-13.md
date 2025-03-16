@@ -1,8 +1,8 @@
 ---
 taip: TAIP-13
 title: Purpose Codes
-author: NotaBene Team
-discussions-to: https://github.com/NotabeneCorp/TAIPs/pull/13
+author: Pelle Braendgaard <pelle@notabene.id>
+discussions-to: https://github.com/TransactionAuthorizationProtocol/TAIPs/pull/21
 status: Draft
 type: Standard
 created: 2024-03-20
@@ -22,11 +22,11 @@ ISO 20022 defines structured codes to indicate the reason or category of a payme
 
 ## Motivation
 
-Blockchain transactions often lack context about their real-world purpose, which can hinder compliance and record-keeping. In traditional payment networks, sender and receiver banks use standardized purpose codes to indicate why a payment is made – for example, whether it's a salary, tax, or invoice payment ([BIS-Purpose]). Such information is crucial in certain jurisdictions for AML/CFT reporting, exchange control, or to trigger specific handling of the payment ([BIS-Purpose]). 
+Blockchain transactions often lack context about their real-world purpose, which can hinder compliance and record-keeping. In traditional payment networks, sender and receiver banks use standardized purpose codes to indicate why a payment is made – for example, whether it's a salary, tax, or invoice payment ([BIS-Purpose]). Such information is crucial in certain jurisdictions for AML/CFT reporting, exchange control, or to trigger specific handling of the payment ([BIS-Purpose]).
 
 Currently, [TAIP-3] Asset Transfer messages do not include dedicated fields to convey the payment's purpose. This omission makes it difficult for Transaction Authorization Protocol (TAP) participants to communicate the intent of a transfer, which is information often required by compliance policies or regulations. For instance, some countries **require** that cross-border payments include a purpose code, and may even reject transactions that lack one [BIS-Purpose]. By introducing `purpose` and `categoryPurpose` fields, we allow VASPs and other agents to embed this important context directly in the transaction metadata.
 
-Using the internationally standardized ISO 20022 codes has several benefits. It avoids each entity using proprietary or inconsistent codes, instead leveraging a harmonized code set maintained by the ISO 20022 Registration Authority [ISO-External]. ISO 20022 Purpose Codes (ExternalPurpose1Code) define the *underlying reason* for a payment [EPC-Purpose], and Category Purpose Codes (ExternalCategoryPurpose1Code) specify a *high-level category* of the payment instruction [EPC-Category]. By adhering to these standards, a TAP transaction can be understood and processed in the same way as a corresponding payment message in traditional finance. This improves interoperability (e.g. mapping a crypto transfer to a bank payment message for off-ramping) and compliance (since regulators can interpret the purpose code). 
+Using the internationally standardized ISO 20022 codes has several benefits. It avoids each entity using proprietary or inconsistent codes, instead leveraging a harmonized code set maintained by the ISO 20022 Registration Authority [ISO-External]. ISO 20022 Purpose Codes (ExternalPurpose1Code) define the *underlying reason* for a payment [EPC-Purpose], and Category Purpose Codes (ExternalCategoryPurpose1Code) specify a *high-level category* of the payment instruction [EPC-Category]. By adhering to these standards, a TAP transaction can be understood and processed in the same way as a corresponding payment message in traditional finance. This improves interoperability (e.g. mapping a crypto transfer to a bank payment message for off-ramping) and compliance (since regulators can interpret the purpose code).
 
 Finally, introducing the `RequirePurpose` policy in [TAIP-7] addresses the need for flexibility in enforcement. Not all transactions will need a purpose code, but an agent in a stricter jurisdiction or a business with specific risk controls may *require* one. With this policy, agents can negotiate and enforce that a `purpose` and/or `categoryPurpose` is provided before they authorize a transfer, similar to how banks ensure required information is present. This decentralized, opt-in approach to policy enforcement is in line with TAP's design (each agent declares its requirements, rather than a centralized rule for all) [TAIP-7-Policies].
 
@@ -40,7 +40,7 @@ In summary, this proposal is motivated by real-world use cases like salary disbu
 
 - **`purpose`** – A code string (1 to 4 characters) indicating the underlying reason for the payment transaction ([EPC-Purpose]). This must be a valid ISO 20022 purpose code (ExternalPurpose1Code) as published in the external code list by ISO ([EPC-Purpose]). Examples: `"SALA"` for a salary payment, `"TAXS"` for a tax payment, `"GDDS"` for a payment related to goods purchase, etc. The purpose code provides a specific reason for the transfer, as understood by end-users and institutions. **No free-form text or proprietary codes are allowed** – only the standard ISO codes (the message must not use any proprietary value in the Purpose element ([BIS-Purpose])).
 
-- **`categoryPurpose`** – A code string (1 to 4 characters) specifying the high-level category of the payment instruction ([EPC-Category]). This must be a valid ISO 20022 category purpose code (ExternalCategoryPurpose1Code) ([EPC-Category]). It classifies the transaction into a broader category for processing or regulatory reasons. Examples: `"SALA"` could denote the transaction is a salary/benefit payment (broad category), `"TAXS"` to categorize it as a tax-related payment, `"BENE"` for a benefit or welfare payment, etc. As with `purpose`, only standard ISO codes are permitted (no proprietary category codes) ([BIS-Purpose]). 
+- **`categoryPurpose`** – A code string (1 to 4 characters) specifying the high-level category of the payment instruction ([EPC-Category]). This must be a valid ISO 20022 category purpose code (ExternalCategoryPurpose1Code) ([EPC-Category]). It classifies the transaction into a broader category for processing or regulatory reasons. Examples: `"SALA"` could denote the transaction is a salary/benefit payment (broad category), `"TAXS"` to categorize it as a tax-related payment, `"BENE"` for a benefit or welfare payment, etc. As with `purpose`, only standard ISO codes are permitted (no proprietary category codes) ([BIS-Purpose]).
 
 Both fields are OPTIONAL in the message format. If provided, they **must** use uppercase alphanumeric codes from the official ISO 20022 lists. The ISO definitions for these elements are as follows:
 
@@ -48,7 +48,7 @@ Both fields are OPTIONAL in the message format. If provided, they **must** use u
 
 - *Category Purpose:* "Specifies the high level purpose of the instruction based on a set of pre-defined categories." ([EPC-Category]) This is a broader categorization (e.g. *Salary & Benefits*, *Tax*, *Trade Settlement*). It corresponds to the ISO 20022 `<CtgyPurp><Cd>` element. The categoryPurpose is often used by initiating parties or schemes to signal special handling (for example, using `"SALA"` in CategoryPurpose in a SEPA payment flags it as a salary, which might get fee exemptions or priority processing).
 
-**Message Schema Changes:** In practice, the JSON-LD context for TAIP messages (e.g. `https://tap.rsvp/schema/1.0`) will be updated to include definitions for `purpose` and `categoryPurpose` in the Asset Transfer schema. They are top-level keys within the TAIP-3 message body JSON. If a TAIP-3 message already includes a `originator` and `beneficiary` (per TAIP-6) along with details like `asset` and `amount`, the new fields appear alongside those. 
+**Message Schema Changes:** In practice, the JSON-LD context for TAIP messages (e.g. `https://tap.rsvp/schema/1.0`) will be updated to include definitions for `purpose` and `categoryPurpose` in the Asset Transfer schema. They are top-level keys within the TAIP-3 message body JSON. If a TAIP-3 message already includes a `originator` and `beneficiary` (per TAIP-6) along with details like `asset` and `amount`, the new fields appear alongside those.
 
 For example, an Asset Transfer message (TAIP-3) with a purpose code might look like:
 
@@ -70,7 +70,7 @@ For example, an Asset Transfer message (TAIP-3) with a purpose code might look l
 }
 ```
 
-In the above JSON example, the `purpose` of the transfer is `"SALA"`, which by the ISO 20022 code list stands for a general Tax Payment ([ISO-Purpose-Codes]). This indicates that Alice (the originator) is sending 2,500 units (e.g., USD or a stablecoin, if `asset` denotes an Ethereum token on mainnet in this case) as a tax payment. No `categoryPurpose` is included in this example, but if it were, it would appear at the same level as `purpose`. 
+In the above JSON example, the `purpose` of the transfer is `"SALA"`, which by the ISO 20022 code list stands for a general Tax Payment ([ISO-Purpose-Codes]). This indicates that Alice (the originator) is sending 2,500 units (e.g., USD or a stablecoin, if `asset` denotes an Ethereum token on mainnet in this case) as a tax payment. No `categoryPurpose` is included in this example, but if it were, it would appear at the same level as `purpose`.
 
 An Asset Transfer message can include either field, both, or neither. Including these fields does **not** change the semantics of the transfer itself, but provides additional metadata to the receiving agent and any compliance processes.
 
@@ -82,10 +82,10 @@ We introduce a new policy type in **TAIP-7 (Agent Policies)** called **`RequireP
 
 **Policy Format:** `RequirePurpose` is a JSON-LD object with an `@type` of `"RequirePurpose"`. It may include the following attributes:
 
-- `fields` – an array specifying which of the two fields are required. Possible values in the array are `"purpose"` and `"categoryPurpose"`. 
+- `fields` – an array specifying which of the two fields are required. Possible values in the array are `"purpose"` and `"categoryPurpose"`.
   - If `fields: ["purpose"]`, the agent requires that a valid `purpose` code be provided in the TAIP-3 message.
   - If `fields: ["categoryPurpose"]`, it requires a `categoryPurpose` code.
-  - If `fields: ["purpose", "categoryPurpose"]`, it requires **both** to be present. 
+  - If `fields: ["purpose", "categoryPurpose"]`, it requires **both** to be present.
   - (If the `fields` array is omitted or empty, the default interpretation SHOULD be that both are required, but explicitly listing the expected fields is recommended for clarity.)
 
 - `fromAgent` – optional, to indicate which party's agent must supply the required information. In most cases this would be `"originator"` (meaning the originator's agent is expected to include the purpose fields in the transfer request) because the originator typically knows the payment reason. If not specified, it is assumed the requirement applies to the initiating party of the transfer by default.
@@ -107,7 +107,7 @@ This policy indicates that the originator's agent is required to include **both*
 Another example: if an agent only cares about having *some* purpose indicator but doesn't require both, it could set `"fields": ["purpose"]` to demand at least a specific purpose code, without a category. Conversely, a policy of `"fields": ["categoryPurpose"]` would insist on the category code but not the detailed purpose. This flexibility allows agents to enforce the level of detail they need.
 
 **Enforcement in TAP Flow:** The presence of `RequirePurpose` in an agent's policy means that during the negotiation of a transaction, the `purpose` and/or `categoryPurpose` fields become effectively required data elements. If they are missing, the transaction is considered non-compliant with the policy. In the TAP message exchange, this would likely result in either:
-- The transaction being rejected by the requiring agent (with a relevant error or refusal message), or 
+- The transaction being rejected by the requiring agent (with a relevant error or refusal message), or
 - A request for additional info (perhaps via an `UpdateParty` or similar message, though in this case it's about updating the transfer details, not party info).
 
 Agents should include `RequirePurpose` policies only when necessary (to avoid over-burdening senders). For example, if a VASP operates in a jurisdiction where certain cross-border transfers must include a purpose code (per law or network rules), it would use this policy when dealing with transfers from abroad. This mechanism mirrors how some payment systems optionally enforce P/CP codes only for specific corridors ([BIS-Purpose]). Notably, *Nexus* (a BIS cross-border payments project) also allows that some countries mandate P/CP codes while others do not, and requires participants to handle both cases ([BIS-Purpose]). The `RequirePurpose` policy in TAP provides a similar capability in a decentralized manner.
@@ -123,7 +123,7 @@ Agents should include `RequirePurpose` policies only when necessary (to avoid ov
   - **DIVD** – Dividend Payment (distribution of dividends to shareholders)
   - **CHAR** – Charity Payment (donation to charity)
   - **OTHR** – Other (payment purpose not specified elsewhere)
-  
+
   Each code has a formal definition in the ISO list. It's recommended to include a code that best matches the actual purpose of the transfer. This helps the receiving side and any monitoring tools to understand the context of the transaction. **Do not** use codes arbitrarily; misuse of codes (e.g., labeling something as SALA when it's not actually a salary) could lead to compliance issues or confusion.
 
 - **Category vs Purpose:** In general, the `categoryPurpose` field should carry a broad classification if one applies. For example, for a routine payroll payment, `categoryPurpose: "SALA"` is appropriate to mark it as a salary-related transfer. The `purpose` field can either be omitted if the category alone suffices, or it can provide a more specific context. In many cases, using one of the fields may be enough. However, providing both is useful when a transaction falls under a broad category but also has a specific subtype worth noting. For instance, a bonus payout could use `categoryPurpose: "SALA"` (since it's under salaries/benefits) and `purpose: "BONU"` (bonus payment) ([ISO-Purpose-Codes]). The TAP standard does not require sending redundant information, but it allows both fields in case they serve different needs. It is up to the initiating agent to decide whether to include one or both, unless constrained by a policy.
@@ -178,7 +178,7 @@ In this **salary payment** example, the `categoryPurpose` is set to `"SALA"`, in
 
 ### 2. Tax Payment (Purpose Only)
 
-**Scenario:** Bob is paying his quarterly income taxes by sending cryptocurrency from his wallet (through his VASP) to a government treasury wallet managed by another institution. The VASP includes a purpose code to denote this is a tax payment.
+**Scenario:** Bob is paying his quarterly income taxes by sending stablecoin from his wallet (through his VASP) to a government treasury wallet managed by another institution. The VASP includes a purpose code to denote this is a tax payment.
 
 ```json
 {
@@ -223,7 +223,7 @@ Here, Bob's VASP tagged the transfer with `purpose: "TAXS"` ([ISO-Purpose-Codes]
 }
 ```
 
-In this **invoice payment** example, the transfer is marked with `categoryPurpose: "BEXP"` and `purpose: "GDDS"`. 
+In this **invoice payment** example, the transfer is marked with `categoryPurpose: "BEXP"` and `purpose: "GDDS"`.
 
 - `"BEXP"` is the code for **Business Expenses**, a broad category indicating the payment is a business-related expense ([ISO-Purpose-Codes]). This fits since Carol's company is paying a supplier (it's an operational expense).
 - `"GDDS"` stands for **Purchase of Goods**, denoting the specific underlying reason is to pay for goods purchased ([ISO-Purpose-Codes]). The invoice likely corresponds to goods delivered by the supplier, so this code is very apt.
@@ -242,7 +242,7 @@ By providing both, Carol's VASP gives full context: the payment is a business ex
 }
 ```
 
-This simple policy (part of a larger `policies` array perhaps) tells the originator's agent: "I need a `purpose` code in the transfer." In practice, if the originator's initial `Transfer` message didn't include a `purpose`, the beneficiary's agent would respond according to TAP with an error or a request for additional info, prompting the originator to resend the transfer with the `purpose` field populated. 
+This simple policy (part of a larger `policies` array perhaps) tells the originator's agent: "I need a `purpose` code in the transfer." In practice, if the originator's initial `Transfer` message didn't include a `purpose`, the beneficiary's agent would respond according to TAP with an error or a request for additional info, prompting the originator to resend the transfer with the `purpose` field populated.
 
 For instance, if Carol's company initially tried to pay the supplier without any purpose specified, `supplier.vasp` might have a policy like the above. Carol's bank (originator agent) would then realize it must include something like `purpose: "GDDS"` (and possibly `categoryPurpose: "BEXP"` if required) to satisfy the policy. Only once the transfer message contains the needed fields would the supplier's agent proceed with authorization. This flow prevents situations where the beneficiary receives funds without knowing the reason, which could be problematic for compliance. It's analogous to a bank saying *"we will not accept this wire unless you provide a proper purpose code"*, automated through TAP.
 
@@ -284,8 +284,23 @@ Purpose codes introduce additional metadata about transactions that requires pri
 
 ## References
 
-[TAIP-3]: ../taip-3.md
-[TAIP-7]: ../taip-7.md
+* [TAIP-3] Asset Transfer
+* [TAIP-7] Agent Policies
+* [ISO-20022-external-purpose-codes] ISO 20022 External Purpose Codes
+* [ISO-20022-external-category-purpose-codes] ISO 20022 External Category Purpose Codes
+* [BIS-Purpose] BIS Purpose Codes Documentation
+* [ISO-External] ISO 20022 External Code Sets
+* [EPC-Purpose] EPC SCT Purpose Codes
+* [EPC-Category] EPC SCT Category Purpose Codes
+* [TAIP-7-Policies] TAP Agent Policies
+* [ACI-ISO20022] ACI ISO 20022 Blog
+* [ISO-Purpose-Codes] RBA External Purpose Codes List
+* [ISO-20022-Update] ISO 20022 Code Sets Update
+* [BIS-Nexus] BIS Nexus Purpose Codes
+* [CC0] Creative Commons CC0 License
+
+[TAIP-3]: ./taip-3
+[TAIP-7]: ./taip-7
 [ISO-20022-external-purpose-codes]: https://raw.githubusercontent.com/TransactionAuthorizationProtocol/iso20022-external-code-sets/refs/heads/main/code_sets/external_purpose_code.json
 [ISO-20022-external-category-purpose-codes]: https://raw.githubusercontent.com/TransactionAuthorizationProtocol/iso20022-external-code-sets/refs/heads/main/code_sets/external_category_purpose_code.json
 [BIS-Purpose]: https://docs.bis.org/nexus/messaging-and-translation/purpose-codes
@@ -297,8 +312,7 @@ Purpose codes introduce additional metadata about transactions that requires pri
 [ISO-Purpose-Codes]: https://www.rba.hr/documents/20182/183267/External+purpose+codes+list/8a28f888-1f83-5e29-d6ed-fce05f428689?version=1.1
 [ISO-20022-Update]: https://www.iso20022.org/catalogue-messages/additional-content-messages/external-code-sets
 [BIS-Nexus]: https://docs.bis.org/nexus/messaging-and-translation/purpose-codes
-
+[CC0]: ../LICENSE
 
 ## Copyright
 Copyright and related rights waived via [CC0](../LICENSE).
-
