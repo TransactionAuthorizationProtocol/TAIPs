@@ -930,7 +930,19 @@ Note that all messages in this flow share the same thread ID (`payment-123`) to 
       "@id": "did:web:merchant.vasp",
       "name": "Example Store"
     },
-    "expiry": "2024-04-21T12:00:00Z"
+    "expiry": "2024-04-21T12:00:00Z",
+    "agents": [
+      {
+        "@id": "did:web:merchant.vasp",
+        "policies": [
+          {
+            "@type": "RequirePresentation",
+            "fromAgent": "originator",
+            "credentialType": "email"
+          }
+        ]
+      }
+    ]
   }
 }
 ```

@@ -8,6 +8,8 @@ type ISO8601DateTime = string;
 type CAIP19 = string;
 type CAIP220 = string;
 type LEICode = string; // 20-character alpha-numeric string conforming to ISO 17442
+type ISO20022PurposeCode = string; // ISO 20022 ExternalPurpose1Code
+type ISO20022CategoryPurposeCode = string; // ISO 20022 ExternalCategoryPurpose1Code
 
 // Common DIDComm Message Structure
 interface DIDCommMessage {
@@ -31,7 +33,7 @@ interface Party {
   "@id": DID | IRI;
   "lei:leiCode"?: LEICode;
   name?: string;
-  nameHash?: string; // SHA-256 hash of normalized name
+  nameHash?: string; // SHA-256 hash of normalized name per TAIP-12
 }
 
 // Agent Data Structure
@@ -39,6 +41,7 @@ interface Agent {
   "@id": DID;
   role?: string;
   for?: DID;
+  policies?: Policy[];
 }
 
 // Policy Types
@@ -49,12 +52,13 @@ interface RequirePresentation {
   aboutParty?: string;
   aboutAgent?: string;
   presentationDefinition: string;
+  credentialType?: string; // Optional, for simpler credential requests
 }
 
 interface RequirePurpose {
   "@type": "RequirePurpose";
-  purpose: string; // ISO 20022 purpose code
-  categoryPurpose?: string; // ISO 20022 category purpose code
+  fromAgent: string;
+  fields: ("purpose" | "categoryPurpose")[];
 }
 
 type Policy = RequirePresentation | RequirePurpose;
@@ -69,6 +73,8 @@ interface TransferMessage extends DIDCommMessage {
     "@type": "https://tap.rsvp/schema/1.0#Transfer";
     asset: CAIP19;
     amount: string;
+    purpose?: ISO20022PurposeCode;
+    categoryPurpose?: ISO20022CategoryPurposeCode;
     originator: Party;
     beneficiary?: Party;
     agents: Agent[];
@@ -87,11 +93,11 @@ interface PaymentRequestMessage extends DIDCommMessage {
     currency?: string; // ISO 4217 currency code
     amount: string;
     supportedAssets?: CAIP19[];
-    invoice?: string;
+    invoice?: string; // URI to invoice
     expiry?: ISO8601DateTime;
     merchant: Party;
     customer?: Party;
-    requirePresentation?: RequirePresentation[];
+    agents: Agent[]; // Required to specify merchant agent with policies
   };
 }
 
@@ -138,7 +144,6 @@ interface CancelMessage extends DIDCommMessage {
   body: {
     "@context": string;
     "@type": "https://tap.rsvp/schema/1.0#Cancel";
-    by: "originator" | "beneficiary";
     reason?: string;
   };
 }
@@ -272,6 +277,8 @@ export type {
   CAIP19,
   CAIP220,
   LEICode,
+  ISO20022PurposeCode,
+  ISO20022CategoryPurposeCode,
   DIDCommMessage,
   Party,
   Agent,
