@@ -304,6 +304,21 @@ interface Participant<T extends ParticipantTypes> extends JsonLdObject<T> {
   policies?: Policy[];
 }
 
+interface Policy<T extends string> extends JsonLdObject<T> {
+  "@type": T;
+  /**
+   * DID of the agent requesting the presentation
+   * The agent that requires the verifiable credentials
+   */
+  from: string;
+  fromRole: string;
+  /**
+   * DID of the agent requesting the presentation
+   * The agent that requires the verifiable credentials
+   */
+  fromAgent: string;
+  purpose: string;
+}
 // Policy Types
 /**
  * Policy requiring presentation of verifiable credentials
@@ -312,25 +327,7 @@ interface Participant<T extends ParticipantTypes> extends JsonLdObject<T> {
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-7.md | TAIP-7: Policies}
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-8.md | TAIP-8: Verifiable Credentials}
  */
-interface RequirePresentation {
-  /**
-   * Policy type identifier
-   * Must be "RequirePresentation" for credential presentation policies
-   */
-  "@type": "RequirePresentation";
-
-  /**
-   * JSON-LD contexts for the presentation request
-   * Defines the semantic vocabulary for the credentials
-   */
-  "@context": string[];
-
-  /**
-   * DID of the agent requesting the presentation
-   * The agent that requires the verifiable credentials
-   */
-  fromAgent: string;
-
+interface RequirePresentation extends Policy<"RequirePresentation"> {
   /**
    * Optional DID of the party the presentation is about
    * Used when requesting credentials about a specific party
@@ -362,19 +359,7 @@ interface RequirePresentation {
  *
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-13.md | TAIP-13: Purpose Codes}
  */
-interface RequirePurpose {
-  /**
-   * Policy type identifier
-   * Must be "RequirePurpose" for purpose code policies
-   */
-  "@type": "RequirePurpose";
-
-  /**
-   * DID of the agent requiring the purpose codes
-   * The agent that enforces the purpose code requirement
-   */
-  fromAgent: string;
-
+interface RequirePurpose extends Policy<"RequirePurpose"> {
   /**
    * Required purpose code fields
    * Specifies which purpose code types must be included
@@ -386,7 +371,7 @@ interface RequirePurpose {
  * Policy type definition
  * Union type of all possible policy types in TAP.
  */
-type Policy = RequirePresentation | RequirePurpose;
+type Policies = RequirePresentation | RequirePurpose;
 
 // Core TAP Data Structures
 
