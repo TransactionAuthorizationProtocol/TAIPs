@@ -23,14 +23,39 @@ type IRI = `${string}:${string}`;
  */
 type DID = `did:${string}:${string}`;
 
+/**
+ * TAP Context URI
+ * Base URI for TAP schema version 1.0.
+ * Used as the default context for all TAP messages.
+ */
 type TAPContext = "https://tap.rsvp/schema/1.0";
+
+/**
+ * TAP Type URI
+ * Fully qualified type identifier for TAP message types.
+ * Combines the TAP context with a type-specific fragment.
+ *
+ * @example "https://tap.rsvp/schema/1.0#Transfer"
+ */
 type TAPType = `${TAPContext}#${string}`;
 
+/**
+ * Base interface for JSON-LD objects
+ * Provides the core structure for JSON-LD compatible objects with type information.
+ *
+ * @template T - The type string that identifies the object type
+ */
 interface JsonLdObject<T extends string> {
   "@context"?: IRI | Record<string, string>;
   "@type": T;
 }
 
+/**
+ * Base interface for TAP message objects
+ * Extends JsonLdObject with TAP-specific context and type requirements.
+ *
+ * @template T - The TAP message type string
+ */
 interface TapMessageObject<T extends string> extends JsonLdObject<T> {
   "@context": TAPContext | Record<string, IRI>;
   "@type": T;
@@ -104,12 +129,17 @@ export type CAIP19 = `${CAIP2}/${string}:${string}`;
 type DTI = string;
 /**
  * Asset Identifier
- * Represents either a blockchain-based asset (CAIP-19) or a traditional finance asset (DTI).
+ * Union type representing either a blockchain-based asset (CAIP-19) or a traditional finance asset (DTI).
+ * Used to identify assets in a chain-agnostic way across different financial systems.
+ *
+ * @example "eip155:1/erc20:0x6b175474e89094c44da98b954eedeac495271d0f" // DAI token on Ethereum mainnet
+ * @example "iban:GB29NWBK60161331926819" // Bank account in traditional finance
  */
 type Asset = CAIP19 | DTI;
 /**
  * ISO 4217 Currency Code
- * Three-letter code representing a currency according to ISO 4217.
+ * Three-letter code representing a currency according to ISO 4217 standard.
+ * Used for fiat currency identification in payment requests and transfers.
  *
  * @example "USD" // United States Dollar
  * @example "EUR" // Euro
@@ -129,7 +159,9 @@ type Amount = `${number}.${number}` | `${number}`;
  * Chain Agnostic Transaction Identifier (CAIP-220)
  * Represents a transaction on a specific blockchain in a chain-agnostic way.
  *
- * @example "eip155:1:tx/0x123..."
+ * Format: `{caip2}/tx/{txid}`
+ *
+ * @example "eip155:1/tx/0x4a563af33c4871b51a8b108aa2fe1dd5280a30dfb7236170ae5e5e7957eb6392"
  * @see {@link https://github.com/ChainAgnostic/CAIPs/blob/master/CAIPs/caip-220.md | CAIP-220 Specification}
  */
 type CAIP220 = string;
@@ -146,6 +178,7 @@ type LEICode = string;
  * Standardized code indicating the purpose of a financial transaction.
  *
  * @example "CASH" // Cash Management Transfer
+ * @example "CORT" // Trade Settlement Payment
  * @see {@link https://www.iso20022.org/catalogue-messages/additional-content-messages/external-code-sets | ISO 20022 External Code Sets}
  */
 type ISO20022PurposeCode = string;
@@ -153,7 +186,8 @@ type ISO20022PurposeCode = string;
  * ISO 20022 External Category Purpose Code
  * High-level classification of the purpose of a financial transaction.
  *
- * @example "CORT" // Corporate Trade
+ * @example "CASH" // Cash Management Transfer
+ * @example "CORT" // Trade Settlement Payment
  * @see {@link https://www.iso20022.org/catalogue-messages/additional-content-messages/external-code-sets | ISO 20022 External Code Sets}
  */
 type ISO20022CategoryPurposeCode = string;
@@ -195,7 +229,15 @@ interface DIDCommMessage<T = Record<string, unknown>> {
   body: T;
 }
 
+/**
+ * DIDComm reply message structure
+ * Extends DIDComm message with required thread ID for responses.
+ *
+ * @template T - The type of the message body
+ * @extends DIDCommMessage<T>
+ */
 interface DIDCommReply<T = Record<string, unknown>> extends DIDCommMessage<T> {
+  /** Thread ID linking this reply to the original message */
   thid: string;
 }
 // Participant Data Structure
@@ -205,7 +247,7 @@ interface DIDCommReply<T = Record<string, unknown>> extends DIDCommMessage<T> {
  * Can include verification methods and policies.
  *
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-5.md | TAIP-5: Agents}
- * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-12.md | TAIP-12: Party Identification}
+ * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-6.md | TAIP-6: Party Identification}
  */
 interface Participant {
   /**
@@ -268,7 +310,7 @@ interface Participant {
  * Used to request specific verifiable credentials from participants.
  *
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-7.md | TAIP-7: Policies}
- * @see {@link https://identity.foundation/presentation-exchange/ | Presentation Exchange}
+ * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-8.md | TAIP-8: Verifiable Credentials}
  */
 interface RequirePresentation {
   /**
@@ -340,6 +382,10 @@ interface RequirePurpose {
   fields: ("purpose" | "categoryPurpose")[];
 }
 
+/**
+ * Policy type definition
+ * Union type of all possible policy types in TAP.
+ */
 type Policy = RequirePresentation | RequirePurpose;
 
 // Core TAP Data Structures
@@ -473,6 +519,10 @@ interface PaymentRequest extends TapMessageObject<"PaymentRequest"> {
 /**
  * Transaction Types
  * Union type of all transaction initiation messages in TAP.
+ * Used for type-safe handling of transaction messages.
+ *
+ * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-3.md | TAIP-3: Transfer Message}
+ * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-14.md | TAIP-14: Payment Request}
  */
 type Transactions = Transfer | PaymentRequest;
 
@@ -598,7 +648,7 @@ interface UpdateAgent extends TapMessageObject<"UpdateAgent"> {
  * Update Party Message
  * Updates the details of a party in the transaction.
  *
- * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-12.md | TAIP-12: Party Identification}
+ * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-6.md | TAIP-6: Party Identification}
  */
 interface UpdateParty extends TapMessageObject<"UpdateParty"> {
   /**
@@ -712,7 +762,7 @@ interface CACAOAttachment {
  * Confirm Relationship Message
  * Confirms a relationship between a party and an agent.
  *
- * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-5.md | TAIP-5: Agents}
+ * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-9.md | TAIP-9: Relationship Proofs}
  */
 interface ConfirmRelationship extends TapMessageObject<"ConfirmRelationship"> {
   /**
@@ -765,6 +815,7 @@ interface TransferMessage extends DIDCommMessage<Transfer> {
  * Payment Request Message Wrapper
  * DIDComm envelope for a Payment Request message.
  *
+ * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-2.md | TAIP-2: Message Format}
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-14.md | TAIP-14: Payment Request}
  */
 interface PaymentRequestMessage extends DIDCommMessage<PaymentRequest> {
@@ -775,6 +826,7 @@ interface PaymentRequestMessage extends DIDCommMessage<PaymentRequest> {
  * Authorization Message Wrapper
  * DIDComm envelope for an Authorization message.
  *
+ * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-2.md | TAIP-2: Message Format}
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-4.md | TAIP-4: Authorization Flow}
  */
 interface AuthorizeMessage extends DIDCommReply<Authorize> {
@@ -782,30 +834,33 @@ interface AuthorizeMessage extends DIDCommReply<Authorize> {
 }
 
 /**
- * Settle Message Wrapper
- * DIDComm envelope for a Settle message.
+ * Settlement Message Wrapper
+ * DIDComm envelope for a Settlement message.
  *
- * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-15.md | TAIP-15: Settlement}
+ * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-2.md | TAIP-2: Message Format}
+ * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-4.md | TAIP-4: Authorization Flow}
  */
 interface SettleMessage extends DIDCommReply<Settle> {
   type: "https://tap.rsvp/schema/1.0#Settle";
 }
 
 /**
- * Reject Message Wrapper
- * DIDComm envelope for a Reject message.
+ * Rejection Message Wrapper
+ * DIDComm envelope for a Rejection message.
  *
- * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-16.md | TAIP-16: Rejection}
+ * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-2.md | TAIP-2: Message Format}
+ * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-4.md | TAIP-4: Authorization Flow}
  */
 interface RejectMessage extends DIDCommReply<Reject> {
   type: "https://tap.rsvp/schema/1.0#Reject";
 }
 
 /**
- * Cancel Message Wrapper
- * DIDComm envelope for a Cancel message.
+ * Cancellation Message Wrapper
+ * DIDComm envelope for a Cancellation message.
  *
- * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-17.md | TAIP-17: Cancellation}
+ * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-2.md | TAIP-2: Message Format}
+ * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-4.md | TAIP-4: Authorization Flow}
  */
 interface CancelMessage extends DIDCommReply<Cancel> {
   type: "https://tap.rsvp/schema/1.0#Cancel";
@@ -815,7 +870,8 @@ interface CancelMessage extends DIDCommReply<Cancel> {
  * Revert Message Wrapper
  * DIDComm envelope for a Revert message.
  *
- * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-18.md | TAIP-18: Revert}
+ * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-2.md | TAIP-2: Message Format}
+ * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-4.md | TAIP-4: Authorization Flow}
  */
 interface RevertMessage extends DIDCommReply<Revert> {
   type: "https://tap.rsvp/schema/1.0#Revert";
@@ -825,7 +881,8 @@ interface RevertMessage extends DIDCommReply<Revert> {
  * Update Agent Message Wrapper
  * DIDComm envelope for an Update Agent message.
  *
- * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-19.md | TAIP-19: Update Agent}
+ * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-2.md | TAIP-2: Message Format}
+ * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-5.md | TAIP-5: Agents}
  */
 interface UpdateAgentMessage extends DIDCommReply<UpdateAgent> {
   type: "https://tap.rsvp/schema/1.0#UpdateAgent";
@@ -835,7 +892,8 @@ interface UpdateAgentMessage extends DIDCommReply<UpdateAgent> {
  * Update Party Message Wrapper
  * DIDComm envelope for an Update Party message.
  *
- * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-20.md | TAIP-20: Update Party}
+ * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-2.md | TAIP-2: Message Format}
+ * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-6.md | TAIP-6: Party Identification}
  */
 interface UpdatePartyMessage extends DIDCommReply<UpdateParty> {
   type: "https://tap.rsvp/schema/1.0#UpdateParty";
@@ -845,7 +903,8 @@ interface UpdatePartyMessage extends DIDCommReply<UpdateParty> {
  * Add Agents Message Wrapper
  * DIDComm envelope for an Add Agents message.
  *
- * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-21.md | TAIP-21: Add Agents}
+ * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-2.md | TAIP-2: Message Format}
+ * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-5.md | TAIP-5: Agents}
  */
 interface AddAgentsMessage extends DIDCommReply<AddAgents> {
   type: "https://tap.rsvp/schema/1.0#AddAgents";
@@ -855,7 +914,8 @@ interface AddAgentsMessage extends DIDCommReply<AddAgents> {
  * Replace Agent Message Wrapper
  * DIDComm envelope for a Replace Agent message.
  *
- * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-22.md | TAIP-22: Replace Agent}
+ * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-2.md | TAIP-2: Message Format}
+ * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-5.md | TAIP-5: Agents}
  */
 interface ReplaceAgentMessage extends DIDCommReply<ReplaceAgent> {
   type: "https://tap.rsvp/schema/1.0#ReplaceAgent";
@@ -865,7 +925,8 @@ interface ReplaceAgentMessage extends DIDCommReply<ReplaceAgent> {
  * Remove Agent Message Wrapper
  * DIDComm envelope for a Remove Agent message.
  *
- * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-23.md | TAIP-23: Remove Agent}
+ * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-2.md | TAIP-2: Message Format}
+ * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-5.md | TAIP-5: Agents}
  */
 interface RemoveAgentMessage extends DIDCommReply<RemoveAgent> {
   type: "https://tap.rsvp/schema/1.0#RemoveAgent";
@@ -875,7 +936,7 @@ interface RemoveAgentMessage extends DIDCommReply<RemoveAgent> {
  * Confirm Relationship Message Wrapper
  * DIDComm envelope for a Confirm Relationship message.
  *
- * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-24.md | TAIP-24: Confirm Relationship}
+ * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-9.md | TAIP-9: Relationship Proofs}
  */
 interface ConfirmRelationshipMessage extends DIDCommReply<ConfirmRelationship> {
   /**
@@ -895,7 +956,7 @@ interface ConfirmRelationshipMessage extends DIDCommReply<ConfirmRelationship> {
  * Update Policies Message Wrapper
  * DIDComm envelope for an Update Policies message.
  *
- * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-25.md | TAIP-25: Update Policies}
+ * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-7.md | TAIP-7: Policies}
  */
 interface UpdatePoliciesMessage extends DIDCommReply<UpdatePolicies> {
   /**
@@ -908,7 +969,8 @@ interface UpdatePoliciesMessage extends DIDCommReply<UpdatePolicies> {
 /**
  * TAP Message
  * Union type of all possible TAP messages.
- * Used for type-safe message handling.
+ * Used for type-safe message handling in TAP implementations.
+ * Includes all transaction, authorization, and management messages.
  *
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-2.md | TAIP-2: Message Format}
  */
