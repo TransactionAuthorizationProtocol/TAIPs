@@ -304,22 +304,52 @@ interface Participant<T extends ParticipantTypes> extends JsonLdObject<T> {
   policies?: Policy[];
 }
 
+/**
+ * Base interface for all TAP policy types.
+ * Policies define requirements and constraints that must be satisfied during a transaction.
+ * Each specific policy type extends this base interface with its own requirements.
+ *
+ * @template T - The specific policy type identifier (e.g. "RequireAuthorization", "RequirePresentation")
+ *
+ * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-7.md | TAIP-7: Policies}
+ */
 interface Policy<T extends string> extends JsonLdObject<T> {
+  /** The type identifier for this policy */
   "@type": T;
+
   /**
-   * DID of the agent requesting the presentation
-   * The agent that requires the verifiable credentials
+   * Optional DID of the party or agent required to fulfill this policy
+   * Can be a single DID or an array of DIDs
    */
-  from: string;
-  fromRole: string;
+  from?: string;
+
   /**
-   * DID of the agent requesting the presentation
-   * The agent that requires the verifiable credentials
+   * Optional role of the party required to fulfill this policy
+   * E.g. 'SettlementAddress' for TAIP-3
    */
-  fromAgent: string;
-  purpose: string;
+  fromRole?: string;
+
+  /**
+   * Optional agent representing a party required to fulfill this policy
+   * E.g. 'originator' or 'beneficiary' in TAIP-3
+   */
+  fromAgent?: string;
+
+  /**
+   * Optional human-readable description of the policy's purpose
+   * Used to explain why this requirement exists
+   */
+  purpose?: string;
 }
 // Policy Types
+/**
+ * Policy requiring authorization before proceeding
+ * Used to ensure specific agents authorize a transaction.
+ *
+ * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-7.md | TAIP-7: Policies}
+ */
+interface RequireAuthorization extends Policy<"RequireAuthorization"> {}
+
 /**
  * Policy requiring presentation of verifiable credentials
  * Used to request specific verifiable credentials from participants.
@@ -354,6 +384,22 @@ interface RequirePresentation extends Policy<"RequirePresentation"> {
 }
 
 /**
+ * Policy requiring relationship confirmation
+ * Used to verify control of addresses and relationships between parties.
+ *
+ * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-7.md | TAIP-7: Policies}
+ * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-9.md | TAIP-9: Proof of Relationship}
+ */
+interface RequireRelationshipConfirmation
+  extends Policy<"RequireRelationshipConfirmation"> {
+  /**
+   * Required nonce for signature
+   * Prevents replay attacks
+   */
+  nonce: string;
+}
+
+/**
  * Policy requiring purpose codes for transactions
  * Used to enforce the inclusion of ISO 20022 purpose codes.
  *
@@ -371,7 +417,11 @@ interface RequirePurpose extends Policy<"RequirePurpose"> {
  * Policy type definition
  * Union type of all possible policy types in TAP.
  */
-type Policies = RequirePresentation | RequirePurpose;
+type Policies =
+  | RequireAuthorization
+  | RequirePresentation
+  | RequireRelationshipConfirmation
+  | RequirePurpose;
 
 // Core TAP Data Structures
 
@@ -994,7 +1044,9 @@ export type {
   // Message Structure
   DIDCommMessage,
   Participant,
+  RequireAuthorization,
   RequirePresentation,
+  RequireRelationshipConfirmation,
   RequirePurpose,
   Policy,
 
