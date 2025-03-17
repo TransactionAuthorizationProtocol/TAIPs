@@ -127,6 +127,7 @@ export type CAIP19 = `${CAIP2}/${string}:${string}`;
  * @see {@link https://www.iso.org/standard/80601.html | ISO 23897}
  */
 type DTI = string;
+
 /**
  * Asset Identifier
  * Union type representing either a blockchain-based asset (CAIP-19) or a traditional finance asset (DTI).
@@ -136,6 +137,7 @@ type DTI = string;
  * @example "iban:GB29NWBK60161331926819" // Bank account in traditional finance
  */
 type Asset = CAIP19 | DTI;
+
 /**
  * ISO 4217 Currency Code
  * Three-letter code representing a currency according to ISO 4217 standard.
@@ -146,6 +148,7 @@ type Asset = CAIP19 | DTI;
  * @see {@link https://www.iso.org/iso-4217-currency-codes.html | ISO 4217}
  */
 type IsoCurrency = string;
+
 /**
  * Decimal Amount
  * String representation of a decimal number.
@@ -155,6 +158,7 @@ type IsoCurrency = string;
  * @example "123.45"
  */
 type Amount = `${number}.${number}` | `${number}`;
+
 /**
  * Chain Agnostic Transaction Identifier (CAIP-220)
  * Represents a transaction on a specific blockchain in a chain-agnostic way.
@@ -173,6 +177,7 @@ type CAIP220 = string;
  * @see {@link https://www.iso.org/standard/59771.html | ISO 17442}
  */
 type LEICode = string;
+
 /**
  * ISO 20022 External Purpose Code
  * Standardized code indicating the purpose of a financial transaction.
@@ -182,6 +187,7 @@ type LEICode = string;
  * @see {@link https://www.iso20022.org/catalogue-messages/additional-content-messages/external-code-sets | ISO 20022 External Code Sets}
  */
 type ISO20022PurposeCode = string;
+
 /**
  * ISO 20022 External Category Purpose Code
  * High-level classification of the purpose of a financial transaction.
@@ -249,23 +255,17 @@ interface DIDCommReply<T = Record<string, unknown>> extends DIDCommMessage<T> {
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-5.md | TAIP-5: Agents}
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-6.md | TAIP-6: Party Identification}
  */
-interface Participant {
-  /**
-   * JSON-LD context for semantic meaning
-   * Defines vocabularies and terms used in the participant data
-   */
-  "@context"?: {
-    /** Base vocabulary URI */
-    "@vocab"?: string;
-    /** LEI vocabulary prefix */
-    lei?: string;
-  };
 
+type ParticipantTypes = "Agent" | "Party";
+
+interface Participant<T extends ParticipantTypes> extends JsonLdObject<T> {
   /**
    * Unique identifier for the participant
    * Can be either a DID or an IRI
    */
   "@id": DID | IRI;
+
+  "@type": T;
 
   /**
    * Legal Entity Identifier code
@@ -426,19 +426,19 @@ interface Transfer extends TapMessageObject<"Transfer"> {
    * Details of the transfer originator
    * The party initiating the transfer
    */
-  originator: Participant;
+  originator: Participant<"Party">;
 
   /**
    * Optional details of the transfer beneficiary
    * The party receiving the transfer
    */
-  beneficiary?: Participant;
+  beneficiary?: Participant<"Party">;
 
   /**
    * List of agents involved in the transfer
    * Includes compliance, custody, and other service providers
    */
-  agents: Participant[];
+  agents: Participant<"Agent">[];
 
   /**
    * Optional settlement transaction identifier
@@ -501,19 +501,19 @@ interface PaymentRequest extends TapMessageObject<"PaymentRequest"> {
    * Details of the merchant requesting payment
    * The party requesting to receive the payment
    */
-  merchant: Participant;
+  merchant: Participant<"Party">;
 
   /**
    * Optional details of the customer
    * The party from whom payment is requested
    */
-  customer?: Participant;
+  customer?: Participant<"Party">;
 
   /**
    * List of agents involved in the payment
    * Must include at least one merchant agent with policies
    */
-  agents: Participant[];
+  agents: Participant<"Agent">[];
 }
 
 /**
@@ -641,7 +641,7 @@ interface UpdateAgent extends TapMessageObject<"UpdateAgent"> {
    * Updated agent details
    * Complete agent information including any changes
    */
-  agent: Participant;
+  agent: Participant<"Agent">;
 }
 
 /**
@@ -655,7 +655,7 @@ interface UpdateParty extends TapMessageObject<"UpdateParty"> {
    * Updated party details
    * Complete party information including any changes
    */
-  party: Participant;
+  party: Participant<"Party">;
 }
 
 /**
@@ -669,7 +669,7 @@ interface AddAgents extends TapMessageObject<"AddAgents"> {
    * List of agents to add
    * Complete details for each new agent
    */
-  agents: Participant[];
+  agents: Participant<"Agent">[];
 }
 
 /**
@@ -689,7 +689,7 @@ interface ReplaceAgent extends TapMessageObject<"ReplaceAgent"> {
    * Details of the replacement agent
    * Complete information for the new agent
    */
-  replacement: Participant;
+  replacement: Participant<"Agent">;
 }
 
 /**
