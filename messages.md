@@ -28,6 +28,8 @@
   - [Policy](#policy)
     - [RequirePresentation](#requirepresentation)
     - [RequirePurpose](#requirepurpose)
+    - [RequireAuthorization](#requireauthorization)
+    - [RequireRelationshipConfirmation](#requirerelationshipconfirmation)
 - [Message Flow Examples](#message-flow-examples)
   - [Basic Transfer Flow](#basic-transfer-flow)
   - [Transfer with LEI and Purpose Code](#transfer-with-lei-and-purpose-code)
@@ -748,7 +750,45 @@ Represents a service involved in executing transactions.
 | fields | array | Yes | Draft ([TAIP-13]) | Array of required fields: ["purpose"] and/or ["categoryPurpose"] |
 | fromAgent | string | No | Draft ([TAIP-13]) | Agent required to provide the purpose code(s) |
 
-The `RequirePurpose` policy allows an agent to require that a purpose code and/or category purpose code be included in the transaction. The `fields` array specifies which codes are required. If both are needed, include both in the array. The `fromAgent` field (typically "originator") indicates which party's agent must provide the codes.
+#### RequireAuthorization
+[TAIP-7] - Review
+
+| Attribute | Type | Required | Status | Description |
+|-----------|------|----------|---------|-------------|
+| @type | string | Yes | Review ([TAIP-7]) | "[RequireAuthorization](#requireauthorization)" |
+| fromAgent | string | Yes | Review ([TAIP-7]) | Agent required to provide authorization |
+| reason | string | No | Review ([TAIP-7]) | Human readable reason for requiring authorization |
+
+#### RequireRelationshipConfirmation
+[TAIP-9] - Draft
+
+| Attribute | Type | Required | Status | Description |
+|-----------|------|----------|---------|-------------|
+| @type | string | Yes | Draft ([TAIP-9]) | "[RequireRelationshipConfirmation](#requirerelationshipconfirmation)" |
+| fromAgent | string | Yes | Draft ([TAIP-9]) | Agent required to confirm the relationship |
+| aboutParty | string | Yes | Draft ([TAIP-9]) | Party whose relationship needs confirmation |
+| aboutAgent | string | Yes | Draft ([TAIP-9]) | Agent whose relationship needs confirmation |
+| reason | string | No | Draft ([TAIP-9]) | Human readable reason for requiring relationship confirmation |
+
+##### Example RequireAuthorization Policy
+```json
+{
+  "@type": "RequireAuthorization",
+  "fromAgent": "beneficiary",
+  "reason": "Beneficiary approval required for transfers over 1000 USDC"
+}
+```
+
+##### Example RequireRelationshipConfirmation Policy
+```json
+{
+  "@type": "RequireRelationshipConfirmation",
+  "fromAgent": "originator",
+  "aboutParty": "originator",
+  "aboutAgent": "did:pkh:eip155:1:0x1234a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb",
+  "reason": "Please confirm control of the settlement address"
+}
+```
 
 ## Message Flow Examples
 
