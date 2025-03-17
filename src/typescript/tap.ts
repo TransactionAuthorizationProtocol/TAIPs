@@ -1,6 +1,15 @@
 // TAP Message Types and Data Structures
 // Based on TAIP specifications
 
+/**
+ * Internationalized Resource Identifier (IRI)
+ * A unique identifier that may contain international characters.
+ * Used for identifying resources, particularly in JSON-LD contexts.
+ *
+ * @see {@link https://www.w3.org/TR/json-ld11/#iris | JSON-LD 1.1 IRIs}
+ */
+type IRI = `${string}:${string}`;
+
 // Common Types
 /**
  * Decentralized Identifier (DID)
@@ -14,15 +23,18 @@
  */
 type DID = `did:${string}:${string}`;
 
-/**
- * Internationalized Resource Identifier (IRI)
- * A unique identifier that may contain international characters.
- * Used for identifying resources, particularly in JSON-LD contexts.
- *
- * @see {@link https://www.w3.org/TR/json-ld11/#iris | JSON-LD 1.1 IRIs}
- */
-type IRI = string;
+type TAPContext = "https://tap.rsvp/schema/1.0";
+type TAPType = `${TAPContext}#${string}`;
 
+interface JsonLdObject<T extends string> {
+  "@context"?: IRI | Record<string, string>;
+  "@type": T;
+}
+
+interface TapMessageObject<T extends string> extends JsonLdObject<T> {
+  "@context": TAPContext | Record<string, IRI>;
+  "@type": T;
+}
 /**
  * ISO 8601 DateTime string
  * Represents date and time in a standardized format.
@@ -183,6 +195,9 @@ interface DIDCommMessage<T = Record<string, unknown>> {
   body: T;
 }
 
+interface DIDCommReply<T = Record<string, unknown>> extends DIDCommMessage<T> {
+  thid: string;
+}
 // Participant Data Structure
 /**
  * Participant in a TAP transaction
@@ -336,19 +351,7 @@ type Policy = RequirePresentation | RequirePurpose;
  *
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-3.md | TAIP-3: Transfer Message}
  */
-interface Transfer {
-  /**
-   * JSON-LD context for semantic meaning
-   * Can be a string URI or a context object
-   */
-  "@context": string | Record<string, string>;
-
-  /**
-   * Message type identifier
-   * Must be "https://tap.rsvp/schema/1.0#Transfer" for transfer messages
-   */
-  "@type": "https://tap.rsvp/schema/1.0#Transfer";
-
+interface Transfer extends TapMessageObject<"Transfer"> {
   /**
    * Asset being transferred
    * Can be either a blockchain asset (CAIP-19) or traditional finance asset (DTI)
@@ -411,19 +414,7 @@ interface Transfer {
  *
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-14.md | TAIP-14: Payment Request}
  */
-interface PaymentRequest {
-  /**
-   * JSON-LD context for semantic meaning
-   * Defines vocabularies and terms used in the payment request
-   */
-  "@context": string;
-
-  /**
-   * Message type identifier
-   * Must be "https://tap.rsvp/schema/1.0#PaymentRequest" for payment requests
-   */
-  "@type": "https://tap.rsvp/schema/1.0#PaymentRequest";
-
+interface PaymentRequest extends TapMessageObject<"PaymentRequest"> {
   /**
    * Optional specific asset requested
    * CAIP-19 identifier for the requested blockchain asset
@@ -491,19 +482,7 @@ type Transactions = Transfer | PaymentRequest;
  *
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-4.md | TAIP-4: Authorization Flow}
  */
-interface Authorize {
-  /**
-   * JSON-LD context for semantic meaning
-   * Defines vocabularies and terms used in the authorization
-   */
-  "@context": string;
-
-  /**
-   * Message type identifier
-   * Must be "https://tap.rsvp/schema/1.0#Authorize" for authorization messages
-   */
-  "@type": "https://tap.rsvp/schema/1.0#Authorize";
-
+interface Authorize extends TapMessageObject<"Authorize"> {
   /**
    * Reference to the transfer being authorized
    * Contains the transfer message ID
@@ -526,19 +505,7 @@ interface Authorize {
  *
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-4.md | TAIP-4: Authorization Flow}
  */
-interface Settle {
-  /**
-   * JSON-LD context for semantic meaning
-   * Defines vocabularies and terms used in the settlement
-   */
-  "@context": string;
-
-  /**
-   * Message type identifier
-   * Must be "https://tap.rsvp/schema/1.0#Settle" for settlement messages
-   */
-  "@type": "https://tap.rsvp/schema/1.0#Settle";
-
+interface Settle extends TapMessageObject<"Settle"> {
   /**
    * Reference to the transfer being settled
    * Contains the transfer message ID
@@ -561,19 +528,7 @@ interface Settle {
  *
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-4.md | TAIP-4: Authorization Flow}
  */
-interface Reject {
-  /**
-   * JSON-LD context for semantic meaning
-   * Defines vocabularies and terms used in the rejection
-   */
-  "@context": string;
-
-  /**
-   * Message type identifier
-   * Must be "https://tap.rsvp/schema/1.0#Reject" for rejection messages
-   */
-  "@type": "https://tap.rsvp/schema/1.0#Reject";
-
+interface Reject extends TapMessageObject<"Reject"> {
   /**
    * Reference to the transfer being rejected
    * Contains the transfer message ID
@@ -596,19 +551,7 @@ interface Reject {
  *
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-4.md | TAIP-4: Authorization Flow}
  */
-interface Cancel {
-  /**
-   * JSON-LD context for semantic meaning
-   * Defines vocabularies and terms used in the cancellation
-   */
-  "@context": string;
-
-  /**
-   * Message type identifier
-   * Must be "https://tap.rsvp/schema/1.0#Cancel" for cancellation messages
-   */
-  "@type": "https://tap.rsvp/schema/1.0#Cancel";
-
+interface Cancel extends TapMessageObject<"Cancel"> {
   /**
    * Optional cancellation reason
    * Explanation of why the transfer was cancelled
@@ -623,28 +566,7 @@ interface Cancel {
  *
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-4.md | TAIP-4: Authorization Flow}
  */
-interface Revert {
-  /**
-   * JSON-LD context for semantic meaning
-   * Defines vocabularies and terms used in the revert request
-   */
-  "@context": string;
-
-  /**
-   * Message type identifier
-   * Must be "https://tap.rsvp/schema/1.0#Revert" for revert messages
-   */
-  "@type": "https://tap.rsvp/schema/1.0#Revert";
-
-  /**
-   * Reference to the transfer to be reverted
-   * Contains the transfer message ID
-   */
-  transfer: {
-    /** ID of the transfer message to revert */
-    "@id": string;
-  };
-
+interface Revert extends TapMessageObject<"Revert"> {
   /**
    * Settlement address for the revert
    * CAIP-10 identifier for the revert destination
@@ -664,19 +586,7 @@ interface Revert {
  *
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-5.md | TAIP-5: Agents}
  */
-interface UpdateAgent {
-  /**
-   * JSON-LD context for semantic meaning
-   * Defines vocabularies and terms used in the agent update
-   */
-  "@context": string;
-
-  /**
-   * Message type identifier
-   * Must be "https://tap.rsvp/schema/1.0#UpdateAgent" for agent updates
-   */
-  "@type": "https://tap.rsvp/schema/1.0#UpdateAgent";
-
+interface UpdateAgent extends TapMessageObject<"UpdateAgent"> {
   /**
    * Updated agent details
    * Complete agent information including any changes
@@ -690,26 +600,7 @@ interface UpdateAgent {
  *
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-12.md | TAIP-12: Party Identification}
  */
-interface UpdateParty {
-  /**
-   * JSON-LD context for semantic meaning
-   * Can be a string URI or a context object with vocabulary definitions
-   */
-  "@context":
-    | string
-    | {
-        /** Base vocabulary URI */
-        "@vocab": string;
-        /** Optional LEI vocabulary prefix */
-        lei?: string;
-      };
-
-  /**
-   * Message type identifier
-   * Must be "https://tap.rsvp/schema/1.0#UpdateParty" for party updates
-   */
-  "@type": "https://tap.rsvp/schema/1.0#UpdateParty";
-
+interface UpdateParty extends TapMessageObject<"UpdateParty"> {
   /**
    * Updated party details
    * Complete party information including any changes
@@ -723,19 +614,7 @@ interface UpdateParty {
  *
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-5.md | TAIP-5: Agents}
  */
-interface AddAgents {
-  /**
-   * JSON-LD context for semantic meaning
-   * Defines vocabularies and terms used in the agent addition
-   */
-  "@context": string;
-
-  /**
-   * Message type identifier
-   * Must be "https://tap.rsvp/schema/1.0#AddAgents" for adding agents
-   */
-  "@type": "https://tap.rsvp/schema/1.0#AddAgents";
-
+interface AddAgents extends TapMessageObject<"AddAgents"> {
   /**
    * List of agents to add
    * Complete details for each new agent
@@ -749,19 +628,7 @@ interface AddAgents {
  *
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-5.md | TAIP-5: Agents}
  */
-interface ReplaceAgent {
-  /**
-   * JSON-LD context for semantic meaning
-   * Defines vocabularies and terms used in the agent replacement
-   */
-  "@context": string;
-
-  /**
-   * Message type identifier
-   * Must be "https://tap.rsvp/schema/1.0#ReplaceAgent" for agent replacement
-   */
-  "@type": "https://tap.rsvp/schema/1.0#ReplaceAgent";
-
+interface ReplaceAgent extends TapMessageObject<"ReplaceAgent"> {
   /**
    * DID of the agent to replace
    * Identifies the existing agent
@@ -781,19 +648,7 @@ interface ReplaceAgent {
  *
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-5.md | TAIP-5: Agents}
  */
-interface RemoveAgent {
-  /**
-   * JSON-LD context for semantic meaning
-   * Defines vocabularies and terms used in the agent removal
-   */
-  "@context": string;
-
-  /**
-   * Message type identifier
-   * Must be "https://tap.rsvp/schema/1.0#RemoveAgent" for agent removal
-   */
-  "@type": "https://tap.rsvp/schema/1.0#RemoveAgent";
-
+interface RemoveAgent extends TapMessageObject<"RemoveAgent"> {
   /**
    * DID of the agent to remove
    * Identifies the agent to be removed from the transaction
@@ -859,19 +714,7 @@ interface CACAOAttachment {
  *
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-5.md | TAIP-5: Agents}
  */
-interface ConfirmRelationship extends Record<string, unknown> {
-  /**
-   * JSON-LD context for semantic meaning
-   * Defines vocabularies and terms used in the relationship confirmation
-   */
-  "@context": string;
-
-  /**
-   * Message type identifier
-   * Must be "https://tap.rsvp/schema/1.0#Agent" for relationship confirmations
-   */
-  "@type": "https://tap.rsvp/schema/1.0#Agent";
-
+interface ConfirmRelationship extends TapMessageObject<"ConfirmRelationship"> {
   /**
    * DID of the agent
    * Identifies the agent in the relationship
@@ -897,19 +740,7 @@ interface ConfirmRelationship extends Record<string, unknown> {
  *
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-7.md | TAIP-7: Policies}
  */
-interface UpdatePolicies {
-  /**
-   * JSON-LD context for semantic meaning
-   * Defines vocabularies and terms used in the policy update
-   */
-  "@context": string;
-
-  /**
-   * Message type identifier
-   * Must be "https://tap.rsvp/schema/1.0#UpdatePolicies" for policy updates
-   */
-  "@type": "https://tap.rsvp/schema/1.0#UpdatePolicies";
-
+interface UpdatePolicies extends TapMessageObject<"UpdatePolicies"> {
   /**
    * List of updated policies
    * Complete set of policies that should apply
@@ -946,7 +777,7 @@ interface PaymentRequestMessage extends DIDCommMessage<PaymentRequest> {
  *
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-4.md | TAIP-4: Authorization Flow}
  */
-interface AuthorizeMessage extends DIDCommMessage<Authorize> {
+interface AuthorizeMessage extends DIDCommReply<Authorize> {
   type: "https://tap.rsvp/schema/1.0#Authorize";
 }
 
@@ -956,7 +787,7 @@ interface AuthorizeMessage extends DIDCommMessage<Authorize> {
  *
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-15.md | TAIP-15: Settlement}
  */
-interface SettleMessage extends DIDCommMessage<Settle> {
+interface SettleMessage extends DIDCommReply<Settle> {
   type: "https://tap.rsvp/schema/1.0#Settle";
 }
 
@@ -966,7 +797,7 @@ interface SettleMessage extends DIDCommMessage<Settle> {
  *
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-16.md | TAIP-16: Rejection}
  */
-interface RejectMessage extends DIDCommMessage<Reject> {
+interface RejectMessage extends DIDCommReply<Reject> {
   type: "https://tap.rsvp/schema/1.0#Reject";
 }
 
@@ -976,7 +807,7 @@ interface RejectMessage extends DIDCommMessage<Reject> {
  *
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-17.md | TAIP-17: Cancellation}
  */
-interface CancelMessage extends DIDCommMessage<Cancel> {
+interface CancelMessage extends DIDCommReply<Cancel> {
   type: "https://tap.rsvp/schema/1.0#Cancel";
 }
 
@@ -986,7 +817,7 @@ interface CancelMessage extends DIDCommMessage<Cancel> {
  *
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-18.md | TAIP-18: Revert}
  */
-interface RevertMessage extends DIDCommMessage<Revert> {
+interface RevertMessage extends DIDCommReply<Revert> {
   type: "https://tap.rsvp/schema/1.0#Revert";
 }
 
@@ -996,7 +827,7 @@ interface RevertMessage extends DIDCommMessage<Revert> {
  *
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-19.md | TAIP-19: Update Agent}
  */
-interface UpdateAgentMessage extends DIDCommMessage<UpdateAgent> {
+interface UpdateAgentMessage extends DIDCommReply<UpdateAgent> {
   type: "https://tap.rsvp/schema/1.0#UpdateAgent";
 }
 
@@ -1006,7 +837,7 @@ interface UpdateAgentMessage extends DIDCommMessage<UpdateAgent> {
  *
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-20.md | TAIP-20: Update Party}
  */
-interface UpdatePartyMessage extends DIDCommMessage<UpdateParty> {
+interface UpdatePartyMessage extends DIDCommReply<UpdateParty> {
   type: "https://tap.rsvp/schema/1.0#UpdateParty";
 }
 
@@ -1016,7 +847,7 @@ interface UpdatePartyMessage extends DIDCommMessage<UpdateParty> {
  *
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-21.md | TAIP-21: Add Agents}
  */
-interface AddAgentsMessage extends DIDCommMessage<AddAgents> {
+interface AddAgentsMessage extends DIDCommReply<AddAgents> {
   type: "https://tap.rsvp/schema/1.0#AddAgents";
 }
 
@@ -1026,7 +857,7 @@ interface AddAgentsMessage extends DIDCommMessage<AddAgents> {
  *
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-22.md | TAIP-22: Replace Agent}
  */
-interface ReplaceAgentMessage extends DIDCommMessage<ReplaceAgent> {
+interface ReplaceAgentMessage extends DIDCommReply<ReplaceAgent> {
   type: "https://tap.rsvp/schema/1.0#ReplaceAgent";
 }
 
@@ -1036,7 +867,7 @@ interface ReplaceAgentMessage extends DIDCommMessage<ReplaceAgent> {
  *
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-23.md | TAIP-23: Remove Agent}
  */
-interface RemoveAgentMessage extends DIDCommMessage<RemoveAgent> {
+interface RemoveAgentMessage extends DIDCommReply<RemoveAgent> {
   type: "https://tap.rsvp/schema/1.0#RemoveAgent";
 }
 
@@ -1046,8 +877,7 @@ interface RemoveAgentMessage extends DIDCommMessage<RemoveAgent> {
  *
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-24.md | TAIP-24: Confirm Relationship}
  */
-interface ConfirmRelationshipMessage
-  extends DIDCommMessage<ConfirmRelationship> {
+interface ConfirmRelationshipMessage extends DIDCommReply<ConfirmRelationship> {
   /**
    * Message type identifier
    * Must be "https://tap.rsvp/schema/1.0#ConfirmRelationship" for relationship confirmations
@@ -1067,7 +897,7 @@ interface ConfirmRelationshipMessage
  *
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-25.md | TAIP-25: Update Policies}
  */
-interface UpdatePoliciesMessage extends DIDCommMessage<UpdatePolicies> {
+interface UpdatePoliciesMessage extends DIDCommReply<UpdatePolicies> {
   /**
    * Message type identifier
    * Must be "https://tap.rsvp/schema/1.0#UpdatePolicies" for policy updates
