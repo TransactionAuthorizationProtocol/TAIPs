@@ -1,6 +1,7 @@
 // TAP Message Types and Data Structures
 // Based on TAIP specifications
 
+import { Purpose, CategoryPurpose } from "@taprsvp/iso20022_external_codes";
 /**
  * Internationalized Resource Identifier (IRI)
  * A unique identifier that may contain international characters.
@@ -186,7 +187,7 @@ type LEICode = string;
  * @example "CORT" // Trade Settlement Payment
  * @see {@link https://www.iso20022.org/catalogue-messages/additional-content-messages/external-code-sets | ISO 20022 External Code Sets}
  */
-type ISO20022PurposeCode = string;
+type ISO20022PurposeCode = Purpose;
 
 /**
  * ISO 20022 External Category Purpose Code
@@ -196,7 +197,7 @@ type ISO20022PurposeCode = string;
  * @example "CORT" // Trade Settlement Payment
  * @see {@link https://www.iso20022.org/catalogue-messages/additional-content-messages/external-code-sets | ISO 20022 External Code Sets}
  */
-type ISO20022CategoryPurposeCode = string;
+type ISO20022CategoryPurposeCode = CategoryPurpose;
 
 // Common DIDComm Message Structure
 /**

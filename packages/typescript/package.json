@@ -31,5 +31,8 @@
   },
   "publishConfig": {
     "access": "public"
+  },
+  "dependencies": {
+    "@taprsvp/iso20022_external_codes": "^1.0.0"
   }
 }
