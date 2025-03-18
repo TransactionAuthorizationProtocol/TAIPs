@@ -89,59 +89,73 @@ sequenceDiagram
     participant Customer
     Merchant->>Customer: **PaymentRequest** (amount, asset/currency, etc.)
     Note over Customer: Customer reviews the request details
-    Customer-->>Merchant: Payment (on-chain transfer of funds)
-    Merchant->>Merchant: Verify payment received on blockchain
+    Customer-->>Merchant: Authorize
+    Merchant-->>Customer: Authorize (provides settlement address)
+    Customer-->>Merchant: Settle (on-chain transfer of funds)
     Merchant-->>Customer: Provide goods/service (out of band)
 ```
 
-*Description:* In the high-level flow, the **Merchant** sends a PaymentRequest to the **Customer** for a certain amount. The Customer (via their wallet) sends the payment to the merchant's blockchain address. Once the payment is confirmed, the merchant fulfills the order (delivers the product or service). This diagram omits the low-level messaging and focuses on the core intent and outcome.
+*Description:* In the high-level flow, the **Merchant** sends a PaymentRequest to the **Customer** for a certain amount. Each side Authorizes the flow and the Customer (via their wallet) sends the payment to the merchant's blockchain address. Once the payment is confirmed, the merchant fulfills the order (delivers the product or service). This diagram omits the low-level messaging and focuses on the core intent and outcome.
 
 #### Figure 3: Detailed Payment Flow with Required Presentation (Successful Payment)
 
 ```mermaid
 sequenceDiagram
     participant Merchant
-    participant MerchantWallet
+    participant PSP
     participant CustomerWallet
     participant Customer
     participant Blockchain
 
-    Merchant->>MerchantWallet: Create PaymentRequest
-    MerchantWallet-->>CustomerWallet: Send PaymentRequest
+    Merchant->>PSP: Create PaymentRequest
+    Merchant-->>Customer: Show PaymentRequest
+    Customer -->> CustomerWallet: Scan/Open PaymentRequest
     CustomerWallet->>Customer: Display request details
-    
-    alt Merchant requires KYC/Info
+    Customer->>CustomerWallet: Authorize payment
+
+    alt Merchant requires Shipping information about Customer
         Customer->>CustomerWallet: Provide requested info
-        CustomerWallet->>MerchantWallet: Send Verifiable Presentation
-        MerchantWallet->>MerchantWallet: Verify customer info
+        CustomerWallet->>PSP: Send Verifiable Presentation
+        PSP->>Merchant: Store customer info
+    end
+
+    alt PSP requires Travel Rule information about Customer
+        CustomerWallet->>PSP: Send Verifiable Presentation
     end
 
     opt Merchant approves transaction
-        MerchantWallet-->>CustomerWallet: Send Authorize message
+        PSP-->>CustomerWallet: Send Authorize message
     end
 
-    Customer->>CustomerWallet: Approve payment
     CustomerWallet->>Blockchain: Submit transaction
-    Blockchain->>MerchantWallet: Confirm transaction
-    MerchantWallet->>Merchant: Notify payment received
-    Merchant->>Merchant: Fulfill order
+    CustomerWallet-->>PSP: Send Settle message
+    Blockchain->>PSP: Confirm transaction
+    PSP->>Merchant: Notify payment received
+    Merchant->>Customer: Fulfill order
 ```
 
-*Description:* This detailed sequence involves the **Merchant's agent (MerchantWallet)** and **Customer's agent (CustomerWallet)** exchanging messages. The merchant's wallet first sends a PaymentRequest to the customer's wallet, including a blockchain **address**, the **amount**, and a policy requiring additional information (for example, an email for receipt, and shipping address for delivery). The Customer's wallet alerts the **Customer** (user) with the details and asks for the required information. The user provides the info, which the wallet packages into a **Verifiable Presentation** (per TAIP-8) and returns to the merchant's wallet. The merchant's wallet verifies the credentials (ensuring they meet policy). Once satisfied, the merchant's wallet (or the merchant) can optionally send an **Authorize** message indicating everything is in order. The **Customer** then approves the payment, prompting the Customer's wallet to submit the blockchain transaction to the **Blockchain** network (this is depicted as a `Settle` action and the actual on-chain transfer). When the blockchain confirms the payment, the Merchant's wallet is notified (by listening to the blockchain or via an event). Finally, the **Merchant** is informed and can now consider the payment complete—at which point they deliver the product or service to the customer (this last step occurs off-chain, but is triggered by the confirmed payment).
+*Description:* This detailed sequence involves the **Merchant's agent (Payment Service Provider - PSP)** and **Customer's agent (CustomerWallet)** exchanging messages. The merchant's PSP creates a PaymentRequest that the **Merchant** presents to the customer, including the **amount** and a policy requiring additional information (for example, an email for receipt, and shipping address for delivery). The Customer's wallet alerts the **Customer** (user) with the details and asks for the required information and approval. The user approves the transfer and sharing of data, which the wallet packages into a **Verifiable Presentation** (per [TAIP-8]) and returns to the merchant's wallet. The merchant's wallet verifies the credentials (ensuring they meet policy). Once satisfied, the merchant's wallet (or the merchant) sends an **Authorize** message indicating everything is in order containing the settlement address. The **CustomerWallet** now automatically submits the blockchain transaction to the **Blockchain** network (this is depicted as a `Settle` action and the actual on-chain transfer). When the blockchain confirms the payment, the Merchant's wallet is notified (by listening to the blockchain or via an event). Finally, the **Merchant** is informed and can now consider the payment complete—at which point they deliver the product or service to the customer (this last step occurs off-chain, but is triggered by the confirmed payment).
 
-**Notes:** In this flow, if any required presentation was missing or invalid, the merchant's agent could send a **Reject** instead of Authorize, or simply not authorize the payment (the customer might then choose not to pay). The optional Authorize step can be omitted in a simple implementation; the customer could directly send the transaction once they've provided the required info (implying consent). The `Authorize` message is more relevant in multi-agent scenarios or where the merchant wants to explicitly signal readiness. Also note that partial payments are not explicitly shown – if the customer decided to send only a portion of the amount, the CustomerWallet would still do a Settle with that amount. The merchant's wallet would detect a shortfall and could either treat it as a partial (awaiting the rest) or send a Reject (if partial not acceptable), according to its policy.
+**Notes:** In this flow, if any required presentation was missing or invalid, the merchant's agent could send a **Reject** instead of Authorize, or simply not authorize the payment (the customer might then choose not to pay).
 
 #### Figure 4: Payment Request Flow with Cancellation (Failure Scenario)
 
 ```mermaid
 sequenceDiagram
-    participant MerchantWallet
+    participant Merchant
+    participant PSP
     participant CustomerWallet
-    MerchantWallet-->>CustomerWallet: **PaymentRequest** (amount, address, etc.)
-    CustomerWallet->>Customer: Display request details (await user action)
+    participant Customer
+    participant Blockchain
+
+    Merchant->>PSP: Create PaymentRequest
+    Merchant-->>Customer: Show PaymentRequest
+    Customer -->> CustomerWallet: Scan/Open PaymentRequest
+    CustomerWallet->>Customer: Display request details
+    Customer->>CustomerWallet: Authorize payment
     Customer-->>CustomerWallet: *Cancel* (user declines to pay)
-    CustomerWallet-->>MerchantWallet: **Cancel** (terminate payment request)
-    MerchantWallet->>MerchantWallet: Mark request as canceled
+    CustomerWallet-->>PSP: **Cancel** (terminate payment request)
+    PSP->>PSP: Mark request as canceled
     Note over MerchantWallet,CustomerWallet: PaymentRequest is canceled – no payment will be made
 ```
 

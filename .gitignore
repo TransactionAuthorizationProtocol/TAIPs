@@ -6,3 +6,5 @@ vendor
 saved
 .DS_Store
 .zed
+dist
+node_modules

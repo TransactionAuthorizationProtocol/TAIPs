@@ -28,6 +28,8 @@
   - [Policy](#policy)
     - [RequirePresentation](#requirepresentation)
     - [RequirePurpose](#requirepurpose)
+    - [RequireAuthorization](#requireauthorization)
+    - [RequireRelationshipConfirmation](#requirerelationshipconfirmation)
 - [Message Flow Examples](#message-flow-examples)
   - [Basic Transfer Flow](#basic-transfer-flow)
   - [Transfer with LEI and Purpose Code](#transfer-with-lei-and-purpose-code)
@@ -158,7 +160,7 @@ Initiates a payment request from a merchant to a customer.
 | expiry | string | No | Draft ([TAIP-14]) | ISO 8601 timestamp when the request expires |
 | merchant | [Party](#party) | Yes | Draft ([TAIP-14]) | Party for the merchant (beneficiary) |
 | customer | [Party](#party) | No | Draft ([TAIP-14]) | Party for the customer (originator) |
-| requirePresentation | array | No | Draft ([TAIP-14]) | Array of [RequirePresentation](#requirepresentation) policies |
+| agents | array of [Agent](#agent) | Yes | Draft ([TAIP-14]) | Array of agents involved in the payment request |
 
 #### Examples
 
@@ -178,12 +180,18 @@ Initiates a payment request from a merchant to a customer.
       "@id": "did:web:merchant.vasp",
       "name": "Example Store"
     },
-    "invoice": "https://example.com/invoice/123"
+    "invoice": "https://example.com/invoice/123",
+    "agents": [
+      {
+        "@id": "did:web:merchant.vasp",
+        "for": "did:web:merchant.vasp"
+      }
+    ]
   }
 }
 ```
 
-##### Fiat payment request with supported assets
+##### Fiat payment request with supported assets and required presentation
 ```json
 {
   "id": "123e4567-e89b-12d3-a456-426614174015",
@@ -204,13 +212,19 @@ Initiates a payment request from a merchant to a customer.
       "name": "Example Store"
     },
     "expiry": "2024-04-21T12:00:00Z",
-    "requirePresentation": [
+    "agents": [
       {
-        "@type": "RequirePresentation",
-        "@context": ["https://schema.org/Person"],
-        "fromAgent": "originator",
-        "aboutParty": "originator",
-        "presentationDefinition": "https://tap.rsvp/presentation-definitions/email/v1"
+        "@id": "did:web:merchant.vasp",
+        "for": "did:web:merchant.vasp",
+        "policies": [
+          {
+            "@type": "RequirePresentation",
+            "@context": ["https://schema.org/Person"],
+            "fromAgent": "originator",
+            "aboutParty": "originator",
+            "presentationDefinition": "https://tap.rsvp/presentation-definitions/email/v1"
+          }
+        ]
       }
     ]
   }
@@ -748,7 +762,45 @@ Represents a service involved in executing transactions.
 | fields | array | Yes | Draft ([TAIP-13]) | Array of required fields: ["purpose"] and/or ["categoryPurpose"] |
 | fromAgent | string | No | Draft ([TAIP-13]) | Agent required to provide the purpose code(s) |
 
-The `RequirePurpose` policy allows an agent to require that a purpose code and/or category purpose code be included in the transaction. The `fields` array specifies which codes are required. If both are needed, include both in the array. The `fromAgent` field (typically "originator") indicates which party's agent must provide the codes.
+#### RequireAuthorization
+[TAIP-7] - Review
+
+| Attribute | Type | Required | Status | Description |
+|-----------|------|----------|---------|-------------|
+| @type | string | Yes | Review ([TAIP-7]) | "[RequireAuthorization](#requireauthorization)" |
+| fromAgent | string | Yes | Review ([TAIP-7]) | Agent required to provide authorization |
+| reason | string | No | Review ([TAIP-7]) | Human readable reason for requiring authorization |
+
+#### RequireRelationshipConfirmation
+[TAIP-9] - Draft
+
+| Attribute | Type | Required | Status | Description |
+|-----------|------|----------|---------|-------------|
+| @type | string | Yes | Draft ([TAIP-9]) | "[RequireRelationshipConfirmation](#requirerelationshipconfirmation)" |
+| fromAgent | string | Yes | Draft ([TAIP-9]) | Agent required to confirm the relationship |
+| aboutParty | string | Yes | Draft ([TAIP-9]) | Party whose relationship needs confirmation |
+| aboutAgent | string | Yes | Draft ([TAIP-9]) | Agent whose relationship needs confirmation |
+| reason | string | No | Draft ([TAIP-9]) | Human readable reason for requiring relationship confirmation |
+
+##### Example RequireAuthorization Policy
+```json
+{
+  "@type": "RequireAuthorization",
+  "fromAgent": "beneficiary",
+  "reason": "Beneficiary approval required for transfers over 1000 USDC"
+}
+```
+
+##### Example RequireRelationshipConfirmation Policy
+```json
+{
+  "@type": "RequireRelationshipConfirmation",
+  "fromAgent": "originator",
+  "aboutParty": "originator",
+  "aboutAgent": "did:pkh:eip155:1:0x1234a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb",
+  "reason": "Please confirm control of the settlement address"
+}
+```
 
 ## Message Flow Examples
 
@@ -930,7 +982,22 @@ Note that all messages in this flow share the same thread ID (`payment-123`) to 
       "@id": "did:web:merchant.vasp",
       "name": "Example Store"
     },
-    "expiry": "2024-04-21T12:00:00Z"
+    "expiry": "2024-04-21T12:00:00Z",
+    "agents": [
+      {
+        "@id": "did:web:merchant.vasp",
+        "for": "did:web:merchant.vasp",
+        "policies": [
+          {
+            "@type": "RequirePresentation",
+            "@context": ["https://schema.org/Person"],
+            "fromAgent": "originator",
+            "aboutParty": "originator",
+            "presentationDefinition": "https://tap.rsvp/presentation-definitions/email/v1"
+          }
+        ]
+      }
+    ]
   }
 }
 ```
@@ -1006,78 +1073,14 @@ Note that all messages in this flow share the same thread ID (`payment-123`) to 
 }
 ```
 
-#### 4. Transfer with LEI and Purpose Codes
-```json
-{
-  "id": "transfer-456",
-  "type": "https://tap.rsvp/schema/1.0#Transfer",
-  "from": "did:web:originator.vasp",
-  "to": ["did:web:beneficiary.vasp"],
-  "body": {
-    "@context": [
-      "https://tap.rsvp/schema/1.0",
-      { "lei": "https://schema.org/leiCode" }
-    ],
-    "@type": "https://tap.rsvp/schema/1.0#Transfer",
-    "asset": "eip155:1/slip44:60",
-    "amount": "1000.00",
-    "purpose": "SALA",
-    "categoryPurpose": "CASH",
-    "originator": {
-      "@id": "did:web:originator.vasp:alice",
-      "lei:leiCode": "5493001KJTIIGC8Y1R12",
-      "nameHash": "b117f44426c9670da91b563db728cd0bc8bafa7d1a6bb5e764d1aad2ca25032e"
-    },
-    "beneficiary": {
-      "@id": "did:web:beneficiary.vasp:bob",
-      "lei:leiCode": "7245001KJTIIGC8Y1R34",
-      "nameHash": "5432e86b4d4a3a2b4be57b713b12c5c576c88459fe1cfdd760fd6c99a0e06686"
-    }
-  }
-}
-```
-
-#### 5. Payment Request Example
-```json
-{
-  "id": "payment-789",
-  "type": "https://tap.rsvp/schema/1.0#PaymentRequest",
-  "from": "did:web:merchant.vasp",
-  "to": ["did:web:customer.wallet"],
-  "body": {
-    "@context": "https://tap.rsvp/schema/1.0",
-    "@type": "https://tap.rsvp/schema/1.0#PaymentRequest",
-    "currency": "USD",
-    "amount": "100.00",
-    "supportedAssets": [
-      "eip155:1/erc20:0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
-      "eip155:1/erc20:0x6B175474E89094C44Da98b954EedeAC495271d0F"
-    ],
-    "expiry": "2024-03-22T15:00:00Z",
-    "invoice": "https://merchant.example/invoice/123",
-    "merchant": {
-      "@id": "did:web:merchant.vasp",
-      "name": "Example Merchant",
-      "requirePresentation": [
-        {
-          "@type": "RequirePresentation",
-          "fromAgent": "originator",
-          "credentialType": "email"
-        }
-      ]
-    }
-  }
-}
-```
-
-#### 6. Payment Request Cancel
+#### 5. Payment Request Cancel Example
 ```json
 {
   "id": "cancel-123",
   "type": "https://tap.rsvp/schema/1.0#Cancel",
   "from": "did:web:customer.wallet",
   "to": ["did:web:merchant.vasp"],
-  "thid": "payment-789",
+  "thid": "payment-123",
   "body": {
     "@context": "https://tap.rsvp/schema/1.0",
     "@type": "https://tap.rsvp/schema/1.0#Cancel",
