@@ -2,6 +2,7 @@
 // Based on TAIP specifications
 
 import { Purpose, CategoryPurpose } from "@taprsvp/iso20022_external_codes";
+import { IsoCurrency } from "./currencies";
 /**
  * Internationalized Resource Identifier (IRI)
  * A unique identifier that may contain international characters.
@@ -138,17 +139,6 @@ type DTI = string;
  * @example "iban:GB29NWBK60161331926819" // Bank account in traditional finance
  */
 type Asset = CAIP19 | DTI;
-
-/**
- * ISO 4217 Currency Code
- * Three-letter code representing a currency according to ISO 4217 standard.
- * Used for fiat currency identification in payment requests and transfers.
- *
- * @example "USD" // United States Dollar
- * @example "EUR" // Euro
- * @see {@link https://www.iso.org/iso-4217-currency-codes.html | ISO 4217}
- */
-type IsoCurrency = string;
 
 /**
  * Decimal Amount
@@ -1036,7 +1026,6 @@ export type {
   CAIP220,
   DTI,
   Asset,
-  IsoCurrency,
   Amount,
   LEICode,
   ISO20022PurposeCode,
