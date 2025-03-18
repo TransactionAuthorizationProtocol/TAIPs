@@ -301,7 +301,7 @@ interface Participant<T extends ParticipantTypes> extends JsonLdObject<T> {
    * List of policies that apply to this participant
    * Defines requirements and constraints on the participant's actions
    */
-  policies?: Policy[];
+  policies?: Policies[];
 }
 
 /**
@@ -830,7 +830,7 @@ interface UpdatePolicies extends TapMessageObject<"UpdatePolicies"> {
    * List of updated policies
    * Complete set of policies that should apply
    */
-  policies: Policy[];
+  policies: Policies[];
 }
 
 // DIDComm Message Wrappers

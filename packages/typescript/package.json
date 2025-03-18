@@ -1,0 +1,35 @@
+{
+  "name": "@taprsvp/typescript",
+  "version": "1.0.0",
+  "description": "TypeScript types and interfaces for the Transaction Authorization Protocol (TAP)",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "clean": "rimraf dist",
+    "type-check": "tsc --noEmit",
+    "prepublishOnly": "npm run build"
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "keywords": [
+    "tap",
+    "typescript",
+    "types",
+    "did",
+    "didcomm",
+    "blockchain",
+    "transaction"
+  ],
+  "author": "Pelle Braendgaard <pelleb@gmail.com",
+  "license": "MIT",
+  "devDependencies": {
+    "rimraf": "^6.0.0",
+    "typescript": "^5.8.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
