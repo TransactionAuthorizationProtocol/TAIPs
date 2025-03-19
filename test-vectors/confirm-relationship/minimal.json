@@ -1,0 +1,24 @@
+{
+  "description": "Minimal valid ConfirmRelationship message",
+  "purpose": "Validate that a ConfirmRelationship message with only required fields is accepted",
+  "shouldPass": true,
+  "version": "1.0.0",
+  "taips": ["taip-2", "taip-9"],
+  "message": {
+    "from": "did:web:beneficiary.vasp",
+    "type": "https://tap.rsvp/schema/1.0#ConfirmRelationship",
+    "id": "confirm-rel-123456",
+    "thid": "1234567890",
+    "to": ["did:web:originator.vasp"],
+    "created_time": 1516269022,
+    "body": {
+      "@context": "https://tap.rsvp/schema/1.0",
+      "@type": "https://tap.rsvp/schema/1.0#Agent",
+      "@id": "did:web:beneficiary.vasp",
+      "for": "did:eg:alice"
+    }
+  },
+  "expectedResult": {
+    "valid": true
+  }
+} 

@@ -1,0 +1,80 @@
+{
+  "description": "Invalid CAIP-19 asset identifiers",
+  "purpose": "Validate that malformed CAIP-19 asset identifiers are rejected",
+  "shouldPass": false,
+  "version": "1.0.0",
+  "taips": ["taip-2", "taip-3"],
+  "message": {
+    "identifiers": [
+      {
+        "description": "Missing namespace",
+        "asset": "eip155:1"
+      },
+      {
+        "description": "Missing chain ID",
+        "asset": "/slip44:60"
+      },
+      {
+        "description": "Invalid chain format",
+        "asset": "ethereum/slip44:60"
+      },
+      {
+        "description": "Invalid reference format",
+        "asset": "eip155:1/erc20:0x12345"
+      },
+      {
+        "description": "Ethereum address with invalid length",
+        "asset": "eip155:1/erc20:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb"
+      },
+      {
+        "description": "Invalid format for ERC-721 token ID",
+        "asset": "eip155:1/erc721:0xbc4ca0eda7647a8ab7c2061c2e118a18a936f13d/token1"
+      },
+      {
+        "description": "Random string",
+        "asset": "foo:bar:baz"
+      },
+      {
+        "description": "Not a string",
+        "asset": 12345
+      }
+    ]
+  },
+  "expectedResult": {
+    "valid": false,
+    "errors": [
+      {
+        "index": 0,
+        "error": "Missing namespace separator '/'"
+      },
+      {
+        "index": 1,
+        "error": "Missing chain ID before '/'"
+      },
+      {
+        "index": 2,
+        "error": "Invalid chain ID format; must follow CAIP-2"
+      },
+      {
+        "index": 3,
+        "error": "Invalid Ethereum address format"
+      },
+      {
+        "index": 4,
+        "error": "Ethereum address must be 40 hex characters"
+      },
+      {
+        "index": 5,
+        "error": "ERC-721 token ID must be a numeric value"
+      },
+      {
+        "index": 6,
+        "error": "Invalid CAIP-19 format"
+      },
+      {
+        "index": 7,
+        "error": "Asset identifier must be a string"
+      }
+    ]
+  }
+} 

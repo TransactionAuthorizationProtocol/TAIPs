@@ -1,0 +1,24 @@
+{
+  "description": "Valid complete Settle message with all fields",
+  "purpose": "Validate that a fully formed Settle message with all fields is accepted",
+  "shouldPass": true,
+  "version": "1.0.0",
+  "taips": ["taip-2", "taip-4"],
+  "message": {
+    "from": "did:web:originator.vasp",
+    "type": "https://tap.rsvp/schema/1.0#Settle",
+    "id": "5566778899",
+    "thid": "1234567890",
+    "to": ["did:web:beneficiary.vasp"],
+    "created_time": 1516269022,
+    "expires_time": 1516385931,
+    "body": {
+      "@context": "https://tap.rsvp/schema/1.0",
+      "@type": "https://tap.rsvp/schema/1.0#Settle",
+      "settlementId": "eip155:1:tx/0x3edb98c24d46d148eb926c714f4fbaa117c47b0c0821f38bfce9763604457c33"
+    }
+  },
+  "expectedResult": {
+    "valid": true
+  }
+} 

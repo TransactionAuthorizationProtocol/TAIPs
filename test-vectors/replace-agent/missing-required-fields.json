@@ -1,0 +1,38 @@
+{
+  "description": "ReplaceAgent message with missing required fields",
+  "purpose": "Validate that a ReplaceAgent message without required fields is rejected",
+  "shouldPass": false,
+  "version": "1.0.0",
+  "taips": ["taip-2", "taip-5"],
+  "message": {
+    "from": "did:web:beneficiary.vasp",
+    "type": "https://tap.rsvp/schema/1.0#ReplaceAgent",
+    "id": "replace-agent-123456",
+    "to": ["did:web:originator.vasp"],
+    "created_time": 1516269022,
+    "body": {
+      "@context": "https://tap.rsvp/schema/1.0",
+      "@type": "https://tap.rsvp/schema/1.0#ReplaceAgent",
+      "replacement": {
+        "@id": "did:pkh:eip155:1:0x1234a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb"
+      }
+    }
+  },
+  "expectedResult": {
+    "valid": false,
+    "errors": [
+      {
+        "field": "thid",
+        "message": "Required field 'thid' is missing"
+      },
+      {
+        "field": "body.original",
+        "message": "Required field 'original' is missing"
+      },
+      {
+        "field": "body.replacement.for",
+        "message": "Required field 'for' is missing"
+      }
+    ]
+  }
+} 

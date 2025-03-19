@@ -1,0 +1,31 @@
+{
+  "description": "Reject message with missing required fields",
+  "purpose": "Validate that a Reject message without required fields is rejected",
+  "shouldPass": false,
+  "version": "1.0.0",
+  "taips": ["taip-2", "taip-4"],
+  "message": {
+    "from": "did:web:beneficiary.vasp",
+    "type": "https://tap.rsvp/schema/1.0#Reject",
+    "id": "1122334455",
+    "to": ["did:web:originator.vasp"],
+    "created_time": 1516269022,
+    "body": {
+      "@type": "https://tap.rsvp/schema/1.0#Reject",
+      "reason": "Beneficiary name mismatch"
+    }
+  },
+  "expectedResult": {
+    "valid": false,
+    "errors": [
+      {
+        "field": "thid",
+        "message": "Required field 'thid' is missing"
+      },
+      {
+        "field": "body.@context",
+        "message": "Required field '@context' is missing"
+      }
+    ]
+  }
+} 

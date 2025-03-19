@@ -1,0 +1,57 @@
+{
+  "description": "Transfer message with multiple agents",
+  "purpose": "Validate that a Transfer message with multiple agents is correctly processed",
+  "shouldPass": true,
+  "version": "1.0.0",
+  "taips": ["taip-2", "taip-3", "taip-5"],
+  "message": {
+    "from": "did:web:originator.vasp",
+    "type": "https://tap.rsvp/schema/1.0#Transfer",
+    "id": "multi-agent-transfer-123",
+    "to": [
+      "did:web:beneficiary.vasp", 
+      "did:pkh:eip155:1:0x1234a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb",
+      "did:web:wallet.service"
+    ],
+    "created_time": 1516269022,
+    "body": {
+      "@context": "https://tap.rsvp/schema/1.0",
+      "@type": "https://tap.rsvp/schema/1.0#Transfer",
+      "asset": "eip155:1/slip44:60",
+      "originator": {
+        "@id": "did:eg:bob"
+      },
+      "beneficiary": {
+        "@id": "did:eg:alice"
+      },
+      "amount": "1.23",
+      "agents": [
+        {
+          "@id": "did:web:originator.vasp",
+          "for": "did:eg:bob"
+        },
+        {
+          "@id": "did:web:beneficiary.vasp",
+          "for": "did:eg:alice"
+        },
+        {
+          "@id": "did:web:wallet.service",
+          "for": "did:web:beneficiary.vasp"
+        },
+        {
+          "@id": "did:pkh:eip155:1:0x1234a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb",
+          "role": "settlementAddress",
+          "for": "did:web:wallet.service"
+        }
+      ]
+    }
+  },
+  "expectedResult": {
+    "valid": true,
+    "didcommRecipients": [
+      "did:web:beneficiary.vasp", 
+      "did:pkh:eip155:1:0x1234a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb",
+      "did:web:wallet.service"
+    ]
+  }
+} 

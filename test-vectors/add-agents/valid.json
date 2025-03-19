@@ -1,0 +1,46 @@
+{
+  "description": "Valid complete AddAgents message with all fields",
+  "purpose": "Validate that a fully formed AddAgents message with all fields is accepted",
+  "shouldPass": true,
+  "version": "1.0.0",
+  "taips": ["taip-2", "taip-5"],
+  "message": {
+    "from": "did:web:beneficiary.vasp",
+    "type": "https://tap.rsvp/schema/1.0#AddAgents",
+    "id": "add-agents-123456",
+    "thid": "1234567890",
+    "to": ["did:web:originator.vasp", "did:web:wallet.service"],
+    "created_time": 1516269022,
+    "expires_time": 1516385931,
+    "body": {
+      "@context": "https://tap.rsvp/schema/1.0",
+      "@type": "https://tap.rsvp/schema/1.0#AddAgents",
+      "agents": [
+        {
+          "@id": "did:web:beneficiary.vasp",
+          "for": "did:eg:alice",
+          "policies": [
+            {
+              "@type": "RequireAuthorization",
+              "fromAgent": "originator",
+              "purpose": "FATF Travel Rule Compliance"
+            }
+          ]
+        },
+        {
+          "@id": "did:web:wallet.service",
+          "for": "did:web:beneficiary.vasp",
+          "role": "custodian"
+        },
+        {
+          "@id": "did:pkh:eip155:1:0x1234a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb",
+          "for": "did:web:wallet.service",
+          "role": "settlementAddress"
+        }
+      ]
+    }
+  },
+  "expectedResult": {
+    "valid": true
+  }
+} 

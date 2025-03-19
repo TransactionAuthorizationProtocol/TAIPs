@@ -1,0 +1,45 @@
+{
+  "description": "Minimal valid Presentation message",
+  "purpose": "Validate that a Presentation message with only required fields is accepted",
+  "shouldPass": true,
+  "version": "1.0.0",
+  "taips": ["taip-2", "taip-8"],
+  "message": {
+    "from": "did:web:originator.vasp",
+    "type": "https://didcomm.org/present-proof/3.0/presentation",
+    "id": "f1ca8245-ab2d-4d9c-8d7d-94bf310314ef",
+    "thid": "95e63a5f-73e1-46ac-b269-48bb22591bfa",
+    "to": ["did:web:beneficiary.vasp"],
+    "created_time": 1516269022,
+    "body": {},
+    "attachments": [
+      {
+        "id": "2a3f1c4c-623c-44e6-b159-179048c51260",
+        "media_type": "application/json",
+        "format": "dif/presentation-exchange/submission@v1.0",
+        "data": {
+          "json": {
+            "@context": [
+              "https://www.w3.org/2018/credentials/v1"
+            ],
+            "type": ["VerifiablePresentation"],
+            "verifiableCredential": [
+              {
+                "@context": ["https://www.w3.org/2018/credentials/v1"],
+                "type": ["VerifiableCredential"],
+                "issuer": "did:web:originator.vasp",
+                "issuanceDate": "2022-01-01T19:23:24Z",
+                "credentialSubject": {
+                  "id": "did:eg:bob"
+                }
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "expectedResult": {
+    "valid": true
+  }
+} 

@@ -1,0 +1,41 @@
+{
+  "description": "Authorize message with misformatted fields",
+  "purpose": "Validate that an Authorize message with incorrectly formatted fields is rejected",
+  "shouldPass": false,
+  "version": "1.0.0",
+  "taips": ["taip-2", "taip-4"],
+  "message": {
+    "from": "did:web:beneficiary.vasp",
+    "type": "https://tap.rsvp/schema/1.0#Authorize",
+    "id": "0987654321",
+    "thid": 1234567890,
+    "to": "did:web:originator.vasp",
+    "created_time": "January 18, 2022",
+    "body": {
+      "@context": "https://tap.rsvp/schema/1.0",
+      "@type": "https://tap.rsvp/schema/1.0#Authorize",
+      "settlementAddress": "0x1234a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb"
+    }
+  },
+  "expectedResult": {
+    "valid": false,
+    "errors": [
+      {
+        "field": "thid",
+        "message": "Invalid format for 'thid', string expected"
+      },
+      {
+        "field": "to",
+        "message": "Invalid format for 'to', array expected"
+      },
+      {
+        "field": "created_time",
+        "message": "Invalid format for 'created_time', ISO 8601 timestamp expected"
+      },
+      {
+        "field": "body.settlementAddress",
+        "message": "Invalid format for 'settlementAddress', CAIP-10 identifier expected"
+      }
+    ]
+  }
+} 

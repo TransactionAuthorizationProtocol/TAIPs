@@ -1,0 +1,42 @@
+{
+  "description": "Valid CAIP-19 asset identifiers",
+  "purpose": "Validate that properly formatted CAIP-19 asset identifiers are accepted",
+  "shouldPass": true,
+  "version": "1.0.0",
+  "taips": ["taip-2", "taip-3"],
+  "message": {
+    "identifiers": [
+      {
+        "description": "Ethereum mainnet ETH",
+        "asset": "eip155:1/slip44:60"
+      },
+      {
+        "description": "Ethereum mainnet ERC-20 token",
+        "asset": "eip155:1/erc20:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
+      },
+      {
+        "description": "Ethereum mainnet ERC-721 NFT contract",
+        "asset": "eip155:1/erc721:0xbc4ca0eda7647a8ab7c2061c2e118a18a936f13d"
+      },
+      {
+        "description": "Ethereum mainnet ERC-721 NFT token",
+        "asset": "eip155:1/erc721:0xbc4ca0eda7647a8ab7c2061c2e118a18a936f13d/1234"
+      },
+      {
+        "description": "Bitcoin mainnet BTC",
+        "asset": "bip122:000000000019d6689c085ae165831e93/slip44:0"
+      },
+      {
+        "description": "Solana mainnet SOL",
+        "asset": "solana:4sGjMW1sUnHzSxGspuhpqLDx6wiyjNtZ/slip44:501"
+      },
+      {
+        "description": "Cosmos Hub ATOM",
+        "asset": "cosmos:cosmoshub-4/slip44:118"
+      }
+    ]
+  },
+  "expectedResult": {
+    "valid": true
+  }
+} 
