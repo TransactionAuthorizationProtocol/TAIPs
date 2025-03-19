@@ -51,8 +51,7 @@ A message sent by an agent requesting connection to another agent:
       "name": "B2B Payment Service",
       "type": "ServiceAgent",
       "endpoints": {
-        "messaging": "https://api.b2bservice.com/agent",
-        "callback": "https://api.b2bservice.com/oauth/callback"
+        "messaging": "https://api.b2bservice.com/agent"
       }
     },
     "for": "did:example:business-customer",
@@ -64,49 +63,16 @@ A message sent by an agent requesting connection to another agent:
         "daily": "50000.00",
         "currency": "USD"
       }
-    },
-    "proof": {
-      "@type": "ConfirmRelationship",
-      "@id": "did:example:b2b-service",
-      "for": "did:example:business-customer",
-      "signature": "..."
     }
   }
 }
 ```
 
-### Authorization Response
-
-If user authorization is required, the receiving agent responds with an authorization URL:
-
-```json
-{
-  "id": "98765432-e89b-12d3-a456-426614174000",
-  "type": "https://tap.rsvp/schema/1.0#AuthorizationRequired",
-  "from": "did:example:vasp",
-  "to": ["did:example:b2b-service"],
-  "thid": "123e4567-e89b-12d3-a456-426614174000",
-  "created_time": 1516269023,
-  "expires_time": 1516385931,
-  "body": {
-    "@context": "https://tap.rsvp/schema/1.0",
-    "@type": "https://tap.rsvp/schema/1.0#AuthorizationRequired",
-    "authorization_url": "https://vasp.com/authorize?request=abc123",
-    "expires": "2024-03-22T15:00:00Z"
-  }
-}
-```
-
-The authorization URL can be opened in a browser or embedded view, where the user can review and approve the connection request, including:
-- The requesting agent's identity
-- Requested transaction purposes and limits
-- Any relationship proofs provided
-
 ### Response Messages
 
-After authorization (or immediately if not required), the receiving agent responds using [TAIP-4] messages:
+The receiving agent (VASP) will handle authorization with their customer out-of-band (e.g., through their existing authentication system). After the customer reviews and decides on the connection request, the VASP responds using [TAIP-4] messages:
 
-- **Authorize:** Connection is approved with a bearer token
+- **Authorize:** Connection is approved
 ```json
 {
   "id": "abcdef12-e89b-12d3-a456-426614174000",
@@ -119,9 +85,7 @@ After authorization (or immediately if not required), the receiving agent respon
     "@context": "https://tap.rsvp/schema/1.0",
     "@type": "https://tap.rsvp/schema/1.0#Authorize",
     "connection": {
-      "id": "conn-abc123",
-      "bearer_token": "eyJhbGci...",
-      "expires": "2025-03-21T00:00:00Z"
+      "id": "conn-abc123"
     }
   }
 }
@@ -166,47 +130,44 @@ After authorization (or immediately if not required), the receiving agent respon
 
 1. Agent A sends Connect message to Agent B with:
    - Their identity and endpoints
-   - The party they represent (with proof)
+   - The party they represent
    - Desired transaction constraints
    
-2. Agent B either:
-   - Returns AuthorizationRequired with a URL for user consent
-   - Directly responds with Authorize/Reject based on policy
+2. Agent B handles authorization with their customer:
+   - Notifies customer through their existing channels (email, app notification, etc.)
+   - Customer logs into Agent B's service to review the request
+   - Customer approves or denies the connection
 
-3. If authorization URL provided:
-   - User reviews and approves/denies the connection
-   - Agent B sends Authorize/Reject accordingly
+3. Agent B sends response:
+   - Authorize message if approved
+   - Reject message if denied
 
-4. If authorized:
-   - Connection is established with bearer token
-   - Future transactions must respect constraints
+4. Once authorized:
+   - Connection is established with a unique identifier
+   - Future transactions must respect the agreed constraints
    - Either party can Cancel the connection
 
 ### Connection Security
 
 - All messages MUST be encrypted using [TAIP-2] message encryption
 - Agents MUST verify DIDs and signatures before accepting connections
-- Bearer tokens should be secure and rotated periodically
-- Relationship proofs must follow [TAIP-9] specifications
-- Authorization URLs must use HTTPS and include CSRF protection
+- Authorization MUST be performed through secure, authenticated channels
+- Connection identifiers should be unique and unpredictable
 
 ## Rationale
 
 The design choices in this specification aim to balance security, usability, and flexibility:
 
-- **Single Connect Message:** Simplified from previous multi-message flow for clarity
-- **OAuth-style Flow:** Familiar pattern for user authorization
-- **Purpose Codes:** Leveraging [TAIP-13] for standardized transaction types
-- **Transaction Limits:** Clear constraints for risk management
-- **Relationship Proofs:** Using [TAIP-9] for verified connections
-- **Bearer Tokens:** Simple but secure ongoing authentication
+- **Out-of-band Authorization:** Leverages existing secure authentication systems
+- **Purpose Codes:** Uses [TAIP-13] for standardized transaction types
+- **Transaction Limits:** Provides clear constraints for risk management
+- **Connection Identifiers:** Enable tracking and management of approved connections
 - **State Management:** Receiving agents track connection status
 
 ## Security Considerations
 
-- **Authorization Flow:** Must prevent CSRF and phishing attacks
-- **Bearer Tokens:** Should be secure, short-lived, and rotatable
-- **Relationship Proofs:** Must be cryptographically verified
+- **Authorization Flow:** Must use secure authentication channels
+- **Connection Identifiers:** Must be unique and unpredictable
 - **Transaction Limits:** Must be enforced server-side
 - **Connection State:** Must be securely maintained
 
