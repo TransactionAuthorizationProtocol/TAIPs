@@ -1,0 +1,55 @@
+{
+  "description": "Invalid UpdatePolicies message with missing or invalid policy details",
+  "purpose": "Validate that an UpdatePolicies message with improperly formatted policies is rejected",
+  "shouldPass": false,
+  "version": "1.0.0",
+  "taips": ["taip-2", "taip-7"],
+  "message": {
+    "from": "did:web:originator.vasp",
+    "type": "https://tap.rsvp/schema/1.0#UpdatePolicies",
+    "id": "invalid-policy-update-123",
+    "thid": "1234567890",
+    "to": ["did:web:beneficiary.vasp"],
+    "created_time": 1516269022,
+    "body": {
+      "@context": "https://tap.rsvp/schema/1.0",
+      "@type": "https://tap.rsvp/schema/1.0#UpdatePolicies",
+      "policies": [
+        {
+          "type": "RequireAuthorization"
+        },
+        {
+          "@type": "RequirePresentation",
+          "aboutParty": "beneficiary",
+          "purpose": "FATF Travel Rule Compliance"
+        },
+        {
+          "@type": "RequireRelationshipConfirmation",
+          "fromRole": "SettlementAddress",
+          "purpose": "Ensure funds are sent to the correct address"
+        }
+      ]
+    }
+  },
+  "expectedResult": {
+    "valid": false,
+    "errors": [
+      {
+        "field": "body.policies[0]",
+        "message": "Invalid format for policy; missing required '@type' field"
+      },
+      {
+        "field": "body.policies[1]",
+        "message": "Policy of type 'RequirePresentation' is missing required field 'fromAgent'"
+      },
+      {
+        "field": "body.policies[1]",
+        "message": "Policy of type 'RequirePresentation' is missing required field 'presentationDefinition'"
+      },
+      {
+        "field": "body.policies[2]",
+        "message": "Policy of type 'RequireRelationshipConfirmation' is missing required field 'nonce'"
+      }
+    ]
+  }
+} 

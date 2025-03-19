@@ -1,0 +1,22 @@
+{
+  "description": "Minimal valid Authorize message",
+  "purpose": "Validate that an Authorize message with only required fields is accepted",
+  "shouldPass": true,
+  "version": "1.0.0",
+  "taips": ["taip-2", "taip-4"],
+  "message": {
+    "from": "did:web:beneficiary.vasp",
+    "type": "https://tap.rsvp/schema/1.0#Authorize",
+    "id": "0987654321",
+    "thid": "1234567890",
+    "to": ["did:web:originator.vasp"],
+    "created_time": 1516269022,
+    "body": {
+      "@context": "https://tap.rsvp/schema/1.0",
+      "@type": "https://tap.rsvp/schema/1.0#Authorize"
+    }
+  },
+  "expectedResult": {
+    "valid": true
+  }
+} 

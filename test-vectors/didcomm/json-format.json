@@ -1,0 +1,120 @@
+{
+  "description": "TAP message wrapped in DIDComm using JSON serialization format",
+  "purpose": "Demonstrate how to use JSON serialization format instead of compact format for JWS and JWE",
+  "version": "1.0.0",
+  "taips": ["taip-2", "taip-3"],
+  "keys": {
+    "originator": {
+      "ed25519": {
+        "id": "did:key:z6MkhaXgBZDvotDkL5257faiztiGiC2QtKLGpbnnEGta2doK#z6MkhaXgBZDvotDkL5257faiztiGiC2QtKLGpbnnEGta2doK",
+        "secret_material": {
+          "private_key_jwk": {
+            "kty": "OKP",
+            "crv": "Ed25519",
+            "d": "ABJKMbJDCnxnTpUUlQCdxGdHLOzIpRrlM6eP3MIzCTQ",
+            "x": "ptvcQHXD0FU4bY5DNz5KgqYYMVXruFBVJLafaZ-gPEQ"
+          }
+        }
+      },
+      "x25519": {
+        "id": "did:key:z6MkhaXgBZDvotDkL5257faiztiGiC2QtKLGpbnnEGta2doK#z6LSotGGBiifoTJh1imy1NUdRBqV2ZHbFijFaHiok79GHZu5",
+        "secret_material": {
+          "private_key_jwk": {
+            "kty": "OKP",
+            "crv": "X25519",
+            "d": "ABJKMbJDCnxnTpUUlQCdxGdHLOzIpRrlM6eP3MIzCTQ",
+            "x": "dOx6tmHUbBq_kf7WXWQNnm5wvhyfTKY_8uKdN98qcX0"
+          }
+        }
+      }
+    },
+    "beneficiary": {
+      "ed25519": {
+        "id": "did:key:z6MkmxgacQRvJBzBremEzYdpZeGJpE9FHfvq6NvBFrgaQXTb#z6MkmxgacQRvJBzBremEzYdpZeGJpE9FHfvq6NvBFrgaQXTb",
+        "secret_material": {
+          "private_key_jwk": {
+            "kty": "OKP",
+            "crv": "Ed25519",
+            "d": "VF5fxXYLAQr_nAxBEv_4WQENp-Y5SP9nMH2ymITaWqU",
+            "x": "UVNrhJtR-JpzN6ZgHRQHlaKILF3IM3QDZ7m6VS4F06w"
+          }
+        }
+      },
+      "x25519": {
+        "id": "did:key:z6MkmxgacQRvJBzBremEzYdpZeGJpE9FHfvq6NvBFrgaQXTb#z6LSj72tK8brWgZdj8m87fNZ4pvMrfQGvisUCNvGk5pPvQwt",
+        "secret_material": {
+          "private_key_jwk": {
+            "kty": "OKP",
+            "crv": "X25519",
+            "d": "VF5fxXYLAQr_nAxBEv_4WQENp-Y5SP9nMH2ymITaWqU",
+            "x": "msTWPGPJEEpJQFGPvEoi8j3IA59zZKM6jKDKQkgPLCU"
+          }
+        }
+      }
+    }
+  },
+  "tap_message": {
+    "from": "did:key:z6MkhaXgBZDvotDkL5257faiztiGiC2QtKLGpbnnEGta2doK",
+    "type": "https://didcomm.org/tap/1.0/transfer",
+    "id": "7eb4ea33-d7a0-49fa-85fc-5cb21cf31dc4",
+    "thid": "7eb4ea33-d7a0-49fa-85fc-5cb21cf31dc4",
+    "to": ["did:key:z6MkmxgacQRvJBzBremEzYdpZeGJpE9FHfvq6NvBFrgaQXTb"],
+    "created_time": 1516269022,
+    "expires_time": 1516385931,
+    "body": {
+      "@context": "https://www.w3.org/2022/credentials/v2",
+      "@type": "https://didcomm.org/tap/1.0/transfer",
+      "asset": "eip155:1/slip44:60",
+      "originator": {
+        "id": "did:example:bob"
+      },
+      "beneficiary": {
+        "id": "did:example:alice"
+      },
+      "amount": "1.23",
+      "agents": [
+        {
+          "id": "did:key:z6MkhaXgBZDvotDkL5257faiztiGiC2QtKLGpbnnEGta2doK",
+          "for": "did:example:bob",
+          "role": "originator"
+        },
+        {
+          "id": "did:key:z6MkmxgacQRvJBzBremEzYdpZeGJpE9FHfvq6NvBFrgaQXTb",
+          "for": "did:example:alice",
+          "role": "beneficiary"
+        }
+      ]
+    }
+  },
+  "didcomm": {
+    "signed": {
+      "payload": "eyJmcm9tIjoiZGlkOmtleTp6Nk1raGFYZ0JaRHZvdERrTDUyNTdmYWl6dGlHaUMyUXRLTEdwYm5uRUd0YTJkb0siLCJ0eXBlIjoiaHR0cHM6Ly9kaWRjb21tLm9yZy90YXAvMS4wL3RyYW5zZmVyIiwiaWQiOiI3ZWI0ZWEzMy1kN2EwLTQ5ZmEtODVmYy01Y2IyMWNmMzFkYzQiLCJ0aGlkIjoiN2ViNGVhMzMtZDdhMC00OWZhLTg1ZmMtNWNiMjFjZjMxZGM0IiwidG8iOlsiZGlkOmtleTp6Nk1rbXhnYWNRUnZKQnpCcmVtRXpZZHBaZUdKcEU5RkhmdnE2TnZCRnJnYVFYVGIiXSwiY3JlYXRlZF90aW1lIjoxNTE2MjY5MDIyLCJleHBpcmVzX3RpbWUiOjE1MTYzODU5MzEsImJvZHkiOnsiQGNvbnRleHQiOiJodHRwczovL3d3dy53My5vcmcvMjAyMi9jcmVkZW50aWFscy92MiIsIkB0eXBlIjoiaHR0cHM6Ly9kaWRjb21tLm9yZy90YXAvMS4wL3RyYW5zZmVyIiwiYXNzZXQiOiJlaXAxNTU6MS9zbGlwNDQ6NjAiLCJvcmlnaW5hdG9yIjp7ImlkIjoiZGlkOmV4YW1wbGU6Ym9iIn0sImJlbmVmaWNpYXJ5Ijp7ImlkIjoiZGlkOmV4YW1wbGU6YWxpY2UifSwiYW1vdW50IjoiMS4yMyIsImFnZW50cyI6W3siaWQiOiJkaWQ6a2V5Ono2TWtoYVhnQlpEdm90RGtMNTI1N2ZhaXp0aUdpQzJRdEtMR3Bibm5FR3RhMmRvSyIsImZvciI6ImRpZDpleGFtcGxlOmJvYiIsInJvbGUiOiJvcmlnaW5hdG9yIn0seyJpZCI6ImRpZDprZXk6ejZNa214Z2FjUVJ2SkJ6QnJlbUV6WWRwWmVHSnBFOUZIZnZxNk52QkZyZ2FRWFRiIiwiZm9yIjoiZGlkOmV4YW1wbGU6YWxpY2UiLCJyb2xlIjoiYmVuZWZpY2lhcnkifV19fQ",
+      "signatures": [
+        {
+          "protected": "eyJhbGciOiJFZERTQSIsImtpZCI6ImRpZDprZXk6ejZNa2hhWGdCWkR2b3REa0w1MjU3ZmFpenRpR2lDMlF0S0xHcGJubkVHdGEyZG9LI3o2TWtoYVhnQlpEdm90RGtMNTI1N2ZhaXp0aUdpQzJRdEtMR3Bibm5FR3RhMmRvSyIsInR5cCI6ImFwcGxpY2F0aW9uL2RpZGNvbW0tc2lnbmVkK2pzb24ifQ",
+          "signature": "VovWn7P-3XD0tRBhEKF6QXKLOg1mmjlHVxTFPxB-jcXgZmjIAHuQbG_5aX-pFMYP1jgTqsNZ8tSXtFIYnvLzAg",
+          "header": {
+            "kid": "did:key:z6MkhaXgBZDvotDkL5257faiztiGiC2QtKLGpbnnEGta2doK#z6MkhaXgBZDvotDkL5257faiztiGiC2QtKLGpbnnEGta2doK"
+          }
+        }
+      ]
+    },
+    "encrypted": {
+      "protected": "eyJlbmMiOiJYQzIwUCIsImFwdSI6IlpHbGtPbXRsZVRwNk5rMXJhR0ZZWjBKYVJIWnZkRVJyVERVeU5UZG1ZV2w2ZEdsSGFVTXlVWFJMVEVkd1ltNXVSVWQwWVRKa2IwcyIsImFwdiI6IlpHbGtPbXRsZVRwNk5rMXJiWGhuWVdOUlVuWktRbnBDY21WdFJYcFpaSEJhWlVkcVVrVTVSa2htZG5FMlRuWkNSbkpuWVZGWVZHSSIsInR5cCI6ImFwcGxpY2F0aW9uL2RpZGNvbW0tZW5jcnlwdGVkK2pzb24iLCJhbGciOiJFQ0RILUVTLVgyNTUxOS1ERU0iLCJza2lkIjoiZGlkOmtleTp6Nk1raGFYZ0JaRHZvdERrTDUyNTdmYWl6dGlHaUMyUXRLTEdwYm5uRUd0YTJkb0sjejZMU290R0dCaWlmb1RKaDFpbXkxTlVkUkJxVjJaSGJGaWpGYUhpb2s3OUdIWnU1In0",
+      "recipients": [
+        {
+          "header": {
+            "kid": "did:key:z6MkmxgacQRvJBzBremEzYdpZeGJpE9FHfvq6NvBFrgaQXTb#z6LSj72tK8brWgZdj8m87fNZ4pvMrfQGvisUCNvGk5pPvQwt"
+          },
+          "encrypted_key": "sHpKZyBHa72XFfloEAaetokzFZNY0ZqRN3E8N6jvN0HSEAhUUyYJcjiEBw"
+        }
+      ],
+      "iv": "oBx0VjrT9HjWvWNY96O7xVJP3LSaRzMe",
+      "ciphertext": "mqVf9zV2dKQK3fpI8YFnLiyoIQGCN8qE7aNasobM4g0q3D1m9QXkBXFRgG0SBnz04zcGkWZYh_2CCW9-EkocQmb-bAtrpJ22iXIgNTvwNBzt3T43GeLffLx2JWGblZoe51_WaJ4tK0BjWp2FY_3kV9ejxTp3b-gLUXjdl_LMR1nsec0irKuIkXNbLkCAIHnhjJ6SBhozpPXWfySh-pBcv4S5nelKxqOjW8LKjl33HkidRz7cLT3f2ECjUGZz4RbJ4nRQT3ssqndU6FcFsT_5I-zYcbBWm2QBvCE2bYKVbOZaI73mE_CuEDRxRHxG7Ye4UJCTONhGkLk0rYF2eMo0A_5wGx2TcR5OD0w0qA48XNXGnOJeGzWKxHXJXK_-OU4Wj2UOBDqIJ-KqoRjxzq0yMkuBx8EG3KCzZu5FXmJWyEHZlNOESz0tEj7FOz2KvOjzxHI_TPZ_c_gVyZpV1GoW6_ytPIvdKwxVJ7zZGcb0oHBTyV9U1STdRxXQCknWGFDlbO8LiC2x40bRtIfctK_LHJnLaafgSLbCcbNUwOKIzGXHjZ58vJQyGYag7_Qf3jdSfHKXTxkqxBRihX96ubzQmI20JHe8MEwZNOqOwwxCbR2o8QYbIY6CqtOiS7kpnC1hQo3-QrTl8acg-ZKlz7u9Xw3M48RgppKKUk9I5mHnQcF-YHzXVc9nf6ZpL3k0OvB-CGCdQpzBVMXYyfrZk7GZ2sdxHqxd6zLUXZ_eoRWw6SqeZA4Vk2P63l_0MQ",
+      "tag": "t5BBgODQMefoD94_sQLQbw"
+    },
+    "expectedResult": {
+      "isValid": true
+    }
+  }
+} 

@@ -1,0 +1,46 @@
+{
+  "description": "Valid complete Transfer message with all fields",
+  "purpose": "Validate that a fully formed Transfer message with all fields is accepted",
+  "shouldPass": true,
+  "version": "1.0.0",
+  "taips": ["taip-2", "taip-3"],
+  "message": {
+    "from": "did:web:originator.vasp",
+    "type": "https://tap.rsvp/schema/1.0#Transfer",
+    "id": "1234567890",
+    "to": ["did:web:beneficiary.vasp", "did:pkh:eip155:1:0x1234a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb"],
+    "created_time": 1516269022,
+    "expires_time": 1516385931,
+    "body": {
+      "@context": "https://tap.rsvp/schema/1.0",
+      "@type": "https://tap.rsvp/schema/1.0#Transfer",
+      "asset": "eip155:1/slip44:60",
+      "originator": {
+        "@id": "did:eg:bob"
+      },
+      "beneficiary": {
+        "@id": "did:eg:alice"
+      },
+      "amount": "1.23",
+      "settlementId": "eip155:1:tx/0x3edb98c24d46d148eb926c714f4fbaa117c47b0c0821f38bfce9763604457c33",
+      "agents": [
+        {
+          "@id": "did:web:originator.vasp",
+          "for": "did:eg:bob"
+        },
+        {
+          "@id": "did:web:beneficiary.vasp",
+          "for": "did:eg:alice"
+        },
+        {
+          "@id": "did:pkh:eip155:1:0x1234a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb",
+          "role": "settlementAddress",
+          "for": "did:web:beneficiary.vasp"
+        }
+      ]
+    }
+  },
+  "expectedResult": {
+    "valid": true
+  }
+} 

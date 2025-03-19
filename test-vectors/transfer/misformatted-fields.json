@@ -1,0 +1,46 @@
+{
+  "description": "Transfer message with misformatted fields",
+  "purpose": "Validate that a Transfer message with incorrectly formatted fields is rejected",
+  "shouldPass": false,
+  "version": "1.0.0",
+  "taips": ["taip-2", "taip-3"],
+  "message": {
+    "from": "did:web:originator.vasp",
+    "type": "https://tap.rsvp/schema/1.0#Transfer",
+    "id": "1234567890",
+    "to": ["did:web:beneficiary.vasp"],
+    "created_time": "2022-01-18",
+    "body": {
+      "@context": "https://tap.rsvp/schema/1.0",
+      "@type": "https://tap.rsvp/schema/1.0#Transfer",
+      "asset": "ethereum/eth",
+      "amount": 1.23,
+      "agents": [
+        {
+          "@id": "originator.vasp"
+        }
+      ]
+    }
+  },
+  "expectedResult": {
+    "valid": false,
+    "errors": [
+      {
+        "field": "created_time",
+        "message": "Invalid format for 'created_time', ISO 8601 timestamp expected"
+      },
+      {
+        "field": "body.asset",
+        "message": "Invalid format for 'asset', CAIP-19 identifier expected"
+      },
+      {
+        "field": "body.amount",
+        "message": "Invalid format for 'amount', string expected"
+      },
+      {
+        "field": "body.agents[0].@id",
+        "message": "Invalid format for agent '@id', DID expected"
+      }
+    ]
+  }
+} 

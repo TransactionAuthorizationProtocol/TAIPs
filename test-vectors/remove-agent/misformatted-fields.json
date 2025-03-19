@@ -1,0 +1,61 @@
+{
+  "description": "RemoveAgent message with misformatted fields",
+  "purpose": "Validate that a RemoveAgent message with incorrectly formatted fields is rejected",
+  "shouldPass": false,
+  "version": "1.0.0",
+  "taips": ["taip-2", "taip-5"],
+  "message": {
+    "from": "beneficiary.vasp",
+    "type": "RemoveAgent",
+    "id": 123456,
+    "thid": 1234567890,
+    "to": "did:web:originator.vasp",
+    "created_time": "2022-01-18",
+    "body": {
+      "@context": "tap.rsvp/schema/1.0",
+      "@type": "RemoveAgent",
+      "agent": "0xabcda96D359eC26a11e2C2b3d8f8B8942d5Bfcdb"
+    }
+  },
+  "expectedResult": {
+    "valid": false,
+    "errors": [
+      {
+        "field": "from",
+        "message": "Invalid format for 'from', DID expected"
+      },
+      {
+        "field": "type",
+        "message": "Invalid format for 'type', full URI expected"
+      },
+      {
+        "field": "id",
+        "message": "Invalid format for 'id', string expected"
+      },
+      {
+        "field": "thid",
+        "message": "Invalid format for 'thid', string expected"
+      },
+      {
+        "field": "to",
+        "message": "Invalid format for 'to', array expected"
+      },
+      {
+        "field": "created_time",
+        "message": "Invalid format for 'created_time', Unix timestamp expected"
+      },
+      {
+        "field": "body.@context",
+        "message": "Invalid format for '@context', URI expected with https:// protocol"
+      },
+      {
+        "field": "body.@type",
+        "message": "Invalid format for '@type', full URI expected"
+      },
+      {
+        "field": "body.agent",
+        "message": "Invalid format for 'agent', DID expected"
+      }
+    ]
+  }
+} 

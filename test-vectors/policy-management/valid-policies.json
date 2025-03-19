@@ -1,0 +1,43 @@
+{
+  "description": "Valid UpdatePolicies message with fully specified policies",
+  "purpose": "Validate that an UpdatePolicies message with properly formatted policies is accepted",
+  "shouldPass": true,
+  "version": "1.0.0",
+  "taips": ["taip-2", "taip-7"],
+  "message": {
+    "from": "did:web:originator.vasp",
+    "type": "https://tap.rsvp/schema/1.0#UpdatePolicies",
+    "id": "policy-update-123",
+    "thid": "1234567890",
+    "to": ["did:web:beneficiary.vasp"],
+    "created_time": 1516269022,
+    "body": {
+      "@context": "https://tap.rsvp/schema/1.0",
+      "@type": "https://tap.rsvp/schema/1.0#UpdatePolicies",
+      "policies": [
+        {
+          "@type": "RequireAuthorization",
+          "fromAgent": "beneficiary",
+          "purpose": "FATF Travel Rule Compliance"
+        },
+        {
+          "@type": "RequirePresentation",
+          "@context": ["https://schema.org/Person", "https://www.gleif.org/ontology/Base/Entity"],
+          "fromAgent": "beneficiary",
+          "aboutParty": "beneficiary",
+          "purpose": "FATF Travel Rule Compliance",
+          "presentationDefinition": "https://tap.rsvp/presentation-definitions/ivms-101/eu/tfr"
+        },
+        {
+          "@type": "RequireRelationshipConfirmation",
+          "fromRole": "SettlementAddress",
+          "purpose": "Ensure funds are sent to the correct address",
+          "nonce": 32891756
+        }
+      ]
+    }
+  },
+  "expectedResult": {
+    "valid": true
+  }
+} 

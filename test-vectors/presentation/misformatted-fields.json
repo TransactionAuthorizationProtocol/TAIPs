@@ -1,0 +1,97 @@
+{
+  "description": "Presentation message with misformatted fields",
+  "purpose": "Validate that a Presentation message with incorrectly formatted fields is rejected",
+  "shouldPass": false,
+  "version": "1.0.0",
+  "taips": ["taip-2", "taip-8"],
+  "message": {
+    "from": "originator.vasp",
+    "type": "present-proof",
+    "id": 12345,
+    "thid": "95e63a5f",
+    "to": "did:web:beneficiary.vasp",
+    "created_time": "January 18, 2022",
+    "body": "",
+    "attachments": [
+      {
+        "id": "2a3f1c4c",
+        "media_type": "text/json",
+        "format": "presentation-exchange",
+        "data": {
+          "json": {
+            "@context": "https://www.w3.org/2018/credentials/v1",
+            "type": "VerifiablePresentation",
+            "verifiableCredential": {
+              "@context": "https://www.w3.org/2018/credentials/v1",
+              "type": "VerifiableCredential",
+              "issuer": "originator.vasp",
+              "issuanceDate": "2022-01-01",
+              "credentialSubject": "did:eg:bob"
+            }
+          }
+        }
+      }
+    ]
+  },
+  "expectedResult": {
+    "valid": false,
+    "errors": [
+      {
+        "field": "from",
+        "message": "Invalid format for 'from', DID expected"
+      },
+      {
+        "field": "type",
+        "message": "Invalid format for 'type', full URI expected"
+      },
+      {
+        "field": "id",
+        "message": "Invalid format for 'id', string expected"
+      },
+      {
+        "field": "thid",
+        "message": "Invalid format for 'thid', string expected"
+      },
+      {
+        "field": "to",
+        "message": "Invalid format for 'to', array expected"
+      },
+      {
+        "field": "created_time",
+        "message": "Invalid format for 'created_time', Unix timestamp expected"
+      },
+      {
+        "field": "body",
+        "message": "Invalid format for 'body', object expected"
+      },
+      {
+        "field": "attachments[0].id",
+        "message": "Invalid format for 'id', string expected"
+      },
+      {
+        "field": "attachments[0].media_type",
+        "message": "Invalid value for 'media_type', 'application/json' expected"
+      },
+      {
+        "field": "attachments[0].format",
+        "message": "Invalid value for 'format', 'dif/presentation-exchange/submission@v1.0' expected"
+      },
+      {
+        "field": "attachments[0].data.json.@context",
+        "message": "Invalid format for '@context', array expected"
+      },
+      {
+        "field": "attachments[0].data.json.verifiableCredential",
+        "message": "Invalid format for 'verifiableCredential', array expected"
+      },
+      {
+        "field": "attachments[0].data.json.verifiableCredential.issuer",
+        "message": "Invalid format for 'issuer', DID expected"
+      },
+      {
+        "field": "attachments[0].data.json.verifiableCredential.credentialSubject",
+        "message": "Invalid format for 'credentialSubject', object expected"
+      }
+    ]
+  }
+} 

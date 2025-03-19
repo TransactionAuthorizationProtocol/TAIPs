@@ -1,0 +1,45 @@
+{
+  "description": "Reject message with misformatted fields",
+  "purpose": "Validate that a Reject message with incorrectly formatted fields is rejected",
+  "shouldPass": false,
+  "version": "1.0.0",
+  "taips": ["taip-2", "taip-4"],
+  "message": {
+    "from": "beneficiary.vasp",
+    "type": "https://tap.rsvp/schema/1.0#Reject",
+    "id": 1122334455,
+    "thid": "1234567890",
+    "to": ["did:web:originator.vasp"],
+    "created_time": "2022-01-18T12:00:00",
+    "body": {
+      "@context": "https://tap.rsvp/schema/1.0",
+      "@type": "Reject",
+      "reason": 404
+    }
+  },
+  "expectedResult": {
+    "valid": false,
+    "errors": [
+      {
+        "field": "from",
+        "message": "Invalid format for 'from', DID expected"
+      },
+      {
+        "field": "id",
+        "message": "Invalid format for 'id', string expected"
+      },
+      {
+        "field": "created_time",
+        "message": "Invalid format for 'created_time', Unix timestamp expected"
+      },
+      {
+        "field": "body.@type",
+        "message": "Invalid format for '@type', full URI expected"
+      },
+      {
+        "field": "body.reason",
+        "message": "Invalid format for 'reason', string expected"
+      }
+    ]
+  }
+} 

@@ -1,0 +1,24 @@
+{
+  "description": "Valid complete Authorize message with all fields",
+  "purpose": "Validate that a fully formed Authorize message with all fields is accepted",
+  "shouldPass": true,
+  "version": "1.0.0",
+  "taips": ["taip-2", "taip-4"],
+  "message": {
+    "from": "did:web:beneficiary.vasp",
+    "type": "https://tap.rsvp/schema/1.0#Authorize",
+    "id": "0987654321",
+    "thid": "1234567890",
+    "to": ["did:web:originator.vasp"],
+    "created_time": 1516269022,
+    "expires_time": 1516385931,
+    "body": {
+      "@context": "https://tap.rsvp/schema/1.0",
+      "@type": "https://tap.rsvp/schema/1.0#Authorize",
+      "settlementAddress": "eip155:1:0x1234a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb"
+    }
+  },
+  "expectedResult": {
+    "valid": true
+  }
+} 

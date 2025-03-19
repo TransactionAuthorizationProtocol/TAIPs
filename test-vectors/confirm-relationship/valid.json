@@ -1,0 +1,53 @@
+{
+  "description": "Valid complete ConfirmRelationship message with all fields",
+  "purpose": "Validate that a fully formed ConfirmRelationship message with all fields is accepted",
+  "shouldPass": true,
+  "version": "1.0.0",
+  "taips": ["taip-2", "taip-9"],
+  "message": {
+    "from": "did:web:beneficiary.vasp",
+    "type": "https://tap.rsvp/schema/1.0#ConfirmRelationship",
+    "id": "confirm-rel-123456",
+    "thid": "1234567890",
+    "to": ["did:web:originator.vasp"],
+    "created_time": 1516269022,
+    "expires_time": 1516385931,
+    "body": {
+      "@context": "https://tap.rsvp/schema/1.0",
+      "@type": "https://tap.rsvp/schema/1.0#Agent",
+      "@id": "did:pkh:eip155:1:0x1234a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb",
+      "for": "did:web:beneficiary.vasp",
+      "role": "settlementAddress"
+    },
+    "attachments": [
+      {
+        "id": "cacao-proof-1",
+        "media_type": "application/json",
+        "data": {
+          "json": {
+            "h": {
+              "t": "eip4361",
+              "c": "did:pkh:eip155:1:0x1234a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb"
+            },
+            "p": {
+              "iss": "did:pkh:eip155:1:0x1234a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb",
+              "aud": "did:web:beneficiary.vasp",
+              "domain": "tap.rsvp",
+              "version": "1",
+              "nonce": "32891756",
+              "iat": "2022-01-18T15:23:42.115Z",
+              "statement": "I confirm that I act as settlementAddress for did:web:beneficiary.vasp in transaction 1234567890"
+            },
+            "s": {
+              "t": "eip191",
+              "s": "0x4566aed6feb2b93eb99a5cca4dcb0915b59eb4334e74818f99d6f4b700c79570670a92b1bce81ab900d8cae6c8704e1be910a3a89cec3edc6cf1b7e34bde84261c"
+            }
+          }
+        }
+      }
+    ]
+  },
+  "expectedResult": {
+    "valid": true
+  }
+} 

@@ -1,0 +1,22 @@
+{
+  "description": "Minimal valid Settle message",
+  "purpose": "Validate that a Settle message with only required fields is accepted",
+  "shouldPass": true,
+  "version": "1.0.0",
+  "taips": ["taip-2", "taip-4"],
+  "message": {
+    "from": "did:web:originator.vasp",
+    "type": "https://tap.rsvp/schema/1.0#Settle",
+    "id": "5566778899",
+    "thid": "1234567890",
+    "to": ["did:web:beneficiary.vasp"],
+    "created_time": 1516269022,
+    "body": {
+      "@context": "https://tap.rsvp/schema/1.0",
+      "@type": "https://tap.rsvp/schema/1.0#Settle"
+    }
+  },
+  "expectedResult": {
+    "valid": true
+  }
+} 

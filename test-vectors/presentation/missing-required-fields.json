@@ -1,0 +1,60 @@
+{
+  "description": "Presentation message with missing required fields",
+  "purpose": "Validate that a Presentation message without required fields is rejected",
+  "shouldPass": false,
+  "version": "1.0.0",
+  "taips": ["taip-2", "taip-8"],
+  "message": {
+    "from": "did:web:originator.vasp",
+    "type": "https://didcomm.org/present-proof/3.0/presentation",
+    "id": "f1ca8245-ab2d-4d9c-8d7d-94bf310314ef",
+    "to": ["did:web:beneficiary.vasp"],
+    "created_time": 1516269022,
+    "body": {},
+    "attachments": [
+      {
+        "id": "2a3f1c4c-623c-44e6-b159-179048c51260",
+        "media_type": "application/json",
+        "data": {
+          "json": {
+            "type": ["VerifiablePresentation"],
+            "verifiableCredential": [
+              {
+                "issuer": "did:web:originator.vasp",
+                "issuanceDate": "2022-01-01T19:23:24Z",
+                "credentialSubject": {
+                  "id": "did:eg:bob"
+                }
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "expectedResult": {
+    "valid": false,
+    "errors": [
+      {
+        "field": "thid",
+        "message": "Required field 'thid' is missing"
+      },
+      {
+        "field": "attachments[0].format",
+        "message": "Required field 'format' is missing"
+      },
+      {
+        "field": "attachments[0].data.json.@context",
+        "message": "Required field '@context' is missing"
+      },
+      {
+        "field": "attachments[0].data.json.verifiableCredential[0].@context",
+        "message": "Required field '@context' is missing"
+      },
+      {
+        "field": "attachments[0].data.json.verifiableCredential[0].type",
+        "message": "Required field 'type' is missing"
+      }
+    ]
+  }
+} 

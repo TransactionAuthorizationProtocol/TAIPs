@@ -1,0 +1,29 @@
+{
+  "description": "Settle message with misformatted fields",
+  "purpose": "Validate that a Settle message with incorrectly formatted fields is rejected",
+  "shouldPass": false,
+  "version": "1.0.0",
+  "taips": ["taip-2", "taip-4"],
+  "message": {
+    "from": "did:web:originator.vasp",
+    "type": "https://tap.rsvp/schema/1.0#Settle",
+    "id": "5566778899",
+    "thid": "1234567890",
+    "to": ["did:web:beneficiary.vasp"],
+    "created_time": 1516269022,
+    "body": {
+      "@context": "https://tap.rsvp/schema/1.0",
+      "@type": "https://tap.rsvp/schema/1.0#Settle",
+      "settlementId": "0x3edb98c24d46d148eb926c714f4fbaa117c47b0c0821f38bfce9763604457c33"
+    }
+  },
+  "expectedResult": {
+    "valid": false,
+    "errors": [
+      {
+        "field": "body.settlementId",
+        "message": "Invalid format for 'settlementId', CAIP-220 block address expected"
+      }
+    ]
+  }
+} 

@@ -1,0 +1,33 @@
+{
+  "description": "Transfer message with missing required fields",
+  "purpose": "Validate that a Transfer message without required fields is rejected",
+  "shouldPass": false,
+  "version": "1.0.0",
+  "taips": ["taip-2", "taip-3"],
+  "message": {
+    "from": "did:web:originator.vasp",
+    "type": "https://tap.rsvp/schema/1.0#Transfer",
+    "id": "1234567890",
+    "to": ["did:web:beneficiary.vasp"],
+    "created_time": 1516269022,
+    "body": {
+      "@context": "https://tap.rsvp/schema/1.0",
+      "@type": "https://tap.rsvp/schema/1.0#Transfer",
+      "amount": "1.23",
+      "agents": [
+        {
+          "@id": "did:web:originator.vasp"
+        }
+      ]
+    }
+  },
+  "expectedResult": {
+    "valid": false,
+    "errors": [
+      {
+        "field": "body.asset",
+        "message": "Required field 'asset' is missing"
+      }
+    ]
+  }
+} 

@@ -1,0 +1,27 @@
+{
+  "description": "Minimal valid ReplaceAgent message",
+  "purpose": "Validate that a ReplaceAgent message with only required fields is accepted",
+  "shouldPass": true,
+  "version": "1.0.0",
+  "taips": ["taip-2", "taip-5"],
+  "message": {
+    "from": "did:web:beneficiary.vasp",
+    "type": "https://tap.rsvp/schema/1.0#ReplaceAgent",
+    "id": "replace-agent-123456",
+    "thid": "1234567890",
+    "to": ["did:web:originator.vasp"],
+    "created_time": 1516269022,
+    "body": {
+      "@context": "https://tap.rsvp/schema/1.0",
+      "@type": "https://tap.rsvp/schema/1.0#ReplaceAgent",
+      "original": "did:pkh:eip155:1:0xabcda96D359eC26a11e2C2b3d8f8B8942d5Bfcdb",
+      "replacement": {
+        "@id": "did:pkh:eip155:1:0x1234a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb",
+        "for": "did:eg:bob"
+      }
+    }
+  },
+  "expectedResult": {
+    "valid": true
+  }
+} 
