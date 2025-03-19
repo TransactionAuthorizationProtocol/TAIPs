@@ -70,7 +70,41 @@ A message sent by an agent requesting connection to another agent:
 
 ### Response Messages
 
-The receiving agent (VASP) will handle authorization with their customer out-of-band (e.g., through their existing authentication system). After the customer reviews and decides on the connection request, the VASP responds using [TAIP-4] messages:
+The receiving agent (VASP) can handle authorization in two ways:
+
+1. Out-of-band through their existing authentication system (email, app notification, etc.)
+2. Through an authorization URL that can be displayed to the customer
+
+#### Authorization URL Response
+
+If the VASP chooses to use an authorization URL:
+
+```json
+{
+  "id": "98765432-e89b-12d3-a456-426614174000",
+  "type": "https://tap.rsvp/schema/1.0#AuthorizationRequired",
+  "from": "did:example:vasp",
+  "to": ["did:example:b2b-service"],
+  "thid": "123e4567-e89b-12d3-a456-426614174000",
+  "created_time": 1516269023,
+  "expires_time": 1516385931,
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#AuthorizationRequired",
+    "authorization_url": "https://vasp.com/authorize?request=abc123",
+    "expires": "2024-03-22T15:00:00Z"
+  }
+}
+```
+
+The authorization URL should display a secure page where the customer can:
+- Authenticate with the VASP
+- Review the connection request details
+- Approve or deny the request
+
+#### Final Response Messages
+
+After authorization (either out-of-band or via URL), the VASP responds using [TAIP-4] messages:
 
 - **Authorize:** Connection is approved
 ```json
@@ -133,16 +167,23 @@ The receiving agent (VASP) will handle authorization with their customer out-of-
    - The party they represent
    - Desired transaction constraints
    
-2. Agent B handles authorization with their customer:
-   - Notifies customer through their existing channels (email, app notification, etc.)
-   - Customer logs into Agent B's service to review the request
-   - Customer approves or denies the connection
+2. Agent B chooses an authorization method:
+   - Option 1: Out-of-band Authorization
+     - Notifies customer through existing channels
+     - Customer logs into VASP's service to review
+   - Option 2: Authorization URL
+     - Returns AuthorizationRequired with URL
+     - Customer opens URL to review and authenticate
 
-3. Agent B sends response:
+3. Customer reviews and decides:
+   - Views connection details and constraints
+   - Approves or denies through chosen interface
+
+4. Agent B sends final response:
    - Authorize message if approved
    - Reject message if denied
 
-4. Once authorized:
+5. Once authorized:
    - Connection is established with a unique identifier
    - Future transactions must respect the agreed constraints
    - Either party can Cancel the connection
@@ -152,13 +193,14 @@ The receiving agent (VASP) will handle authorization with their customer out-of-
 - All messages MUST be encrypted using [TAIP-2] message encryption
 - Agents MUST verify DIDs and signatures before accepting connections
 - Authorization MUST be performed through secure, authenticated channels
+- Authorization URLs MUST use HTTPS and include CSRF protection
 - Connection identifiers should be unique and unpredictable
 
 ## Rationale
 
 The design choices in this specification aim to balance security, usability, and flexibility:
 
-- **Out-of-band Authorization:** Leverages existing secure authentication systems
+- **Flexible Authorization:** Supports both out-of-band and URL-based flows
 - **Purpose Codes:** Uses [TAIP-13] for standardized transaction types
 - **Transaction Limits:** Provides clear constraints for risk management
 - **Connection Identifiers:** Enable tracking and management of approved connections
@@ -167,6 +209,7 @@ The design choices in this specification aim to balance security, usability, and
 ## Security Considerations
 
 - **Authorization Flow:** Must use secure authentication channels
+- **Authorization URLs:** Must prevent CSRF and phishing attacks
 - **Connection Identifiers:** Must be unique and unpredictable
 - **Transaction Limits:** Must be enforced server-side
 - **Connection State:** Must be securely maintained
