@@ -22,6 +22,9 @@
   - [ConfirmRelationship](#confirmrelationship)
 - [Policy messages](#policy-messages)
   - [UpdatePolicies](#updatepolicies)
+- [Connection Messages](#connection-messages)
+  - [Connect](#connect)
+  - [AuthorizationRequired](#authorizationrequired)
 - [Data Elements](#data-elements)
   - [Party](#party)
   - [Agent](#agent)
@@ -658,6 +661,88 @@ Updates policies for a transaction.
 }
 ```
 
+## Connection Messages
+
+### Connect
+[TAIP-15] - Draft
+
+Requests a connection between agents with specified constraints.
+
+| Attribute | Type | Required | Status | Description |
+|-----------|------|----------|---------|-------------|
+| @context | string | Yes | Draft ([TAIP-15]) | JSON-LD context "https://tap.rsvp/schema/1.0" |
+| @type | string | Yes | Draft ([TAIP-15]) | JSON-LD type "https://tap.rsvp/schema/1.0#Connect" |
+| agent | object | Yes | Draft ([TAIP-15]) | Details of the requesting agent |
+| for | string | Yes | Draft ([TAIP-15]) | DID of the party the agent represents |
+| constraints | object | Yes | Draft ([TAIP-15]) | Transaction constraints for the connection |
+
+#### Examples
+
+```json
+{
+  "id": "123e4567-e89b-12d3-a456-426614174000",
+  "type": "https://tap.rsvp/schema/1.0#Connect",
+  "from": "did:example:b2b-service",
+  "to": ["did:example:vasp"],
+  "created_time": 1516269022,
+  "expires_time": 1516385931,
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#Connect",
+    "agent": {
+      "@id": "did:example:b2b-service",
+      "name": "B2B Payment Service",
+      "type": "ServiceAgent",
+      "endpoints": {
+        "messaging": "https://api.b2bservice.com/agent"
+      }
+    },
+    "for": "did:example:business-customer",
+    "constraints": {
+      "purposes": ["BEXP", "SUPP"],
+      "categoryPurposes": ["CASH", "CCRD"],
+      "limits": {
+        "per_transaction": "10000.00",
+        "daily": "50000.00",
+        "currency": "USD"
+      }
+    }
+  }
+}
+```
+
+### AuthorizationRequired
+[TAIP-15] - Draft
+
+Provides an authorization URL for interactive connection approval.
+
+| Attribute | Type | Required | Status | Description |
+|-----------|------|----------|---------|-------------|
+| @context | string | Yes | Draft ([TAIP-15]) | JSON-LD context "https://tap.rsvp/schema/1.0" |
+| @type | string | Yes | Draft ([TAIP-15]) | JSON-LD type "https://tap.rsvp/schema/1.0#AuthorizationRequired" |
+| authorization_url | string | Yes | Draft ([TAIP-15]) | URL where the customer can review and approve the connection |
+| expires | string | Yes | Draft ([TAIP-15]) | ISO 8601 timestamp when the authorization URL expires |
+
+#### Examples
+
+```json
+{
+  "id": "98765432-e89b-12d3-a456-426614174000",
+  "type": "https://tap.rsvp/schema/1.0#AuthorizationRequired",
+  "from": "did:example:vasp",
+  "to": ["did:example:b2b-service"],
+  "thid": "123e4567-e89b-12d3-a456-426614174000",
+  "created_time": 1516269023,
+  "expires_time": 1516385931,
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#AuthorizationRequired",
+    "authorization_url": "https://vasp.com/authorize?request=abc123",
+    "expires": "2024-03-22T15:00:00Z"
+  }
+}
+```
+
 ## Data Elements
 
 ### Party
@@ -1102,3 +1187,4 @@ Note that all messages in this flow share the same thread ID (`payment-123`) to 
 [TAIP-12]: ./TAIPs/taip-12
 [TAIP-13]: ./TAIPs/taip-13
 [TAIP-14]: ./TAIPs/taip-14
+[TAIP-15]: ./taip-15 "Agent Connection Protocol"
