@@ -37,33 +37,40 @@ A message sent by an agent requesting connection to another agent:
 
 ```json
 {
-  "@type": "Connect",
-  "@id": "123e4567-e89b-12d3-a456-426614174000",
-  "from": {
-    "@id": "did:example:b2b-service",
-    "name": "B2B Payment Service",
-    "type": "ServiceAgent",
-    "endpoints": {
-      "messaging": "https://api.b2bservice.com/agent",
-      "callback": "https://api.b2bservice.com/oauth/callback"
-    }
-  },
+  "id": "123e4567-e89b-12d3-a456-426614174000",
+  "type": "https://tap.rsvp/schema/1.0#Connect",
+  "from": "did:example:b2b-service",
   "to": ["did:example:vasp"],
-  "for": "did:example:business-customer",
-  "constraints": {
-    "purposes": ["BEXP", "SUPP"],
-    "categoryPurposes": ["CASH", "CCRD"],
-    "limits": {
-      "per_transaction": "10000.00",
-      "daily": "50000.00",
-      "currency": "USD"
-    }
-  },
-  "proof": {
-    "@type": "ConfirmRelationship",
-    "@id": "did:example:b2b-service",
+  "created_time": 1516269022,
+  "expires_time": 1516385931,
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#Connect",
+    "agent": {
+      "@id": "did:example:b2b-service",
+      "name": "B2B Payment Service",
+      "type": "ServiceAgent",
+      "endpoints": {
+        "messaging": "https://api.b2bservice.com/agent",
+        "callback": "https://api.b2bservice.com/oauth/callback"
+      }
+    },
     "for": "did:example:business-customer",
-    "signature": "..."
+    "constraints": {
+      "purposes": ["BEXP", "SUPP"],
+      "categoryPurposes": ["CASH", "CCRD"],
+      "limits": {
+        "per_transaction": "10000.00",
+        "daily": "50000.00",
+        "currency": "USD"
+      }
+    },
+    "proof": {
+      "@type": "ConfirmRelationship",
+      "@id": "did:example:b2b-service",
+      "for": "did:example:business-customer",
+      "signature": "..."
+    }
   }
 }
 ```
@@ -74,11 +81,19 @@ If user authorization is required, the receiving agent responds with an authoriz
 
 ```json
 {
-  "@type": "AuthorizationRequired",
-  "@id": "98765432-e89b-12d3-a456-426614174000",
+  "id": "98765432-e89b-12d3-a456-426614174000",
+  "type": "https://tap.rsvp/schema/1.0#AuthorizationRequired",
+  "from": "did:example:vasp",
+  "to": ["did:example:b2b-service"],
   "thid": "123e4567-e89b-12d3-a456-426614174000",
-  "authorization_url": "https://vasp.com/authorize?request=abc123",
-  "expires": "2024-03-22T15:00:00Z"
+  "created_time": 1516269023,
+  "expires_time": 1516385931,
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#AuthorizationRequired",
+    "authorization_url": "https://vasp.com/authorize?request=abc123",
+    "expires": "2024-03-22T15:00:00Z"
+  }
 }
 ```
 
@@ -94,13 +109,20 @@ After authorization (or immediately if not required), the receiving agent respon
 - **Authorize:** Connection is approved with a bearer token
 ```json
 {
-  "@type": "Authorize",
-  "@id": "abcdef12-e89b-12d3-a456-426614174000",
+  "id": "abcdef12-e89b-12d3-a456-426614174000",
+  "type": "https://tap.rsvp/schema/1.0#Authorize",
+  "from": "did:example:vasp",
+  "to": ["did:example:b2b-service"],
   "thid": "123e4567-e89b-12d3-a456-426614174000",
-  "connection": {
-    "id": "conn-abc123",
-    "bearer_token": "eyJhbGci...",
-    "expires": "2025-03-21T00:00:00Z"
+  "created_time": 1516269024,
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#Authorize",
+    "connection": {
+      "id": "conn-abc123",
+      "bearer_token": "eyJhbGci...",
+      "expires": "2025-03-21T00:00:00Z"
+    }
   }
 }
 ```
@@ -108,21 +130,35 @@ After authorization (or immediately if not required), the receiving agent respon
 - **Reject:** Connection is denied
 ```json
 {
-  "@type": "Reject",
-  "@id": "76543210-e89b-12d3-a456-426614174000",
+  "id": "76543210-e89b-12d3-a456-426614174000",
+  "type": "https://tap.rsvp/schema/1.0#Reject",
+  "from": "did:example:vasp",
+  "to": ["did:example:b2b-service"],
   "thid": "123e4567-e89b-12d3-a456-426614174000",
-  "reason": "unauthorized"
+  "created_time": 1516269024,
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#Reject",
+    "reason": "unauthorized"
+  }
 }
 ```
 
 - **Cancel:** Either party can terminate the connection
 ```json
 {
-  "@type": "Cancel",
-  "@id": "fedcba98-e89b-12d3-a456-426614174000",
+  "id": "fedcba98-e89b-12d3-a456-426614174000",
+  "type": "https://tap.rsvp/schema/1.0#Cancel",
+  "from": "did:example:vasp",
+  "to": ["did:example:b2b-service"],
   "thid": "123e4567-e89b-12d3-a456-426614174000",
-  "connection_id": "conn-abc123",
-  "reason": "user_requested"
+  "created_time": 1516269025,
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#Cancel",
+    "connection_id": "conn-abc123",
+    "reason": "user_requested"
+  }
 }
 ```
 
