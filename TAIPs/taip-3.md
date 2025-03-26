@@ -54,8 +54,63 @@ As specified in [TAIP-2] the message body is [JSON-LD]. The following attributes
 * `agents` - REQUIRED an array of identity objects representing the agents who help execute the transaction. See [TAIP-5](TAIP-5) for more.
 * `memo` - OPTIONAL a human readable UTF-8 string to be provided as-is by the originator to the beneficiary about the transfer
 
-
 Many of the attributes are optional and through the process of authorization can be expanded and modified collaboratively by the agents of a transaction.
+
+### Out-of-Band Initiation
+
+To initiate a transfer with a party that hasn't communicated before, agents MUST support [Out-of-Band Messages](https://identity.foundation/didcomm-messaging/spec/v2.1/#out-of-band-messages). The OOB message allows sharing the Transfer request through URLs or QR codes.
+
+OOB messages for Transfer requests:
+
+1. MUST use the `https://didcomm.org/out-of-band/2.0` protocol
+2. MUST include the goal_code `tap.transfer`
+3. SHOULD be shared as URLs according to the [Out-of-Band message spec](https://identity.foundation/didcomm-messaging/spec/v2.1/#out-of-band-messages)
+4. MUST include the Transfer message as a signed DIDComm message in the attachment
+
+Example Out-of-Band message with Transfer request:
+
+```json
+{
+  "type": "https://didcomm.org/out-of-band/2.0/invitation",
+  "id": "2e9e257c-2839-4fae-b0c4-dcd4e2159f4e",
+  "from": "did:web:originator.vasp",
+  "body": {
+    "goal_code": "tap.transfer",
+    "goal": "Process asset transfer",
+    "accept": ["didcomm/v2"]
+  },
+  "attachments": [{
+    "id": "transfer-request-1",
+    "mime_type": "application/didcomm-signed+json",
+    "data": {
+      "json": {
+        "payload": "eyJpZCI6IjU5OWY3MjIwLTYxNDktNGM0NS1hZGJiLTg2ZDk2YzhlMDYwOCIsInR5cGUiOiJodHRwczovL3RhcC5yc3ZwL3NjaGVtYS8xLjAjVHJhbnNmZXIiLCJmcm9tIjoiZGlkOndlYjpvcmlnaW5hdG9yLnZhc3AiLCJib2R5Ijp7IkBjb250ZXh0IjoiaHR0cHM6Ly90YXAucnN2cC9zY2hlbWEvMS4wIiwiQHR5cGUiOiJodHRwczovL3RhcC5yc3ZwL3NjaGVtYS8xLjAjVHJhbnNmZXIiLCJhc3NldCI6ImVpcDE1NToxL3NsaXA0NDo2MCIsImFtb3VudCI6IjEuMjMiLCJvcmlnaW5hdG9yIjp7IkBpZCI6ImRpZDplZzpib2IifSwiYWdlbnRzIjpbeyJAaWQiOiJkaWQ6d2ViOm9yaWdpbmF0b3IudmFzcCJ9XX19",
+        "signatures": [{
+          "protected": "eyJ0eXAiOiJKV1QiLCJhbGciOiJFZERTQSIsImtpZCI6ImRpZDp3ZWI6b3JpZ2luYXRvci52YXNwI2tleS0xIn0",
+          "signature": "8KqJCbUdHMfN1etqy9_kyhVkw9h1Va3Z2vYu6dxZYuQM2XwYoG_5rFTvk3YH9xDRp5VxbXqnYYvKjHzjhBRzBw"
+        }]
+      }
+    }
+  }]
+}
+```
+
+The `json` field contains a signed JWS with:
+- `payload`: Base64URL-encoded Transfer message
+- `signatures`: Array of signatures with protected header and signature value
+- The protected header includes the key identifier (`kid`) that can be resolved through the signer's DID Document
+
+The corresponding URL format would be either:
+```
+https://example.com/path?_oob=eyJ0eXAiOiJKV1QiLCJhbGciOiJFZERTQSJ9...
+```
+
+Or using the shorter `_oobid` parameter that references a previously published Out-of-Band message:
+```
+https://example.com/path?_oobid=2e9e257c-2839-4fae-b0c4-dcd4e2159f4e
+```
+
+Where the `_oob` parameter contains the base64url-encoded Out-of-Band message, or the `_oobid` parameter contains a unique identifier that can be resolved to retrieve the full Out-of-Band message.
   
 #### Transfer Amounts
 

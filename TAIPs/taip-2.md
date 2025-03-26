@@ -70,6 +70,63 @@ See DIDComm specification for details on key resolution throught the senders and
 
 ### Sending and Receiving messages
 
+TAP messages MUST be transported according to the [DIDComm Transport Specification](https://identity.foundation/didcomm-messaging/spec/v2.1/#transports). While DIDComm supports multiple transport protocols, for TAP messages:
+
+1. HTTPS endpoints SHOULD be the primary transport method specified in DID Documents for sending and receiving messages
+2. DID Document service endpoints for TAP MUST use the `DIDCommMessaging` type
+3. HTTPS endpoints MUST use TLS 1.3 or higher
+4. Messages sent over HTTPS MUST use POST requests with the `application/didcomm-encrypted+json` content type for encrypted messages or `application/didcomm-signed+json` for signed-only messages
+
+Example DID Document service entry:
+
+```json
+{
+  "service": [{
+    "id": "#didcomm-1",
+    "type": "DIDCommMessaging",
+    "serviceEndpoint": "https://example.com/didcomm"
+  }]
+}
+```
+
+### Initiating Sessions with Out-of-Band Messages
+
+To initiate a new messaging session between parties that haven't communicated before, TAP implementations MUST support [Out-of-Band Messages](https://identity.foundation/didcomm-messaging/spec/v2.1/#out-of-band-messages). The OOB message allows the initial sender to share their DID and service endpoint information with a potential recipient.
+
+OOB messages in TAP:
+
+1. MUST use the `https://didcomm.org/out-of-band/2.0` protocol
+2. MUST include at least one goal_code that starts with `tap.`
+3. SHOULD be shared as URLs according to the [Out-of-Band message spec](https://identity.foundation/didcomm-messaging/spec/v2.1/#out-of-band-messages)
+4. MAY include additional handshake protocols
+
+Example Out-of-Band message:
+
+```json
+{
+  "type": "https://didcomm.org/out-of-band/2.0/invitation",
+  "id": "2e9e257c-2839-4fae-b0c4-dcd4e2159f4e",
+  "from": "did:example:alice",
+  "body": {
+    "goal_code": "tap.connect",
+    "goal": "Initialize a TAP Connection",
+    "accept": ["didcomm/v2"]
+  }
+}
+```
+
+The corresponding URL format would be either:
+```
+https://example.com/path?_oob=eyJ0eXAiOiJKV1QiLCJhbGciOiJFZERTQSJ9...
+```
+
+Or using the shorter `_oobid` parameter that references a previously published Out-of-Band message:
+```
+https://example.com/path?_oobid=2e9e257c-2839-4fae-b0c4-dcd4e2159f4e
+```
+
+Where the `_oob` parameter contains the base64url-encoded Out-of-Band message, or the `_oobid` parameter contains a unique identifier that can be resolved to retrieve the full Out-of-Band message.
+
 ## Rationale
 
 This TAIP is based on existing standards like JWE and JWS. It is designed to be decentralized and tightly tied to decentralized identifies for each party involved. While centralized services can actively play a part in TAP, it is never a requirement.

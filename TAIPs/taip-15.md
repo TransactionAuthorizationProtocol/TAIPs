@@ -118,6 +118,69 @@ A message sent to terminate an existing connection:
    - Future transactions must respect the agreed constraints
    - Either party can Cancel the connection
 
+### Out-of-Band Initiation
+
+To initiate a connection with a party that hasn't communicated before, agents MUST support [Out-of-Band Messages](https://identity.foundation/didcomm-messaging/spec/v2.1/#out-of-band-messages). The OOB message allows sharing the Connect request through URLs or QR codes.
+
+OOB messages for Connect requests:
+
+1. MUST use the `https://didcomm.org/out-of-band/2.0` protocol
+2. MUST include the goal_code `tap.connect`
+3. SHOULD be shared as URLs according to the [Out-of-Band message spec](https://identity.foundation/didcomm-messaging/spec/v2.1/#out-of-band-messages)
+4. MUST include the Connect message as a signed DIDComm message in the attachment
+
+Example Out-of-Band message with Connect request:
+
+```json
+{
+  "type": "https://didcomm.org/out-of-band/2.0/invitation",
+  "id": "2e9e257c-2839-4fae-b0c4-dcd4e2159f4e",
+  "from": "did:example:b2b-service",
+  "body": {
+    "goal_code": "tap.connect",
+    "goal": "Establish agent connection",
+    "accept": ["didcomm/v2"]
+  },
+  "attachments": [{
+    "id": "connect-request-1",
+    "mime_type": "application/didcomm-signed+json",
+    "data": {
+      "json": {
+        "type": "https://tap.rsvp/schema/1.0#Connect",
+        "id": "599f7220-6149-4c45-adbb-86d96c8e0608",
+        "from": "did:example:b2b-service",
+        "body": {
+          "@context": "https://tap.rsvp/schema/1.0",
+          "@type": "https://tap.rsvp/schema/1.0#Connect",
+          "agent": {
+            "@id": "did:example:b2b-service",
+            "name": "B2B Payment Service"
+          },
+          "for": "did:example:business-customer",
+          "constraints": {
+            "purposes": ["BEXP", "SUPP"]
+          }
+        },
+        "attachments": [],
+        "created_time": 1516269022
+      }
+    }
+  }]
+}
+```
+
+The corresponding URL format would be either:
+```
+https://example.com/path?_oob=eyJ0eXAiOiJKV1QiLCJhbGciOiJFZERTQSJ9...
+```
+
+Or using the shorter `_oobid` parameter that references a previously published Out-of-Band message:
+```
+https://example.com/path?_oobid=2e9e257c-2839-4fae-b0c4-dcd4e2159f4e
+```
+
+Where the `_oob` parameter contains the base64url-encoded Out-of-Band message, or the `_oobid` parameter contains a unique identifier that can be resolved to retrieve the full Out-of-Band message.
+
 ### Connection Flow Diagrams
 
 #### Basic Connection Flow with Direct Authorization
