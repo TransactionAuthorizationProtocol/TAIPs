@@ -622,15 +622,16 @@ interface Reject extends TapMessageObject<"Reject"> {
 }
 
 /**
- * Cancellation Message
- * Cancels an in-progress transfer.
+ * Cancel Message
+ * Terminates an existing transaction or connection.
+ * Uses the thread ID to identify what is being cancelled.
  *
- * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-4.md | TAIP-4: Authorization Flow}
+ * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-4.md | TAIP-4: Transaction Authorization Protocol}
  */
 interface Cancel extends TapMessageObject<"Cancel"> {
   /**
-   * Optional cancellation reason
-   * Explanation of why the transfer was cancelled
+   * Optional reason for cancellation
+   * Human readable explanation
    */
   reason?: string;
 }
@@ -824,6 +825,106 @@ interface UpdatePolicies extends TapMessageObject<"UpdatePolicies"> {
   policies: Policies[];
 }
 
+/**
+ * Transaction Constraints
+ * Defines the allowed transaction parameters for a connection.
+ *
+ * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-15.md | TAIP-15: Agent Connection Protocol}
+ */
+interface TransactionConstraints {
+  /**
+   * Allowed ISO 20022 purpose codes
+   * Array of valid purpose codes for transactions
+   */
+  purposes?: ISO20022PurposeCode[];
+
+  /**
+   * Allowed ISO 20022 category purpose codes
+   * Array of valid category purpose codes
+   */
+  categoryPurposes?: ISO20022CategoryPurposeCode[];
+
+  /**
+   * Transaction limits
+   * Monetary limits for transactions
+   */
+  limits?: {
+    /**
+     * Maximum amount per transaction
+     * Decimal string representation
+     */
+    per_transaction: Amount;
+
+    /**
+     * Maximum daily total
+     * Decimal string representation
+     */
+    daily: Amount;
+
+    /**
+     * Currency for the limits
+     * ISO 4217 currency code
+     */
+    currency: IsoCurrency;
+  };
+}
+
+/**
+ * Connect Message
+ * Requests a connection between agents with specified constraints.
+ *
+ * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-15.md | TAIP-15: Agent Connection Protocol}
+ */
+interface Connect extends TapMessageObject<"Connect"> {
+  /**
+   * Details of the requesting agent
+   * Includes identity and endpoints
+   */
+  agent?: {
+    /** DID of the agent */
+    "@id": DID;
+    /** Human-readable name */
+    name?: string;
+    /** Type of agent */
+    type?: string;
+    /** Service URL */
+    serviceUrl?: string;
+  };
+
+  /**
+   * DID of the represented party
+   * The party the agent acts on behalf of
+   */
+  for: DID;
+
+  /**
+   * Transaction constraints
+   * Limits and allowed transaction types
+   */
+  constraints: TransactionConstraints;
+}
+
+/**
+ * Authorization Required Message
+ * Response providing an authorization URL for connection approval.
+ *
+ * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-15.md | TAIP-15: Agent Connection Protocol}
+ */
+interface AuthorizationRequired
+  extends TapMessageObject<"AuthorizationRequired"> {
+  /**
+   * URL for connection authorization
+   * Where the customer can review and approve
+   */
+  authorization_url: string;
+
+  /**
+   * Expiration timestamp
+   * When the authorization URL expires
+   */
+  expires: ISO8601DateTime;
+}
+
 // DIDComm Message Wrappers
 
 /**
@@ -993,6 +1094,27 @@ interface UpdatePoliciesMessage extends DIDCommReply<UpdatePolicies> {
 }
 
 /**
+ * Connect Message Wrapper
+ * DIDComm envelope for a Connect message.
+ *
+ * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-15.md | TAIP-15: Agent Connection Protocol}
+ */
+interface ConnectMessage extends DIDCommMessage<Connect> {
+  type: "https://tap.rsvp/schema/1.0#Connect";
+}
+
+/**
+ * Authorization Required Message Wrapper
+ * DIDComm envelope for an Authorization Required message.
+ *
+ * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-15.md | TAIP-15: Agent Connection Protocol}
+ */
+interface AuthorizationRequiredMessage
+  extends DIDCommReply<AuthorizationRequired> {
+  type: "https://tap.rsvp/schema/1.0#AuthorizationRequired";
+}
+
+/**
  * TAP Message
  * Union type of all possible TAP messages.
  * Used for type-safe message handling in TAP implementations.
@@ -1014,7 +1136,9 @@ type TAPMessage =
   | ReplaceAgentMessage
   | RemoveAgentMessage
   | ConfirmRelationshipMessage
-  | UpdatePoliciesMessage;
+  | UpdatePoliciesMessage
+  | ConnectMessage
+  | AuthorizationRequiredMessage;
 
 // Export all types
 export type {
@@ -1073,5 +1197,12 @@ export type {
   CACAOAttachment,
   ConfirmRelationshipMessage,
   UpdatePoliciesMessage,
+  ConnectMessage,
+  AuthorizationRequiredMessage,
   TAPMessage,
+
+  // New types
+  TransactionConstraints,
+  Connect,
+  AuthorizationRequired,
 };

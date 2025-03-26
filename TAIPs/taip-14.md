@@ -161,6 +161,62 @@ sequenceDiagram
 
 *Description:* In this failure scenario, the merchant's wallet sends a PaymentRequest, but the customer decides not to proceed (for any reason – maybe they canceled the checkout or disagreed with the terms). The **Customer's wallet** then sends a **Cancel** message to the **Merchant's wallet**, notifying that the request is aborted. Both sides consider the payment request closed. The merchant's wallet may notify the merchant system to void the invoice or record the cancellation. Similarly, if the merchant needed to cancel (e.g. the order was out-of-stock or expired), the merchant's wallet would send a Cancel to the customer's wallet, which would inform the user. In either case, the Cancel message definitively ends that PaymentRequest thread. This differs from a **Reject** in that it isn't necessarily due to rule violations; it's a voluntary termination (any outstanding authorization or info exchange stops here). After a Cancel, the customer is not expected to send payment, and the merchant should not accept a payment if one somehow arrives late (they might refund it or handle it out of band).
 
+### Out-of-Band Initiation
+
+To initiate a PaymentRequest with a party that hasn't communicated before, the merchant's agent MUST support [Out-of-Band Messages](https://identity.foundation/didcomm-messaging/spec/v2.1/#out-of-band-messages). The OOB message allows sharing the PaymentRequest with potential customers through URLs or QR codes.
+
+OOB messages for PaymentRequests:
+
+1. MUST use the `https://didcomm.org/out-of-band/2.0` protocol
+2. MUST include the goal_code `tap.payment`
+3. SHOULD be shared as URLs according to the [Out-of-Band message spec](https://identity.foundation/didcomm-messaging/spec/v2.1/#out-of-band-messages)
+4. MUST include the PaymentRequest as a signed DIDComm message in the attachment
+
+Example Out-of-Band message with PaymentRequest:
+
+```json
+{
+  "type": "https://didcomm.org/out-of-band/2.0/invitation",
+  "id": "2e9e257c-2839-4fae-b0c4-dcd4e2159f4e",
+  "from": "did:example:merchant",
+  "body": {
+    "goal_code": "tap.payment",
+    "goal": "Process payment request",
+    "accept": ["didcomm/v2"]
+  },
+  "attachments": [{
+    "id": "payment-request-1",
+    "mime_type": "application/didcomm-signed+json",
+    "data": {
+      "json": {
+        "payload": "eyJpZCI6IjU5OWY3MjIwLTYxNDktNGM0NS1hZGJiLTg2ZDk2YzhlMDYwOCIsInR5cGUiOiJodHRwczovL3RhcC5yc3ZwL3NjaGVtYS8xLjAjUGF5bWVudFJlcXVlc3QiLCJmcm9tIjoiZGlkOmV4YW1wbGU6bWVyY2hhbnQiLCJib2R5Ijp7IkBjb250ZXh0IjoiaHR0cHM6Ly90YXAucnN2cC9zY2hlbWEvMS4wIiwiQHR5cGUiOiJodHRwczovL3RhcC5yc3ZwL3NjaGVtYS8xLjAjUGF5bWVudFJlcXVlc3QiLCJjdXJyZW5jeSI6IlVTRCIsImFtb3VudCI6IjEwMC4wMCIsIm1lcmNoYW50Ijp7IkBpZCI6ImRpZDpleGFtcGxlOm1lcmNoYW50In19fQ",
+        "signatures": [{
+          "protected": "eyJ0eXAiOiJKV1QiLCJhbGciOiJFZERTQSIsImtpZCI6ImRpZDpleGFtcGxlOm1lcmNoYW50I2tleS0xIn0",
+          "signature": "FW33NnvOHV0Ted9-F7GZbkia-vYAfBKtH4oBxbrttWAhBZ6UFJMxcGjL3lwOl4YohI3kyyd2LqvFHsEFk7R7Cg"
+        }]
+      }
+    }
+  }]
+}
+```
+
+The `json` field contains a signed JWS with:
+- `payload`: Base64URL-encoded PaymentRequest message
+- `signatures`: Array of signatures with protected header and signature value
+- The protected header includes the key identifier (`kid`) that can be resolved through the signer's DID Document
+
+The corresponding URL format would be either:
+```
+https://example.com/path?_oob=eyJ0eXAiOiJKV1QiLCJhbGciOiJFZERTQSJ9...
+```
+
+Or using the shorter `_oobid` parameter that references a previously published Out-of-Band message:
+```
+https://example.com/path?_oobid=2e9e257c-2839-4fae-b0c4-dcd4e2159f4e
+```
+
+Where the `_oob` parameter contains the base64url-encoded Out-of-Band message, or the `_oobid` parameter contains a unique identifier that can be resolved to retrieve the full Out-of-Band message.
+
 ## Security Considerations
 
 Because PaymentRequests involve off-chain negotiation and on-chain settlement, there are security implications on both sides:
