@@ -1,0 +1,38 @@
+{
+  "description": "Valid B2B service connection request",
+  "purpose": "Validates a connection request from a B2B service with transaction constraints",
+  "shouldPass": true,
+  "version": "1.0.0",
+  "taips": ["taip-2", "taip-15"],
+  "message": {
+    "id": "123e4567-e89b-12d3-a456-426614174000",
+    "type": "https://tap.rsvp/schema/1.0#Connect",
+    "from": "did:web:b2b-service.example",
+    "to": ["did:web:vasp.example"],
+    "created_time": 1516269022,
+    "expires_time": 1516385931,
+    "body": {
+      "@context": "https://tap.rsvp/schema/1.0",
+      "@type": "https://tap.rsvp/schema/1.0#Connect",
+      "agent": {
+        "@id": "did:web:b2b-service.example",
+        "name": "B2B Payment Service",
+        "type": "ServiceAgent",
+        "serviceUrl": "https://b2b-service.example/did-comm"
+      },
+      "for": "did:web:business-customer.example",
+      "constraints": {
+        "purposes": ["BEXP", "SUPP"],
+        "categoryPurposes": ["CASH", "CCRD"],
+        "limits": {
+          "per_transaction": "10000.00",
+          "daily": "50000.00",
+          "currency": "USD"
+        }
+      }
+    }
+  },
+  "expectedResult": {
+    "valid": true
+  }
+}

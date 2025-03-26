@@ -1,0 +1,30 @@
+{
+  "description": "Invalid revert message missing settlement address",
+  "purpose": "Validates that revert messages must include a settlement address",
+  "shouldPass": false,
+  "version": "1.0.0",
+  "taips": ["taip-2", "taip-4"],
+  "message": {
+    "id": "revert-125",
+    "type": "https://tap.rsvp/schema/1.0#Revert",
+    "from": "did:web:beneficiary.vasp",
+    "to": ["did:web:originator.vasp"],
+    "thid": "1234567890",
+    "created_time": 1516269022,
+    "body": {
+      "@context": "https://tap.rsvp/schema/1.0",
+      "@type": "https://tap.rsvp/schema/1.0#Revert",
+      "transfer": {
+        "@id": "1234567890"
+      },
+      "reason": "Post-settlement compliance check failed"
+    }
+  },
+  "expectedResult": {
+    "valid": false,
+    "error": {
+      "type": "ValidationError",
+      "message": "Revert message must include a settlement address"
+    }
+  }
+}

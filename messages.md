@@ -616,6 +616,162 @@ The body object must contain:
 }
 ```
 
+### ConfirmRelationship Message Examples
+
+#### 1. Confirm Settlement Address with CACAO Proof
+```json
+{
+  "id": "confirm-rel-123",
+  "type": "https://tap.rsvp/schema/1.0#ConfirmRelationship",
+  "from": "did:pkh:eip155:1:0x1234a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb",
+  "to": ["did:web:beneficiary.vasp"],
+  "thid": "1234567890",
+  "created_time": 1516269022,
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#ConfirmRelationship",
+    "@id": "did:pkh:eip155:1:0x1234a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb",
+    "for": "did:web:beneficiary.vasp",
+    "role": "settlementAddress"
+  },
+  "attachments": [
+    {
+      "id": "proof-1",
+      "media_type": "application/json",
+      "data": {
+        "json": {
+          "h": "eth-personal-sign",
+          "s": "0x4b688df40bcedbe641ddb52926c971c4f3715a9b5bd0055e0d83659a45c0fc9f7e4979547f179f5880b66684081ac5e32a39a404d33f6cf7b3271e619a97c2f81c",
+          "p": "I confirm that this wallet (0x1234...fcdb) is controlled by did:web:beneficiary.vasp",
+          "t": "2024-03-07T12:00:00Z"
+        }
+      }
+    }
+  ]
+}
+```
+
+#### 2. Confirm Custodial Relationship
+```json
+{
+  "id": "confirm-rel-124",
+  "type": "https://tap.rsvp/schema/1.0#ConfirmRelationship",
+  "from": "did:web:custodian.service",
+  "to": ["did:web:beneficiary.vasp"],
+  "thid": "1234567890",
+  "created_time": 1516269022,
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#ConfirmRelationship",
+    "@id": "did:web:custodian.service",
+    "for": "did:web:beneficiary.vasp",
+    "role": "custodian"
+  }
+}
+```
+
+### Connect Message Examples
+
+#### 1. B2B Service Connection Request
+```json
+{
+  "id": "connect-123",
+  "type": "https://tap.rsvp/schema/1.0#Connect",
+  "from": "did:web:b2b.service",
+  "to": ["did:web:beneficiary.vasp"],
+  "created_time": 1516269022,
+  "expires_time": 1516385931,
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#Connect",
+    "agent": {
+      "@id": "did:web:b2b.service",
+      "name": "B2B Payment Service",
+      "type": "ServiceAgent",
+      "serviceUrl": "https://b2b.service/did-comm"
+    },
+    "for": "did:org:business-customer",
+    "constraints": {
+      "purposes": ["BEXP", "SUPP"],
+      "categoryPurposes": ["CASH", "CCRD"],
+      "limits": {
+        "per_transaction": "10000.00",
+        "daily": "50000.00",
+        "currency": "USD"
+      }
+    }
+  }
+}
+```
+
+#### 2. Merchant Connection Request
+```json
+{
+  "id": "connect-124",
+  "type": "https://tap.rsvp/schema/1.0#Connect",
+  "from": "did:web:merchant.vasp",
+  "to": ["did:web:payment.provider"],
+  "created_time": 1516269022,
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#Connect",
+    "agent": {
+      "@id": "did:web:merchant.vasp",
+      "name": "Example Store",
+      "type": "Merchant"
+    },
+    "for": "did:web:merchant.vasp",
+    "constraints": {
+      "purposes": ["RCPT"],
+      "categoryPurposes": ["EPAY"],
+      "limits": {
+        "per_transaction": "5000.00",
+        "daily": "25000.00",
+        "currency": "USD"
+      }
+    }
+  }
+}
+```
+
+### AuthorizationRequired Message Examples
+
+#### 1. Interactive Authorization Required
+```json
+{
+  "id": "auth-req-123",
+  "type": "https://tap.rsvp/schema/1.0#AuthorizationRequired",
+  "from": "did:web:beneficiary.vasp",
+  "to": ["did:web:b2b.service"],
+  "thid": "connect-123",
+  "created_time": 1516269022,
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#AuthorizationRequired",
+    "authorization_url": "https://beneficiary.vasp/authorize?request=abc123",
+    "expires": "2024-03-22T15:00:00Z"
+  }
+}
+```
+
+#### 2. Authorization Required with Custom Portal
+```json
+{
+  "id": "auth-req-124",
+  "type": "https://tap.rsvp/schema/1.0#AuthorizationRequired",
+  "from": "did:web:payment.provider",
+  "to": ["did:web:merchant.vasp"],
+  "thid": "connect-124",
+  "created_time": 1516269022,
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#AuthorizationRequired",
+    "authorization_url": "https://payment.provider/merchant/onboard?id=xyz789",
+    "expires": "2024-03-22T15:00:00Z"
+  }
+}
+```
+
 ## Policy messages
 
 ### UpdatePolicies
@@ -855,14 +1011,13 @@ Terminates an existing connection.
 {
   "id": "fedcba98-e89b-12d3-a456-426614174004",
   "type": "https://tap.rsvp/schema/1.0#Cancel",
-  "from": "did:example:vasp",
-  "to": ["did:example:b2b-service"],
-  "thid": "123e4567-e89b-12d3-a456-426614174000",
-  "created_time": 1516269025,
+  "from": "did:web:customer.wallet",
+  "to": ["did:web:merchant.vasp"],
+  "thid": "payment-123",
   "body": {
     "@context": "https://tap.rsvp/schema/1.0",
     "@type": "https://tap.rsvp/schema/1.0#Cancel",
-    "reason": "user_requested"
+    "reason": "User declined payment request"
   }
 }
 ```
@@ -1294,6 +1449,298 @@ Note that all messages in this flow share the same thread ID (`payment-123`) to 
     "@context": "https://tap.rsvp/schema/1.0",
     "@type": "https://tap.rsvp/schema/1.0#Cancel",
     "reason": "User declined payment request"
+  }
+}
+```
+
+### Payment Request Flow Examples
+
+#### 1. Payment Request with Fiat Amount and Supported Assets
+```json
+{
+  "id": "payment-req-123",
+  "type": "https://tap.rsvp/schema/1.0#PaymentRequest",
+  "from": "did:web:merchant.vasp",
+  "to": ["did:web:customer.vasp"],
+  "created_time": 1516269022,
+  "expires_time": 1516385931,
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#PaymentRequest",
+    "currency": "USD",
+    "amount": "100.00",
+    "supportedAssets": [
+      "eip155:1/erc20:0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+      "eip155:1/erc20:0x6B175474E89094C44Da98b954EedeAC495271d0F"
+    ],
+    "merchant": {
+      "@id": "did:web:merchant.vasp",
+      "name": "Example Store"
+    },
+    "invoice": "https://example.com/invoice/123",
+    "expiry": "2024-04-21T12:00:00Z",
+    "agents": [
+      {
+        "@id": "did:web:merchant.vasp",
+        "for": "did:web:merchant.vasp",
+        "policies": [
+          {
+            "@type": "RequirePresentation",
+            "@context": ["https://schema.org/Person"],
+            "fromAgent": "originator",
+            "aboutParty": "originator",
+            "presentationDefinition": "https://tap.rsvp/presentation-definitions/email/v1"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+#### 2. Payment Request with Direct Asset
+```json
+{
+  "id": "payment-req-124",
+  "type": "https://tap.rsvp/schema/1.0#PaymentRequest",
+  "from": "did:web:merchant.vasp",
+  "to": ["did:web:customer.vasp"],
+  "created_time": 1516269022,
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#PaymentRequest",
+    "asset": "eip155:1/erc20:0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+    "amount": "100.00",
+    "merchant": {
+      "@id": "did:web:merchant.vasp",
+      "name": "Example Store"
+    },
+    "agents": [
+      {
+        "@id": "did:web:merchant.vasp",
+        "for": "did:web:merchant.vasp"
+      }
+    ]
+  }
+}
+```
+
+### Cancel Message Examples
+
+#### 1. Cancel Transaction
+```json
+{
+  "id": "cancel-123",
+  "type": "https://tap.rsvp/schema/1.0#Cancel",
+  "from": "did:web:originator.vasp",
+  "to": ["did:web:beneficiary.vasp"],
+  "thid": "1234567890",
+  "created_time": 1516269022,
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#Cancel",
+    "reason": "User requested cancellation"
+  }
+}
+```
+
+#### 2. Cancel Connection
+```json
+{
+  "id": "cancel-124",
+  "type": "https://tap.rsvp/schema/1.0#Cancel",
+  "from": "did:web:originator.vasp",
+  "to": ["did:web:beneficiary.vasp"],
+  "thid": "connection-123",
+  "created_time": 1516269022,
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#Cancel",
+    "reason": "Service agreement terminated"
+  }
+}
+```
+
+### Revert Message Examples
+
+#### 1. Revert for Compliance Reasons
+```json
+{
+  "id": "revert-123",
+  "type": "https://tap.rsvp/schema/1.0#Revert",
+  "from": "did:web:beneficiary.vasp",
+  "to": ["did:web:originator.vasp"],
+  "thid": "1234567890",
+  "created_time": 1516269022,
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#Revert",
+    "transfer": {
+      "@id": "1234567890"
+    },
+    "settlementAddress": "eip155:1:0x1234a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb",
+    "reason": "Post-settlement compliance check failed"
+  }
+}
+```
+
+#### 2. Revert for Dispute Resolution
+```json
+{
+  "id": "revert-124",
+  "type": "https://tap.rsvp/schema/1.0#Revert",
+  "from": "did:web:originator.vasp",
+  "to": ["did:web:beneficiary.vasp"],
+  "thid": "1234567890",
+  "created_time": 1516269022,
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#Revert",
+    "transfer": {
+      "@id": "1234567890"
+    },
+    "settlementAddress": "eip155:1:0x5678a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb",
+    "reason": "Customer dispute - unauthorized transaction"
+  }
+}
+```
+
+### UpdateAgent Message Examples
+
+#### 1. Update Agent with New Policies
+```json
+{
+  "id": "update-agent-123",
+  "type": "https://tap.rsvp/schema/1.0#UpdateAgent",
+  "from": "did:web:originator.vasp",
+  "to": ["did:web:beneficiary.vasp"],
+  "thid": "1234567890",
+  "created_time": 1516269022,
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#UpdateAgent",
+    "agent": {
+      "@id": "did:web:originator.vasp",
+      "for": "did:eg:bob",
+      "policies": [
+        {
+          "@type": "RequirePresentation",
+          "@context": ["https://schema.org/Person"],
+          "fromAgent": "beneficiary",
+          "aboutParty": "beneficiary",
+          "presentationDefinition": "https://tap.rsvp/presentation-definitions/ivms-101/eu/tfr"
+        },
+        {
+          "@type": "RequirePurpose",
+          "fromAgent": "beneficiary",
+          "fields": ["purpose", "categoryPurpose"]
+        }
+      ]
+    }
+  }
+}
+```
+
+#### 2. Update Agent Role
+```json
+{
+  "id": "update-agent-124",
+  "type": "https://tap.rsvp/schema/1.0#UpdateAgent",
+  "from": "did:web:beneficiary.vasp",
+  "to": ["did:web:originator.vasp"],
+  "thid": "1234567890",
+  "created_time": 1516269022,
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#UpdateAgent",
+    "agent": {
+      "@id": "did:pkh:eip155:1:0x1234a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb",
+      "for": "did:web:beneficiary.vasp",
+      "role": "custodian"
+    }
+  }
+}
+```
+
+### UpdateParty Message Examples
+
+#### 1. Update Party with LEI
+```json
+{
+  "id": "update-party-123",
+  "type": "https://tap.rsvp/schema/1.0#UpdateParty",
+  "from": "did:web:originator.vasp",
+  "to": ["did:web:beneficiary.vasp"],
+  "thid": "1234567890",
+  "created_time": 1516269022,
+  "body": {
+    "@context": {
+      "@vocab": "https://tap.rsvp/schema/1.0",
+      "lei": "https://schema.org/leiCode"
+    },
+    "@type": "https://tap.rsvp/schema/1.0#UpdateParty",
+    "party": {
+      "@id": "did:org:acmecorp",
+      "lei:leiCode": "3M5E1GQKGL17HI8CPN20",
+      "name": "ACME Corporation"
+    }
+  }
+}
+```
+
+#### 2. Update Party with Name Hash
+```json
+{
+  "id": "update-party-124",
+  "type": "https://tap.rsvp/schema/1.0#UpdateParty",
+  "from": "did:web:beneficiary.vasp",
+  "to": ["did:web:originator.vasp"],
+  "thid": "1234567890",
+  "created_time": 1516269022,
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#UpdateParty",
+    "party": {
+      "@id": "did:eg:alice",
+      "name": "Alice Smith",
+      "nameHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  }
+}
+```
+
+### RemoveAgent Message Examples
+
+#### 1. Remove Settlement Address
+```json
+{
+  "id": "remove-agent-123",
+  "type": "https://tap.rsvp/schema/1.0#RemoveAgent",
+  "from": "did:web:beneficiary.vasp",
+  "to": ["did:web:originator.vasp"],
+  "thid": "1234567890",
+  "created_time": 1516269022,
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#RemoveAgent",
+    "agent": "did:pkh:eip155:1:0x1234a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb"
+  }
+}
+```
+
+#### 2. Remove Custodial Service
+```json
+{
+  "id": "remove-agent-124",
+  "type": "https://tap.rsvp/schema/1.0#RemoveAgent",
+  "from": "did:web:originator.vasp",
+  "to": ["did:web:beneficiary.vasp", "did:web:custodian.service"],
+  "thid": "1234567890",
+  "created_time": 1516269022,
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#RemoveAgent",
+    "agent": "did:web:custodian.service"
   }
 }
 ```

@@ -1,0 +1,44 @@
+{
+  "description": "Valid out-of-band message for Payment Request",
+  "purpose": "Validates an out-of-band message containing a Payment Request",
+  "shouldPass": true,
+  "version": "1.0.0",
+  "taips": ["taip-2", "taip-4"],
+  "message": {
+    "type": "https://didcomm.org/out-of-band/2.0/invitation",
+    "id": "4f9e257c-2839-4fae-b0c4-dcd4e2159f6f",
+    "from": "did:web:merchant.vasp.example",
+    "body": {
+      "goal_code": "tap.payment",
+      "goal": "Process payment request",
+      "accept": ["didcomm/v2"]
+    },
+    "attachments": [
+      {
+        "id": "payment-request-1",
+        "mime_type": "application/didcomm-signed+json",
+        "data": {
+          "json": {
+            "payload": "eyJpZCI6Ijc4OWFiY2QtZTg5Yi0xMmQzLWE0NTYtNDI2NjE0MTc0MDA2IiwidHlwZSI6Imh0dHBzOi8vdGFwLnJzdnAvc2NoZW1hLzEuMCNQYXltZW50UmVxdWVzdCIsImZyb20iOiJkaWQ6d2ViOm1lcmNoYW50LnZhc3AuZXhhbXBsZSIsImNyZWF0ZWRfdGltZSI6MTUxNjI2OTAyMiwiZXhwaXJlc190aW1lIjoxNTE2Mzg1OTMxLCJib2R5Ijp7IkBjb250ZXh0IjoiaHR0cHM6Ly90YXAucnN2cC9zY2hlbWEvMS4wIiwiQHR5cGUiOiJodHRwczovL3RhcC5yc3ZwL3NjaGVtYS8xLjAjUGF5bWVudFJlcXVlc3QiLCJjdXJyZW5jeSI6IlVTRCIsImFtb3VudCI6IjUwMC4wMCIsInN1cHBvcnRlZEFzc2V0cyI6WyJlaXAxNTU6MS9lcmMyMDoweEEwYjg2OTkxYzYyMThiMzZjMWQxOUQ0YTJlOUViMGNFMzYwNmVCNDgiLCJlaXAxNTU6MS9lcmMyMDoweDZCMTc1NDc0RTg5MDk0QzQ0RGE5OGI5NTRFZWRlQUM0OTUyNzFkMEYiXSwibWVyY2hhbnQiOnsiQGlkIjoiZGlkOndlYjptZXJjaGFudC5leGFtcGxlIiwibmFtZSI6IkV4YW1wbGUgU3RvcmUifSwiaW52b2ljZSI6Imh0dHBzOi8vbWVyY2hhbnQuZXhhbXBsZS9pbnZvaWNlLzEyMyIsImV4cGlyeSI6IjIwMjQtMDQtMjFUMTI6MDA6MDBaIiwiYWdlbnRzIjpbeyJAaWQiOiJkaWQ6d2ViOm1lcmNoYW50LnZhc3AuZXhhbXBsZSIsImZvciI6ImRpZDp3ZWI6bWVyY2hhbnQuZXhhbXBsZSJ9XX19",
+            "signatures": [
+              {
+                "protected": "eyJhbGciOiJFZERTQSIsImtpZCI6ImRpZDp3ZWI6bWVyY2hhbnQudmFzcC5leGFtcGxlI2tleS0xIn0",
+                "signature": "YmFzZTY0dXJsIGVuY29kZWQgc2lnbmF0dXJl",
+                "header": {
+                  "kid": "did:web:merchant.vasp.example#key-1"
+                }
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "expectedResult": {
+    "valid": true,
+    "urls": [
+      "https://example.com/path?_oob=eyJ0eXAiOiJKV1QiLCJhbGciOiJFZERTQSJ9...",
+      "https://example.com/path?_oobid=4f9e257c-2839-4fae-b0c4-dcd4e2159f6f"
+    ]
+  }
+}

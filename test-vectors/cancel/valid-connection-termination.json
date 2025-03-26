@@ -1,0 +1,26 @@
+{
+  "description": "Valid connection termination",
+  "purpose": "Validates a cancel message for terminating an established connection",
+  "shouldPass": true,
+  "version": "1.0.0",
+  "taips": ["taip-2", "taip-15"],
+  "message": {
+    "id": "fedcba98-e89b-12d3-a456-426614174004",
+    "type": "https://tap.rsvp/schema/1.0#Cancel",
+    "from": "did:web:vasp.example",
+    "to": ["did:web:b2b-service.example"],
+    "thid": "conn-123e4567-e89b-12d3-a456-426614174000",
+    "created_time": 1516269025,
+    "body": {
+      "@context": "https://tap.rsvp/schema/1.0",
+      "@type": "https://tap.rsvp/schema/1.0#Cancel",
+      "connection": {
+        "id": "conn-123e4567-e89b-12d3-a456-426614174000"
+      },
+      "reason": "Service agreement terminated"
+    }
+  },
+  "expectedResult": {
+    "valid": true
+  }
+}

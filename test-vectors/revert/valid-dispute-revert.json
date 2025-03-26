@@ -1,0 +1,27 @@
+{
+  "description": "Valid revert message for dispute resolution",
+  "purpose": "Validates a revert message requesting return of funds due to a customer dispute",
+  "shouldPass": true,
+  "version": "1.0.0",
+  "taips": ["taip-2", "taip-4"],
+  "message": {
+    "id": "revert-124",
+    "type": "https://tap.rsvp/schema/1.0#Revert",
+    "from": "did:web:originator.vasp",
+    "to": ["did:web:beneficiary.vasp"],
+    "thid": "1234567890",
+    "created_time": 1516269022,
+    "body": {
+      "@context": "https://tap.rsvp/schema/1.0",
+      "@type": "https://tap.rsvp/schema/1.0#Revert",
+      "transfer": {
+        "@id": "1234567890"
+      },
+      "settlementAddress": "eip155:1:0x5678a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb",
+      "reason": "Customer dispute - unauthorized transaction"
+    }
+  },
+  "expectedResult": {
+    "valid": true
+  }
+}

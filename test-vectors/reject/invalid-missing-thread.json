@@ -1,0 +1,26 @@
+{
+  "description": "Invalid reject message missing thread ID",
+  "purpose": "Validates that reject messages must include a thread ID",
+  "shouldPass": false,
+  "version": "1.0.0",
+  "taips": ["taip-2", "taip-15"],
+  "message": {
+    "id": "76543210-e89b-12d3-a456-426614174004",
+    "type": "https://tap.rsvp/schema/1.0#Reject",
+    "from": "did:web:vasp.example",
+    "to": ["did:web:b2b-service.example"],
+    "created_time": 1516269024,
+    "body": {
+      "@context": "https://tap.rsvp/schema/1.0",
+      "@type": "https://tap.rsvp/schema/1.0#Reject",
+      "reason": "Unauthorized connection request"
+    }
+  },
+  "expectedResult": {
+    "valid": false,
+    "error": {
+      "type": "ValidationError",
+      "message": "Reject message must include a thread ID (thid)"
+    }
+  }
+}

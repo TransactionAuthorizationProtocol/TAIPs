@@ -1,0 +1,23 @@
+{
+  "description": "Valid connection rejection",
+  "purpose": "Validates a reject message for a connection request",
+  "shouldPass": true,
+  "version": "1.0.0",
+  "taips": ["taip-2", "taip-15"],
+  "message": {
+    "id": "76543210-e89b-12d3-a456-426614174003",
+    "type": "https://tap.rsvp/schema/1.0#Reject",
+    "from": "did:web:vasp.example",
+    "to": ["did:web:b2b-service.example"],
+    "thid": "123e4567-e89b-12d3-a456-426614174000",
+    "created_time": 1516269024,
+    "body": {
+      "@context": "https://tap.rsvp/schema/1.0",
+      "@type": "https://tap.rsvp/schema/1.0#Reject",
+      "reason": "Unauthorized connection request"
+    }
+  },
+  "expectedResult": {
+    "valid": true
+  }
+}

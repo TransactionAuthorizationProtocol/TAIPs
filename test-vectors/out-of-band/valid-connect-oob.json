@@ -1,0 +1,44 @@
+{
+  "description": "Valid out-of-band message for Connect request",
+  "purpose": "Validates an out-of-band message containing a Connect request for B2B service integration",
+  "shouldPass": true,
+  "version": "1.0.0",
+  "taips": ["taip-2", "taip-15"],
+  "message": {
+    "type": "https://didcomm.org/out-of-band/2.0/invitation",
+    "id": "2e9e257c-2839-4fae-b0c4-dcd4e2159f4e",
+    "from": "did:web:b2b-service.example",
+    "body": {
+      "goal_code": "tap.connect",
+      "goal": "Establish agent connection",
+      "accept": ["didcomm/v2"]
+    },
+    "attachments": [
+      {
+        "id": "connect-request-1",
+        "mime_type": "application/didcomm-signed+json",
+        "data": {
+          "json": {
+            "payload": "eyJpZCI6IjEyM2U0NTY3LWU4OWItMTJkMy1hNDU2LTQyNjYxNDE3NDAwMCIsInR5cGUiOiJodHRwczovL3RhcC5yc3ZwL3NjaGVtYS8xLjAjQ29ubmVjdCIsImZyb20iOiJkaWQ6d2ViOmIyYi1zZXJ2aWNlLmV4YW1wbGUiLCJjcmVhdGVkX3RpbWUiOjE1MTYyNjkwMjIsImV4cGlyZXNfdGltZSI6MTUxNjM4NTkzMSwiYm9keSI6eyJAY29udGV4dCI6Imh0dHBzOi8vdGFwLnJzdnAvc2NoZW1hLzEuMCIsIkB0eXBlIjoiaHR0cHM6Ly90YXAucnN2cC9zY2hlbWEvMS4wI0Nvbm5lY3QiLCJhZ2VudCI6eyJAaWQiOiJkaWQ6d2ViOmIyYi1zZXJ2aWNlLmV4YW1wbGUiLCJuYW1lIjoiQjJCIFBheW1lbnQgU2VydmljZSIsInR5cGUiOiJTZXJ2aWNlQWdlbnQiLCJzZXJ2aWNlVXJsIjoiaHR0cHM6Ly9iMmItc2VydmljZS5leGFtcGxlL2RpZC1jb21tIn0sImZvciI6ImRpZDp3ZWI6YnVzaW5lc3MtY3VzdG9tZXIuZXhhbXBsZSIsImNvbnN0cmFpbnRzIjp7InB1cnBvc2VzIjpbIkJFWFAiLCJTVVBQIl0sImNhdGVnb3J5UHVycG9zZXMiOlsiQ0FTSCIsIkNDUkQiXSwibGltaXRzIjp7InBlcl90cmFuc2FjdGlvbiI6IjEwMDAwLjAwIiwiZGFpbHkiOiI1MDAwMC4wMCIsImN1cnJlbmN5IjoiVVNEIn19fX0",
+            "signatures": [
+              {
+                "protected": "eyJhbGciOiJFZERTQSIsImtpZCI6ImRpZDp3ZWI6YjJiLXNlcnZpY2UuZXhhbXBsZSNrZXktMSJ9",
+                "signature": "YmFzZTY0dXJsIGVuY29kZWQgc2lnbmF0dXJl",
+                "header": {
+                  "kid": "did:web:b2b-service.example#key-1"
+                }
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "expectedResult": {
+    "valid": true,
+    "urls": [
+      "https://example.com/path?_oob=eyJ0eXAiOiJKV1QiLCJhbGciOiJFZERTQSJ9...",
+      "https://example.com/path?_oobid=2e9e257c-2839-4fae-b0c4-dcd4e2159f4e"
+    ]
+  }
+}

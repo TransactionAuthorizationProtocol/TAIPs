@@ -1,0 +1,44 @@
+{
+  "description": "Valid out-of-band message for Transfer request",
+  "purpose": "Validates an out-of-band message containing a Transfer request",
+  "shouldPass": true,
+  "version": "1.0.0",
+  "taips": ["taip-2", "taip-3"],
+  "message": {
+    "type": "https://didcomm.org/out-of-band/2.0/invitation",
+    "id": "3f9e257c-2839-4fae-b0c4-dcd4e2159f5f",
+    "from": "did:web:originator.vasp.example",
+    "body": {
+      "goal_code": "tap.transfer",
+      "goal": "Initiate asset transfer",
+      "accept": ["didcomm/v2"]
+    },
+    "attachments": [
+      {
+        "id": "transfer-request-1",
+        "mime_type": "application/didcomm-signed+json",
+        "data": {
+          "json": {
+            "payload": "eyJpZCI6IjQ1Njc4OWFiLWU4OWItMTJkMy1hNDU2LTQyNjYxNDE3NDAwNSIsInR5cGUiOiJodHRwczovL3RhcC5yc3ZwL3NjaGVtYS8xLjAjVHJhbnNmZXIiLCJmcm9tIjoiZGlkOndlYjpvcmlnaW5hdG9yLnZhc3AuZXhhbXBsZSIsImNyZWF0ZWRfdGltZSI6MTUxNjI2OTAyMiwiZXhwaXJlc190aW1lIjoxNTE2Mzg1OTMxLCJib2R5Ijp7IkBjb250ZXh0IjoiaHR0cHM6Ly90YXAucnN2cC9zY2hlbWEvMS4wIiwiQHR5cGUiOiJodHRwczovL3RhcC5yc3ZwL3NjaGVtYS8xLjAjVHJhbnNmZXIiLCJhc3NldCI6ImVpcDE1NToxL2VyYzIwOjB4QTBiODY5OTFjNjIxOGIzNmMxZDE5RDRhMmU5RWIwY0UzNjA2ZUI0OCIsImFtb3VudCI6IjEwMDAuMDAiLCJvcmlnaW5hdG9yIjp7IkBpZCI6ImRpZDp3ZWI6b3JpZ2luYXRvci5leGFtcGxlIiwibmFtZSI6IkFsaWNlIENvcnAifSwiYmVuZWZpY2lhcnkiOnsiQGlkIjoiZGlkOndlYjpiZW5lZmljaWFyeS5leGFtcGxlIiwibmFtZSI6IkJvYiBMdGQifSwicHVycG9zZSI6IkJFWFAiLCJhZ2VudHMiOlt7IkBpZCI6ImRpZDp3ZWI6b3JpZ2luYXRvci52YXNwLmV4YW1wbGUiLCJmb3IiOiJkaWQ6d2ViOm9yaWdpbmF0b3IuZXhhbXBsZSJ9XX19",
+            "signatures": [
+              {
+                "protected": "eyJhbGciOiJFZERTQSIsImtpZCI6ImRpZDp3ZWI6b3JpZ2luYXRvci52YXNwLmV4YW1wbGUja2V5LTEifQ",
+                "signature": "YmFzZTY0dXJsIGVuY29kZWQgc2lnbmF0dXJl",
+                "header": {
+                  "kid": "did:web:originator.vasp.example#key-1"
+                }
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "expectedResult": {
+    "valid": true,
+    "urls": [
+      "https://example.com/path?_oob=eyJ0eXAiOiJKV1QiLCJhbGciOiJFZERTQSJ9...",
+      "https://example.com/path?_oobid=3f9e257c-2839-4fae-b0c4-dcd4e2159f5f"
+    ]
+  }
+}

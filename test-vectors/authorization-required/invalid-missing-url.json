@@ -1,0 +1,27 @@
+{
+  "description": "Invalid authorization required message missing URL",
+  "purpose": "Validates that authorization required messages must include an authorization URL",
+  "shouldPass": false,
+  "version": "1.0.0",
+  "taips": ["taip-2", "taip-15"],
+  "message": {
+    "id": "98765432-e89b-12d3-a456-426614174002",
+    "type": "https://tap.rsvp/schema/1.0#AuthorizationRequired",
+    "from": "did:web:vasp.example",
+    "to": ["did:web:b2b-service.example"],
+    "thid": "123e4567-e89b-12d3-a456-426614174000",
+    "created_time": 1516269023,
+    "body": {
+      "@context": "https://tap.rsvp/schema/1.0",
+      "@type": "https://tap.rsvp/schema/1.0#AuthorizationRequired",
+      "expires": "2024-03-22T15:00:00Z"
+    }
+  },
+  "expectedResult": {
+    "valid": false,
+    "error": {
+      "type": "ValidationError",
+      "message": "Authorization required message must include an authorization URL"
+    }
+  }
+}

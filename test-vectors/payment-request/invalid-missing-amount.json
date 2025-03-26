@@ -1,0 +1,33 @@
+{
+  "description": "Invalid payment request missing amount field",
+  "purpose": "Validates that payment requests must include an amount",
+  "shouldPass": false,
+  "version": "1.0.0",
+  "taips": ["taip-2", "taip-4"],
+  "message": {
+    "id": "payment-req-125",
+    "type": "https://tap.rsvp/schema/1.0#PaymentRequest",
+    "from": "did:web:merchant.vasp",
+    "to": ["did:web:customer.vasp"],
+    "created_time": 1516269022,
+    "body": {
+      "@context": "https://tap.rsvp/schema/1.0",
+      "@type": "https://tap.rsvp/schema/1.0#PaymentRequest",
+      "currency": "USD",
+      "supportedAssets": [
+        "eip155:1/erc20:0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+      ],
+      "merchant": {
+        "@id": "did:web:merchant.vasp",
+        "name": "Example Store"
+      }
+    }
+  },
+  "expectedResult": {
+    "valid": false,
+    "error": {
+      "type": "ValidationError",
+      "message": "Payment request must include an amount"
+    }
+  }
+}

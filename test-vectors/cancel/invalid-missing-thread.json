@@ -1,0 +1,26 @@
+{
+  "description": "Invalid cancel message missing thread ID",
+  "purpose": "Validates that cancel messages must include a thread ID",
+  "shouldPass": false,
+  "version": "1.0.0",
+  "taips": ["taip-2", "taip-4"],
+  "message": {
+    "id": "cancel-125",
+    "type": "https://tap.rsvp/schema/1.0#Cancel",
+    "from": "did:web:originator.vasp",
+    "to": ["did:web:beneficiary.vasp"],
+    "created_time": 1516269022,
+    "body": {
+      "@context": "https://tap.rsvp/schema/1.0",
+      "@type": "https://tap.rsvp/schema/1.0#Cancel",
+      "reason": "User requested cancellation"
+    }
+  },
+  "expectedResult": {
+    "valid": false,
+    "error": {
+      "type": "ValidationError",
+      "message": "Cancel message must include a thread ID (thid)"
+    }
+  }
+}

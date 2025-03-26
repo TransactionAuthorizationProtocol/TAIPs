@@ -1,0 +1,43 @@
+{
+  "description": "Invalid out-of-band message missing goal_code",
+  "purpose": "Validates that out-of-band messages must include a tap.* goal_code",
+  "shouldPass": false,
+  "version": "1.0.0",
+  "taips": ["taip-2"],
+  "message": {
+    "type": "https://didcomm.org/out-of-band/2.0/invitation",
+    "id": "5f9e257c-2839-4fae-b0c4-dcd4e2159f7f",
+    "from": "did:web:merchant.vasp.example",
+    "body": {
+      "goal": "Process payment request",
+      "accept": ["didcomm/v2"]
+    },
+    "attachments": [
+      {
+        "id": "payment-request-1",
+        "mime_type": "application/didcomm-signed+json",
+        "data": {
+          "json": {
+            "id": "789abcd-e89b-12d3-a456-426614174007",
+            "type": "https://tap.rsvp/schema/1.0#PaymentRequest",
+            "from": "did:web:merchant.vasp.example",
+            "created_time": 1516269022,
+            "body": {
+              "@context": "https://tap.rsvp/schema/1.0",
+              "@type": "https://tap.rsvp/schema/1.0#PaymentRequest",
+              "currency": "USD",
+              "amount": "500.00"
+            }
+          }
+        }
+      }
+    ]
+  },
+  "expectedResult": {
+    "valid": false,
+    "error": {
+      "type": "ValidationError",
+      "message": "Out-of-band message must include a goal_code starting with 'tap.'"
+    }
+  }
+}

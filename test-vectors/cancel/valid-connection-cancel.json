@@ -1,0 +1,23 @@
+{
+  "description": "Valid connection cancellation",
+  "purpose": "Validates a cancel message for an existing connection",
+  "shouldPass": true,
+  "version": "1.0.0",
+  "taips": ["taip-2", "taip-4"],
+  "message": {
+    "id": "cancel-124",
+    "type": "https://tap.rsvp/schema/1.0#Cancel",
+    "from": "did:web:originator.vasp",
+    "to": ["did:web:beneficiary.vasp"],
+    "thid": "connection-123",
+    "created_time": 1516269022,
+    "body": {
+      "@context": "https://tap.rsvp/schema/1.0",
+      "@type": "https://tap.rsvp/schema/1.0#Cancel",
+      "reason": "Service agreement terminated"
+    }
+  },
+  "expectedResult": {
+    "valid": true
+  }
+}

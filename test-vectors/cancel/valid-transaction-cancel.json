@@ -1,0 +1,23 @@
+{
+  "description": "Valid transaction cancellation",
+  "purpose": "Validates a cancel message for an in-progress transaction",
+  "shouldPass": true,
+  "version": "1.0.0",
+  "taips": ["taip-2", "taip-4"],
+  "message": {
+    "id": "cancel-123",
+    "type": "https://tap.rsvp/schema/1.0#Cancel",
+    "from": "did:web:originator.vasp",
+    "to": ["did:web:beneficiary.vasp"],
+    "thid": "1234567890",
+    "created_time": 1516269022,
+    "body": {
+      "@context": "https://tap.rsvp/schema/1.0",
+      "@type": "https://tap.rsvp/schema/1.0#Cancel",
+      "reason": "User requested cancellation"
+    }
+  },
+  "expectedResult": {
+    "valid": true
+  }
+}
