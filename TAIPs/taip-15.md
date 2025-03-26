@@ -19,9 +19,9 @@ This TAIP defines a protocol for agents to establish secure, authorized connecti
 
 ## Motivation
 
-The Transaction Authorization Protocol enables secure communication between different agents (VASPs, wallets, custodians, etc.). However, for ongoing business relationships, agents need a way to establish persistent, authorized connections with predefined constraints. Current implementations often rely on ad-hoc methods or require repeated authorizations. This TAIP addresses several key needs:
+The Transaction Authorization Protocol enables secure communication between different agents (AI Agents, VASPs, wallets, custodians, etc.). However, for ongoing business relationships, agents need a way to establish persistent, authorized connections with predefined constraints. Current implementations often rely on ad-hoc methods or require repeated authorizations. This TAIP addresses several key needs:
 
-1. **Business Integration:** B2B services need to connect securely with their customers' accounts at VASPs or custodians.
+1. **Business Integration:** B2B services need to connect securely with their customers' accounts at VASPs or custodians for ongoing transactions on behalf of the customer.
 2. **User Authorization:** Account holders must explicitly authorize agent connections through familiar OAuth-style flows.
 3. **Transaction Constraints:** Connections should specify upfront what types of transactions are allowed (purposes, limits).
 4. **Relationship Verification:** Agents must prove their relationship to the parties they represent.
@@ -31,134 +31,64 @@ By standardizing these connection aspects, we enable secure B2B integrations whi
 
 ## Specification
 
+### Message Types
+
+All messages implement [TAIP-2] and are sent between [TAIP-5 Agents][TAIP-5]. Each message type has specific requirements for its body object.
+
 ### Connect Message
 
 A message sent by an agent requesting connection to another agent:
 
-```json
-{
-  "id": "123e4567-e89b-12d3-a456-426614174000",
-  "type": "https://tap.rsvp/schema/1.0#Connect",
-  "from": "did:example:b2b-service",
-  "to": ["did:example:vasp"],
-  "created_time": 1516269022,
-  "expires_time": 1516385931,
-  "body": {
-    "@context": "https://tap.rsvp/schema/1.0",
-    "@type": "https://tap.rsvp/schema/1.0#Connect",
-    "agent": {
-      "@id": "did:example:b2b-service",
-      "name": "B2B Payment Service",
-      "type": "ServiceAgent",
-      "endpoints": {
-        "messaging": "https://api.b2bservice.com/agent"
-      }
-    },
-    "for": "did:example:business-customer",
-    "constraints": {
-      "purposes": ["BEXP", "SUPP"],
-      "categoryPurposes": ["CASH", "CCRD"],
-      "limits": {
-        "per_transaction": "10000.00",
-        "daily": "50000.00",
-        "currency": "USD"
-      }
-    }
-  }
-}
-```
+- `@context` - REQUIRED the JSON-LD context `https://tap.rsvp/schema/1.0`
+- `@type` - REQUIRED the JSON-LD type `https://tap.rsvp/schema/1.0#Connect`
+- `agent` - OPTIONAL object containing information about the requesting agent:
+  - `@id` - REQUIRED string DID of the requesting agent
+  - `name` - OPTIONAL string human-readable name of the agent
+  - `type` - OPTIONAL string type of agent (e.g. "ServiceAgent", "WalletAgent")
+  - `serviceUrl` - OPTIONAL string URL for the agent's DIDComm endpoint
+- `for` - REQUIRED string DID of the party the agent represents
+- `constraints` - REQUIRED object specifying the requested transaction constraints:
+  - `purposes` - OPTIONAL array of [TAIP-13] purpose codes
+  - `categoryPurposes` - OPTIONAL array of [TAIP-13] category purpose codes
+  - `limits` - OPTIONAL object containing transaction limits:
+    - `per_transaction` - OPTIONAL string decimal amount
+    - `daily` - OPTIONAL string decimal amount
+    - `currency` - REQUIRED string ISO 4217 currency code if limits are specified
 
-### Response Messages
+### AuthorizationRequired Message
 
-The receiving agent (VASP) can handle authorization in two ways:
+A message sent in response to a Connect request when interactive authorization is needed:
 
-1. Out-of-band through their existing authentication system (email, app notification, etc.)
-2. Through an authorization URL that can be displayed to the customer
+- `@context` - REQUIRED the JSON-LD context `https://tap.rsvp/schema/1.0`
+- `@type` - REQUIRED the JSON-LD type `https://tap.rsvp/schema/1.0#AuthorizationRequired`
+- `authorization_url` - REQUIRED string URL where the user can authorize the connection
+- `expires` - REQUIRED string ISO 8601 timestamp when the authorization URL expires
 
-#### Authorization URL Response
+### Authorize Message
 
-If the VASP chooses to use an authorization URL:
+A message sent to approve a connection request:
 
-```json
-{
-  "id": "98765432-e89b-12d3-a456-426614174000",
-  "type": "https://tap.rsvp/schema/1.0#AuthorizationRequired",
-  "from": "did:example:vasp",
-  "to": ["did:example:b2b-service"],
-  "thid": "123e4567-e89b-12d3-a456-426614174000",
-  "created_time": 1516269023,
-  "expires_time": 1516385931,
-  "body": {
-    "@context": "https://tap.rsvp/schema/1.0",
-    "@type": "https://tap.rsvp/schema/1.0#AuthorizationRequired",
-    "authorization_url": "https://vasp.com/authorize?request=abc123",
-    "expires": "2024-03-22T15:00:00Z"
-  }
-}
-```
+- `@context` - REQUIRED the JSON-LD context `https://tap.rsvp/schema/1.0`
+- `@type` - REQUIRED the JSON-LD type `https://tap.rsvp/schema/1.0#Authorize`
+- `connection` - REQUIRED object containing:
+  - `id` - REQUIRED string unique identifier for the approved connection
 
-The authorization URL should display a secure page where the customer can:
-- Authenticate with the VASP
-- Review the connection request details
-- Approve or deny the request
+### Reject Message
 
-#### Final Response Messages
+A message sent to reject a connection request:
 
-After authorization (either out-of-band or via URL), the VASP responds using [TAIP-4] messages:
+- `@context` - REQUIRED the JSON-LD context `https://tap.rsvp/schema/1.0`
+- `@type` - REQUIRED the JSON-LD type `https://tap.rsvp/schema/1.0#Reject`
+- `reason` - OPTIONAL string human-readable reason for rejection
 
-- **Authorize:** Connection is approved
-```json
-{
-  "id": "abcdef12-e89b-12d3-a456-426614174000",
-  "type": "https://tap.rsvp/schema/1.0#Authorize",
-  "from": "did:example:vasp",
-  "to": ["did:example:b2b-service"],
-  "thid": "123e4567-e89b-12d3-a456-426614174000",
-  "created_time": 1516269024,
-  "body": {
-    "@context": "https://tap.rsvp/schema/1.0",
-    "@type": "https://tap.rsvp/schema/1.0#Authorize",
-    "connection": {
-      "id": "conn-abc123"
-    }
-  }
-}
-```
+### Cancel Message
 
-- **Reject:** Connection is denied
-```json
-{
-  "id": "76543210-e89b-12d3-a456-426614174000",
-  "type": "https://tap.rsvp/schema/1.0#Reject",
-  "from": "did:example:vasp",
-  "to": ["did:example:b2b-service"],
-  "thid": "123e4567-e89b-12d3-a456-426614174000",
-  "created_time": 1516269024,
-  "body": {
-    "@context": "https://tap.rsvp/schema/1.0",
-    "@type": "https://tap.rsvp/schema/1.0#Reject",
-    "reason": "unauthorized"
-  }
-}
-```
+A message sent to terminate an existing connection:
 
-- **Cancel:** Either party can terminate the connection
-```json
-{
-  "id": "fedcba98-e89b-12d3-a456-426614174000",
-  "type": "https://tap.rsvp/schema/1.0#Cancel",
-  "from": "did:example:vasp",
-  "to": ["did:example:b2b-service"],
-  "thid": "123e4567-e89b-12d3-a456-426614174000",
-  "created_time": 1516269025,
-  "body": {
-    "@context": "https://tap.rsvp/schema/1.0",
-    "@type": "https://tap.rsvp/schema/1.0#Cancel",
-    "connection_id": "conn-abc123",
-    "reason": "user_requested"
-  }
-}
-```
+- `@context` - REQUIRED the JSON-LD context `https://tap.rsvp/schema/1.0`
+- `@type` - REQUIRED the JSON-LD type `https://tap.rsvp/schema/1.0#Cancel`
+- `connection_id` - REQUIRED string identifier of the connection to cancel
+- `reason` - OPTIONAL string human-readable reason for cancellation
 
 ### Connection Flow
 
@@ -187,6 +117,77 @@ After authorization (either out-of-band or via URL), the VASP responds using [TA
    - Connection is established with a unique identifier
    - Future transactions must respect the agreed constraints
    - Either party can Cancel the connection
+
+### Connection Flow Diagrams
+
+#### Basic Connection Flow with Direct Authorization
+
+```mermaid
+sequenceDiagram
+    participant B2B as B2B Service
+    participant VASP
+    participant Customer
+
+    B2B->>VASP: Connect [constraints, for: customer]
+    VASP->>Customer: Out-of-band notification
+    Customer->>VASP: Review & Authorize
+    VASP->>B2B: Authorize
+    Note over B2B,VASP: Connection Established
+```
+
+#### Connection Flow with Interactive Authorization
+
+```mermaid
+sequenceDiagram
+    participant B2B as B2B Service
+    participant VASP
+    participant Customer
+
+    B2B->>VASP: Connect [constraints, for: customer]
+    VASP->>B2B: AuthorizationRequired [URL]
+    B2B->>Customer: Redirect to authorization URL
+    Customer->>VASP: Authenticate & Review
+    Customer->>VASP: Approve
+    VASP->>B2B: Authorize
+    Note over B2B,VASP: Connection Established
+```
+
+#### Connection State Machine
+
+```mermaid
+stateDiagram-v2
+    direction LR
+    [*] --> Requested: Connect
+    Requested --> PendingAuthorization: AuthorizationRequired
+    Requested --> Authorized: Authorize
+    Requested --> Rejected: Reject
+    PendingAuthorization --> Authorized: Authorize
+    PendingAuthorization --> Rejected: Reject
+    Authorized --> Cancelled: Cancel
+    Authorized --> [*]
+    Rejected --> [*]
+    Cancelled --> [*]
+```
+
+### Transaction Flow Using Connection
+
+The following diagram shows how an established connection is used for subsequent transactions:
+
+```mermaid
+sequenceDiagram
+    participant B2B as B2B Service
+    participant VASP
+    participant Blockchain
+
+    Note over B2B,VASP: Connection already established
+    B2B->>VASP: Transfer [pthid: connection_id]
+    activate VASP
+    VASP->>VASP: Validate against constraints
+    VASP->>B2B: Authorize [settlementAddress]
+    deactivate VASP
+    B2B->>Blockchain: Submit transaction
+    B2B->>VASP: Settle [settlementId]
+```
 
 ### Connection Security
 
@@ -222,6 +223,161 @@ The design choices in this specification aim to balance security, usability, and
 - **Data Retention:** Clear connection data when terminated
 - **Audit Logs:** Balance logging with privacy
 
+## Test Cases
+
+The following are example plaintext messages. See [TAIP-2] for how to sign the messages.
+
+### Connect
+
+```json
+{
+  "id": "123e4567-e89b-12d3-a456-426614174000",
+  "type": "https://tap.rsvp/schema/1.0#Connect",
+  "from": "did:example:b2b-service",
+  "to": ["did:example:vasp"],
+  "created_time": 1516269022,
+  "expires_time": 1516385931,
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#Connect",
+    "agent": {
+      "@id": "did:example:b2b-service",
+      "name": "B2B Payment Service",
+      "type": "ServiceAgent",
+      "serviceUrl": "https://b2b-service/did-comm"
+    },
+    "for": "did:example:business-customer",
+    "constraints": {
+      "purposes": ["BEXP", "SUPP"],
+      "categoryPurposes": ["CASH", "CCRD"],
+      "limits": {
+        "per_transaction": "10000.00",
+        "daily": "50000.00",
+        "currency": "USD"
+      }
+    }
+  }
+}
+```
+
+### AuthorizationRequired
+
+```json
+{
+  "id": "98765432-e89b-12d3-a456-426614174001",
+  "type": "https://tap.rsvp/schema/1.0#AuthorizationRequired",
+  "from": "did:example:vasp",
+  "to": ["did:example:b2b-service"],
+  "thid": "123e4567-e89b-12d3-a456-426614174000",
+  "created_time": 1516269023,
+  "expires_time": 1516385931,
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#AuthorizationRequired",
+    "authorization_url": "https://vasp.com/authorize?request=abc123",
+    "expires": "2024-03-22T15:00:00Z"
+  }
+}
+```
+
+### Authorize
+
+```json
+{
+  "id": "abcdef12-e89b-12d3-a456-426614174002",
+  "type": "https://tap.rsvp/schema/1.0#Authorize",
+  "from": "did:example:vasp",
+  "to": ["did:example:b2b-service"],
+  "thid": "123e4567-e89b-12d3-a456-426614174000",
+  "created_time": 1516269024,
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#Authorize"
+  }
+}
+```
+
+### Reject
+
+```json
+{
+  "id": "76543210-e89b-12d3-a456-426614174003",
+  "type": "https://tap.rsvp/schema/1.0#Reject",
+  "from": "did:example:vasp",
+  "to": ["did:example:b2b-service"],
+  "thid": "123e4567-e89b-12d3-a456-426614174000",
+  "created_time": 1516269024,
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#Reject",
+    "reason": "unauthorized"
+  }
+}
+```
+
+### Cancel
+
+```json
+{
+  "id": "fedcba98-e89b-12d3-a456-426614174004",
+  "type": "https://tap.rsvp/schema/1.0#Cancel",
+  "from": "did:example:vasp",
+  "to": ["did:example:b2b-service"],
+  "thid": "123e4567-e89b-12d3-a456-426614174000",
+  "created_time": 1516269025,
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#Cancel",
+    "reason": "user_requested"
+  }
+}
+```
+
+## Using Connections for Transactions
+
+Once a connection is established, the connecting agent can perform transactions on behalf of the customer. All transactions related to a connection MUST include the connection's `id` as the `pthid` (parent thread ID) in the message header. This allows receiving agents to validate the transaction against the connection's constraints.
+
+### Example Transfer Using Connection
+
+The following example shows a [TAIP-3] Transfer message sent by a B2B service using their authorized connection to initiate a transfer on behalf of their customer:
+
+```json
+{
+  "id": "456789ab-e89b-12d3-a456-426614174005",
+  "type": "https://tap.rsvp/schema/1.0#Transfer",
+  "from": "did:example:b2b-service",
+  "to": ["did:example:vasp"],
+  "pthid": "123e4567-e89b-12d3-a456-426614174000",
+  "created_time": 1516269026,
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#Transfer",
+    "asset": "eip155:1/slip44:60",
+    "amount": "1.23",
+    "originator": {
+      "@id": "did:example:business-customer"
+    },
+    "agents": [
+      {
+        "@id": "did:example:b2b-service"
+      },
+      {
+        "@id": "did:example:vasp"
+      }
+    ]
+  }
+}
+```
+
+The receiving agent MUST:
+1. Verify the connection ID in `pthid` exists and is active
+2. Validate that the transaction complies with the connection's constraints:
+   - Check that the purpose (if specified) is allowed
+   - Verify the amount is within the per-transaction and daily limits
+   - Confirm the originator matches the connection's `for` party
+3. Process the transaction according to [TAIP-4] if all checks pass 
+
+
 ## References
 
 * [TAIP-2] TAP Messaging
@@ -238,4 +394,4 @@ The design choices in this specification aim to balance security, usability, and
 
 ## Copyright
 
-Copyright and related rights waived via [CC0]. 
+Copyright and related rights waived via [CC0].

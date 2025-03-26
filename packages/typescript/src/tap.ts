@@ -622,15 +622,16 @@ interface Reject extends TapMessageObject<"Reject"> {
 }
 
 /**
- * Cancellation Message
- * Cancels an in-progress transfer.
+ * Cancel Message
+ * Terminates an existing transaction or connection.
+ * Uses the thread ID to identify what is being cancelled.
  *
- * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-4.md | TAIP-4: Authorization Flow}
+ * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-4.md | TAIP-4: Transaction Authorization Protocol}
  */
 interface Cancel extends TapMessageObject<"Cancel"> {
   /**
-   * Optional cancellation reason
-   * Explanation of why the transfer was cancelled
+   * Optional reason for cancellation
+   * Human readable explanation
    */
   reason?: string;
 }
@@ -879,20 +880,15 @@ interface Connect extends TapMessageObject<"Connect"> {
    * Details of the requesting agent
    * Includes identity and endpoints
    */
-  agent: {
+  agent?: {
     /** DID of the agent */
     "@id": DID;
     /** Human-readable name */
     name?: string;
     /** Type of agent */
     type?: string;
-    /** Service endpoints */
-    endpoints?: {
-      /** Messaging endpoint URL */
-      messaging: string;
-      /** Additional endpoints as needed */
-      [key: string]: string;
-    };
+    /** Service URL */
+    serviceUrl?: string;
   };
 
   /**

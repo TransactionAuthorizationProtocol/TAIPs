@@ -335,29 +335,27 @@ Rejects a proposed transfer.
 ### Cancel
 [TAIP-4] - Review
 
-Allows a party to cancel a transaction.
+Terminates an existing transaction or connection. When used with transactions, it signals a voluntary termination by one of the parties. When used with connections, it terminates the ongoing relationship.
 
 | Attribute | Type | Required | Status | Description |
 |-----------|------|----------|---------|-------------|
 | @context | string | Yes | Review ([TAIP-4]) | JSON-LD context "https://tap.rsvp/schema/1.0" |
 | @type | string | Yes | Review ([TAIP-4]) | JSON-LD type "https://tap.rsvp/schema/1.0#Cancel" |
-| by | string | Yes | Review ([TAIP-4]) | The party cancelling the transaction (e.g. 'originator' or 'beneficiary') |
-| reason | string | No | Review ([TAIP-4]) | Human readable message describing why the transaction was cancelled |
+| reason | string | No | Review ([TAIP-4]) | Human readable reason for cancellation |
 
-#### Examples
-
+#### Example Cancel Message
 ```json
 {
-  "id": "123e4567-e89b-12d3-a456-426614174004",
+  "id": "fedcba98-e89b-12d3-a456-426614174004",
   "type": "https://tap.rsvp/schema/1.0#Cancel",
-  "from": "did:web:originator.vasp",
-  "to": ["did:web:beneficiary.vasp"],
+  "from": "did:example:vasp",
+  "to": ["did:example:b2b-service"],
   "thid": "123e4567-e89b-12d3-a456-426614174000",
+  "created_time": 1516269025,
   "body": {
     "@context": "https://tap.rsvp/schema/1.0",
     "@type": "https://tap.rsvp/schema/1.0#Cancel",
-    "by": "originator",
-    "reason": "Customer requested cancellation"
+    "reason": "user_requested"
   }
 }
 ```
@@ -672,12 +670,11 @@ Requests a connection between agents with specified constraints.
 |-----------|------|----------|---------|-------------|
 | @context | string | Yes | Draft ([TAIP-15]) | JSON-LD context "https://tap.rsvp/schema/1.0" |
 | @type | string | Yes | Draft ([TAIP-15]) | JSON-LD type "https://tap.rsvp/schema/1.0#Connect" |
-| agent | object | Yes | Draft ([TAIP-15]) | Details of the requesting agent |
+| agent | object | No | Draft ([TAIP-15]) | Details of the requesting agent |
 | for | string | Yes | Draft ([TAIP-15]) | DID of the party the agent represents |
 | constraints | object | Yes | Draft ([TAIP-15]) | Transaction constraints for the connection |
 
-#### Examples
-
+#### Example Connect Message
 ```json
 {
   "id": "123e4567-e89b-12d3-a456-426614174000",
@@ -693,9 +690,7 @@ Requests a connection between agents with specified constraints.
       "@id": "did:example:b2b-service",
       "name": "B2B Payment Service",
       "type": "ServiceAgent",
-      "endpoints": {
-        "messaging": "https://api.b2bservice.com/agent"
-      }
+      "serviceUrl": "https://b2b-service/did-comm"
     },
     "for": "did:example:business-customer",
     "constraints": {
@@ -723,11 +718,10 @@ Provides an authorization URL for interactive connection approval.
 | authorization_url | string | Yes | Draft ([TAIP-15]) | URL where the customer can review and approve the connection |
 | expires | string | Yes | Draft ([TAIP-15]) | ISO 8601 timestamp when the authorization URL expires |
 
-#### Examples
-
+#### Example AuthorizationRequired Message
 ```json
 {
-  "id": "98765432-e89b-12d3-a456-426614174000",
+  "id": "98765432-e89b-12d3-a456-426614174001",
   "type": "https://tap.rsvp/schema/1.0#AuthorizationRequired",
   "from": "did:example:vasp",
   "to": ["did:example:b2b-service"],
@@ -739,6 +733,136 @@ Provides an authorization URL for interactive connection approval.
     "@type": "https://tap.rsvp/schema/1.0#AuthorizationRequired",
     "authorization_url": "https://vasp.com/authorize?request=abc123",
     "expires": "2024-03-22T15:00:00Z"
+  }
+}
+```
+
+### Connection Flow Example
+
+This flow demonstrates establishing a connection between a B2B service and a VASP, followed by using that connection for a transaction:
+
+1. Initial connection request
+2. Interactive authorization
+3. Connection approval
+4. Using the connection for a transfer
+
+#### 1. Connect Request
+```json
+{
+  "id": "123e4567-e89b-12d3-a456-426614174000",
+  "type": "https://tap.rsvp/schema/1.0#Connect",
+  "from": "did:example:b2b-service",
+  "to": ["did:example:vasp"],
+  "created_time": 1516269022,
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#Connect",
+    "agent": {
+      "@id": "did:example:b2b-service",
+      "name": "B2B Payment Service",
+      "type": "ServiceAgent"
+    },
+    "for": "did:example:business-customer",
+    "constraints": {
+      "purposes": ["BEXP", "SUPP"],
+      "limits": {
+        "per_transaction": "10000.00",
+        "daily": "50000.00",
+        "currency": "USD"
+      }
+    }
+  }
+}
+```
+
+#### 2. Authorization Required Response
+```json
+{
+  "id": "98765432-e89b-12d3-a456-426614174001",
+  "type": "https://tap.rsvp/schema/1.0#AuthorizationRequired",
+  "from": "did:example:vasp",
+  "to": ["did:example:b2b-service"],
+  "thid": "123e4567-e89b-12d3-a456-426614174000",
+  "created_time": 1516269023,
+  "expires_time": 1516385931,
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#AuthorizationRequired",
+    "authorization_url": "https://vasp.com/authorize?request=abc123",
+    "expires": "2024-03-22T15:00:00Z"
+  }
+}
+```
+
+#### 3. Connection Authorization
+```json
+{
+  "id": "abcdef12-e89b-12d3-a456-426614174002",
+  "type": "https://tap.rsvp/schema/1.0#Authorize",
+  "from": "did:example:vasp",
+  "to": ["did:example:b2b-service"],
+  "thid": "123e4567-e89b-12d3-a456-426614174000",
+  "created_time": 1516269024,
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#Authorize"
+  }
+}
+```
+
+#### 4. Transfer Using Connection
+```json
+{
+  "id": "456789ab-e89b-12d3-a456-426614174005",
+  "type": "https://tap.rsvp/schema/1.0#Transfer",
+  "from": "did:example:b2b-service",
+  "to": ["did:example:vasp"],
+  "pthid": "123e4567-e89b-12d3-a456-426614174000",
+  "created_time": 1516269026,
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#Transfer",
+    "asset": "eip155:1/slip44:60",
+    "amount": "1.23",
+    "originator": {
+      "@id": "did:example:business-customer"
+    },
+    "agents": [
+      {
+        "@id": "did:example:b2b-service"
+      },
+      {
+        "@id": "did:example:vasp"
+      }
+    ]
+  }
+}
+```
+
+### Cancel
+[TAIP-4] - Review
+
+Terminates an existing connection.
+
+| Attribute | Type | Required | Status | Description |
+|-----------|------|----------|---------|-------------|
+| @context | string | Yes | Draft ([TAIP-4]) | JSON-LD context "https://tap.rsvp/schema/1.0" |
+| @type | string | Yes | Draft ([TAIP-4]) | JSON-LD type "https://tap.rsvp/schema/1.0#Cancel" |
+| reason | string | No | Draft ([TAIP-4]) | Human readable reason for cancellation |
+
+#### Example Cancel Message
+```json
+{
+  "id": "fedcba98-e89b-12d3-a456-426614174004",
+  "type": "https://tap.rsvp/schema/1.0#Cancel",
+  "from": "did:example:vasp",
+  "to": ["did:example:b2b-service"],
+  "thid": "123e4567-e89b-12d3-a456-426614174000",
+  "created_time": 1516269025,
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#Cancel",
+    "reason": "user_requested"
   }
 }
 ```
@@ -1187,4 +1311,4 @@ Note that all messages in this flow share the same thread ID (`payment-123`) to 
 [TAIP-12]: ./TAIPs/taip-12
 [TAIP-13]: ./TAIPs/taip-13
 [TAIP-14]: ./TAIPs/taip-14
-[TAIP-15]: ./taip-15 "Agent Connection Protocol"
+[TAIP-15]: ./TAIPs/taip-15
