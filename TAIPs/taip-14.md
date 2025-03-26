@@ -72,9 +72,9 @@ stateDiagram-v2
     Request --> Rejected : Reject
     Request --> Cancelled : Cancel
     Authorized --> Settled : Settle
-    Settled -> ReversalRequested: Revert
-    ReversalRequested -> Reversed: Settle
-    ReversalRequested -> Settled: Reject
+    Settled --> ReversalRequested: Revert
+    ReversalRequested --> Reversed: Settle
+    ReversalRequested --> Settled: Reject
     Settled --> [*]
 ```
 
