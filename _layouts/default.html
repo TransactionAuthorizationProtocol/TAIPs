@@ -6,6 +6,8 @@
   <title>{% if page.title %}{{ page.title }} - {% endif %}{{ site.title }}</title>
   <link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url }}">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔄</text></svg>">
+  <!-- Mermaid.js for diagrams -->
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
 </head>
 <body>
   <div class="wrapper">
@@ -54,5 +56,36 @@
       </footer>
     </main>
   </div>
+
+  <!-- Initialize Mermaid diagrams -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      mermaid.initialize({
+        startOnLoad: true,
+        theme: 'default',
+        securityLevel: 'loose',
+        fontFamily: 'var(--font-sans)',
+        flowchart: {
+          curve: 'linear',
+          useMaxWidth: true
+        }
+      });
+      
+      // Process pre code blocks with language-mermaid class
+      document.querySelectorAll('pre code.language-mermaid').forEach(function(el) {
+        // Create a div for mermaid
+        const mermaidDiv = document.createElement('div');
+        mermaidDiv.className = 'mermaid';
+        mermaidDiv.innerHTML = el.textContent;
+        
+        // Replace the pre element with our mermaid div
+        const pre = el.parentElement;
+        pre.parentElement.replaceChild(mermaidDiv, pre);
+      });
+      
+      // Render mermaid
+      mermaid.init(undefined, document.querySelectorAll('.mermaid'));
+    });
+  </script>
 </body>
 </html> 
