@@ -1,7 +1,7 @@
 ---
 taip: 11
 title: Legal Entity Identifier (LEI) to Identify institutional participants in TAP Messages
-status: Draft
+status: Review
 type: Standard
 author: Pelle Braendgaard <pelle@notabene.id>
 created: 2025-03-05

@@ -1,7 +1,7 @@
 ---
 taip: 14
 title: Payment Requests
-status: Draft
+status: Review
 type: Standard
 author: Pelle Braendgaard <pelle@notabene.id>
 created: 2024-03-21

@@ -2,7 +2,7 @@
 taip: 8
 title: Selective Disclosure
 author: Pelle Braendgaard <pelle@notabene.id>, Andrés Junge <andres@notabene.id>, Richard Crosby <richard@notabene.id>
-status: Draft
+status: Review
 type: Standard
 created: 2024-01-24
 updated: 2025-03-07

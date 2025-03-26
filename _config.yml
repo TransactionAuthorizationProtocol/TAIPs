@@ -28,6 +28,8 @@ repository: TransactionAuthorizationProtocol/TAIPs
 
 header_pages:
   - index.html
+  - tap-overview.md
+  - messages.md
 
 # Build settings
 theme: minima

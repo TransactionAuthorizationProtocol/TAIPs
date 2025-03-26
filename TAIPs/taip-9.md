@@ -2,7 +2,7 @@
 taip: 9
 title: Proof of Relationship
 author: Pelle Braendgaard <pelle@notabene.id>
-status: Draft
+status: Review
 type: Standard
 created: 2024-01-25
 updated: 2025-03-07

@@ -1,3 +1,9 @@
+---
+layout: page
+title: TAP Messages
+permalink: /messages/
+---
+
 # Transaction Authorization Protocol (TAP) Message Types and Data Structures
 
 ## Table of Contents

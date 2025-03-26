@@ -1,9 +1,9 @@
 ---
-taip: TAIP-13
-title: Purpose Codes
+taip: 13
+title: Transaction Purpose Codes
 author: Pelle Braendgaard <pelle@notabene.id>
 discussions-to: https://github.com/TransactionAuthorizationProtocol/TAIPs/pull/21
-status: Draft
+status: Review
 type: Standard
 created: 2024-03-20
 updated: 2024-03-20
