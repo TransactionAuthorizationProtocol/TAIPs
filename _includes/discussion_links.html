@@ -1,4 +1,6 @@
 {% assign links=include.links|split:"," %}
 {% for link in links %}
-    <a href="{{ link | strip | uri_escape }}">{{ link | strip | xml_escape }}</a>{% if forloop.last == false %}, {% endif %}
+    {% assign link_trimmed = link | strip %}
+    {% assign domain = link_trimmed | split: "//" | last | split: "/" | first %}
+    <a href="{{ link_trimmed | uri_escape }}">{{ domain }}</a>{% if forloop.last == false %}, {% endif %}
 {% endfor %}

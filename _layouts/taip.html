@@ -2,94 +2,159 @@
 layout: default
 ---
 
-<div class="home">
-  <h1 class="page-heading">
-    TAIP-{{ page.taip | xml_escape }}: {{ page.title | xml_escape }}
-    <a href="https://github.com/{{site.repository}}/blob/main/{{page.path}}"><svg aria-hidden="true" height="24" viewBox="0 0 16 16" version="1.1" width="24" data-view-component="true" class="octicon octicon-mark-github">
-      <path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path>
-      </svg></a>
-  </h1>
-  <h3>{{ page.description | xml_escape }}</h3>
-  <table>
-    <tr>
-      <th>Author</th>
-      <td>{% include authorlist.html authors=page.author %}</td>
-    </tr>
-    {% if page["discussions-to"] != undefined %}
-    <tr>
-      <th>Discussions-To</th>
-      <td>{% include discussion_links.html links=page.discussions-to %}</td>
-    </tr>
-    {% endif %}
-    <tr>
-      <th>Status</th>
-      <td>{{ page.status | xml_escape }}
-        {% if page.last-call-deadline != undefined %}
-    <tr>
-      <th>Last Call Deadline</th>
-      <td>{{ page.last-call-deadline | xml_escape }}</td>
-    </tr>
-    {% endif %}
-    </td>
-    </tr>
-    <tr>
-      <th>Type</th>
-      <td>{{ page.type | xml_escape }}</td>
-    </tr>
-    {% if page.category != undefined %}
-    <tr>
-      <th>Category</th>
-      <td>{{ page.category | xml_escape }}</td>
-    </tr>
-    {% endif %}
-    <tr>
-      <th>Created</th>
-      <td>{{ page.created | xml_escape }}</td>
-    </tr>
-    {% if page.updated != undefined %}
-    <tr>
-      <th>Updated</th>
-      <td>{{ page.updated | xml_escape }}</td>
-    </tr>
-    {% endif %}
-    {% if page.requires != undefined %}
-    <tr>
-      <th>Requires</th>
-      <td>{% include taipnums.html taips=page.requires %}</td>
-    </tr>
-    {% endif %}
-    {% if page.superseded-by != undefined %}
-    <tr>
-      <th>Superseded By</th>
-      <td>{% include superseded_by.html taips=page.superseded-by %}</td>
-    </tr>
-    {% endif %}
-    {% if page["withdrawal-reason"] != undefined %}
-    <tr>
-      <th>Withdrawal reason</th>
-      <td>{{ page["withdrawal-reason"] | xml_escape }}</td>
-    </tr>
-    {% endif %}
-  </table>
+{% comment %}
+Process content to remove the copyright section
+{% endcomment %}
+{% assign content_parts = content | split: '<h2 id="copyright">' %}
+{% assign main_content = content_parts[0] %}
+{% if content_parts.size > 1 %}
+  {% assign copyright_part = content_parts[1] | split: '</p>' | first %}
+  {% assign remaining_content = content_parts[1] | split: '</p>' | slice: 1, 100 | join: '</p>' %}
+  {% assign processed_content = main_content | append: remaining_content %}
+{% else %}
+  {% assign processed_content = content %}
+{% endif %}
 
-  <div class="toc">
-    <h2>Table of Contents</h2>
-    {% include toc.html html=content sanitize=true h_max=3 %}
+<article class="taip">
+  <header>
+    <h1>TAIP-{{ page.taip }}: {{ page.title }}</h1>
+    
+    <div class="taip-metadata">
+      <div class="metadata-item">
+        <span class="status-pill status-{{ page.status | downcase }}">{{ page.status }}</span>
+      </div>
+      
+      <div class="metadata-item">
+        <strong>Author:</strong> {% include authorlist.html authors=page.author %}
+      </div>
+      
+      {% if page.discussions-to %}
+      <div class="metadata-item">
+        <strong>Discussions:</strong> {% include discussion_links.html links=page.discussions-to %}
+      </div>
+      {% endif %}
+      
+      <div class="metadata-item">
+        <strong>Type:</strong> {{ page.type }}
+      </div>
+      
+      <div class="metadata-item">
+        <strong>Created:</strong> {{ page.created }}
+      </div>
+      
+      {% if page.updated %}
+      <div class="metadata-item">
+        <strong>Updated:</strong> {{ page.updated }}
+      </div>
+      {% endif %}
+      
+      {% if page.requires %}
+      <div class="metadata-item">
+        <strong>Requires:</strong> {% include taipnums.html taips=page.requires %}
+      </div>
+      {% endif %}
+      
+      {% if page.replaces %}
+      <div class="metadata-item">
+        <strong>Replaces:</strong> {% include taipnums.html taips=page.replaces %}
+      </div>
+      {% endif %}
+      
+      {% if page.superseded-by %}
+      <div class="metadata-item">
+        <strong>Superseded by:</strong> {% include superseded_by.html taips=page.superseded-by %}
+      </div>
+      {% endif %}
+    </div>
+  </header>
+  
+  <div class="taip-content">
+    {{ processed_content }}
   </div>
+</article>
 
-  {% include anchor_headings.html html=content anchorClass="anchor-link" beforeHeading=true %}
+<style>
+  .taip-metadata {
+    background-color: var(--color-sidebar);
+    border-radius: 0.5rem;
+    padding: 1.25rem;
+    margin-bottom: 2rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+    border: 1px solid var(--color-border);
+  }
+  
+  .metadata-item {
+    margin-bottom: 0.5rem;
+  }
+  
+  .metadata-item strong {
+    font-weight: 600;
+    font-family: var(--font-heading);
+  }
+  
+  .taip-content {
+    margin-top: 2rem;
+  }
+  
+  .taip-content h2.hidden,
+  .taip-content h2.hidden + p {
+    display: none;
+  }
+  
+  .toc {
+    background-color: var(--color-secondary-bg);
+    border-radius: 0.5rem;
+    padding: 1.25rem;
+    margin-bottom: 2rem;
+    border: 1px solid var(--color-border);
+  }
+  
+  .toc h2 {
+    margin-top: 0;
+    border-bottom: none;
+    font-size: 1.25rem;
+    color: var(--color-secondary-fg);
+  }
+  
+  .toc ul {
+    margin-bottom: 0;
+  }
+  
+  .anchor-link {
+    color: var(--color-primary);
+    opacity: 0.5;
+    transition: opacity 0.2s;
+  }
+  
+  .anchor-link:hover {
+    opacity: 1;
+  }
 
-  <h2>Citation</h2>
-  <p>Please cite this document as:</p>
-  {% comment %}
-  IEEE specification for reference formatting:
-  https://ieee-dataport.org/sites/default/files/analysis/27/IEEE%20Citation%20Guidelines.pdf
-  {% endcomment %}
-  <p>{% include authorlist.html authors=page.author %}, "TAIP-{{ page.taip | xml_escape }}: {{ page.title | xml_escape
-    }}{% if page.status == "Draft" or page.status == "Last Call" or page.status == "Abandoned" %} [DRAFT]{% endif %}," <em>Transaction Authorization Improvement Proposals</em>, no. {{
-    page.taip | xml_escape }}, {{ page.created | date: "%B %Y" }}. [Online serial]. Available:
-    https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/master/TAIPs/taip-{{ page.taip | xml_escape }}.md</p>
+  .license-section {
+    margin-top: 3rem;
+  }
+</style>
+
+<div class="toc">
+  <h2>Table of Contents</h2>
+  {% include toc.html html=processed_content sanitize=true h_max=3 %}
 </div>
+
+{% include anchor_headings.html html=processed_content anchorClass="anchor-link" beforeHeading=true %}
+
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+{% comment %}
+IEEE specification for reference formatting:
+https://ieee-dataport.org/sites/default/files/analysis/27/IEEE%20Citation%20Guidelines.pdf
+{% endcomment %}
+<p>{% include authorlist.html authors=page.author %}, "TAIP-{{ page.taip | xml_escape }}: {{ page.title | xml_escape
+  }}{% if page.status == "Draft" or page.status == "Last Call" or page.status == "Abandoned" %} [DRAFT]{% endif %}," <em>Transaction Authorization Improvement Proposals</em>, no. {{
+  page.taip | xml_escape }}, {{ page.created | date: "%B %Y" }}. [Online serial]. Available:
+  https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/master/TAIPs/taip-{{ page.taip | xml_escape }}.md</p>
+
 {% comment %}
 Article schema specification:
 https://schema.org/TechArticle
@@ -107,7 +172,7 @@ https://schema.org/TechArticle
     "discussionUrl": "{{ page["discussions-to"] | uri_escape }}",
 {% endif %}    
     "inLanguage": "en-US",
-    "license": "#copyright",
+    "license": "https://creativecommons.org/publicdomain/zero/1.0/",
     "copyrightYear": "{{ page.created | date: "%Y" }}"
   }
 </script>

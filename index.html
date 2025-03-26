@@ -3,13 +3,157 @@ layout: default
 title: Home
 ---
 
-{% include blurb.html %}
+<div class="home-content">
+  <header class="hero">
+    <h1>Transaction Authorization Protocol</h1>
+    <p class="lead">A framework for secure, compliant, and flexible blockchain transaction authorization</p>
+  </header>
 
-<div class="messages-reference-link" style="text-align: center; margin: 2em 0; padding: 1em; background-color: #f8f9fa; border-radius: 4px;">
-  <h2>📝 New: TAP Messages Reference</h2>
-  <p>View the complete reference for all TAP message types and data structures</p>
-  <a href="messages" class="btn btn-primary btn-lg">View Messages Reference →</a>
+  <section class="intro">
+    <h2>Welcome to TAP</h2>
+    <p>The Transaction Authorization Protocol (TAP) enables secure, compliant, and flexible transaction authorization between parties before settlement on a blockchain. TAP creates a separate "authorization layer" that operates independently from the blockchain "settlement layer," allowing participants to exchange necessary information, perform risk assessments, and implement compliance checks before funds move.</p>
+    
+    <div class="cta-buttons">
+      <a href="{{ '/overview/' | relative_url }}" class="button">Read the Overview</a>
+      <a href="{{ '/messages/' | relative_url }}" class="button button-secondary">View TAP Messages</a>
+    </div>
+  </section>
+
+  <section class="taips-section">
+    <h2>Transaction Authorization Improvement Proposals (TAIPs)</h2>
+    <p>TAIPs describe standards for the Transaction Authorization Protocol ecosystem.</p>
+    
+    <h3>Core TAIPs</h3>
+    <div class="taips-grid">
+      {% assign core_taips = site.pages | where_exp: "item", "item.path contains 'TAIPs/taip-'" | where: "type", "Standard" | sort: 'taip' %}
+      {% for taip in core_taips limit:6 %}
+        <div class="taip-card">
+          <h4><a href="{{ taip.url | relative_url }}">TAIP-{{ taip.taip }}: {{ taip.title }}</a></h4>
+          <span class="status-pill status-{{ taip.status | downcase }}">{{ taip.status }}</span>
+          <p>{{ taip.description | default: "Defines a standard component of the Transaction Authorization Protocol." }}</p>
+        </div>
+      {% endfor %}
+    </div>
+    
+    {% assign taip_count = site.pages | where_exp: "item", "item.path contains 'TAIPs/taip-'" | size %}
+    {% if taip_count > 6 %}
+      <div class="more-link">
+        <a href="#" class="view-all">View all {{ taip_count }} TAIPs</a>
+      </div>
+    {% endif %}
+  </section>
 </div>
 
-{% include taiptable.html taips=site.pages %}
+<style>
+  .hero {
+    margin-bottom: 3rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--color-border);
+  }
+  
+  .hero h1 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    color: var(--color-text);
+  }
+  
+  .lead {
+    font-size: 1.25rem;
+    color: var(--color-text-light);
+    margin-bottom: 2rem;
+  }
+  
+  .cta-buttons {
+    display: flex;
+    gap: 1rem;
+    margin: 2rem 0;
+  }
+  
+  .button {
+    display: inline-block;
+    padding: 0.75rem 1.5rem;
+    background-color: var(--color-primary);
+    color: var(--color-text);
+    border-radius: 0.375rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: background-color 0.2s, transform 0.2s;
+    font-family: var(--font-heading);
+  }
+  
+  .button:hover {
+    background-color: var(--color-primary-light);
+    text-decoration: none;
+    transform: translateY(-2px);
+  }
+  
+  .button-secondary {
+    background-color: var(--color-secondary-bg);
+    color: var(--color-secondary-fg);
+    border: 1px solid var(--color-primary);
+  }
+  
+  .button-secondary:hover {
+    background-color: var(--color-secondary-bg);
+    opacity: 0.9;
+  }
+  
+  .intro, .taips-section {
+    margin-bottom: 3rem;
+  }
+  
+  .taips-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+  }
+  
+  .taip-card {
+    background-color: var(--color-sidebar);
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    transition: transform 0.2s, box-shadow 0.2s;
+    border: 1px solid var(--color-border);
+  }
+  
+  .taip-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(65, 224, 41, 0.1);
+    border-color: var(--color-primary);
+  }
+  
+  .taip-card h4 {
+    margin-top: 0;
+    margin-bottom: 0.75rem;
+  }
+  
+  .taip-card h4 a {
+    color: var(--color-text);
+  }
+  
+  .taip-card h4 a:hover {
+    color: var(--color-primary);
+  }
+  
+  .more-link {
+    text-align: center;
+    margin-top: 2rem;
+  }
+  
+  .view-all {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--color-border);
+    border-radius: 0.375rem;
+    font-weight: 500;
+    font-family: var(--font-heading);
+    transition: all 0.2s;
+  }
+  
+  .view-all:hover {
+    border-color: var(--color-primary);
+    background-color: var(--color-secondary-bg);
+  }
+</style>
 

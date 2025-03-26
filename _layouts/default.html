@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% if page.title %}{{ page.title }} - {% endif %}{{ site.title }}</title>
+  <link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url }}">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔄</text></svg>">
+</head>
+<body>
+  <div class="wrapper">
+    <aside class="sidebar">
+      <div class="header">
+        <a href="{{ '/' | relative_url }}" class="logo">TAP</a>
+      </div>
+      
+      <nav>
+        <div class="nav-section">
+          <div class="nav-section-title">Documentation</div>
+          <ul class="nav-links">
+            <li><a href="{{ '/' | relative_url }}" class="nav-link {% if page.url == '/' %}active{% endif %}">Home</a></li>
+            <li><a href="{{ '/overview/' | relative_url }}" class="nav-link {% if page.url == '/overview/' %}active{% endif %}">Overview</a></li>
+            <li><a href="{{ '/messages/' | relative_url }}" class="nav-link {% if page.url == '/messages/' %}active{% endif %}">Message Reference</a></li>
+            <li><a href="https://tap.rsvp" class="nav-link" target="_blank">TAP Homepage</a></li>
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">TAIPs</div>
+          <ul class="nav-links">
+            {% assign taips = site.pages | where_exp: "item", "item.path contains 'TAIPs/taip-'" | sort: 'taip' %}
+            {% for taip in taips %}
+              <li>
+                <a href="{{ taip.url | relative_url }}" class="nav-link {% if page.url == taip.url %}active{% endif %}">
+                  TAIP-{{ taip.taip }}: {{ taip.title }}
+                </a>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </nav>
+    </aside>
+    
+    <main class="main-content">
+      <div class="content">
+        {{ content }}
+      </div>
+      
+      <footer>
+        {% include cc0-license.html %}
+        <div class="attribution">
+          <p>TAP is donated by <a href="https://notabene.id" target="_blank" rel="noopener">Notabene</a> and other contributors to the crypto community as public domain.</p>
+        </div>
+      </footer>
+    </main>
+  </div>
+</body>
+</html> 

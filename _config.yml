@@ -32,8 +32,6 @@ header_pages:
   - messages.md
 
 # Build settings
-theme: minima
-highlighter: rouge
 markdown: kramdown
 plugins:
   - jekyll-feed
@@ -45,6 +43,17 @@ defaults:
       path: "TAIPs"
     values:
       layout: "taip"
+  - scope:
+      path: ""
+    values:
+      layout: "default"
 
 exclude:
   - taip-template.md
+  - vendor/
+  - Gemfile
+  - Gemfile.lock
+  - .git/
+  - .github/
+  - README.md
+  - CONTRIBUTING.md
