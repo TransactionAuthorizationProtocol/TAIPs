@@ -251,8 +251,9 @@ Approves a transfer for execution.
 |-----------|------|----------|---------|-------------|
 | @context | string | Yes | Review ([TAIP-4]) | JSON-LD context "https://tap.rsvp/schema/1.0" |
 | @type | string | Yes | Review ([TAIP-4]) | JSON-LD type "https://tap.rsvp/schema/1.0#Authorize" |
-| transfer | object | Yes | Review ([TAIP-4]) | Reference to the Transfer message being authorized |
 | reason | string | No | Review ([TAIP-4]) | Optional reason for authorization |
+
+> **Note:** The message refers to the original Transfer message via the DIDComm `thid` (thread ID) in the message envelope.
 
 #### Examples
 
@@ -266,9 +267,6 @@ Approves a transfer for execution.
   "body": {
     "@context": "https://tap.rsvp/schema/1.0",
     "@type": "https://tap.rsvp/schema/1.0#Authorize",
-    "transfer": {
-      "@id": "123e4567-e89b-12d3-a456-426614174000"
-    },
     "reason": "All compliance checks passed"
   }
 }
@@ -283,8 +281,9 @@ Confirms the on-chain settlement of a transfer.
 |-----------|------|----------|---------|-------------|
 | @context | string | Yes | Review ([TAIP-4]) | JSON-LD context "https://tap.rsvp/schema/1.0" |
 | @type | string | Yes | Review ([TAIP-4]) | JSON-LD type "https://tap.rsvp/schema/1.0#Settle" |
-| transfer | object | Yes | Review ([TAIP-4]) | Reference to the Transfer message being settled |
 | settlementId | string | Yes | Review ([TAIP-4]) | CAIP-220 identifier of the settlement transaction |
+
+> **Note:** The message refers to the original Transfer message via the DIDComm `thid` (thread ID) in the message envelope.
 
 #### Examples
 
@@ -298,9 +297,6 @@ Confirms the on-chain settlement of a transfer.
   "body": {
     "@context": "https://tap.rsvp/schema/1.0",
     "@type": "https://tap.rsvp/schema/1.0#Settle",
-    "transfer": {
-      "@id": "123e4567-e89b-12d3-a456-426614174000"
-    },
     "settlementId": "eip155:1:tx/0x3edb98c24d46d148eb926c714f4fbaa117c47b0c0821f38bfce9763604457c33"
   }
 }
@@ -315,8 +311,9 @@ Rejects a proposed transfer.
 |-----------|------|----------|---------|-------------|
 | @context | string | Yes | Review ([TAIP-4]) | JSON-LD context "https://tap.rsvp/schema/1.0" |
 | @type | string | Yes | Review ([TAIP-4]) | JSON-LD type "https://tap.rsvp/schema/1.0#Reject" |
-| transfer | object | Yes | Review ([TAIP-4]) | Reference to the Transfer message being rejected |
 | reason | string | Yes | Review ([TAIP-4]) | Reason for rejection |
+
+> **Note:** The message refers to the original Transfer message via the DIDComm `thid` (thread ID) in the message envelope.
 
 #### Examples
 
@@ -330,9 +327,6 @@ Rejects a proposed transfer.
   "body": {
     "@context": "https://tap.rsvp/schema/1.0",
     "@type": "https://tap.rsvp/schema/1.0#Reject",
-    "transfer": {
-      "@id": "123e4567-e89b-12d3-a456-426614174000"
-    },
     "reason": "Beneficiary account is not active"
   }
 }
@@ -375,9 +369,10 @@ Requests a reversal of a settled transaction. This could be part of a dispute re
 |-----------|------|----------|---------|-------------|
 | @context | string | Yes | Review ([TAIP-4]) | JSON-LD context "https://tap.rsvp/schema/1.0" |
 | @type | string | Yes | Review ([TAIP-4]) | JSON-LD type "https://tap.rsvp/schema/1.0#Revert" |
-| transfer | object | Yes | Review ([TAIP-4]) | Reference to the Transfer message being reverted |
 | settlementAddress | string | Yes | Review ([TAIP-4]) | CAIP-10 identifier of the proposed settlement address to return the funds to |
 | reason | string | Yes | Review ([TAIP-4]) | Human readable message describing why the transaction reversal is being requested |
+
+> **Note:** The message refers to the original Transfer message via the DIDComm `thid` (thread ID) in the message envelope.
 
 #### Examples
 
@@ -391,9 +386,6 @@ Requests a reversal of a settled transaction. This could be part of a dispute re
   "body": {
     "@context": "https://tap.rsvp/schema/1.0",
     "@type": "https://tap.rsvp/schema/1.0#Revert",
-    "transfer": {
-      "@id": "123e4567-e89b-12d3-a456-426614174000"
-    },
     "settlementAddress": "eip155:1:0x1234a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb",
     "reason": "Insufficient Originator Information"
   }
@@ -1066,27 +1058,14 @@ If a customer (originator or beneficiary) is a legal entity and has an LEI, that
   "asset": "eip155:1/slip44:60",
   "amount": "100.00",
   "originator": {
-    "@id": "did:org:acmecorp",
+    "@id": "did:org:acmecorp-123",
     "lei:leiCode": "3M5E1GQKGL17HI8CPN20",
     "name": "ACME Corporation"
   },
   "agents": [
     {
       "@id": "did:web:originator.vasp",
-      "for": "did:org:acmecorp",
-      "policies": [
-        {
-          "@type": "RequirePresentation",
-          "@context": [
-            "https://schema.org/Organization",
-            "https://www.gleif.org/ontology/Base/Entity"
-          ],
-          "fromAgent": "beneficiary",
-          "aboutAgent": "beneficiary",
-          "purpose": "Require beneficiary institution LEI for compliance",
-          "presentationDefinition": "https://tap.rsvp/definitions/lei/v1"
-        }
-      ]
+      "for": "did:org:acmecorp"
     }
   ]
 }
@@ -1095,7 +1074,6 @@ If a customer (originator or beneficiary) is a legal entity and has an LEI, that
 The example above shows:
 1. A Party for a legal entity (ACME Corporation) with its LEI
 2. An Agent representing that party (the VASP)
-3. A policy requiring the beneficiary to present their LEI credentials
 
 Note: Future versions may support verifiable LEIs (vLEIs) through the standard credential presentation mechanism defined in [TAIP-8].
 
@@ -1253,10 +1231,7 @@ Note that all messages share the same thread ID to link them together.
   "thid": "transfer-123",
   "body": {
     "@context": "https://tap.rsvp/schema/1.0",
-    "@type": "https://tap.rsvp/schema/1.0#Authorize",
-    "transfer": {
-      "@id": "transfer-123"
-    }
+    "@type": "https://tap.rsvp/schema/1.0#Authorize"
   }
 }
 ```
@@ -1272,9 +1247,6 @@ Note that all messages share the same thread ID to link them together.
   "body": {
     "@context": "https://tap.rsvp/schema/1.0",
     "@type": "https://tap.rsvp/schema/1.0#Settle",
-    "transfer": {
-      "@id": "transfer-123"
-    },
     "settlementId": "eip155:1:tx/0x3edb98c24d46d148eb926c714f4fbaa117c47b0c0821f38bfce9763604457c33"
   }
 }
@@ -1416,10 +1388,7 @@ Note that all messages in this flow share the same thread ID (`payment-123`) to 
   "thid": "payment-123",
   "body": {
     "@context": "https://tap.rsvp/schema/1.0",
-    "@type": "https://tap.rsvp/schema/1.0#Authorize",
-    "transfer": {
-      "@id": "transfer-123"
-    }
+    "@type": "https://tap.rsvp/schema/1.0#Authorize"
   }
 }
 ```
@@ -1435,9 +1404,6 @@ Note that all messages in this flow share the same thread ID (`payment-123`) to 
   "body": {
     "@context": "https://tap.rsvp/schema/1.0",
     "@type": "https://tap.rsvp/schema/1.0#Settle",
-    "transfer": {
-      "@id": "transfer-123"
-    },
     "settlementId": "eip155:1:tx/0x3edb98c24d46d148eb926c714f4fbaa117c47b0c0821f38bfce9763604457c33"
   }
 }
@@ -1581,9 +1547,6 @@ Note that all messages in this flow share the same thread ID (`payment-123`) to 
   "body": {
     "@context": "https://tap.rsvp/schema/1.0",
     "@type": "https://tap.rsvp/schema/1.0#Revert",
-    "transfer": {
-      "@id": "1234567890"
-    },
     "settlementAddress": "eip155:1:0x1234a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb",
     "reason": "Post-settlement compliance check failed"
   }
@@ -1602,9 +1565,6 @@ Note that all messages in this flow share the same thread ID (`payment-123`) to 
   "body": {
     "@context": "https://tap.rsvp/schema/1.0",
     "@type": "https://tap.rsvp/schema/1.0#Revert",
-    "transfer": {
-      "@id": "1234567890"
-    },
     "settlementAddress": "eip155:1:0x5678a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb",
     "reason": "Customer dispute - unauthorized transaction"
   }
