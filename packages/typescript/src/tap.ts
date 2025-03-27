@@ -857,7 +857,7 @@ interface Connect extends TapMessageObject<"Connect"> {
    */
   agent?: Participant<"Agent"> & {
     /** Service URL */
-    serviceUrl?: string;
+    serviceUrl?: IRI;
   };
 
   /**
