@@ -293,6 +293,8 @@ interface Participant<T extends ParticipantTypes> extends JsonLdObject<T> {
    * Defines requirements and constraints on the participant's actions
    */
   policies?: Policies[];
+
+
 }
 
 /**
@@ -560,15 +562,6 @@ type Transactions = Transfer | PaymentRequest;
  */
 interface Authorize extends TapMessageObject<"Authorize"> {
   /**
-   * Reference to the transfer being authorized
-   * Contains the transfer message ID
-   */
-  transfer: {
-    /** ID of the transfer message being authorized */
-    "@id": string;
-  };
-
-  /**
    * Optional authorization reason
    * Additional context for the authorization decision
    */
@@ -583,15 +576,6 @@ interface Authorize extends TapMessageObject<"Authorize"> {
  */
 interface Settle extends TapMessageObject<"Settle"> {
   /**
-   * Reference to the transfer being settled
-   * Contains the transfer message ID
-   */
-  transfer: {
-    /** ID of the transfer message being settled */
-    "@id": string;
-  };
-
-  /**
    * Settlement transaction identifier
    * CAIP-220 identifier for the on-chain settlement transaction
    */
@@ -605,15 +589,6 @@ interface Settle extends TapMessageObject<"Settle"> {
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-4.md | TAIP-4: Authorization Flow}
  */
 interface Reject extends TapMessageObject<"Reject"> {
-  /**
-   * Reference to the transfer being rejected
-   * Contains the transfer message ID
-   */
-  transfer: {
-    /** ID of the transfer message being rejected */
-    "@id": string;
-  };
-
   /**
    * Reason for rejection
    * Explanation of why the transfer was rejected
@@ -880,13 +855,7 @@ interface Connect extends TapMessageObject<"Connect"> {
    * Details of the requesting agent
    * Includes identity and endpoints
    */
-  agent?: {
-    /** DID of the agent */
-    "@id": DID;
-    /** Human-readable name */
-    name?: string;
-    /** Type of agent */
-    type?: string;
+  agent?: Participant<"Agent"> & {
     /** Service URL */
     serviceUrl?: string;
   };
