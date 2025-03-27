@@ -8,6 +8,16 @@
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔄</text></svg>">
   <!-- Mermaid.js for diagrams -->
   <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-DFQHXTJQ91"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-DFQHXTJQ91');
+  </script>
 </head>
 <body>
   <div class="wrapper">
@@ -24,6 +34,18 @@
             <li><a href="{{ '/overview/' | relative_url }}" class="nav-link {% if page.url == '/overview/' %}active{% endif %}">Overview</a></li>
             <li><a href="{{ '/messages/' | relative_url }}" class="nav-link {% if page.url == '/messages/' %}active{% endif %}">Message Reference</a></li>
             <li><a href="https://tap.rsvp" class="nav-link" target="_blank">TAP Homepage</a></li>
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Messages</div>
+          <ul class="nav-links">
+            <li><a href="{{ '/transactions/' | relative_url }}" class="nav-link">Transaction Types</a></li>
+            <li><a href="{{ '/authorization/' | relative_url }}" class="nav-link">Authorization Flow</a></li>
+            <li><a href="{{ '/parties/' | relative_url }}" class="nav-link">Parties</a></li>
+            <li><a href="{{ '/agents/' | relative_url }}" class="nav-link">Agents</a></li>
+            <li><a href="{{ '/messages/#policy-messages' | relative_url }}" class="nav-link">Policies</a></li>
+            <li><a href="{{ '/messages/' | relative_url }}" class="nav-link">Full Reference</a></li>
           </ul>
         </div>
         
@@ -88,4 +110,4 @@
     });
   </script>
 </body>
-</html> 
+</html>
