@@ -69,7 +69,12 @@ Process content to remove the copyright section
   </header>
   
   <div class="taip-content">
-    {{ processed_content }}
+    <div class="toc">
+      <h2>Table of Contents</h2>
+      {% include toc.html html=processed_content sanitize=true h_max=3 %}
+    </div>
+
+    {% include anchor_headings.html html=processed_content anchorClass="anchor-link" beforeHeading=true %}
   </div>
 </article>
 
@@ -136,13 +141,6 @@ Process content to remove the copyright section
     margin-top: 3rem;
   }
 </style>
-
-<div class="toc">
-  <h2>Table of Contents</h2>
-  {% include toc.html html=processed_content sanitize=true h_max=3 %}
-</div>
-
-{% include anchor_headings.html html=processed_content anchorClass="anchor-link" beforeHeading=true %}
 
 <h2>Citation</h2>
 <p>Please cite this document as:</p>
