@@ -21,7 +21,7 @@ Examples of parties include virtual asset service providers (VASPs), financial i
 The roles of parties in TAP are dependent on the specific transaction type:
 
 - In **Transfers**, parties act as **Originators** (sending assets) and **Beneficiaries** (receiving assets)
-- In **PaymentRequests**, parties take the roles of **Customers** (paying for services/goods) and **Merchants** (providing services/goods)
+- In **Payments**, parties take the roles of **Customers** (paying for services/goods) and **Merchants** (providing services/goods)
 - **Intermediary Parties** may facilitate transactions between other parties and are typically implemented as [Agents](/agents/) that follow the TAP Agent architecture
 
 Each transaction type defines specific responsibilities and compliance requirements for the involved parties. For detailed information about transaction types and associated party roles, see the [Transaction Types](/transactions/) documentation.

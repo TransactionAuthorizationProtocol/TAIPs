@@ -17,7 +17,7 @@ The Transaction Authorization Protocol (TAP) creates a pre-transaction authoriza
 
 The standard TAP authorization flow consists of three main steps:
 
-1. **Transaction Proposal**: Originator sends a Transfer/PaymentRequest message
+1. **Transaction Proposal**: Originator sends a Transfer/Payment message
 2. **Authorization Decision**: Beneficiary responds with Authorize or Reject
 3. **Settlement Confirmation**: Originator notifies of on-chain settlement via Settle message
 
@@ -36,7 +36,7 @@ sequenceDiagram
 
 ### Authorize
 
-The Authorize message indicates the beneficiary approves the transaction after completing their compliance checks. It references the original Transfer/PaymentRequest via the DIDComm thread ID.
+The Authorize message indicates the beneficiary approves the transaction after completing their compliance checks. It references the original Transfer/Payment via the DIDComm thread ID.
 
 **Business Implications**:
 - Confirms the beneficiary has completed all compliance requirements
@@ -113,17 +113,17 @@ sequenceDiagram
 
 ## Complex Authorization Flows
 
-### PaymentRequest Flow
+### Payment Flow
 
-When using the PaymentRequest message type, the flow begins with the beneficiary requesting payment, shifting the initial message direction.
+When using the Payment message type, the flow begins with the beneficiary requesting payment, shifting the initial message direction.
 
 ```mermaid
 sequenceDiagram
     participant Customer as Customer (Originator)
     participant Merchant as Merchant (Beneficiary)
-    Merchant->>Customer: PaymentRequest
+    Merchant->>Customer: Payment
     Note over Customer: Customer reviews and decides
-    Customer->>Merchant: Transfer (references PaymentRequest)
+    Customer->>Merchant: Transfer (references Payment)
     Merchant->>Customer: Authorize
     Note over Customer: Execute on-chain payment
     Customer->>Merchant: Settle (with settlement proof)

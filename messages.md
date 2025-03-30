@@ -11,7 +11,7 @@ permalink: /messages/
 - [Common DIDComm Message Structure](#common-didcomm-message-structure)
 - [Transaction Message](#transaction-message)
   - [Transfer](#transfer)
-  - [PaymentRequest](#paymentrequest)
+  - [Payment](#payment)
 - [Authorization Flow Messages](#authorization-flow-messages)
   - [Authorize](#authorize)
   - [Settle](#settle)
@@ -152,7 +152,7 @@ Initiates a virtual asset transfer between parties.
 }
 ```
 
-### PaymentRequest
+### Payment
 [TAIP-14] - Draft
 
 Initiates a payment request from a merchant to a customer.
@@ -160,7 +160,7 @@ Initiates a payment request from a merchant to a customer.
 | Attribute | Type | Required | Status | Description |
 |-----------|------|----------|---------|-------------|
 | @context | string | Yes | Draft ([TAIP-14]) | JSON-LD context "https://tap.rsvp/schema/1.0" |
-| @type | string | Yes | Draft ([TAIP-14]) | JSON-LD type "https://tap.rsvp/schema/1.0#PaymentRequest" |
+| @type | string | Yes | Draft ([TAIP-14]) | JSON-LD type "https://tap.rsvp/schema/1.0#Payment" |
 | asset | string | No | Draft ([TAIP-14]) | CAIP-19 identifier of the asset to be paid. Must be present if currency is not provided. |
 | currency | string | No | Draft ([TAIP-14]) | ISO 4217 currency code for fiat amount. Must be present if asset is not provided. |
 | amount | string | Yes | Draft ([TAIP-14]) | Amount requested in the specified asset or currency |
@@ -177,12 +177,12 @@ Initiates a payment request from a merchant to a customer.
 ```json
 {
   "id": "123e4567-e89b-12d3-a456-426614174014",
-  "type": "https://tap.rsvp/schema/1.0#PaymentRequest",
+  "type": "https://tap.rsvp/schema/1.0#Payment",
   "from": "did:web:merchant.vasp",
   "to": ["did:web:customer.vasp"],
   "body": {
     "@context": "https://tap.rsvp/schema/1.0",
-    "@type": "https://tap.rsvp/schema/1.0#PaymentRequest",
+    "@type": "https://tap.rsvp/schema/1.0#Payment",
     "asset": "eip155:1/erc20:0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
     "amount": "100.00",
     "merchant": {
@@ -204,12 +204,12 @@ Initiates a payment request from a merchant to a customer.
 ```json
 {
   "id": "123e4567-e89b-12d3-a456-426614174015",
-  "type": "https://tap.rsvp/schema/1.0#PaymentRequest",
+  "type": "https://tap.rsvp/schema/1.0#Payment",
   "from": "did:web:merchant.vasp",
   "to": ["did:web:customer.vasp"],
   "body": {
     "@context": "https://tap.rsvp/schema/1.0",
-    "@type": "https://tap.rsvp/schema/1.0#PaymentRequest",
+    "@type": "https://tap.rsvp/schema/1.0#Payment",
     "currency": "USD",
     "amount": "50.00",
     "supportedAssets": [
@@ -676,7 +676,7 @@ The body object must contain:
   "id": "connect-123",
   "type": "https://tap.rsvp/schema/1.0#Connect",
   "from": "did:web:b2b.service",
-  "to": ["did:web:beneficiary.vasp"],
+  "to": ["did:web:vasp"],
   "created_time": 1516269022,
   "expires_time": 1516385931,
   "body": {
@@ -688,7 +688,7 @@ The body object must contain:
       "type": "ServiceAgent",
       "serviceUrl": "https://b2b.service/did-comm"
     },
-    "for": "did:org:business-customer",
+    "for": "did:example:business-customer",
     "constraints": {
       "purposes": ["BEXP", "SUPP"],
       "categoryPurposes": ["CASH", "CCRD"],
@@ -741,7 +741,7 @@ The body object must contain:
   "type": "https://tap.rsvp/schema/1.0#AuthorizationRequired",
   "from": "did:web:beneficiary.vasp",
   "to": ["did:web:b2b.service"],
-  "thid": "connect-123",
+  "thid": "1234567890",
   "created_time": 1516269022,
   "body": {
     "@context": "https://tap.rsvp/schema/1.0",
@@ -759,7 +759,7 @@ The body object must contain:
   "type": "https://tap.rsvp/schema/1.0#AuthorizationRequired",
   "from": "did:web:payment.provider",
   "to": ["did:web:merchant.vasp"],
-  "thid": "connect-124",
+  "thid": "1234567890",
   "created_time": 1516269022,
   "body": {
     "@context": "https://tap.rsvp/schema/1.0",
@@ -908,17 +908,20 @@ This flow demonstrates establishing a connection between a B2B service and a VAS
   "from": "did:example:b2b-service",
   "to": ["did:example:vasp"],
   "created_time": 1516269022,
+  "expires_time": 1516385931,
   "body": {
     "@context": "https://tap.rsvp/schema/1.0",
     "@type": "https://tap.rsvp/schema/1.0#Connect",
     "agent": {
       "@id": "did:example:b2b-service",
       "name": "B2B Payment Service",
-      "type": "ServiceAgent"
+      "type": "ServiceAgent",
+      "serviceUrl": "https://b2b-service/did-comm"
     },
     "for": "did:example:business-customer",
     "constraints": {
       "purposes": ["BEXP", "SUPP"],
+      "categoryPurposes": ["CASH", "CCRD"],
       "limits": {
         "per_transaction": "10000.00",
         "daily": "50000.00",
@@ -1064,8 +1067,7 @@ If a customer (originator or beneficiary) is a legal entity and has an LEI, that
   },
   "agents": [
     {
-      "@id": "did:web:originator.vasp",
-      "for": "did:org:acmecorp"
+      "@id": "did:web:originator.vasp"
     }
   ]
 }
@@ -1309,12 +1311,12 @@ Note that all messages in this flow share the same thread ID (`payment-123`) to 
 ```json
 {
   "id": "payment-123",
-  "type": "https://tap.rsvp/schema/1.0#PaymentRequest",
+  "type": "https://tap.rsvp/schema/1.0#Payment",
   "from": "did:web:merchant.vasp",
   "to": ["did:web:customer.vasp"],
   "body": {
     "@context": "https://tap.rsvp/schema/1.0",
-    "@type": "https://tap.rsvp/schema/1.0#PaymentRequest",
+    "@type": "https://tap.rsvp/schema/1.0#Payment",
     "currency": "USD",
     "amount": "100.00",
     "supportedAssets": [
@@ -1431,14 +1433,14 @@ Note that all messages in this flow share the same thread ID (`payment-123`) to 
 ```json
 {
   "id": "payment-req-123",
-  "type": "https://tap.rsvp/schema/1.0#PaymentRequest",
+  "type": "https://tap.rsvp/schema/1.0#Payment",
   "from": "did:web:merchant.vasp",
   "to": ["did:web:customer.vasp"],
   "created_time": 1516269022,
   "expires_time": 1516385931,
   "body": {
     "@context": "https://tap.rsvp/schema/1.0",
-    "@type": "https://tap.rsvp/schema/1.0#PaymentRequest",
+    "@type": "https://tap.rsvp/schema/1.0#Payment",
     "currency": "USD",
     "amount": "100.00",
     "supportedAssets": [
@@ -1474,13 +1476,13 @@ Note that all messages in this flow share the same thread ID (`payment-123`) to 
 ```json
 {
   "id": "payment-req-124",
-  "type": "https://tap.rsvp/schema/1.0#PaymentRequest",
+  "type": "https://tap.rsvp/schema/1.0#Payment",
   "from": "did:web:merchant.vasp",
   "to": ["did:web:customer.vasp"],
   "created_time": 1516269022,
   "body": {
     "@context": "https://tap.rsvp/schema/1.0",
-    "@type": "https://tap.rsvp/schema/1.0#PaymentRequest",
+    "@type": "https://tap.rsvp/schema/1.0#Payment",
     "asset": "eip155:1/erc20:0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
     "amount": "100.00",
     "merchant": {

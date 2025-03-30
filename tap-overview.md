@@ -66,11 +66,11 @@ However, the protocol is flexible enough to accommodate more complex flows with 
 
 ## Payment Request Flow
 
-TAP introduces a **Payment Request** flow that enables merchants to request payments from customers, simulating familiar e-commerce and invoicing experiences. This "pull payment" model complements the standard "push payment" approach of cryptocurrencies.
+TAP introduces a **Payment** flow that enables merchants to request payments from customers, simulating familiar e-commerce and invoicing experiences. This "pull payment" model complements the standard "push payment" approach of cryptocurrencies.
 
 ### How Payment Requests Work
 
-1. A merchant initiates by sending a **PaymentRequest** message that specifies:
+1. A merchant initiates by sending a **Payment** message that specifies:
    - Amount due (in either crypto asset or fiat currency)
    - Acceptable payment assets (if priced in fiat)
    - Optional expiry time

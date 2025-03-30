@@ -482,13 +482,13 @@ interface Transfer extends TapMessageObject<"Transfer"> {
 }
 
 /**
- * Payment Request Message
+ * Payment Message
  * Requests payment from a customer, optionally specifying supported assets.
  * Used for merchant-initiated payment flows.
  *
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-14.md | TAIP-14: Payment Request}
  */
-interface PaymentRequest extends TapMessageObject<"PaymentRequest"> {
+interface Payment extends TapMessageObject<"Payment"> {
   /**
    * Optional specific asset requested
    * CAIP-19 identifier for the requested blockchain asset
@@ -552,7 +552,7 @@ interface PaymentRequest extends TapMessageObject<"PaymentRequest"> {
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-3.md | TAIP-3: Transfer Message}
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-14.md | TAIP-14: Payment Request}
  */
-type Transactions = Transfer | PaymentRequest;
+type Transactions = Transfer | Payment;
 
 /**
  * Authorization Message
@@ -908,14 +908,14 @@ interface TransferMessage extends DIDCommMessage<Transfer> {
 }
 
 /**
- * Payment Request Message Wrapper
- * DIDComm envelope for a Payment Request message.
+ * Payment Message Wrapper
+ * DIDComm envelope for a Payment message.
  *
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-2.md | TAIP-2: Message Format}
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-14.md | TAIP-14: Payment Request}
  */
-interface PaymentRequestMessage extends DIDCommMessage<PaymentRequest> {
-  type: "https://tap.rsvp/schema/1.0#PaymentRequest";
+interface PaymentMessage extends DIDCommMessage<Payment> {
+  type: "https://tap.rsvp/schema/1.0#Payment";
 }
 
 /**
@@ -1093,7 +1093,7 @@ interface AuthorizationRequiredMessage
  */
 type TAPMessage =
   | TransferMessage
-  | PaymentRequestMessage
+  | PaymentMessage
   | AuthorizeMessage
   | SettleMessage
   | RejectMessage
@@ -1135,7 +1135,7 @@ export type {
 
   // Core TAP types
   Transfer,
-  PaymentRequest,
+  Payment,
   Transactions,
   Authorize,
   Settle,
@@ -1152,7 +1152,7 @@ export type {
 
   // DIDComm Message types
   TransferMessage,
-  PaymentRequestMessage,
+  PaymentMessage,
   AuthorizeMessage,
   SettleMessage,
   RejectMessage,

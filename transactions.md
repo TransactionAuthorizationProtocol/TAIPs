@@ -4,7 +4,7 @@ title: TAP Transaction Types
 permalink: /transactions/
 ---
 
-The Transaction Authorization Protocol (TAP) supports two primary transaction message types: **Transfer** and **PaymentRequest**. Both enable compliant blockchain transactions, but they serve different business needs and workflows.
+The Transaction Authorization Protocol (TAP) supports two primary transaction message types: **Transfer** and **Payment**. Both enable compliant blockchain transactions, but they serve different business needs and workflows.
 
 ## Transfer
 
@@ -24,9 +24,9 @@ The **Transfer** message type is the foundation of TAP, designed for direct cryp
 - **Pre-Transaction Authorization**: Compliance checks occur before settlement on the blockchain
 - **Compliance Data Exchange**: Allows sharing of identity information, purpose codes, and other compliance data
 
-## PaymentRequest
+## Payment
 
-The **PaymentRequest** message type extends TAP to support merchant payment scenarios where the receiver initiates the request.
+The **Payment** message type extends TAP to support merchant payment scenarios where the receiver initiates the request.
 
 ### Business Use Cases
 
@@ -44,7 +44,7 @@ The **PaymentRequest** message type extends TAP to support merchant payment scen
 
 ## Business Differences
 
-| Aspect | Transfer | PaymentRequest |
+| Aspect | Transfer | Payment |
 |--------|----------|---------------|
 | **Initiator** | Originator (sender) | Beneficiary (receiver) |
 | **Flow Direction** | Push (send) | Pull (request) |
@@ -59,7 +59,7 @@ The **PaymentRequest** message type extends TAP to support merchant payment scen
 When implementing TAP, organizations should consider which transaction type best fits their business model:
 
 - **Financial Institutions** typically focus on the Transfer message type to support customer withdrawals and institutional transfers
-- **Merchants and Service Providers** benefit from implementing the PaymentRequest flow to collect payments
+- **Merchants and Service Providers** benefit from implementing the Payment flow to collect payments
 - **Full-Service Platforms** may implement both to support various business scenarios
 
 For technical details on these message types, including required attributes and examples, see the [full message reference](/messages/#transaction-message).
