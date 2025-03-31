@@ -12,7 +12,7 @@ discussions-to: https://github.com/TransactionAuthorizationProtocol/TAIPs/pull/4
 
 ## Summary
 
-TAIP-2 defines the messaging structure in the Transaction Authorization Protocol (TAP)](<https://tap.rsvp>) that allows agents and parties identified through Decentralized Identifiers ([DIDs][DID]) to securely communicate about a digital asset transaction before settlement on a blockchain.
+TAIP-2 defines the messaging structure in the [Transaction Authorization Protocol (TAP)](<https://tap.rsvp>) that allows agents and parties identified through Decentralized Identifiers ([DIDs][DID]) to securely communicate about a digital asset transaction before settlement on a blockchain.
 
 ## Abstract
 

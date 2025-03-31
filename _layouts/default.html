@@ -24,6 +24,7 @@
     <aside class="sidebar">
       <div class="header">
         <a href="{{ '/' | relative_url }}" class="logo" style="font-size: 1.8rem; font-weight: 700;">TAP</a>
+        <button class="mobile-menu-toggle" aria-label="Toggle mobile menu">☰</button>
       </div>
       
       <nav>
@@ -78,6 +79,43 @@
       </footer>
     </main>
   </div>
+
+  <!-- Mobile navigation script -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Mobile menu toggle
+      const menuToggle = document.querySelector('.mobile-menu-toggle');
+      const sidebar = document.querySelector('.sidebar');
+      
+      if (menuToggle && sidebar) {
+        menuToggle.addEventListener('click', function() {
+          sidebar.classList.toggle('expanded');
+        });
+      }
+      
+      // Section toggles for mobile
+      const sectionTitles = document.querySelectorAll('.nav-section-title');
+      
+      sectionTitles.forEach(function(title) {
+        title.addEventListener('click', function() {
+          // Only apply on mobile
+          if (window.innerWidth <= 768) {
+            const section = this.parentElement;
+            section.classList.toggle('expanded');
+          }
+        });
+      });
+      
+      // If a section contains the active link, expand it on mobile
+      const activeLink = document.querySelector('.nav-link.active');
+      if (activeLink && window.innerWidth <= 768) {
+        const section = activeLink.closest('.nav-section');
+        if (section) {
+          section.classList.add('expanded');
+        }
+      }
+    });
+  </script>
 
   <!-- Initialize Mermaid diagrams -->
   <script>

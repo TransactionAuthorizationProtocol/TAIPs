@@ -242,6 +242,14 @@ footer {
     position: static;
     border-right: none;
     border-bottom: 1px solid var(--color-border);
+    max-height: 60px;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+  }
+  
+  .sidebar.expanded {
+    max-height: 100vh;
+    overflow-y: auto;
   }
   
   .main-content {
@@ -251,6 +259,66 @@ footer {
   
   .header {
     padding: 1rem 1.5rem;
+    position: relative;
+  }
+  
+  .mobile-menu-toggle {
+    display: block;
+    position: absolute;
+    right: 1.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--color-primary);
+    font-size: 1.5rem;
+    cursor: pointer;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    z-index: 10;
+  }
+  
+  .nav-section-title {
+    cursor: pointer;
+    position: relative;
+  }
+  
+  .nav-section-title::after {
+    content: "+";
+    position: absolute;
+    right: 1.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    transition: transform 0.2s;
+  }
+  
+  .nav-section.expanded .nav-section-title::after {
+    content: "−";
+  }
+  
+  .nav-links {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+  }
+  
+  .nav-section.expanded .nav-links {
+    max-height: 1000px;
+  }
+  
+  .nav-link {
+    padding: 0.75rem 1.5rem;
+  }
+}
+
+@media (min-width: 769px) {
+  .mobile-menu-toggle {
+    display: none;
+  }
+  
+  .nav-links {
+    max-height: none !important;
   }
 }
 
