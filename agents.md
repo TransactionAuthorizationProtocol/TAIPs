@@ -61,16 +61,6 @@ graph LR
 - Agents derive their authority from their controlling party
 - The agent-party relationship must be cryptographically verifiable
 
-### Party Attributes
-
-Agents manage various party attributes, including:
-
-- **Identity** - DIDs or IRIs that identify the party
-- **Name** - Human-readable identifiers
-- **LEI Codes** - For institutional parties, Legal Entity Identifiers
-- **Merchant Category Codes** - ISO 18245 codes identifying business types for merchant parties
-- **Verification methods** - Ways to verify party identity and claims
-
 ## Agent Management Messages
 
 TAP includes specific messages for managing agents throughout their lifecycle:
