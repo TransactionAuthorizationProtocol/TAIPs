@@ -46,6 +46,16 @@ A **Payment** is a [DIDComm] message (per [TAIP-2]) initiated by the merchant's 
 - **`merchant`** – **Required**, **object** with information about the merchant (payee). This includes the merchant's identity (DID) and may include additional descriptive information such as a name or website to help the customer recognize the merchant. The merchant object **MUST** include an `@id` attribute with the merchant's DID. The merchant object **MAY** include an `mcc` attribute with the ISO 18245 Merchant Category Code to identify the type of business (e.g., "5411" for grocery stores or "5812" for restaurants).
 - **`agents`** – **Required**, **array of objects** representing agents involved in the payment process. Each agent object must have an `@id` attribute with the agent's DID. At minimum, one agent MUST be associated with the merchant to handle the Payment. The agent's capabilities (and any policies it enforces) are defined according to the Agent specification [TAIP-6].
 
+### Complete Message
+
+A **Complete** message is sent by the merchant's agent to indicate that the transaction is ready for settlement. This replaces the previous approach of using an `Authorize` message for this purpose. The message structure is defined as follows (fields in **bold** are required):
+
+- **`@type`** – Type identifier of the message, e.g. `"Complete"` (in context of TAIP message types).
+- **`settlementAddress`** – **Required**, **string** representing the intended destination address where funds should be sent, specified in [CAIP-10] format.
+- **`amount`** – *Optional*, **string** containing a decimal representation of the final payment amount. If specified, this MUST be less than or equal to the amount in the original Payment message. The amount must be a valid positive number expressed as a string, following the same formatting rules as the amount in the Payment message. If omitted, the full amount from the original Payment message is implied.
+
+When a merchant's agent sends a Complete message with an amount specified, the customer's agent MUST verify that the amount is correct before sending a settlement with that amount. This allows merchants to adjust the final settlement amount if necessary (for example, to account for partial fulfillment of an order or application of discounts), while ensuring the customer approves the final amount.
+
 ### Payment Flow
 
 Once a Payment is sent by the merchant's agent, the transaction can progress through various states as messages are exchanged and the on-chain payment is executed. Payments operate within the **Transaction Authorization Protocol** defined in [TAIP-4]. In particular, the Payment message serves as the initial transaction request to which subsequent authorization messages (Authorize, Settle, Reject, Cancel, Revert) will refer via the `thid` (thread ID).
@@ -86,7 +96,7 @@ sequenceDiagram
     Merchant->>Customer: **Payment** (amount, asset/currency, etc.)
     Note over Customer: Customer reviews the request details
     Customer-->>Merchant: Authorize
-    Merchant-->>Customer: Authorize (provides settlement address)
+    Merchant-->>Customer: Complete (provides settlement address)
     Customer-->>Merchant: Settle (on-chain transfer of funds)
     Merchant-->>Customer: Provide goods/service (out of band)
 ```
@@ -120,7 +130,7 @@ sequenceDiagram
     end
 
     opt Merchant approves transaction
-        PSP-->>CustomerWallet: Send Authorize message
+        PSP-->>CustomerWallet: Send Complete message
     end
 
     CustomerWallet->>Blockchain: Submit transaction
@@ -130,9 +140,9 @@ sequenceDiagram
     Merchant->>Customer: Fulfill order
 ```
 
-*Description:* This detailed sequence involves the **Merchant's agent (Payment Service Provider - PSP)** and **Customer's agent (CustomerWallet)** exchanging messages. The merchant's PSP creates a Payment that the **Merchant** presents to the customer, including the **amount** and a policy requiring additional information (for example, an email for receipt, and shipping address for delivery). The Customer's wallet alerts the **Customer** (user) with the details and asks for the required information and approval. The user approves the transfer and sharing of data, which the wallet packages into a **Verifiable Presentation** (per [TAIP-8]) and returns to the merchant's wallet. The merchant's wallet verifies the credentials (ensuring they meet policy). Once satisfied, the merchant's wallet (or the merchant) sends an **Authorize** message indicating everything is in order containing the settlement address. The **CustomerWallet** now automatically submits the blockchain transaction to the **Blockchain** network (this is depicted as a `Settle` action and the actual on-chain transfer). When the blockchain confirms the payment, the Merchant's wallet is notified (by listening to the blockchain or via an event). Finally, the **Merchant** is informed and can now consider the payment complete—at which point they deliver the product or service to the customer (this last step occurs off-chain, but is triggered by the confirmed payment).
+*Description:* This detailed sequence involves the **Merchant's agent (Payment Service Provider - PSP)** and **Customer's agent (CustomerWallet)** exchanging messages. The merchant's PSP creates a Payment that the **Merchant** presents to the customer, including the **amount** and a policy requiring additional information (for example, an email for receipt, and shipping address for delivery). The Customer's wallet alerts the **Customer** (user) with the details and asks for the required information and approval. The user approves the transfer and sharing of data, which the wallet packages into a **Verifiable Presentation** (per [TAIP-8]) and returns to the merchant's wallet. The merchant's wallet verifies the credentials (ensuring they meet policy). Once satisfied, the merchant's wallet (or the merchant) sends a **Complete** message indicating everything is in order containing the settlement address. The **CustomerWallet** now automatically submits the blockchain transaction to the **Blockchain** network (this is depicted as a `Settle` action and the actual on-chain transfer). When the blockchain confirms the payment, the Merchant's wallet is notified (by listening to the blockchain or via an event). Finally, the **Merchant** is informed and can now consider the payment complete—at which point they deliver the product or service to the customer (this last step occurs off-chain, but is triggered by the confirmed payment).
 
-**Notes:** In this flow, if any required presentation was missing or invalid, the merchant's agent could send a **Reject** instead of Authorize, or simply not authorize the payment (the customer might then choose not to pay).
+**Notes:** In this flow, if any required presentation was missing or invalid, the merchant's agent could send a **Reject** instead of Complete, or simply not authorize the payment (the customer might then choose not to pay).
 
 #### Figure 4: Payment Flow with Cancellation (Failure Scenario)
 

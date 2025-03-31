@@ -14,6 +14,7 @@ permalink: /messages/
   - [Payment](#payment)
 - [Authorization Flow Messages](#authorization-flow-messages)
   - [Authorize](#authorize)
+  - [Complete](#complete)
   - [Settle](#settle)
   - [Reject](#reject)
   - [Cancel](#cancel)
@@ -246,13 +247,14 @@ Initiates a payment request from a merchant to a customer.
 ### Authorize
 [TAIP-4] - Review
 
-Approves a transfer for execution.
+Approves a transaction after completing compliance checks.
 
 | Attribute | Type | Required | Status | Description |
 |-----------|------|----------|---------|-------------|
 | @context | string | Yes | Review ([TAIP-4]) | JSON-LD context "https://tap.rsvp/schema/1.0" |
 | @type | string | Yes | Review ([TAIP-4]) | JSON-LD type "https://tap.rsvp/schema/1.0#Authorize" |
 | reason | string | No | Review ([TAIP-4]) | Optional reason for authorization |
+| settlementAddress | string | No | Review ([TAIP-4]) | Optional CAIP-10 identifier for the settlement address |
 
 > **Note:** The message refers to the original Transfer message via the DIDComm `thid` (thread ID) in the message envelope.
 
@@ -273,6 +275,38 @@ Approves a transfer for execution.
 }
 ```
 
+### Complete
+[TAIP-14] - Review
+
+Indicates that a transaction is ready for settlement, sent by the merchant's agent in a Payment flow. This replaces the previous approach of using Authorize for this purpose.
+
+| Attribute | Type | Required | Status | Description |
+|-----------|------|----------|---------|-------------|
+| @context | string | Yes | Review ([TAIP-14]) | JSON-LD context "https://tap.rsvp/schema/1.0" |
+| @type | string | Yes | Review ([TAIP-14]) | JSON-LD type "https://tap.rsvp/schema/1.0#Complete" |
+| settlementAddress | string | Yes | Review ([TAIP-14]) | CAIP-10 identifier for the settlement address |
+| amount | string | No | Review ([TAIP-14]) | Optional final payment amount, must be less than or equal to the original requested amount |
+
+> **Note:** The message refers to the original Payment message via the DIDComm `thid` (thread ID) in the message envelope.
+
+#### Examples
+
+```json
+{
+  "id": "123e4567-e89b-12d3-a456-426614174007",
+  "type": "https://tap.rsvp/schema/1.0#Complete",
+  "from": "did:web:merchant.vasp",
+  "to": ["did:web:customer.vasp"],
+  "thid": "123e4567-e89b-12d3-a456-426614174014",
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#Complete",
+    "settlementAddress": "eip155:1:0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+    "amount": "95.50"
+  }
+}
+```
+
 ### Settle
 [TAIP-4] - Review
 
@@ -283,6 +317,7 @@ Confirms the on-chain settlement of a transfer.
 | @context | string | Yes | Review ([TAIP-4]) | JSON-LD context "https://tap.rsvp/schema/1.0" |
 | @type | string | Yes | Review ([TAIP-4]) | JSON-LD type "https://tap.rsvp/schema/1.0#Settle" |
 | settlementId | string | Yes | Review ([TAIP-4]) | CAIP-220 identifier of the settlement transaction |
+| amount | string | No | Review ([TAIP-4]) | Optional settled amount, must be less than or equal to the original amount. If a Complete message specified an amount, this must match that value. |
 
 > **Note:** The message refers to the original Transfer message via the DIDComm `thid` (thread ID) in the message envelope.
 
@@ -299,6 +334,24 @@ Confirms the on-chain settlement of a transfer.
     "@context": "https://tap.rsvp/schema/1.0",
     "@type": "https://tap.rsvp/schema/1.0#Settle",
     "settlementId": "eip155:1:tx/0x3edb98c24d46d148eb926c714f4fbaa117c47b0c0821f38bfce9763604457c33"
+  }
+}
+```
+
+Example with amount field:
+
+```json
+{
+  "id": "123e4567-e89b-12d3-a456-426614174008",
+  "type": "https://tap.rsvp/schema/1.0#Settle",
+  "from": "did:web:customer.vasp",
+  "to": ["did:web:merchant.vasp"],
+  "thid": "123e4567-e89b-12d3-a456-426614174014",
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#Settle",
+    "settlementId": "eip155:1:tx/0x3edb98c24d46d148eb926c714f4fbaa117c47b0c0821f38bfce9763604457c33",
+    "amount": "95.50"
   }
 }
 ```

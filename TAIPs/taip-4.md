@@ -152,6 +152,7 @@ An originating agent notifies the other agents in the same thread that they are 
 - `@context` - REQUIRED the JSON-LD context `https://tap.rsvp/schema/1.0`
 - `@type` - REQUIRED the JSON-LD type `https://tap.rsvp/schema/1.0#Settle`
 - `settlementId` - OPTIONAL a [CAIP-220](https://github.com/ChainAgnostic/CAIPs/pull/221/files) identifier of the underlying settlement transaction on a blockchain. REQUIRED by at least one agent representing the originator.
+- `amount` - OPTIONAL string containing a decimal representation of the settled amount. If specified, this MUST be less than or equal to the amount in the original transaction message. If a `Complete` message was received with an amount specified, then the amount in the `Settle` message MUST match that value. If omitted, the full amount from the original transaction message is implied.
 
 The following shows an simplified authorization flow with a succesfull outcome (transaction settled):
 
@@ -386,6 +387,7 @@ The following are example plaintext messages. See [TAIP-2] for how to sign the m
     "@context": "https://tap.rsvp/schema/1.0",
     "@type": "https://tap.rsvp/schema/1.0#Settle",
     "settlementId":"eip155:1:tx/0x3edb98c24d46d148eb926c714f4fbaa117c47b0c0821f38bfce9763604457c33",  /* Blockchain transaction hash */
+    "amount": "100.00"
   }
 }
 ```

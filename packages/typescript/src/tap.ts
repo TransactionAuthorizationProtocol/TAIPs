@@ -572,10 +572,34 @@ type Transactions = Transfer | Payment;
  */
 interface Authorize extends TapMessageObject<"Authorize"> {
   /**
-   * Optional authorization reason
-   * Additional context for the authorization decision
+   * Optional reason for authorization
    */
   reason?: string;
+  /**
+   * Optional settlement address
+   * The blockchain address where funds should be sent
+   */
+  settlementAddress?: CAIP10;
+}
+
+/**
+ * Complete Message
+ * Indicates that a transaction is ready for settlement, sent by the merchant's agent.
+ *
+ * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-14.md | TAIP-14: Payments}
+ */
+interface Complete extends TapMessageObject<"Complete"> {
+  /**
+   * Settlement address
+   * The blockchain address where funds should be sent, specified in CAIP-10 format
+   */
+  settlementAddress: CAIP10;
+  
+  /**
+   * Optional final payment amount
+   * If specified, must be less than or equal to the amount in the original Payment message
+   */
+  amount?: Amount;
 }
 
 /**
@@ -590,6 +614,13 @@ interface Settle extends TapMessageObject<"Settle"> {
    * CAIP-220 identifier for the on-chain settlement transaction
    */
   settlementId: CAIP220;
+  
+  /**
+   * Optional settled amount
+   * If specified, must be less than or equal to the amount in the original transaction
+   * If a Complete message specified an amount, this must match that value
+   */
+  amount?: Amount;
 }
 
 /**
@@ -1094,6 +1125,16 @@ interface AuthorizationRequiredMessage
 }
 
 /**
+ * Complete Message Wrapper
+ * DIDComm envelope for a Complete message.
+ *
+ * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-14.md | TAIP-14: Payments}
+ */
+interface CompleteMessage extends DIDCommReply<Complete> {
+  type: "https://tap.rsvp/schema/1.0#Complete";
+}
+
+/**
  * TAP Message
  * Union type of all possible TAP messages.
  * Used for type-safe message handling in TAP implementations.
@@ -1117,7 +1158,8 @@ type TAPMessage =
   | ConfirmRelationshipMessage
   | UpdatePoliciesMessage
   | ConnectMessage
-  | AuthorizationRequiredMessage;
+  | AuthorizationRequiredMessage
+  | CompleteMessage;
 
 // Export all types
 export type {
@@ -1178,10 +1220,12 @@ export type {
   UpdatePoliciesMessage,
   ConnectMessage,
   AuthorizationRequiredMessage,
+  CompleteMessage,
   TAPMessage,
 
   // New types
   TransactionConstraints,
   Connect,
   AuthorizationRequired,
+  Complete,
 };
