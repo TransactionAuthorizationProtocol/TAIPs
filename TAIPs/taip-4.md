@@ -145,6 +145,14 @@ sequenceDiagram
 
 The above flow demonstrates the power of multiple agents collaborating around authorizing a transaction. The Beneficiary Agent and WalletAPI maintain their risk profiles and can independently authorize the transaction. In most cases, the Wallet API will defer to their customer, the Beneficiary Agent, and can use the signal that their customer Authorizes it to Authorize it and present the `settlementAddress` to the originating agent.
 
+### Message Expiration
+
+As detailed in [TAIP-2], the `expires_time` header is used to semantically express when the underlying intent of a message is no longer valid:
+
+* For `Authorize` messages, the `expires_time` SHOULD be included to indicate the time period for which the authorization is valid. This allows the authorizing party to express that they only authorize a transaction for a specific time window, after which the authorization is no longer valid.
+* If the authorizing agent includes an `expires_time`, but no settlement has occurred before that time, other agents SHOULD consider the authorization expired and SHOULD NOT proceed with the settlement.
+* In merchant payment flows, the customer's wallet may either accept the merchant's specified expiration time or override it with a different time for their own customer service purposes.
+
 ### Settle
 
 An originating agent notifies the other agents in the same thread that they are ready to settle the transfer. The following shows the attributes of the `body` object:

@@ -56,6 +56,14 @@ As specified in [TAIP-2] the message body is [JSON-LD]. The following attributes
 
 Many of the attributes are optional and through the process of authorization can be expanded and modified collaboratively by the agents of a transaction.
 
+### Message Expiration
+
+As specified in [TAIP-2], DIDComm messages support an `expires_time` header. For Transfer messages:
+
+* The `expires_time` SHOULD be set by the originator's agent to indicate the time period within which the transaction must be authorized.
+* If a Transfer is not Authorized within the time specified in `expires_time`, the transfer request SHOULD be considered expired and the funds will not be sent.
+* Recipients' agents SHOULD communicate this expiration deadline to their users when presenting the transfer for review.
+
 ### Out-of-Band Initiation
 
 To initiate a transfer with a party that hasn't communicated before, agents MUST support [Out-of-Band Messages](https://identity.foundation/didcomm-messaging/spec/v2.1/#out-of-band-messages). The OOB message allows sharing the Transfer request through URLs or QR codes.

@@ -55,6 +55,14 @@ A message sent by an agent requesting connection to another agent:
     - `daily` - OPTIONAL string decimal amount
     - `currency` - REQUIRED string ISO 4217 currency code if limits are specified
 
+### Message Expiration
+
+As specified in [TAIP-2], the DIDComm `expires_time` header is used semantically to express when the underlying intent of a message is no longer valid. For Connect messages:
+
+* The `expires_time` SHOULD be included to indicate the time period for which the connection request is valid. If not specified, the recipient may assume the request is valid indefinitely or apply their own time constraints.
+* Connect messages with an `expires_time` that has passed SHOULD be rejected by receiving agents.
+* The `expires_time` on a Connect message is distinct from any time-based constraints that may be placed on the connection once established.
+
 ### AuthorizationRequired Message
 
 A message sent in response to a Connect request when interactive authorization is needed:

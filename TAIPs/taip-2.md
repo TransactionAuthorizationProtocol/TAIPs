@@ -42,7 +42,7 @@ The following attributes from DIDComm are used in TAP:
 * `pthid` - OPTIONAL. Parent thread identifier. If the message is a child of a thread the pthid will uniquely identify which thread is the parent.
 * `body` - REQUIRED. The message body, which MUST contain a valid [JSON-LD] object.
 * `created_time` - REQUIRED. The time the message was created.
-* `expires_time` - OPTIONAL. The time the message expires. A recipient MUST ignore the message after this time.
+* `expires_time` - OPTIONAL. The time the message expires. A recipient MUST ignore the message after this time. In TAP, this field SHOULD be used semantically by the sending agent to express when the underlying intent of the message is no longer valid. This is distinct from simple message expiry and relates to the business intent behind the message, signaling when the proposed transaction, payment, or connection should no longer be considered valid.
 
 ### Message Signing
 
