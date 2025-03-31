@@ -187,7 +187,8 @@ Initiates a payment request from a merchant to a customer.
     "amount": "100.00",
     "merchant": {
       "@id": "did:web:merchant.vasp",
-      "name": "Example Store"
+      "name": "Example Store",
+      "mcc": "5812"
     },
     "invoice": "https://example.com/invoice/123",
     "agents": [
@@ -676,7 +677,7 @@ The body object must contain:
   "id": "connect-123",
   "type": "https://tap.rsvp/schema/1.0#Connect",
   "from": "did:web:b2b.service",
-  "to": ["did:web:vasp"],
+  "to": ["did:example:vasp"],
   "created_time": 1516269022,
   "expires_time": 1516385931,
   "body": {
@@ -686,7 +687,7 @@ The body object must contain:
       "@id": "did:web:b2b.service",
       "name": "B2B Payment Service",
       "type": "ServiceAgent",
-      "serviceUrl": "https://b2b.service/did-comm"
+      "serviceUrl": "https://b2b-service/did-comm"
     },
     "for": "did:example:business-customer",
     "constraints": {
@@ -1036,6 +1037,7 @@ Represents a participant in a transaction (originator or beneficiary).
 | lei:leiCode | string | No | Draft ([TAIP-11]) | LEI code for legal entities. Must be a 20-character alpha-numeric string conforming to ISO 17442 |
 | name | string | No | Review ([TAIP-6]) | Human-readable name |
 | nameHash | string | No | Draft ([TAIP-12]) | SHA-256 hash of the normalized name (uppercase, no whitespace) |
+| mcc | string | No | Review ([TAIP-14]) | Merchant Category Code (ISO 18245) that identifies the type of business (e.g., "5411" for grocery stores) |
 
 When including an LEI, the Party MUST include the appropriate JSON-LD context:
 
@@ -1324,22 +1326,14 @@ Note that all messages in this flow share the same thread ID (`payment-123`) to 
     ],
     "merchant": {
       "@id": "did:web:merchant.vasp",
-      "name": "Example Store"
+      "name": "Example Store",
+      "mcc": "5812"
     },
     "expiry": "2024-04-21T12:00:00Z",
     "agents": [
       {
         "@id": "did:web:merchant.vasp",
-        "for": "did:web:merchant.vasp",
-        "policies": [
-          {
-            "@type": "RequirePresentation",
-            "@context": ["https://schema.org/Person"],
-            "fromAgent": "originator",
-            "aboutParty": "originator",
-            "presentationDefinition": "https://tap.rsvp/presentation-definitions/email/v1"
-          }
-        ]
+        "for": "did:web:merchant.vasp"
       }
     ]
   }
@@ -1427,78 +1421,6 @@ Note that all messages in this flow share the same thread ID (`payment-123`) to 
 }
 ```
 
-### Payment Request Flow Examples
-
-#### 1. Payment Request with Fiat Amount and Supported Assets
-```json
-{
-  "id": "payment-req-123",
-  "type": "https://tap.rsvp/schema/1.0#Payment",
-  "from": "did:web:merchant.vasp",
-  "to": ["did:web:customer.vasp"],
-  "created_time": 1516269022,
-  "expires_time": 1516385931,
-  "body": {
-    "@context": "https://tap.rsvp/schema/1.0",
-    "@type": "https://tap.rsvp/schema/1.0#Payment",
-    "currency": "USD",
-    "amount": "100.00",
-    "supportedAssets": [
-      "eip155:1/erc20:0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
-      "eip155:1/erc20:0x6B175474E89094C44Da98b954EedeAC495271d0F"
-    ],
-    "merchant": {
-      "@id": "did:web:merchant.vasp",
-      "name": "Example Store"
-    },
-    "invoice": "https://example.com/invoice/123",
-    "expiry": "2024-04-21T12:00:00Z",
-    "agents": [
-      {
-        "@id": "did:web:merchant.vasp",
-        "for": "did:web:merchant.vasp",
-        "policies": [
-          {
-            "@type": "RequirePresentation",
-            "@context": ["https://schema.org/Person"],
-            "fromAgent": "originator",
-            "aboutParty": "originator",
-            "presentationDefinition": "https://tap.rsvp/presentation-definitions/email/v1"
-          }
-        ]
-      }
-    ]
-  }
-}
-```
-
-#### 2. Payment Request with Direct Asset
-```json
-{
-  "id": "payment-req-124",
-  "type": "https://tap.rsvp/schema/1.0#Payment",
-  "from": "did:web:merchant.vasp",
-  "to": ["did:web:customer.vasp"],
-  "created_time": 1516269022,
-  "body": {
-    "@context": "https://tap.rsvp/schema/1.0",
-    "@type": "https://tap.rsvp/schema/1.0#Payment",
-    "asset": "eip155:1/erc20:0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
-    "amount": "100.00",
-    "merchant": {
-      "@id": "did:web:merchant.vasp",
-      "name": "Example Store"
-    },
-    "agents": [
-      {
-        "@id": "did:web:merchant.vasp",
-        "for": "did:web:merchant.vasp"
-      }
-    ]
-  }
-}
-```
-
 ### Cancel Message Examples
 
 #### 1. Cancel Transaction
@@ -1513,7 +1435,7 @@ Note that all messages in this flow share the same thread ID (`payment-123`) to 
   "body": {
     "@context": "https://tap.rsvp/schema/1.0",
     "@type": "https://tap.rsvp/schema/1.0#Cancel",
-    "reason": "User requested cancellation"
+    "reason": "User cancelled the request"
   }
 }
 ```

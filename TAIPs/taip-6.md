@@ -65,6 +65,15 @@ Or add the [LEI](https://www.gleif.org/en/about-lei/introducing-the-legal-entity
 }
 ```
 
+For merchant parties, you can add a Merchant Category Code ([ISO 18245](https://www.iso.org/standard/33365.html)) to indicate the type of business:
+
+```json
+{
+  "@id":"did:web:merchant.com",
+  "mcc":"5812" // Restaurant
+}
+```
+
 Future TAIPs can add additional attributes to parties. Since it is JSON-LD, you could add additional data from other contexts.
 
 ### Types of Parties

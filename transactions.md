@@ -23,6 +23,7 @@ The **Transfer** message type is the foundation of TAP, designed for direct cryp
 - **Push-Based Model**: Assets are "pushed" from the originator to the beneficiary
 - **Pre-Transaction Authorization**: Compliance checks occur before settlement on the blockchain
 - **Compliance Data Exchange**: Allows sharing of identity information, purpose codes, and other compliance data
+- **Purpose Code Support**: Includes optional ISO 20022 `purpose` and `categoryPurpose` fields to indicate the reason for payment (e.g., "SALA" for salary payments, "SUPP" for supplier payments) as defined in [TAIP-13](/TAIPs/taip-13.md)
 
 ## Payment
 
@@ -41,6 +42,7 @@ The **Payment** message type extends TAP to support merchant payment scenarios w
 - **Pull-Based Model**: Beneficiary requests the customer to "pull" funds from their wallet
 - **Enhanced Metadata**: Supports additional information like invoices, items, and payment terms
 - **Customer Experience Focus**: Designed for consumer-friendly payment flows with clear merchant identification
+- **Merchant Classification**: Supports ISO 18245 Merchant Category Codes (MCC) for business type identification (e.g., restaurants, grocery stores)
 
 ## Business Differences
 

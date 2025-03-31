@@ -294,6 +294,16 @@ interface Participant<T extends ParticipantTypes> extends JsonLdObject<T> {
    */
   policies?: Policies[];
 
+  /**
+   * Merchant Category Code (ISO 18245)
+   * Standard classification code for merchant types in payment transactions
+   * Used primarily for merchants in payment requests
+   * 
+   * @example "5411" // Grocery stores and supermarkets
+   * @example "5812" // Restaurants
+   * @see {@link https://www.iso.org/standard/33365.html | ISO 18245}
+   */
+  mcc?: string;
 
 }
 

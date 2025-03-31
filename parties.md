@@ -34,6 +34,16 @@ Each party in TAP is identified through:
 2. **Verifiable Credentials**: May provide additional attestations about the party
 3. **Relationship Proofs**: Document connections between parties and their agents
 
+## Party Attributes
+
+Parties in TAP may have various attributes that describe their characteristics:
+
+1. **Name**: Human-readable identifier for the party
+2. **Legal Entity Identifier (LEI)**: For institutional parties, a globally recognized identifier
+3. **Merchant Category Code (MCC)**: Optional ISO 18245 code for merchant parties that identifies their business type (e.g., "5411" for grocery stores, "5812" for restaurants)
+4. **Contact Information**: Methods for reaching the party outside of the TAP protocol
+5. **Regulatory Status**: Information about regulatory compliance and licensing
+
 ## Party Management Messages
 
 TAP includes specific messages for managing party information:
