@@ -461,6 +461,12 @@ interface Transfer extends TapMessageObject<"Transfer"> {
   categoryPurpose?: ISO20022CategoryPurposeCode;
 
   /**
+   * Optional expiration timestamp
+   * Indicates when the transfer request expires
+   */
+  expiry?: ISO8601DateTime;
+
+  /**
    * Details of the transfer originator
    * The party initiating the transfer
    */
@@ -555,16 +561,6 @@ interface Payment extends TapMessageObject<"Payment"> {
 }
 
 /**
- * Transaction Types
- * Union type of all transaction initiation messages in TAP.
- * Used for type-safe handling of transaction messages.
- *
- * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-3.md | TAIP-3: Transfer Message}
- * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-14.md | TAIP-14: Payment Request}
- */
-type Transactions = Transfer | Payment;
-
-/**
  * Authorization Message
  * Approves a transfer for execution after compliance checks.
  *
@@ -580,27 +576,58 @@ interface Authorize extends TapMessageObject<"Authorize"> {
    * The blockchain address where funds should be sent
    */
   settlementAddress?: CAIP10;
+  
+  /**
+   * Optional expiration timestamp
+   * Indicates when the authorization expires
+   */
+  expiry?: ISO8601DateTime;
 }
 
 /**
- * Complete Message
- * Indicates that a transaction is ready for settlement, sent by the merchant's agent.
+ * Connect Message
+ * Requests a connection between agents with specified constraints.
  *
- * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-14.md | TAIP-14: Payments}
+ * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-15.md | TAIP-15: Agent Connection Protocol}
  */
-interface Complete extends TapMessageObject<"Complete"> {
+interface Connect extends TapMessageObject<"Connect"> {
   /**
-   * Settlement address
-   * The blockchain address where funds should be sent, specified in CAIP-10 format
+   * Details of the requesting agent
+   * Includes identity and endpoints
    */
-  settlementAddress: CAIP10;
-  
+  agent?: Participant<"Agent"> & {
+    /** Service URL */
+    serviceUrl?: IRI;
+  };
+
   /**
-   * Optional final payment amount
-   * If specified, must be less than or equal to the amount in the original Payment message
+   * DID of the represented party
+   * The party the agent acts on behalf of
    */
-  amount?: Amount;
+  for: DID;
+
+  /**
+   * Transaction constraints
+   * Limits and allowed transaction types
+   */
+  constraints: TransactionConstraints;
+
+  /**
+   * Optional expiration timestamp
+   * Indicates when the connection request expires
+   */
+  expiry?: ISO8601DateTime;
 }
+
+/**
+ * Transaction Types
+ * Union type of all transaction initiation messages in TAP.
+ * Used for type-safe handling of transaction messages.
+ *
+ * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-3.md | TAIP-3: Transfer Message}
+ * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-14.md | TAIP-14: Payment Request}
+ */
+type Transactions = Transfer | Payment;
 
 /**
  * Settlement Message
@@ -886,35 +913,6 @@ interface TransactionConstraints {
 }
 
 /**
- * Connect Message
- * Requests a connection between agents with specified constraints.
- *
- * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-15.md | TAIP-15: Agent Connection Protocol}
- */
-interface Connect extends TapMessageObject<"Connect"> {
-  /**
-   * Details of the requesting agent
-   * Includes identity and endpoints
-   */
-  agent?: Participant<"Agent"> & {
-    /** Service URL */
-    serviceUrl?: IRI;
-  };
-
-  /**
-   * DID of the represented party
-   * The party the agent acts on behalf of
-   */
-  for: DID;
-
-  /**
-   * Transaction constraints
-   * Limits and allowed transaction types
-   */
-  constraints: TransactionConstraints;
-}
-
-/**
  * Authorization Required Message
  * Response providing an authorization URL for connection approval.
  *
@@ -935,7 +933,28 @@ interface AuthorizationRequired
   expires: ISO8601DateTime;
 }
 
-// DIDComm Message Wrappers
+/**
+ * Complete Message
+ * Indicates that a transaction is ready for settlement, sent by the merchant's agent.
+ *
+ * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-14.md | TAIP-14: Payments}
+ */
+interface Complete extends TapMessageObject<"Complete"> {
+  /**
+   * Settlement address
+   * The blockchain address where funds should be sent, specified in CAIP-10 format
+   */
+  settlementAddress: CAIP10;
+  
+  /**
+   * Optional final payment amount
+   * If specified, must be less than or equal to the amount in the original Payment message
+   */
+  amount?: Amount;
+}
+
+/**
+ * DIDComm Message Wrappers
 
 /**
  * Transfer Message Wrapper

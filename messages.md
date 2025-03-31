@@ -85,6 +85,7 @@ Initiates a virtual asset transfer between parties.
 | memo | string | No | Review ([TAIP-3]) | Human readable message about the transfer |
 | purpose | string | No | Draft ([TAIP-13]) | ISO 20022 purpose code indicating the reason for the transfer |
 | categoryPurpose | string | No | Draft ([TAIP-13]) | ISO 20022 category purpose code for high-level classification |
+| expiry | string | No | Review ([TAIP-3]) | ISO 8601 datetime indicating when the transfer request expires |
 
 #### Examples
 
@@ -255,6 +256,7 @@ Approves a transaction after completing compliance checks.
 | @type | string | Yes | Review ([TAIP-4]) | JSON-LD type "https://tap.rsvp/schema/1.0#Authorize" |
 | reason | string | No | Review ([TAIP-4]) | Optional reason for authorization |
 | settlementAddress | string | No | Review ([TAIP-4]) | Optional CAIP-10 identifier for the settlement address |
+| expiry | string | No | Review ([TAIP-4]) | ISO 8601 datetime indicating when the authorization expires |
 
 > **Note:** The message refers to the original Transfer message via the DIDComm `thid` (thread ID) in the message envelope.
 
@@ -729,7 +731,7 @@ The body object must contain:
 {
   "id": "connect-123",
   "type": "https://tap.rsvp/schema/1.0#Connect",
-  "from": "did:web:b2b.service",
+  "from": "did:example:b2b-service",
   "to": ["did:example:vasp"],
   "created_time": 1516269022,
   "expires_time": 1516385931,
@@ -737,7 +739,7 @@ The body object must contain:
     "@context": "https://tap.rsvp/schema/1.0",
     "@type": "https://tap.rsvp/schema/1.0#Connect",
     "agent": {
-      "@id": "did:web:b2b.service",
+      "@id": "did:example:b2b-service",
       "name": "B2B Payment Service",
       "type": "ServiceAgent",
       "serviceUrl": "https://b2b-service/did-comm"
@@ -794,7 +796,7 @@ The body object must contain:
   "id": "auth-req-123",
   "type": "https://tap.rsvp/schema/1.0#AuthorizationRequired",
   "from": "did:web:beneficiary.vasp",
-  "to": ["did:web:b2b.service"],
+  "to": ["did:web:b2b-service"],
   "thid": "1234567890",
   "created_time": 1516269022,
   "body": {
@@ -881,6 +883,7 @@ Requests a connection between agents with specified constraints.
 | agent | object | No | Draft ([TAIP-15]) | Details of the requesting agent |
 | for | string | Yes | Draft ([TAIP-15]) | DID of the party the agent represents |
 | constraints | object | Yes | Draft ([TAIP-15]) | Transaction constraints for the connection |
+| expiry | string | No | Draft ([TAIP-15]) | ISO 8601 datetime indicating when the connection request expires |
 
 #### Example Connect Message
 ```json
