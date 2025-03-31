@@ -54,14 +54,7 @@ A message sent by an agent requesting connection to another agent:
     - `per_transaction` - OPTIONAL string decimal amount
     - `daily` - OPTIONAL string decimal amount
     - `currency` - REQUIRED string ISO 4217 currency code if limits are specified
-
-### Message Expiration
-
-As specified in [TAIP-2], the DIDComm `expires_time` header is used semantically to express when the underlying intent of a message is no longer valid. For Connect messages:
-
-* The `expires_time` SHOULD be included to indicate the time period for which the connection request is valid. If not specified, the recipient may assume the request is valid indefinitely or apply their own time constraints.
-* Connect messages with an `expires_time` that has passed SHOULD be rejected by receiving agents.
-* The `expires_time` on a Connect message is distinct from any time-based constraints that may be placed on the connection once established.
+- `expiry` - OPTIONAL timestamp in ISO 8601 format indicating when the connection request expires. After this time, if no authorization has occurred, the connection request should be considered invalid. This is distinct from the technical message expiry handled by the DIDComm `expires_time` header.
 
 ### AuthorizationRequired Message
 
@@ -307,7 +300,6 @@ The following are example plaintext messages. See [TAIP-2] for how to sign the m
   "from": "did:example:b2b-service",
   "to": ["did:example:vasp"],
   "created_time": 1516269022,
-  "expires_time": 1516385931,
   "body": {
     "@context": "https://tap.rsvp/schema/1.0",
     "@type": "https://tap.rsvp/schema/1.0#Connect",
@@ -326,7 +318,8 @@ The following are example plaintext messages. See [TAIP-2] for how to sign the m
         "daily": "50000.00",
         "currency": "USD"
       }
-    }
+    },
+    "expiry": "2024-03-22T15:00:00Z"
   }
 }
 ```

@@ -53,16 +53,9 @@ As specified in [TAIP-2] the message body is [JSON-LD]. The following attributes
 * `settlementId` - OPTIONAL a [CAIP-220](https://github.com/ChainAgnostic/CAIPs/pull/221/files) identifier of the underlying settlement transaction on a blockchain. For more details see below.
 * `agents` - REQUIRED an array of identity objects representing the agents who help execute the transaction. See [TAIP-5](TAIP-5) for more.
 * `memo` - OPTIONAL a human readable UTF-8 string to be provided as-is by the originator to the beneficiary about the transfer
+* `expiry` - OPTIONAL a timestamp in ISO 8601 format indicating when the transfer request expires. After this time, if no authorization has occurred, the transfer should be considered invalid and funds will not be sent. Recipients' agents SHOULD communicate this expiration deadline to their users when presenting the transfer for review.
 
 Many of the attributes are optional and through the process of authorization can be expanded and modified collaboratively by the agents of a transaction.
-
-### Message Expiration
-
-As specified in [TAIP-2], DIDComm messages support an `expires_time` header. For Transfer messages:
-
-* The `expires_time` SHOULD be set by the originator's agent to indicate the time period within which the transaction must be authorized.
-* If a Transfer is not Authorized within the time specified in `expires_time`, the transfer request SHOULD be considered expired and the funds will not be sent.
-* Recipients' agents SHOULD communicate this expiration deadline to their users when presenting the transfer for review.
 
 ### Out-of-Band Initiation
 
