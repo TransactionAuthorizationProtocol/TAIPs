@@ -11,7 +11,7 @@ requires: 2, 3, 4, 6, 7, 8, 9
 
 ## Simple Summary
 
-A standard for **Payments** that allows a *merchant* (formerly "beneficiary") to request a blockchain payment from a *customer* (formerly "originator"). This proposal defines a Payment message including the amount due (in either a specific asset or fiat currency), the destination address, and any required customer information.
+A standard for **Payments** that allows a *merchant* to request a blockchain payment from a *customer*. This proposal defines a Payment message including the amount due (in either a specific asset or fiat currency), the destination address, and any required customer information.
 
 ## Abstract
 
