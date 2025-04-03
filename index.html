@@ -24,8 +24,30 @@ title: Home
     
     <h3>Core TAIPs</h3>
     <div class="taips-grid">
-      {% assign core_taips = site.pages | where_exp: "item", "item.path contains 'TAIPs/taip-'" | where: "type", "Standard" | sort: 'taip' %}
-      {% for taip in core_taips limit:6 %}
+      {% assign review_taips = site.pages | where_exp: "item", "item.path contains 'TAIPs/taip-'" | where: "status", "Review" | sort: 'taip' %}
+      {% assign accepted_taips = site.pages | where_exp: "item", "item.path contains 'TAIPs/taip-'" | where: "status", "Accepted" | sort: 'taip' %}
+      {% assign draft_taips = site.pages | where_exp: "item", "item.path contains 'TAIPs/taip-'" | where: "status", "Draft" | sort: 'taip' %}
+      
+      {% comment %} Display Accepted TAIPs first {% endcomment %}
+      {% for taip in accepted_taips %}
+        <div class="taip-card">
+          <h4><a href="{{ taip.url | relative_url }}">TAIP-{{ taip.taip }}: {{ taip.title }}</a></h4>
+          <span class="status-pill status-{{ taip.status | downcase }}">{{ taip.status }}</span>
+          <p>{{ taip.description | default: "Defines a standard component of the Transaction Authorization Protocol." }}</p>
+        </div>
+      {% endfor %}
+      
+      {% comment %} Display Review TAIPs next {% endcomment %}
+      {% for taip in review_taips %}
+        <div class="taip-card">
+          <h4><a href="{{ taip.url | relative_url }}">TAIP-{{ taip.taip }}: {{ taip.title }}</a></h4>
+          <span class="status-pill status-{{ taip.status | downcase }}">{{ taip.status }}</span>
+          <p>{{ taip.description | default: "Defines a standard component of the Transaction Authorization Protocol." }}</p>
+        </div>
+      {% endfor %}
+      
+      {% comment %} Display Draft TAIPs last {% endcomment %}
+      {% for taip in draft_taips %}
         <div class="taip-card">
           <h4><a href="{{ taip.url | relative_url }}">TAIP-{{ taip.taip }}: {{ taip.title }}</a></h4>
           <span class="status-pill status-{{ taip.status | downcase }}">{{ taip.status }}</span>
@@ -33,13 +55,6 @@ title: Home
         </div>
       {% endfor %}
     </div>
-    
-    {% assign taip_count = site.pages | where_exp: "item", "item.path contains 'TAIPs/taip-'" | size %}
-    {% if taip_count > 6 %}
-      <div class="more-link">
-        <a href="#" class="view-all">View all {{ taip_count }} TAIPs</a>
-      </div>
-    {% endif %}
   </section>
 </div>
 
