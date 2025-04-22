@@ -44,6 +44,7 @@ The **Payment** message type extends TAP to support merchant payment scenarios w
 - **Customer Experience Focus**: Designed for consumer-friendly payment flows with clear merchant identification
 - **Merchant Classification**: Supports ISO 18245 Merchant Category Codes (MCC) for business type identification (e.g., restaurants, grocery stores)
 - **Flexible Settlement**: Supports optional partial payments through the **Complete** message, allowing merchants to adjust final amounts
+- **Invoice Support**: Includes comprehensive invoice functionality as defined in [TAIP-16](/TAIPs/taip-16.md), supporting detailed line items, tax information, and payment terms
 
 ### Complete Message
 
@@ -52,7 +53,7 @@ The **Complete** message is a crucial part of the Payment flow, sent by the merc
 - **Settlement Readiness**: Clearly signals that the merchant has finished all necessary checks and is ready to receive payment
 - **Address Provision**: Provides the blockchain address where funds should be sent
 - **Optional Amount Adjustment**: Allows merchants to specify a final amount (which must be less than or equal to the original requested amount), enabling scenarios like partial fulfillment or applied discounts
-- **Settlement Guidance**: When an amount is specified in the Complete message, the customer's agent must use that exact amount in the subsequent Settle message
+- **Settlement Guidance**: When an amount is specified in the Complete message, the customer's agent must use that exact amount in the subsequent Settle message. If omitted, the full amount from the original Payment message is implied
 
 ## Business Differences
 

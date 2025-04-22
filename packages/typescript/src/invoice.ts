@@ -320,6 +320,7 @@ export interface Invoice {
    * Unique identifier for the invoice
    * 
    * @example "INV001"
+   * @validation Must be a unique identifier for the invoice
    */
   id: string;
   
@@ -328,6 +329,7 @@ export interface Invoice {
    * ISO 8601 date format (YYYY-MM-DD)
    * 
    * @example "2025-04-22"
+   * @validation Must be a valid date in ISO 8601 format
    */
   issueDate: string;
   
@@ -338,38 +340,52 @@ export interface Invoice {
    * 
    * @example "USD"
    * @example "EUR"
+   * @validation Must be a valid ISO 4217 currency code
    */
   currencyCode: IsoCurrency;
   
   /**
    * Individual items being invoiced
+   * 
+   * @validation Must be an array of LineItem objects
    */
   lineItems: LineItem[];
   
   /**
    * Aggregate tax information
+   * 
+   * @validation Must be a TaxTotal object if present
    */
   taxTotal?: TaxTotal;
   
   /**
    * Total amount of the invoice, including taxes
    * Must match the amount in the Payment Request body
+   * 
+   * @validation Must be a positive number
    */
   total: number;
   
   /**
    * Sum of line totals before taxes
+   * 
+   * @validation Must be a positive number if present
    */
   subTotal?: number;
   
   /**
    * Date when payment is due
    * ISO 8601 date format (YYYY-MM-DD)
+   * 
+   * @example "2025-05-22"
+   * @validation Must be a valid date in ISO 8601 format if present
    */
   dueDate?: string;
   
   /**
    * Additional notes or terms for the invoice
+   * 
+   * @validation Must be a string if present
    */
   note?: string;
   
@@ -377,22 +393,29 @@ export interface Invoice {
    * Terms of payment
    * 
    * @example "Net 30"
+   * @validation Must be a string if present
    */
   paymentTerms?: string;
   
   /**
    * Buyer's accounting code
    * Used to route costs to specific accounts
+   * 
+   * @validation Must be a string if present
    */
   accountingCost?: string;
   
   /**
    * Reference to a related order
+   * 
+   * @validation Must be an OrderReference object if present
    */
   orderReference?: OrderReference;
   
   /**
    * References to additional documents
+   * 
+   * @validation Must be an array of AdditionalDocumentReference objects if present
    */
   additionalDocumentReference?: AdditionalDocumentReference[];
 }

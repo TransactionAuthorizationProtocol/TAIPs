@@ -75,20 +75,21 @@ TAP introduces a **Payment** flow that enables merchants to request payments fro
    - Acceptable payment assets (if priced in fiat)
    - Optional expiry time
    - Information requirements from the customer
+   - Optional detailed invoice with line items, taxes, and payment terms (as defined in TAIP-16)
 
 2. The customer's wallet displays the request, allowing the customer to:
-   - Review payment details
+   - Review payment details and invoice information
    - Provide any requested information (securely via selective disclosure)
    - Approve or decline the payment
 
 3. If approved, the standard TAP authorization flow begins:
-   - The merchant's agent may provide a settlement address
+   - The merchant's agent sends a **Complete** message with a settlement address and optional final amount
    - The customer's wallet executes the blockchain transaction
-   - Settlement confirmation is exchanged
+   - Settlement confirmation is exchanged via a **Settle** message
 
 4. Either party can cancel the request at any time before settlement
 
-This approach brings familiar payment experiences to blockchain transactions, with added privacy protection for customer information and flexibility in payment methods. It's particularly valuable for e-commerce, subscriptions, and B2B invoicing.
+This approach brings familiar payment experiences to blockchain transactions, with added privacy protection for customer information and flexibility in payment methods. It's particularly valuable for e-commerce, subscriptions, and B2B invoicing with detailed invoice support.
 
 ## Agent Connection Protocol
 
