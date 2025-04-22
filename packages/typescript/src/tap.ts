@@ -3,6 +3,8 @@
 
 import { Purpose, CategoryPurpose } from "@taprsvp/iso20022_external_codes";
 import { IsoCurrency } from "./currencies";
+import { Invoice } from "./invoice";
+
 /**
  * Internationalized Resource Identifier (IRI)
  * A unique identifier that may contain international characters.
@@ -530,10 +532,10 @@ interface Payment extends TapMessageObject<"Payment"> {
   supportedAssets?: CAIP19[];
 
   /**
-   * Optional URI to an invoice document
+   * Optional Invoice object or URI to an invoice document
    * Provides additional details about the payment request
    */
-  invoice?: string;
+  invoice?: Invoice;
 
   /**
    * Optional expiration time
