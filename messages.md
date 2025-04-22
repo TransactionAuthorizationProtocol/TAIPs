@@ -34,6 +34,7 @@ permalink: /messages/
   - [AuthorizationRequired](#authorizationrequired)
 - [Data Elements](#data-elements)
   - [Party](#party)
+  - [Invoice](#invoice)
   - [Agent](#agent)
   - [Policy](#policy)
     - [RequirePresentation](#requirepresentation)
@@ -155,23 +156,23 @@ Initiates a virtual asset transfer between parties.
 ```
 
 ### Payment
-[TAIP-14] - Draft
+[TAIP-14] - Review
 
 Initiates a payment request from a merchant to a customer.
 
 | Attribute | Type | Required | Status | Description |
 |-----------|------|----------|---------|-------------|
-| @context | string | Yes | Draft ([TAIP-14]) | JSON-LD context "https://tap.rsvp/schema/1.0" |
-| @type | string | Yes | Draft ([TAIP-14]) | JSON-LD type "https://tap.rsvp/schema/1.0#Payment" |
-| asset | string | No | Draft ([TAIP-14]) | CAIP-19 identifier of the asset to be paid. Must be present if currency is not provided. |
-| currency | string | No | Draft ([TAIP-14]) | ISO 4217 currency code for fiat amount. Must be present if asset is not provided. |
-| amount | string | Yes | Draft ([TAIP-14]) | Amount requested in the specified asset or currency |
-| supportedAssets | array | No | Draft ([TAIP-14]) | Array of CAIP-19 asset identifiers that can be used to settle a fiat currency amount |
-| invoice | string | No | Draft ([TAIP-14]) | URI to an invoice |
-| expiry | string | No | Draft ([TAIP-14]) | ISO 8601 timestamp when the request expires |
-| merchant | [Party](#party) | Yes | Draft ([TAIP-14]) | Party for the merchant (beneficiary) |
-| customer | [Party](#party) | No | Draft ([TAIP-14]) | Party for the customer (originator) |
-| agents | array of [Agent](#agent) | Yes | Draft ([TAIP-14]) | Array of agents involved in the payment request |
+| @context | string | Yes | Review ([TAIP-14]) | JSON-LD context "https://tap.rsvp/schema/1.0" |
+| @type | string | Yes | Review ([TAIP-14]) | JSON-LD type "https://tap.rsvp/schema/1.0#Payment" |
+| asset | string | No | Review ([TAIP-14]) | CAIP-19 identifier of the asset to be paid. Either asset OR currency is required. |
+| currency | string | No | Review ([TAIP-14]) | ISO 4217 currency code for fiat amount. Either asset OR currency is required. |
+| amount | string | Yes | Review ([TAIP-14]) | Amount requested in the specified asset or currency |
+| supportedAssets | array | No | Review ([TAIP-14]) | Array of CAIP-19 asset identifiers that can be used to settle a fiat currency amount. Used when currency is specified to indicate which crypto assets can be used. |
+| invoice | object or string | No | Review ([TAIP-14], [TAIP-16]) | Invoice object as defined in TAIP-16 or URI to an invoice document |
+| expiry | string | No | Review ([TAIP-14]) | ISO 8601 timestamp when the request expires |
+| merchant | [Party](#party) | Yes | Review ([TAIP-14]) | Party for the merchant (beneficiary) |
+| customer | [Party](#party) | No | Review ([TAIP-14]) | Party for the customer (originator) |
+| agents | array of [Agent](#agent) | Yes | Review ([TAIP-14]) | Array of agents involved in the payment request |
 
 #### Examples
 
@@ -224,7 +225,26 @@ Initiates a payment request from a merchant to a customer.
       "name": "Example Store"
     },
     "expiry": "2024-04-21T12:00:00Z",
-    "agents": [
+    "invoice": {
+      "id": "INV001",
+      "issueDate": "2023-02-15",
+      "currencyCode": "USD",
+      "lineItems": [
+        {
+          "id": "1",
+          "description": "Widget A",
+          "quantity": 2,
+          "unitCode": "EA",
+          "unitPrice": 20.00,
+          "lineTotal": 40.00
+        }
+      ],
+      "total": 40.00,
+      "subTotal": 40.00,
+      "dueDate": "2023-03-15",
+      "paymentTerms": "Net 30"
+    },
+"agents": [
       {
         "@id": "did:web:merchant.vasp",
         "for": "did:web:merchant.vasp",
@@ -287,7 +307,7 @@ Indicates that a transaction is ready for settlement, sent by the merchant's age
 | @context | string | Yes | Review ([TAIP-14]) | JSON-LD context "https://tap.rsvp/schema/1.0" |
 | @type | string | Yes | Review ([TAIP-14]) | JSON-LD type "https://tap.rsvp/schema/1.0#Complete" |
 | settlementAddress | string | Yes | Review ([TAIP-14]) | CAIP-10 identifier for the settlement address |
-| amount | string | No | Review ([TAIP-14]) | Optional final payment amount, must be less than or equal to the original requested amount |
+| amount | string | No | Review ([TAIP-14]) | Optional final payment amount, must be less than or equal to the original requested amount. If omitted, the full amount from the original Payment message is implied. |
 
 > **Note:** The message refers to the original Payment message via the DIDComm `thid` (thread ID) in the message envelope.
 
@@ -321,7 +341,7 @@ Confirms the on-chain settlement of a transfer.
 | settlementId | string | Yes | Review ([TAIP-4]) | CAIP-220 identifier of the settlement transaction |
 | amount | string | No | Review ([TAIP-4]) | Optional settled amount, must be less than or equal to the original amount. If a Complete message specified an amount, this must match that value. |
 
-> **Note:** The message refers to the original Transfer message via the DIDComm `thid` (thread ID) in the message envelope.
+> **Note:** The message refers to the original Transfer or Payment message via the DIDComm `thid` (thread ID) in the message envelope.
 
 #### Examples
 
@@ -1024,7 +1044,7 @@ This flow demonstrates establishing a connection between a B2B service and a VAS
 }
 ```
 
-#### 4. Transfer Using Connection
+#### 4. Using the connection for a transfer
 ```json
 {
   "id": "456789ab-e89b-12d3-a456-426614174005",
@@ -1136,6 +1156,85 @@ The example above shows:
 2. An Agent representing that party (the VASP)
 
 Note: Future versions may support verifiable LEIs (vLEIs) through the standard credential presentation mechanism defined in [TAIP-8].
+
+### Invoice
+[TAIP-16] - Review
+
+Represents a detailed invoice that can be included in a Payment message.
+
+| Attribute | Type | Required | Status | Description |
+|-----------|------|----------|---------|-------------|
+| id | string | Yes | Review ([TAIP-16]) | Unique identifier for the invoice (e.g., "INV001") |
+| issueDate | string | Yes | Review ([TAIP-16]) | ISO 8601 date format (YYYY-MM-DD) when the invoice was issued |
+| currencyCode | string | Yes | Review ([TAIP-16]) | ISO 4217 currency code for the invoice amounts |
+| lineItems | array | Yes | Review ([TAIP-16]) | Array of line item objects representing the individual items being invoiced |
+| taxTotal | object | No | Review ([TAIP-16]) | Aggregate tax information including tax amount and breakdown by category |
+| total | number | Yes | Review ([TAIP-16]) | Total amount of the invoice, including taxes. Must match the amount in the Payment Request body. |
+| subTotal | number | No | Review ([TAIP-16]) | Sum of line totals before taxes |
+| dueDate | string | No | Review ([TAIP-16]) | ISO 8601 date format (YYYY-MM-DD) when payment is due |
+| note | string | No | Review ([TAIP-16]) | Additional notes or terms for the invoice |
+| paymentTerms | string | No | Review ([TAIP-16]) | Terms of payment (e.g., "Net 30") |
+| accountingCost | string | No | Review ([TAIP-16]) | Buyer's accounting code, used to route costs to specific accounts |
+| orderReference | object | No | Review ([TAIP-16]) | Reference to a related order |
+| additionalDocumentReference | array | No | Review ([TAIP-16]) | References to additional documents |
+
+Each line item in the `lineItems` array contains:
+
+| Attribute | Type | Required | Status | Description |
+|-----------|------|----------|---------|-------------|
+| id | string | Yes | Review ([TAIP-16]) | Unique identifier for the line item within the invoice |
+| description | string | Yes | Review ([TAIP-16]) | Description of the item or service |
+| quantity | number | Yes | Review ([TAIP-16]) | Quantity of the item |
+| unitCode | string | No | Review ([TAIP-16]) | Unit of measure code (e.g., "EA" for each, "KGM" for kilogram) |
+| unitPrice | number | Yes | Review ([TAIP-16]) | Price per unit |
+| lineTotal | number | Yes | Review ([TAIP-16]) | Total amount for this line item (typically quantity × unitPrice) |
+| taxCategory | object | No | Review ([TAIP-16]) | Tax category information specific to this line item |
+
+#### Example Invoice Object
+
+```json
+{
+  "id": "INV001",
+  "issueDate": "2025-04-22",
+  "currencyCode": "USD",
+  "lineItems": [
+    {
+      "id": "1",
+      "description": "Widget A",
+      "quantity": 5,
+      "unitCode": "EA",
+      "unitPrice": 10.00,
+      "lineTotal": 50.00
+    },
+    {
+      "id": "2",
+      "description": "Widget B",
+      "quantity": 10,
+      "unitCode": "EA",
+      "unitPrice": 5.00,
+      "lineTotal": 50.00
+    }
+  ],
+  "taxTotal": {
+    "taxAmount": 15.00,
+    "taxSubtotal": [
+      {
+        "taxableAmount": 100.00,
+        "taxAmount": 15.00,
+        "taxCategory": {
+          "id": "S",
+          "percent": 15.0,
+          "taxScheme": "VAT"
+        }
+      }
+    ]
+  },
+  "total": 115.00,
+  "subTotal": 100.00,
+  "dueDate": "2025-05-22",
+  "paymentTerms": "Net 30"
+}
+```
 
 ### Agent
 [TAIP-5] - Review
@@ -1626,9 +1725,9 @@ Note that all messages in this flow share the same thread ID (`payment-123`) to 
     },
     "@type": "https://tap.rsvp/schema/1.0#UpdateParty",
     "party": {
-      "@id": "did:org:acmecorp",
-      "lei:leiCode": "3M5E1GQKGL17HI8CPN20",
-      "name": "ACME Corporation"
+      "@id": "did:eg:alice",
+      "lei:leiCode": "5493001KJTIIGC8Y1R12",
+      "name": "Alice Corp Ltd"
     }
   }
 }
@@ -1691,6 +1790,79 @@ Note that all messages in this flow share the same thread ID (`payment-123`) to 
 }
 ```
 
+### Payment Request with Invoice Example
+
+```json
+{
+  "id": "payment-456",
+  "type": "https://tap.rsvp/schema/1.0#Payment",
+  "from": "did:web:merchant.vasp",
+  "to": ["did:web:customer.vasp"],
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#Payment",
+    "currency": "USD",
+    "amount": "115.00",
+    "supportedAssets": [
+      "eip155:1/erc20:0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+    ],
+    "invoice": {
+      "id": "INV001",
+      "issueDate": "2025-04-22",
+      "currencyCode": "USD",
+      "lineItems": [
+        {
+          "id": "1",
+          "description": "Widget A",
+          "quantity": 5,
+          "unitCode": "EA",
+          "unitPrice": 10.00,
+          "lineTotal": 50.00
+        },
+        {
+          "id": "2",
+          "description": "Widget B",
+          "quantity": 10,
+          "unitCode": "EA",
+          "unitPrice": 5.00,
+          "lineTotal": 50.00
+        }
+      ],
+      "taxTotal": {
+        "taxAmount": 15.00,
+        "taxSubtotal": [
+          {
+            "taxableAmount": 100.00,
+            "taxAmount": 15.00,
+            "taxCategory": {
+              "id": "S",
+              "percent": 15.0,
+              "taxScheme": "VAT"
+            }
+          }
+        ]
+      },
+      "total": 115.00,
+      "subTotal": 100.00,
+      "dueDate": "2025-05-22",
+      "paymentTerms": "Net 30"
+    },
+    "merchant": {
+      "@id": "did:web:merchant.vasp",
+      "name": "Example Store",
+      "mcc": "5812"
+    },
+    "expiry": "2025-04-29T12:00:00Z",
+    "agents": [
+      {
+        "@id": "did:web:merchant.vasp",
+        "for": "did:web:merchant.vasp"
+      }
+    ]
+  }
+}
+```
+
 [TAIP-2]: ./TAIPs/taip-2
 [TAIP-3]: ./TAIPs/taip-3
 [TAIP-4]: ./TAIPs/taip-4
@@ -1705,3 +1877,4 @@ Note that all messages in this flow share the same thread ID (`payment-123`) to 
 [TAIP-13]: ./TAIPs/taip-13
 [TAIP-14]: ./TAIPs/taip-14
 [TAIP-15]: ./TAIPs/taip-15
+[TAIP-16]: ./TAIPs/taip-16

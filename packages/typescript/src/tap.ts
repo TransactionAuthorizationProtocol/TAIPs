@@ -3,6 +3,8 @@
 
 import { Purpose, CategoryPurpose } from "@taprsvp/iso20022_external_codes";
 import { IsoCurrency } from "./currencies";
+import { Invoice } from "./invoice";
+
 /**
  * Internationalized Resource Identifier (IRI)
  * A unique identifier that may contain international characters.
@@ -429,6 +431,16 @@ type Policies =
 // Core TAP Data Structures
 
 /**
+ * Transaction Types
+ * Union type of all transaction initiation messages in TAP.
+ * Used for type-safe handling of transaction messages.
+ *
+ * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-3.md | TAIP-3: Transfer Message}
+ * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-14.md | TAIP-14: Payment Request}
+ */
+type Transactions = Transfer | Payment;
+
+/**
  * Transfer Message
  * Initiates a transfer of assets between parties.
  * Core message type for asset transfers in TAP.
@@ -508,12 +520,14 @@ interface Payment extends TapMessageObject<"Payment"> {
   /**
    * Optional specific asset requested
    * CAIP-19 identifier for the requested blockchain asset
+   * Either asset OR currency is required
    */
   asset?: CAIP19;
 
   /**
    * Optional ISO 4217 currency code
    * For fiat currency payment requests
+   * Either asset OR currency is required
    */
   currency?: IsoCurrency;
 
@@ -526,14 +540,17 @@ interface Payment extends TapMessageObject<"Payment"> {
   /**
    * Optional list of acceptable assets
    * CAIP-19 identifiers for assets the merchant will accept
+   * Used when currency is specified to indicate which crypto assets can be used
    */
   supportedAssets?: CAIP19[];
 
   /**
-   * Optional URI to an invoice document
+   * Optional Invoice object or URI to an invoice document
    * Provides additional details about the payment request
+   * 
+   * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-16.md | TAIP-16: Invoices}
    */
-  invoice?: string;
+  invoice?: Invoice | string;
 
   /**
    * Optional expiration time
@@ -620,14 +637,26 @@ interface Connect extends TapMessageObject<"Connect"> {
 }
 
 /**
- * Transaction Types
- * Union type of all transaction initiation messages in TAP.
- * Used for type-safe handling of transaction messages.
+ * Complete Message
+ * Indicates that a transaction is ready for settlement, sent by the merchant's agent.
+ * Used in the Payment flow to provide settlement address to the customer.
  *
- * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-3.md | TAIP-3: Transfer Message}
- * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-14.md | TAIP-14: Payment Request}
+ * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-14.md | TAIP-14: Payments}
  */
-type Transactions = Transfer | Payment;
+interface Complete extends TapMessageObject<"Complete"> {
+  /**
+   * Settlement address
+   * The blockchain address where funds should be sent, specified in CAIP-10 format
+   */
+  settlementAddress: CAIP10;
+  
+  /**
+   * Optional final payment amount
+   * If specified, must be less than or equal to the amount in the original Payment message
+   * If omitted, the full amount from the original Payment message is implied
+   */
+  amount?: Amount;
+}
 
 /**
  * Settlement Message
@@ -931,26 +960,6 @@ interface AuthorizationRequired
    * When the authorization URL expires
    */
   expires: ISO8601DateTime;
-}
-
-/**
- * Complete Message
- * Indicates that a transaction is ready for settlement, sent by the merchant's agent.
- *
- * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-14.md | TAIP-14: Payments}
- */
-interface Complete extends TapMessageObject<"Complete"> {
-  /**
-   * Settlement address
-   * The blockchain address where funds should be sent, specified in CAIP-10 format
-   */
-  settlementAddress: CAIP10;
-  
-  /**
-   * Optional final payment amount
-   * If specified, must be less than or equal to the amount in the original Payment message
-   */
-  amount?: Amount;
 }
 
 /**

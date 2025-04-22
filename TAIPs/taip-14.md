@@ -5,8 +5,8 @@ status: Review
 type: Standard
 author: Pelle Braendgaard <pelle@notabene.id>
 created: 2024-03-21
-updated: 2024-03-21
-requires: 2, 3, 4, 6, 7, 8, 9
+updated: 2025-04-22
+requires: 2, 3, 4, 6, 7, 8, 9, 16
 ---
 
 ## Simple Summary
@@ -39,7 +39,7 @@ A **Payment** is a [DIDComm] message (per [TAIP-2]) initiated by the merchant's 
 - **`supportedAssets`** – *Optional*, **array of strings** ([CAIP-19] or [DTI] asset identifiers). If `currency` is given (fiat-denominated request), this field can list which crypto assets are acceptable to settle that currency amount. Each entry is an asset the merchant will accept as payment for the given fiat amount. For example, a Payment might specify `"currency": "EUR", "amount": "50.00", "supportedAssets": ["eip155:1/erc20:0xA0b86991..."]` to indicate €50.00 can be paid in USDC on Ethereum (asset listed) or potentially other listed stablecoins. If `supportedAssets` is omitted for a fiat request, it implies the customer's wallet may choose any asset to settle that amount, subject to the merchant and wallet's out-of-band agreement or policy.
 - **`expiry`** – *Optional*, **timestamp** indicating an expiration time for the request. After this time the merchant may no longer honor the payment (e.g. if exchange rates or inventory changed). The customer's wallet SHOULD treat an expired Payment as invalid and not allow payment. If omitted, the request is considered valid until canceled or fulfilled. This field SHOULD align with the DIDComm `expires_time` header (as specified in [TAIP-2]) to ensure consistency. In hotel reservation scenarios, for example, a merchant might set an expiry to the checkout date, indicating that if the payment is not completed by then, the reservation will be lost.
 - **`amount`** – **Required**, **string** containing a decimal representation of the payment amount. The amount must be a valid positive number expressed as a string. Leading zeroes may be omitted (e.g. "0.5" or ".5" for half a unit). Trailing zeroes may be present (e.g. "10.00" for exactly ten units). The amount is denominated in the `asset` token units or the `currency` fiat units as appropriate.
-- **`invoice`** – *Optional*, **URI** providing additional details about the payment being requested (e.g. a link to an external invoice). This can provide further context for the customer, though the basic payment details should always be present directly in the Payment message itself.
+- **`invoice`** – *Optional*, **Invoice** per [TAIP-16] or **URI** providing additional details about the payment being requested (e.g. a link to an external invoice). This can provide further context for the customer, though the basic payment details should always be present directly in the Payment message itself.
 - **`policies`** – *Optional*, **array of policy objects** defining requirements that must be satisfied by the customer's agent. Each policy object conforms to [TAIP-7] and may include:
   - **`requirePresentation`** – *Optional*, **array** of policy objects each of type `RequirePresentation`. This specifies that the merchant requires certain verifiable information from the customer before or alongside payment. Each entry is a request for a verifiable presentation as defined in **TAIP-8**. For example, a merchant might include a policy: `{ "@type": "RequirePresentation", "fromAgent": "originator", "about": "...", "credentialType": "email" }` to require the customer's agent (originator) to present an email credential. In general, a `RequirePresentation` policy will indicate **which party's agent** must present data (e.g. `fromAgent: "originator"` meaning the customer's side) and **what data** is needed (either by specifying credential type, or a schema, etc.) [TAIP-8]. The exact format and additional fields for these policies follow TAIP-8 and TAIP-7 (Agent Policies). When a Payment contains `requirePresentation` entries, the customer's wallet MUST prompt the user to provide the requested credentials or proofs, and return them to the merchant's agent (see Flow below). The merchant's agent will verify the provided information (e.g. check the credentials' validity) before authorizing the payment to proceed.
 - **`customer`** – *Optional*, **object** for information about the customer (payer). In many cases, the merchant may not know the customer's identity at the time of issuing the request (for example, if the Payment is delivered via a public QR code or link). This object can be omitted or left minimal in such cases. If the merchant does know the customer's identity or wants to bind the request to a specific customer, they MAY include an identifier here (e.g. the customer's DID or reference). The `customer` object could simply be: `{ "@id": "did:example:alice" }` to target a specific party. Even if provided, this field is mainly informational; the DIDComm transport (to the customer's agent) or context of delivery typically ensures the request reaches the intended customer.
@@ -258,6 +258,7 @@ By incorporating selective disclosure and unique payment addresses, the Payment 
 * [TAIP-7] Agent Policies
 * [TAIP-8] Selective Disclosure
 * [TAIP-9] Proof of Relationship
+* [TAIP-16] Invoices
 * [CAIP-19] Asset Type and Asset ID Specification
 * [BIP-70] Payment Protocol
 * [BIP-75] Out of Band Address Exchange using Payment Protocol Encryption
@@ -272,6 +273,7 @@ By incorporating selective disclosure and unique payment addresses, the Payment 
 [TAIP-7]: ./taip-7 "Agent Policies"
 [TAIP-8]: ./taip-8 "Selective Disclosure"
 [TAIP-9]: ./taip-9 "Proof of Relationship"
+[TAIP-16]: ./taip-16 "Invoices"
 [CAIP-19]: https://chainagnostic.org/CAIPs/caip-19 "Asset Type and Asset ID Specification"
 [BIP-70]: https://github.com/bitcoin/bips/blob/master/bip-0070.mediawiki "Payment Protocol"
 [BIP-75]: https://github.com/bitcoin/bips/blob/master/bip-0075.mediawiki "Out of Band Address Exchange using Payment Protocol Encryption"
