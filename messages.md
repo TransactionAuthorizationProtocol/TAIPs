@@ -274,7 +274,6 @@ Approves a transaction after completing compliance checks.
 |-----------|------|----------|---------|-------------|
 | @context | string | Yes | Review ([TAIP-4]) | JSON-LD context "https://tap.rsvp/schema/1.0" |
 | @type | string | Yes | Review ([TAIP-4]) | JSON-LD type "https://tap.rsvp/schema/1.0#Authorize" |
-| reason | string | No | Review ([TAIP-4]) | Optional reason for authorization |
 | settlementAddress | string | No | Review ([TAIP-4]) | Optional CAIP-10 identifier for the settlement address |
 | expiry | string | No | Review ([TAIP-4]) | ISO 8601 datetime indicating when the authorization expires |
 
@@ -292,7 +291,6 @@ Approves a transaction after completing compliance checks.
   "body": {
     "@context": "https://tap.rsvp/schema/1.0",
     "@type": "https://tap.rsvp/schema/1.0#Authorize",
-    "reason": "All compliance checks passed"
   }
 }
 ```

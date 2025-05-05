@@ -300,13 +300,12 @@ interface Participant<T extends ParticipantTypes> extends JsonLdObject<T> {
    * Merchant Category Code (ISO 18245)
    * Standard classification code for merchant types in payment transactions
    * Used primarily for merchants in payment requests
-   * 
+   *
    * @example "5411" // Grocery stores and supermarkets
    * @example "5812" // Restaurants
    * @see {@link https://www.iso.org/standard/33365.html | ISO 18245}
    */
   mcc?: string;
-
 }
 
 /**
@@ -547,7 +546,7 @@ interface Payment extends TapMessageObject<"Payment"> {
   /**
    * Optional Invoice object or URI to an invoice document
    * Provides additional details about the payment request
-   * 
+   *
    * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-16.md | TAIP-16: Invoices}
    */
   invoice?: Invoice | string;
@@ -585,15 +584,11 @@ interface Payment extends TapMessageObject<"Payment"> {
  */
 interface Authorize extends TapMessageObject<"Authorize"> {
   /**
-   * Optional reason for authorization
-   */
-  reason?: string;
-  /**
    * Optional settlement address
    * The blockchain address where funds should be sent
    */
   settlementAddress?: CAIP10;
-  
+
   /**
    * Optional expiration timestamp
    * Indicates when the authorization expires
@@ -649,7 +644,7 @@ interface Complete extends TapMessageObject<"Complete"> {
    * The blockchain address where funds should be sent, specified in CAIP-10 format
    */
   settlementAddress: CAIP10;
-  
+
   /**
    * Optional final payment amount
    * If specified, must be less than or equal to the amount in the original Payment message
@@ -670,7 +665,7 @@ interface Settle extends TapMessageObject<"Settle"> {
    * CAIP-220 identifier for the on-chain settlement transaction
    */
   settlementId: CAIP220;
-  
+
   /**
    * Optional settled amount
    * If specified, must be less than or equal to the amount in the original transaction
