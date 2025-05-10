@@ -6,14 +6,14 @@
   "taips": ["taip-2", "taip-4"],
   "message": {
     "id": "payment-req-123",
-    "type": "https://tap.rsvp/schema/1.0#PaymentRequest",
+    "type": "https://tap.rsvp/schema/1.0#Payment",
     "from": "did:web:merchant.vasp",
     "to": ["did:web:customer.vasp"],
     "created_time": 1516269022,
     "expires_time": 1516385931,
     "body": {
       "@context": "https://tap.rsvp/schema/1.0",
-      "@type": "https://tap.rsvp/schema/1.0#PaymentRequest",
+      "@type": "https://tap.rsvp/schema/1.0#Payment",
       "currency": "USD",
       "amount": "100.00",
       "supportedAssets": [

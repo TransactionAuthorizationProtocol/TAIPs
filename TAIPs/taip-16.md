@@ -70,14 +70,14 @@ An **Invoice** is an object that can be embedded in a TAIP-14 Payment Request to
   - **`documentType`** – *Optional*, **string** specifying the type of document using UBL Document Type Code standard (e.g., "Invoice", "CreditNote", "DebitNote", "Order", "Contract", "Timesheet").
   - **`url`** – *Optional*, **string** containing a URL where the document can be accessed.
 
-### Integration with TAIP-14 Payment Request
+### Integration with TAIP-14 Payment request
 
 The Invoice object is embedded in a TAIP-14 Payment Request as follows:
 
 ```json
 {
   "from": "did:web:merchant.vasp",
-  "type": "https://tap.rsvp/schema/1.0#PaymentRequest",
+  "type": "https://tap.rsvp/schema/1.0#Payment",
   "id": "uuid:123e4567-e89b-12d3-a456-426614174000",
   "to": ["did:web:customer.vasp"],
   "body": {
@@ -85,7 +85,7 @@ The Invoice object is embedded in a TAIP-14 Payment Request as follows:
       "https://tap.rsvp/schema/1.0",
       "urn:oasis:names:specification:ubl:schema:xsd:Invoice-2"
     ],
-    "@type": "https://tap.rsvp/schema/1.0#PaymentRequest",
+    "@type": "https://tap.rsvp/schema/1.0#Payment",
     "asset": "eip155:1/erc20:0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
     "amount": "115.00",
     "merchant": {
@@ -424,7 +424,7 @@ This TAIP extends TAIP-14 by defining the structure of the `invoice` field, whic
 - [UBL-2.1] Universal Business Language Version 2.1
 - [W3C-PR] W3C Payment Request API
 - [ISO-4217] Currency Codes
-- [UN/ECE 5305 Tax Category Code] 
+- [UN/ECE 5305 Tax Category Code]
 - [UN/ECE 5305 Tax Type Code]
 
 [TAIP-14]: ./taip-14 "Payments"

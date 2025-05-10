@@ -1455,14 +1455,14 @@ This example shows a transfer that includes:
 ### Payment Request Flow
 
 This flow demonstrates a complete payment request process from a merchant to a customer, including:
-1. A merchant initiates by sending a PaymentRequest for $100 USD, accepting USDC as payment
+1. A merchant initiates by sending a Payment request for $100 USD, accepting USDC as payment
 2. The customer responds with a Transfer message, choosing to pay in USDC
 3. The merchant authorizes the transfer after verifying the details match their request
 4. The customer settles the payment on-chain and notifies the merchant with the transaction ID
 
 Note that all messages in this flow share the same thread ID (`payment-123`) to link them together. The merchant can use this to track the payment status and match it to their original request.
 
-#### 1. Initial PaymentRequest from Merchant
+#### 1. Initial Payment from Merchant
 ```json
 {
   "id": "payment-123",
