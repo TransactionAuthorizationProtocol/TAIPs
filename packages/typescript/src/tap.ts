@@ -12,7 +12,7 @@ import { Invoice } from "./invoice";
  *
  * @see {@link https://www.w3.org/TR/json-ld11/#iris | JSON-LD 1.1 IRIs}
  */
-type IRI = `${string}:${string}`;
+export type IRI = `${string}:${string}`;
 
 // Common Types
 /**
@@ -25,14 +25,14 @@ type IRI = `${string}:${string}`;
  * @example "did:key:z6MkhaXgBZDvotDkL5257faiztiGiC2QtKLGpbnnEGta2doK"
  * @see {@link https://www.w3.org/TR/did-core/ | DID Core Specification}
  */
-type DID = `did:${string}:${string}`;
+export type DID = `did:${string}:${string}`;
 
 /**
  * TAP Context URI
  * Base URI for TAP schema version 1.0.
  * Used as the default context for all TAP messages.
  */
-type TAPContext = "https://tap.rsvp/schema/1.0";
+export type TAPContext = "https://tap.rsvp/schema/1.0";
 
 /**
  * TAP Type URI
@@ -41,7 +41,7 @@ type TAPContext = "https://tap.rsvp/schema/1.0";
  *
  * @example "https://tap.rsvp/schema/1.0#Transfer"
  */
-type TAPType = `${TAPContext}#${string}`;
+export type TAPType = `${TAPContext}#${string}`;
 
 /**
  * Base interface for JSON-LD objects
@@ -49,7 +49,7 @@ type TAPType = `${TAPContext}#${string}`;
  *
  * @template T - The type string that identifies the object type
  */
-interface JsonLdObject<T extends string> {
+export interface JsonLdObject<T extends string> {
   "@context"?: IRI | Record<string, string>;
   "@type": T;
 }
@@ -60,7 +60,7 @@ interface JsonLdObject<T extends string> {
  *
  * @template T - The TAP message type string
  */
-interface TapMessageObject<T extends string> extends JsonLdObject<T> {
+export interface TapMessageObject<T extends string> extends JsonLdObject<T> {
   "@context": TAPContext | Record<string, IRI>;
   "@type": T;
 }
@@ -71,7 +71,7 @@ interface TapMessageObject<T extends string> extends JsonLdObject<T> {
  * @example "2024-03-21T13:45:30Z"
  * @see {@link https://www.iso.org/iso-8601-date-and-time-format.html | ISO 8601}
  */
-type ISO8601DateTime = string;
+export type ISO8601DateTime = string;
 /**
  * Chain Agnostic Blockchain Identifier (CAIP-2)
  * Represents a blockchain in a chain-agnostic way following the CAIP-2 specification.
@@ -130,7 +130,7 @@ export type CAIP19 = `${CAIP2}/${string}:${string}`;
  * @example "iban:GB29NWBK60161331926819"
  * @see {@link https://www.iso.org/standard/80601.html | ISO 23897}
  */
-type DTI = string;
+export type DTI = string;
 
 /**
  * Asset Identifier
@@ -140,7 +140,7 @@ type DTI = string;
  * @example "eip155:1/erc20:0x6b175474e89094c44da98b954eedeac495271d0f" // DAI token on Ethereum mainnet
  * @example "iban:GB29NWBK60161331926819" // Bank account in traditional finance
  */
-type Asset = CAIP19 | DTI;
+export type Asset = CAIP19 | DTI;
 
 /**
  * Decimal Amount
@@ -150,7 +150,7 @@ type Asset = CAIP19 | DTI;
  * @example "100"
  * @example "123.45"
  */
-type Amount = `${number}.${number}` | `${number}`;
+export type Amount = `${number}.${number}` | `${number}`;
 
 /**
  * Chain Agnostic Transaction Identifier (CAIP-220)
@@ -161,7 +161,7 @@ type Amount = `${number}.${number}` | `${number}`;
  * @example "eip155:1/tx/0x4a563af33c4871b51a8b108aa2fe1dd5280a30dfb7236170ae5e5e7957eb6392"
  * @see {@link https://github.com/ChainAgnostic/CAIPs/blob/master/CAIPs/caip-220.md | CAIP-220 Specification}
  */
-type CAIP220 = string;
+export type CAIP220 = string;
 /**
  * Legal Entity Identifier (LEI)
  * A 20-character alphanumeric code that uniquely identifies legal entities globally.
@@ -169,7 +169,7 @@ type CAIP220 = string;
  * @example "969500KN90DZLPGW6898"
  * @see {@link https://www.iso.org/standard/59771.html | ISO 17442}
  */
-type LEICode = string;
+export type LEICode = string;
 
 /**
  * ISO 20022 External Purpose Code
@@ -179,7 +179,7 @@ type LEICode = string;
  * @example "CORT" // Trade Settlement Payment
  * @see {@link https://www.iso20022.org/catalogue-messages/additional-content-messages/external-code-sets | ISO 20022 External Code Sets}
  */
-type ISO20022PurposeCode = Purpose;
+export type ISO20022PurposeCode = Purpose;
 
 /**
  * ISO 20022 External Category Purpose Code
@@ -189,7 +189,7 @@ type ISO20022PurposeCode = Purpose;
  * @example "CORT" // Trade Settlement Payment
  * @see {@link https://www.iso20022.org/catalogue-messages/additional-content-messages/external-code-sets | ISO 20022 External Code Sets}
  */
-type ISO20022CategoryPurposeCode = CategoryPurpose;
+export type ISO20022CategoryPurposeCode = CategoryPurpose;
 
 // Common DIDComm Message Structure
 /**
@@ -199,7 +199,7 @@ type ISO20022CategoryPurposeCode = CategoryPurpose;
  * @see {@link https://identity.foundation/didcomm-messaging/spec/ | DIDComm Messaging Specification}
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-2.md | TAIP-2: Message Format}
  */
-interface DIDCommMessage<T = Record<string, unknown>> {
+export interface DIDCommMessage<T = Record<string, unknown>> {
   /** Unique identifier for the message */
   id: string;
 
@@ -235,7 +235,7 @@ interface DIDCommMessage<T = Record<string, unknown>> {
  * @template T - The type of the message body
  * @extends DIDCommMessage<T>
  */
-interface DIDCommReply<T = Record<string, unknown>> extends DIDCommMessage<T> {
+export interface DIDCommReply<T = Record<string, unknown>> extends DIDCommMessage<T> {
   /** Thread ID linking this reply to the original message */
   thid: string;
 }
@@ -249,9 +249,9 @@ interface DIDCommReply<T = Record<string, unknown>> extends DIDCommMessage<T> {
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-6.md | TAIP-6: Party Identification}
  */
 
-type ParticipantTypes = "Agent" | "Party";
+export type ParticipantTypes = "Agent" | "Party";
 
-interface Participant<T extends ParticipantTypes> extends JsonLdObject<T> {
+export interface Participant<T extends ParticipantTypes> extends JsonLdObject<T> {
   /**
    * Unique identifier for the participant
    * Can be either a DID or an IRI
@@ -317,7 +317,7 @@ interface Participant<T extends ParticipantTypes> extends JsonLdObject<T> {
  *
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-7.md | TAIP-7: Policies}
  */
-interface Policy<T extends string> extends JsonLdObject<T> {
+export interface Policy<T extends string> extends JsonLdObject<T> {
   /** The type identifier for this policy */
   "@type": T;
 
@@ -352,7 +352,7 @@ interface Policy<T extends string> extends JsonLdObject<T> {
  *
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-7.md | TAIP-7: Policies}
  */
-interface RequireAuthorization extends Policy<"RequireAuthorization"> {}
+export interface RequireAuthorization extends Policy<"RequireAuthorization"> {}
 
 /**
  * Policy requiring presentation of verifiable credentials
@@ -361,7 +361,7 @@ interface RequireAuthorization extends Policy<"RequireAuthorization"> {}
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-7.md | TAIP-7: Policies}
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-8.md | TAIP-8: Verifiable Credentials}
  */
-interface RequirePresentation extends Policy<"RequirePresentation"> {
+export interface RequirePresentation extends Policy<"RequirePresentation"> {
   /**
    * Optional DID of the party the presentation is about
    * Used when requesting credentials about a specific party
@@ -394,8 +394,7 @@ interface RequirePresentation extends Policy<"RequirePresentation"> {
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-7.md | TAIP-7: Policies}
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-9.md | TAIP-9: Proof of Relationship}
  */
-interface RequireRelationshipConfirmation
-  extends Policy<"RequireRelationshipConfirmation"> {
+export interface RequireRelationshipConfirmation extends Policy<"RequireRelationshipConfirmation"> {
   /**
    * Required nonce for signature
    * Prevents replay attacks
@@ -409,19 +408,19 @@ interface RequireRelationshipConfirmation
  *
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-13.md | TAIP-13: Purpose Codes}
  */
-interface RequirePurpose extends Policy<"RequirePurpose"> {
+export interface RequirePurpose extends Policy<"RequirePurpose"> {
   /**
    * Required purpose code fields
    * Specifies which purpose code types must be included
    */
-  fields: ("purpose" | "categoryPurpose")[];
+  required: Array<"purpose" | "categoryPurpose">;
 }
 
 /**
  * Policy type definition
  * Union type of all possible policy types in TAP.
  */
-type Policies =
+export type Policies =
   | RequireAuthorization
   | RequirePresentation
   | RequireRelationshipConfirmation
@@ -437,7 +436,7 @@ type Policies =
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-3.md | TAIP-3: Transfer Message}
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-14.md | TAIP-14: Payment Request}
  */
-type Transactions = Transfer | Payment;
+export type Transactions = Transfer | Payment;
 
 /**
  * Transfer Message
@@ -446,7 +445,7 @@ type Transactions = Transfer | Payment;
  *
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-3.md | TAIP-3: Transfer Message}
  */
-interface Transfer extends TapMessageObject<"Transfer"> {
+export interface Transfer extends TapMessageObject<"Transfer"> {
   /**
    * Asset being transferred
    * Can be either a blockchain asset (CAIP-19) or traditional finance asset (DTI)
@@ -515,7 +514,7 @@ interface Transfer extends TapMessageObject<"Transfer"> {
  *
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-14.md | TAIP-14: Payment Request}
  */
-interface Payment extends TapMessageObject<"Payment"> {
+export interface Payment extends TapMessageObject<"Payment"> {
   /**
    * Optional specific asset requested
    * CAIP-19 identifier for the requested blockchain asset
@@ -582,7 +581,7 @@ interface Payment extends TapMessageObject<"Payment"> {
  *
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-4.md | TAIP-4: Authorization Flow}
  */
-interface Authorize extends TapMessageObject<"Authorize"> {
+export interface Authorize extends TapMessageObject<"Authorize"> {
   /**
    * Optional settlement address
    * The blockchain address where funds should be sent
@@ -602,7 +601,7 @@ interface Authorize extends TapMessageObject<"Authorize"> {
  *
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-15.md | TAIP-15: Agent Connection Protocol}
  */
-interface Connect extends TapMessageObject<"Connect"> {
+export interface Connect extends TapMessageObject<"Connect"> {
   /**
    * Details of the requesting agent
    * Includes identity and endpoints
@@ -638,7 +637,7 @@ interface Connect extends TapMessageObject<"Connect"> {
  *
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-14.md | TAIP-14: Payments}
  */
-interface Complete extends TapMessageObject<"Complete"> {
+export interface Complete extends TapMessageObject<"Complete"> {
   /**
    * Settlement address
    * The blockchain address where funds should be sent, specified in CAIP-10 format
@@ -659,7 +658,7 @@ interface Complete extends TapMessageObject<"Complete"> {
  *
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-4.md | TAIP-4: Authorization Flow}
  */
-interface Settle extends TapMessageObject<"Settle"> {
+export interface Settle extends TapMessageObject<"Settle"> {
   /**
    * Settlement transaction identifier
    * CAIP-220 identifier for the on-chain settlement transaction
@@ -680,7 +679,7 @@ interface Settle extends TapMessageObject<"Settle"> {
  *
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-4.md | TAIP-4: Authorization Flow}
  */
-interface Reject extends TapMessageObject<"Reject"> {
+export interface Reject extends TapMessageObject<"Reject"> {
   /**
    * Reason for rejection
    * Explanation of why the transfer was rejected
@@ -695,7 +694,7 @@ interface Reject extends TapMessageObject<"Reject"> {
  *
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-4.md | TAIP-4: Transaction Authorization Protocol}
  */
-interface Cancel extends TapMessageObject<"Cancel"> {
+export interface Cancel extends TapMessageObject<"Cancel"> {
   /**
    * Optional reason for cancellation
    * Human readable explanation
@@ -710,7 +709,7 @@ interface Cancel extends TapMessageObject<"Cancel"> {
  *
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-4.md | TAIP-4: Authorization Flow}
  */
-interface Revert extends TapMessageObject<"Revert"> {
+export interface Revert extends TapMessageObject<"Revert"> {
   /**
    * Settlement address for the revert
    * CAIP-10 identifier for the revert destination
@@ -730,7 +729,7 @@ interface Revert extends TapMessageObject<"Revert"> {
  *
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-5.md | TAIP-5: Agents}
  */
-interface UpdateAgent extends TapMessageObject<"UpdateAgent"> {
+export interface UpdateAgent extends TapMessageObject<"UpdateAgent"> {
   /**
    * Updated agent details
    * Complete agent information including any changes
@@ -744,7 +743,7 @@ interface UpdateAgent extends TapMessageObject<"UpdateAgent"> {
  *
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-6.md | TAIP-6: Party Identification}
  */
-interface UpdateParty extends TapMessageObject<"UpdateParty"> {
+export interface UpdateParty extends TapMessageObject<"UpdateParty"> {
   /**
    * Updated party details
    * Complete party information including any changes
@@ -758,7 +757,7 @@ interface UpdateParty extends TapMessageObject<"UpdateParty"> {
  *
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-5.md | TAIP-5: Agents}
  */
-interface AddAgents extends TapMessageObject<"AddAgents"> {
+export interface AddAgents extends TapMessageObject<"AddAgents"> {
   /**
    * List of agents to add
    * Complete details for each new agent
@@ -772,7 +771,7 @@ interface AddAgents extends TapMessageObject<"AddAgents"> {
  *
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-5.md | TAIP-5: Agents}
  */
-interface ReplaceAgent extends TapMessageObject<"ReplaceAgent"> {
+export interface ReplaceAgent extends TapMessageObject<"ReplaceAgent"> {
   /**
    * DID of the agent to replace
    * Identifies the existing agent
@@ -792,7 +791,7 @@ interface ReplaceAgent extends TapMessageObject<"ReplaceAgent"> {
  *
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-5.md | TAIP-5: Agents}
  */
-interface RemoveAgent extends TapMessageObject<"RemoveAgent"> {
+export interface RemoveAgent extends TapMessageObject<"RemoveAgent"> {
   /**
    * DID of the agent to remove
    * Identifies the agent to be removed from the transaction
@@ -806,7 +805,7 @@ interface RemoveAgent extends TapMessageObject<"RemoveAgent"> {
  *
  * @see {@link https://github.com/ChainAgnostic/CAIPs/blob/master/CAIPs/caip-74.md | CAIP-74: CACAO}
  */
-interface CACAOAttachment {
+export interface CACAOAttachment {
   /**
    * Unique identifier for the attachment
    * Used to reference this attachment within the message
@@ -858,7 +857,7 @@ interface CACAOAttachment {
  *
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-9.md | TAIP-9: Relationship Proofs}
  */
-interface ConfirmRelationship extends TapMessageObject<"ConfirmRelationship"> {
+export interface ConfirmRelationship extends TapMessageObject<"ConfirmRelationship"> {
   /**
    * DID of the agent
    * Identifies the agent in the relationship
@@ -884,7 +883,7 @@ interface ConfirmRelationship extends TapMessageObject<"ConfirmRelationship"> {
  *
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-7.md | TAIP-7: Policies}
  */
-interface UpdatePolicies extends TapMessageObject<"UpdatePolicies"> {
+export interface UpdatePolicies extends TapMessageObject<"UpdatePolicies"> {
   /**
    * List of updated policies
    * Complete set of policies that should apply
@@ -898,7 +897,7 @@ interface UpdatePolicies extends TapMessageObject<"UpdatePolicies"> {
  *
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-15.md | TAIP-15: Agent Connection Protocol}
  */
-interface TransactionConstraints {
+export interface TransactionConstraints {
   /**
    * Allowed ISO 20022 purpose codes
    * Array of valid purpose codes for transactions
@@ -942,7 +941,7 @@ interface TransactionConstraints {
  *
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-15.md | TAIP-15: Agent Connection Protocol}
  */
-interface AuthorizationRequired
+export interface AuthorizationRequired
   extends TapMessageObject<"AuthorizationRequired"> {
   /**
    * URL for connection authorization
@@ -967,7 +966,7 @@ interface AuthorizationRequired
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-2.md | TAIP-2: Message Format}
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-3.md | TAIP-3: Transfer Message}
  */
-interface TransferMessage extends DIDCommMessage<Transfer> {
+export interface TransferMessage extends DIDCommMessage<Transfer> {
   type: "https://tap.rsvp/schema/1.0#Transfer";
 }
 
@@ -978,7 +977,7 @@ interface TransferMessage extends DIDCommMessage<Transfer> {
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-2.md | TAIP-2: Message Format}
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-14.md | TAIP-14: Payment Request}
  */
-interface PaymentMessage extends DIDCommMessage<Payment> {
+export interface PaymentMessage extends DIDCommMessage<Payment> {
   type: "https://tap.rsvp/schema/1.0#Payment";
 }
 
@@ -989,7 +988,7 @@ interface PaymentMessage extends DIDCommMessage<Payment> {
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-2.md | TAIP-2: Message Format}
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-4.md | TAIP-4: Authorization Flow}
  */
-interface AuthorizeMessage extends DIDCommReply<Authorize> {
+export interface AuthorizeMessage extends DIDCommReply<Authorize> {
   type: "https://tap.rsvp/schema/1.0#Authorize";
 }
 
@@ -1000,7 +999,7 @@ interface AuthorizeMessage extends DIDCommReply<Authorize> {
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-2.md | TAIP-2: Message Format}
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-4.md | TAIP-4: Authorization Flow}
  */
-interface SettleMessage extends DIDCommReply<Settle> {
+export interface SettleMessage extends DIDCommReply<Settle> {
   type: "https://tap.rsvp/schema/1.0#Settle";
 }
 
@@ -1011,7 +1010,7 @@ interface SettleMessage extends DIDCommReply<Settle> {
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-2.md | TAIP-2: Message Format}
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-4.md | TAIP-4: Authorization Flow}
  */
-interface RejectMessage extends DIDCommReply<Reject> {
+export interface RejectMessage extends DIDCommReply<Reject> {
   type: "https://tap.rsvp/schema/1.0#Reject";
 }
 
@@ -1022,7 +1021,7 @@ interface RejectMessage extends DIDCommReply<Reject> {
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-2.md | TAIP-2: Message Format}
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-4.md | TAIP-4: Authorization Flow}
  */
-interface CancelMessage extends DIDCommReply<Cancel> {
+export interface CancelMessage extends DIDCommReply<Cancel> {
   type: "https://tap.rsvp/schema/1.0#Cancel";
 }
 
@@ -1033,7 +1032,7 @@ interface CancelMessage extends DIDCommReply<Cancel> {
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-2.md | TAIP-2: Message Format}
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-4.md | TAIP-4: Authorization Flow}
  */
-interface RevertMessage extends DIDCommReply<Revert> {
+export interface RevertMessage extends DIDCommReply<Revert> {
   type: "https://tap.rsvp/schema/1.0#Revert";
 }
 
@@ -1044,7 +1043,7 @@ interface RevertMessage extends DIDCommReply<Revert> {
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-2.md | TAIP-2: Message Format}
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-5.md | TAIP-5: Agents}
  */
-interface UpdateAgentMessage extends DIDCommReply<UpdateAgent> {
+export interface UpdateAgentMessage extends DIDCommReply<UpdateAgent> {
   type: "https://tap.rsvp/schema/1.0#UpdateAgent";
 }
 
@@ -1055,7 +1054,7 @@ interface UpdateAgentMessage extends DIDCommReply<UpdateAgent> {
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-2.md | TAIP-2: Message Format}
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-6.md | TAIP-6: Party Identification}
  */
-interface UpdatePartyMessage extends DIDCommReply<UpdateParty> {
+export interface UpdatePartyMessage extends DIDCommReply<UpdateParty> {
   type: "https://tap.rsvp/schema/1.0#UpdateParty";
 }
 
@@ -1066,7 +1065,7 @@ interface UpdatePartyMessage extends DIDCommReply<UpdateParty> {
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-2.md | TAIP-2: Message Format}
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-5.md | TAIP-5: Agents}
  */
-interface AddAgentsMessage extends DIDCommReply<AddAgents> {
+export interface AddAgentsMessage extends DIDCommReply<AddAgents> {
   type: "https://tap.rsvp/schema/1.0#AddAgents";
 }
 
@@ -1077,7 +1076,7 @@ interface AddAgentsMessage extends DIDCommReply<AddAgents> {
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-2.md | TAIP-2: Message Format}
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-5.md | TAIP-5: Agents}
  */
-interface ReplaceAgentMessage extends DIDCommReply<ReplaceAgent> {
+export interface ReplaceAgentMessage extends DIDCommReply<ReplaceAgent> {
   type: "https://tap.rsvp/schema/1.0#ReplaceAgent";
 }
 
@@ -1088,7 +1087,7 @@ interface ReplaceAgentMessage extends DIDCommReply<ReplaceAgent> {
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-2.md | TAIP-2: Message Format}
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-5.md | TAIP-5: Agents}
  */
-interface RemoveAgentMessage extends DIDCommReply<RemoveAgent> {
+export interface RemoveAgentMessage extends DIDCommReply<RemoveAgent> {
   type: "https://tap.rsvp/schema/1.0#RemoveAgent";
 }
 
@@ -1098,7 +1097,7 @@ interface RemoveAgentMessage extends DIDCommReply<RemoveAgent> {
  *
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-9.md | TAIP-9: Relationship Proofs}
  */
-interface ConfirmRelationshipMessage extends DIDCommReply<ConfirmRelationship> {
+export interface ConfirmRelationshipMessage extends DIDCommReply<ConfirmRelationship> {
   /**
    * Message type identifier
    * Must be "https://tap.rsvp/schema/1.0#ConfirmRelationship" for relationship confirmations
@@ -1118,7 +1117,7 @@ interface ConfirmRelationshipMessage extends DIDCommReply<ConfirmRelationship> {
  *
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-7.md | TAIP-7: Policies}
  */
-interface UpdatePoliciesMessage extends DIDCommReply<UpdatePolicies> {
+export interface UpdatePoliciesMessage extends DIDCommReply<UpdatePolicies> {
   /**
    * Message type identifier
    * Must be "https://tap.rsvp/schema/1.0#UpdatePolicies" for policy updates
@@ -1132,7 +1131,7 @@ interface UpdatePoliciesMessage extends DIDCommReply<UpdatePolicies> {
  *
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-15.md | TAIP-15: Agent Connection Protocol}
  */
-interface ConnectMessage extends DIDCommMessage<Connect> {
+export interface ConnectMessage extends DIDCommMessage<Connect> {
   type: "https://tap.rsvp/schema/1.0#Connect";
 }
 
@@ -1142,7 +1141,7 @@ interface ConnectMessage extends DIDCommMessage<Connect> {
  *
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-15.md | TAIP-15: Agent Connection Protocol}
  */
-interface AuthorizationRequiredMessage
+export interface AuthorizationRequiredMessage
   extends DIDCommReply<AuthorizationRequired> {
   type: "https://tap.rsvp/schema/1.0#AuthorizationRequired";
 }
@@ -1153,7 +1152,7 @@ interface AuthorizationRequiredMessage
  *
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-14.md | TAIP-14: Payments}
  */
-interface CompleteMessage extends DIDCommReply<Complete> {
+export interface CompleteMessage extends DIDCommReply<Complete> {
   type: "https://tap.rsvp/schema/1.0#Complete";
 }
 
@@ -1165,7 +1164,7 @@ interface CompleteMessage extends DIDCommReply<Complete> {
  *
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-2.md | TAIP-2: Message Format}
  */
-type TAPMessage =
+export type TAPMessage =
   | TransferMessage
   | PaymentMessage
   | AuthorizeMessage
@@ -1184,71 +1183,4 @@ type TAPMessage =
   | AuthorizationRequiredMessage
   | CompleteMessage;
 
-// Export all types
-export type {
-  // Common Types
-  DID,
-  IRI,
-  ISO8601DateTime,
-  // CAIP2, CAIP10, and CAIP19 are exported above with their documentation
-  CAIP220,
-  DTI,
-  Asset,
-  Amount,
-  LEICode,
-  ISO20022PurposeCode,
-  ISO20022CategoryPurposeCode,
-
-  // Message Structure
-  DIDCommMessage,
-  Participant,
-  RequireAuthorization,
-  RequirePresentation,
-  RequireRelationshipConfirmation,
-  RequirePurpose,
-  Policy,
-
-  // Core TAP types
-  Transfer,
-  Payment,
-  Transactions,
-  Authorize,
-  Settle,
-  Reject,
-  Cancel,
-  Revert,
-  UpdateAgent,
-  UpdateParty,
-  AddAgents,
-  ReplaceAgent,
-  RemoveAgent,
-  ConfirmRelationship,
-  UpdatePolicies,
-
-  // DIDComm Message types
-  TransferMessage,
-  PaymentMessage,
-  AuthorizeMessage,
-  SettleMessage,
-  RejectMessage,
-  CancelMessage,
-  RevertMessage,
-  UpdateAgentMessage,
-  UpdatePartyMessage,
-  AddAgentsMessage,
-  ReplaceAgentMessage,
-  RemoveAgentMessage,
-  CACAOAttachment,
-  ConfirmRelationshipMessage,
-  UpdatePoliciesMessage,
-  ConnectMessage,
-  AuthorizationRequiredMessage,
-  CompleteMessage,
-  TAPMessage,
-
-  // New types
-  TransactionConstraints,
-  Connect,
-  AuthorizationRequired,
-  Complete,
-};
+// All types and interfaces are now exported directly in their declarations
