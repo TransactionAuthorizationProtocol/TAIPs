@@ -5,7 +5,7 @@ author: Pelle Braendgaard <pelle@notabene.id>, Andrés Junge <andres@notabene.id
 status: Review
 type: Standard
 created: 2024-01-22
-updated: 2025-03-07
+updated: 2025-05-14
 discussions-to: https://github.com/TransactionAuthorizationProtocol/TAIPs/pull/7
 requires: 2
 ---
@@ -26,6 +26,8 @@ Agents can be centralized services, software applications running on end-user de
 Traditional payment authorization protocols such as [ISO-20022] or [ISO-8583] only support centralized financial institutions as agents and must work better with self-hosted or decentralized participants.
 
 For virtual asset transactions to truly become a core part of the world's financial infrastructure, all three types of agents can participate equally in the authorization flow of a transaction.
+
+Additionally, in real-world scenarios, some agents may act on behalf of multiple entities simultaneously. For example, a wallet provider might service multiple VASPs, or a VASP might facilitate a direct transfer between two of its customers. Supporting multiple entities in the "for" field enables more efficient representation of these intermediary relationships without requiring redundant agent entries.
 
 ## Specification
 
@@ -73,10 +75,31 @@ The following are the attributes of an object in the `agents` array:
 
 - `@id` - REQUIRED the [DID] of the Agent
 - `role` - OPTIONAL a string or an array of strings as specified for the particular kind of transaction. Eg. `SettlementAddress` for [TAIP-3]
-- `for` - OPTIONAL a [DID] of another Agent or Party that this agent acts on behalf of in this transaction.
+- `for` - OPTIONAL a [DID] or an array of DIDs of another Agent or Party that this agent acts on behalf of in this transaction.
 - `policies` - OPTIONAL an array of [TAIP-7 Policies][TAIP-7]
 
 Future TAIPs are encouraged to extend the agent model with additional functionality.
+
+### The "for" Field
+
+The "for" field specifies on whose behalf an agent is acting. It can contain either:
+
+1. A single DID string - when the agent is acting on behalf of a single entity.
+2. An array of DID strings - when the agent is acting on behalf of multiple entities simultaneously.
+
+Using an array of DIDs is particularly useful in scenarios where:
+- A wallet provider services multiple VASPs and needs to represent this relationship efficiently
+- A VASP facilitates direct transfers between its own customers (e.g., Bob and Alice are both customers of the same VASP)
+- A shared service acts as infrastructure for multiple entities in the same transaction
+
+Example with multiple DIDs in the "for" field:
+```json
+{
+  "@id":"did:web:shared.wallet.provider",
+  "for":["did:web:vasp1.example", "did:web:vasp2.example"],
+  "role":"WalletProvider"
+}
+```
 
 ### Agent Interaction Types
 
@@ -313,7 +336,7 @@ See the following [TAIP-3] message outlining a typical Asset Transfer where a cu
 
 #### Complete example showing VASP to VASP third party Asset Transfer
 
-After completing the discovery aspects  of TAP the Asset Transfer could look like this with a third party beneficiary and a VASP controlling the Settlement Address:
+After completing the discovery aspects of TAP the Asset Transfer could look like this with a third party beneficiary and a VASP controlling the Settlement Address:
 
 ```json
 {
@@ -403,6 +426,98 @@ After completing the discovery aspects of TAP we discover the Asset Transfer goe
 }
 ```
 
+#### Complete example showing same-VASP transfer with an agent acting for both sender and receiver
+
+This example demonstrates a transfer where Bob sends funds to Alice, and both are customers of the same VASP (GoodbyeFiat). The VASP acts as an agent for both parties:
+
+```json
+{
+  "from":"did:web:goodbyefiat.com",
+  "type": "https://tap.rsvp/schema/1.0#Transfer",
+  "id": "...",
+  "to": ["did:web:goodbyefiat.com"],
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#Transfer",
+    "originator":{
+      "@id":"did:eg:bob"
+    },
+    "beneficiary":{
+      "@id":"did:eg:alice"
+    },
+    "asset": "eip155:1/slip44:60",
+    "amount": "1.23",
+    "settlementId":"eip155:1:tx/0x3edb98c24d46d148eb926c714f4fbaa117c47b0c0821f38bfce9763604457c33",
+    "agents":[
+      {
+        "@id":"did:pkh:eip155:1:0xabcda96D359eC26a11e2C2b3d8f8B8942d5Bfcdb",
+        "for":"did:web:goodbyefiat.com",
+        "role":"SourceAddress"
+      },
+      {
+        "@id":"did:web:goodbyefiat.com",
+        "for":["did:eg:bob", "did:eg:alice"]
+      },
+      {
+        "@id":"did:pkh:eip155:1:0x1234a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb",
+        "for":"did:web:goodbyefiat.com",
+        "role":"SettlementAddress"
+      }
+    ]
+  }
+}
+```
+
+#### Complete example showing cross-VASP transfer with a shared wallet provider
+
+This example demonstrates a transfer where Bob (customer of GoodbyeFiat) sends funds to Alice (customer of HelloCrypto), and both VASPs use Superwallet as their shared wallet provider:
+
+```json
+{
+  "from":"did:web:goodbyefiat.com",
+  "type": "https://tap.rsvp/schema/1.0#Transfer",
+  "id": "...",
+  "to": ["did:web:hellocrypto.com"],
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#Transfer",
+    "originator":{
+      "@id":"did:eg:bob"
+    },
+    "beneficiary":{
+      "@id":"did:eg:alice"
+    },
+    "asset": "eip155:1/slip44:60",
+    "amount": "1.23",
+    "settlementId":"eip155:1:tx/0x3edb98c24d46d148eb926c714f4fbaa117c47b0c0821f38bfce9763604457c33",
+    "agents":[
+      {
+        "@id":"did:web:goodbyefiat.com",
+        "for":"did:eg:bob"
+      },
+      {
+        "@id":"did:web:hellocrypto.com",
+        "for":"did:eg:alice"
+      },
+      {
+        "@id":"did:web:superwallet.com",
+        "for":["did:web:goodbyefiat.com", "did:web:hellocrypto.com"],
+        "role":"WalletProvider"
+      },
+      {
+        "@id":"did:pkh:eip155:1:0xabcda96D359eC26a11e2C2b3d8f8B8942d5Bfcdb",
+        "for":"did:web:superwallet.com",
+        "role":"SourceAddress"
+      },
+      {
+        "@id":"did:pkh:eip155:1:0x1234a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb",
+        "for":"did:web:superwallet.com",
+        "role":"SettlementAddress"
+      }
+    ]
+  }
+}
+```
 
 ### Agent Meta Data Messages
 
