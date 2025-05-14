@@ -43,6 +43,8 @@ permalink: /messages/
     - [RequireRelationshipConfirmation](#requirerelationshipconfirmation)
 - [Message Flow Examples](#message-flow-examples)
   - [Basic Transfer Flow](#basic-transfer-flow)
+  - [Same-VASP Transfer with Multiple DIDs](#same-vasp-transfer-with-multiple-dids)
+  - [Cross-VASP Transfer with Shared Wallet Provider](#cross-vasp-transfer-with-shared-wallet-provider)
   - [Transfer with LEI and Purpose Code](#transfer-with-lei-and-purpose-code)
   - [Payment Request Flow](#payment-request-flow)
 
@@ -1243,7 +1245,36 @@ Represents a service involved in executing transactions.
 |-----------|------|----------|---------|-------------|
 | @id | string | Yes | Review ([TAIP-5]) | DID of the agent |
 | role | string | No | Review ([TAIP-5]) | Role of the agent (e.g., "SettlementAddress", "SourceAddress") |
-| for | string | No | Review ([TAIP-5]) | Reference to the Party this agent represents |
+| for | string or array of strings | No | Review ([TAIP-5]) | Reference to the Party or Parties this agent represents. Can be either a single DID string or an array of DID strings when the agent acts on behalf of multiple entities simultaneously |
+
+#### Agent Examples
+
+##### 1. Agent Acting for a Single Party
+```json
+{
+  "@id": "did:web:originator.vasp",
+  "for": "did:eg:bob",
+  "role": "SourceAddress"
+}
+```
+
+##### 2. Agent Acting for Multiple Parties
+```json
+{
+  "@id": "did:web:goodbyefiat.com",
+  "for": ["did:eg:bob", "did:eg:alice"],
+  "role": "CustodialService"
+}
+```
+
+##### 3. Shared Wallet Provider Acting for Multiple VASPs
+```json
+{
+  "@id": "did:web:superwallet.com",
+  "for": ["did:web:goodbyefiat.com", "did:web:hellocrypto.com"],
+  "role": "WalletProvider"
+}
+```
 
 ### Policy
 [TAIP-7] - Review
@@ -1409,9 +1440,110 @@ Note that all messages share the same thread ID to link them together.
 }
 ```
 
+### Same-VASP Transfer with Multiple DIDs
+
+Demonstrates a transfer between two customers of the same VASP with:
+- A single agent (the VASP) acting on behalf of both parties simultaneously using multiple DIDs in the "for" field
+- Internal transfer between customers of the same institution
+- Simplified agent list as the VASP acts for both sender and receiver
+
+#### Same-VASP Transfer Example
+
+```json
+{
+  "from": "did:web:goodbyefiat.com",
+  "type": "https://tap.rsvp/schema/1.0#Transfer",
+  "id": "1234567890",
+  "to": ["did:web:goodbyefiat.com"],
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#Transfer",
+    "asset": "eip155:1/slip44:60",
+    "amount": "1.23",
+    "originator": {
+      "@id": "did:eg:bob"
+    },
+    "beneficiary": {
+      "@id": "did:eg:alice"
+    },
+    "agents": [
+      {
+        "@id": "did:pkh:eip155:1:0xabcda96D359eC26a11e2C2b3d8f8B8942d5Bfcdb",
+        "for": "did:web:goodbyefiat.com",
+        "role": "SourceAddress"
+      },
+      {
+        "@id": "did:web:goodbyefiat.com",
+        "for": ["did:eg:bob", "did:eg:alice"]
+      },
+      {
+        "@id": "did:pkh:eip155:1:0x1234a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb",
+        "for": "did:web:goodbyefiat.com",
+        "role": "SettlementAddress"
+      }
+    ]
+  }
+}
+```
+
+### Cross-VASP Transfer with Shared Wallet Provider
+
+Demonstrates a cross-VASP transfer with:
+- A shared wallet provider supporting multiple VASPs
+- Use of multiple DIDs in the "for" field to show the wallet provider's relationship with both VASPs
+- Efficient representation of intermediary relationships without duplicating agent entries
+
+#### Shared Wallet Provider Example
+
+```json
+{
+  "from": "did:web:goodbyefiat.com",
+  "type": "https://tap.rsvp/schema/1.0#Transfer",
+  "id": "9876543210",
+  "to": ["did:web:hellocrypto.com"],
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#Transfer",
+    "asset": "eip155:1/slip44:60",
+    "amount": "5.67",
+    "originator": {
+      "@id": "did:eg:bob"
+    },
+    "beneficiary": {
+      "@id": "did:eg:alice"
+    },
+    "agents": [
+      {
+        "@id": "did:web:goodbyefiat.com",
+        "for": "did:eg:bob"
+      },
+      {
+        "@id": "did:web:hellocrypto.com",
+        "for": "did:eg:alice"
+      },
+      {
+        "@id": "did:web:superwallet.com",
+        "for": ["did:web:goodbyefiat.com", "did:web:hellocrypto.com"],
+        "role": "WalletProvider"
+      },
+      {
+        "@id": "did:pkh:eip155:1:0xabcda96D359eC26a11e2C2b3d8f8B8942d5Bfcdb",
+        "for": "did:web:superwallet.com",
+        "role": "SourceAddress"
+      },
+      {
+        "@id": "did:pkh:eip155:1:0x1234a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb",
+        "for": "did:web:superwallet.com",
+        "role": "SettlementAddress"
+      }
+    ]
+  }
+}
+```
+
 ### Transfer with LEI and Purpose Code
 
-This example shows a transfer that includes:
+Demonstrates usage of:
 - Legal Entity Identifier (LEI) for the originator
 - ISO 20022 purpose codes for payment classification
 - Corporate transfer between institutions
