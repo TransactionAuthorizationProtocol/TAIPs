@@ -74,8 +74,8 @@ The following example shows its use in a [TAIP-3] message:
 The following are the attributes of an object in the `agents` array:
 
 - `@id` - REQUIRED the [DID] of the Agent
-- `role` - OPTIONAL a string or an array of strings as specified for the particular kind of transaction. Eg. `SettlementAddress` for [TAIP-3]
-- `for` - OPTIONAL a [DID] or an array of DIDs of another Agent or Party that this agent acts on behalf of in this transaction.
+- `role` - REQUIRED a string or an array of strings as specified for the particular kind of transaction. Eg. `SettlementAddress` for [TAIP-3]
+- `for` - REQUIRED a [DID] or an array of DIDs of another Agent or Party that this agent acts on behalf of in this transaction.
 - `policies` - OPTIONAL an array of [TAIP-7 Policies][TAIP-7]
 
 Future TAIPs are encouraged to extend the agent model with additional functionality.

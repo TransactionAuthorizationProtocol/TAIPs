@@ -146,11 +146,13 @@ Initiates a virtual asset transfer between parties.
     "agents": [
       {
         "@id": "did:web:originator.vasp",
-        "for": "did:org:acmecorp"
+        "for": "did:org:acmecorp",
+        "role": "CustodialService"
       },
       {
         "@id": "did:web:beneficiary.vasp",
-        "for": "did:eg:alice"
+        "for": "did:eg:alice",
+        "role": "CustodialService"
       }
     ]
   }
@@ -199,7 +201,8 @@ Initiates a payment request from a merchant to a customer.
     "agents": [
       {
         "@id": "did:web:merchant.vasp",
-        "for": "did:web:merchant.vasp"
+        "for": "did:web:merchant.vasp",
+        "role": "MerchantService"
       }
     ]
   }
@@ -496,7 +499,7 @@ Updates information about an agent.
     "agent": {
       "@id": "did:web:originator.vasp",
       "for": "did:eg:bob",
-      "role": "SourceAddress"
+      "role": "CustodialService"
     }
   }
 }
@@ -564,7 +567,7 @@ Adds one or more additional agents to the transaction.
       {
         "@id": "did:pkh:eip155:1:0x1234a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb",
         "for": "did:web:beneficiary.vasp",
-        "role": "settlementAddress"
+        "role": "SettlementAddress"
       }
     ]
   }
@@ -599,7 +602,7 @@ Replaces an agent with another agent in the transaction.
     "replacement": {
       "@id": "did:pkh:eip155:1:0x5678a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb",
       "for": "did:web:beneficiary.vasp",
-      "role": "settlementAddress"
+      "role": "SettlementAddress"
     }
   }
 }
@@ -671,7 +674,7 @@ The body object must contain:
     "@type": "https://tap.rsvp/schema/1.0#Agent",
     "@id": "did:pkh:eip155:1:0x1234a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb",
     "for": "did:web:beneficiary.vasp",
-    "role": "settlementAddress"
+    "role": "SettlementAddress"
   },
   "attachments": [
     {
@@ -1145,7 +1148,9 @@ If a customer (originator or beneficiary) is a legal entity and has an LEI, that
   },
   "agents": [
     {
-      "@id": "did:web:originator.vasp"
+      "@id": "did:web:originator.vasp",
+      "for": "did:eg:bob",
+      "role": "CustodialService"
     }
   ]
 }
@@ -1244,8 +1249,8 @@ Represents a service involved in executing transactions.
 | Attribute | Type | Required | Status | Description |
 |-----------|------|----------|---------|-------------|
 | @id | string | Yes | Review ([TAIP-5]) | DID of the agent |
-| role | string | No | Review ([TAIP-5]) | Role of the agent (e.g., "SettlementAddress", "SourceAddress") |
-| for | string or array of strings | No | Review ([TAIP-5]) | Reference to the Party or Parties this agent represents. Can be either a single DID string or an array of DID strings when the agent acts on behalf of multiple entities simultaneously |
+| role | string | Yes | Review ([TAIP-5]) | Role of the agent (e.g., "SettlementAddress", "SourceAddress", "CustodialService", "WalletProvider", "MerchantService") |
+| for | string or array of strings | Yes | Review ([TAIP-5]) | Reference to the Party or Parties this agent represents. Can be either a single DID string or an array of DID strings when the agent acts on behalf of multiple entities simultaneously |
 
 #### Agent Examples
 
@@ -1368,12 +1373,16 @@ Note that all messages share the same thread ID to link them together.
     "beneficiary": {
       "@id": "did:eg:alice"
     },
-    "agents": [
+    "agents":[
       {
-        "@id": "did:web:originator.vasp"
+        "@id":"did:web:originator.vasp",
+        "for":"did:eg:bob",
+        "role":"CustodialService"
       },
       {
-        "@id": "did:web:beneficiary.vasp"
+        "@id": "did:web:beneficiary.vasp",
+        "for": "did:eg:alice",
+        "role": "CustodialService"
       }
     ]
   }
@@ -1474,7 +1483,8 @@ Demonstrates a transfer between two customers of the same VASP with:
       },
       {
         "@id": "did:web:goodbyefiat.com",
-        "for": ["did:eg:bob", "did:eg:alice"]
+        "for": ["did:eg:bob", "did:eg:alice"],
+        "role": "CustodialService"
       },
       {
         "@id": "did:pkh:eip155:1:0x1234a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb",
@@ -1515,11 +1525,13 @@ Demonstrates a cross-VASP transfer with:
     "agents": [
       {
         "@id": "did:web:goodbyefiat.com",
-        "for": "did:eg:bob"
+        "for": "did:eg:bob",
+        "role": "CustodialService"
       },
       {
         "@id": "did:web:hellocrypto.com",
-        "for": "did:eg:alice"
+        "for": "did:eg:alice",
+        "role": "CustodialService"
       },
       {
         "@id": "did:web:superwallet.com",
@@ -1574,10 +1586,14 @@ Demonstrates usage of:
     },
     "agents": [
       {
-        "@id": "did:web:originator.vasp"
+        "@id": "did:web:originator.vasp",
+        "for": "did:org:acmecorp-123",
+        "role": "CustodialService"
       },
       {
-        "@id": "did:web:beneficiary.vasp"
+        "@id": "did:web:beneficiary.vasp",
+        "for": "did:eg:alice",
+        "role": "CustodialService"
       }
     ]
   }
@@ -1618,7 +1634,8 @@ Note that all messages in this flow share the same thread ID (`payment-123`) to 
     "agents": [
       {
         "@id": "did:web:merchant.vasp",
-        "for": "did:web:merchant.vasp"
+        "for": "did:web:merchant.vasp",
+        "role": "MerchantService"
       }
     ]
   }
@@ -1648,11 +1665,13 @@ Note that all messages in this flow share the same thread ID (`payment-123`) to 
     "agents": [
       {
         "@id": "did:web:customer.vasp",
-        "for": "did:web:customer"
+        "for": "did:web:customer",
+        "role": "CustodialService"
       },
       {
         "@id": "did:web:merchant.vasp",
-        "for": "did:web:merchant.vasp"
+        "for": "did:web:merchant.vasp",
+        "role": "MerchantService"
       }
     ]
   }
@@ -1797,6 +1816,7 @@ Note that all messages in this flow share the same thread ID (`payment-123`) to 
     "agent": {
       "@id": "did:web:originator.vasp",
       "for": "did:eg:bob",
+      "role": "CustodialService",
       "policies": [
         {
           "@type": "RequirePresentation",
@@ -1986,7 +2006,8 @@ Note that all messages in this flow share the same thread ID (`payment-123`) to 
     "agents": [
       {
         "@id": "did:web:merchant.vasp",
-        "for": "did:web:merchant.vasp"
+        "for": "did:web:merchant.vasp",
+        "role": "MerchantService"
       }
     ]
   }

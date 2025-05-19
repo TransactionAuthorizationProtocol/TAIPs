@@ -283,14 +283,17 @@ export interface Participant<T extends ParticipantTypes>
   /**
    * Role of the participant in the transaction
    * e.g., "originator", "beneficiary", "agent"
+   * Required for type "Agent", optional for other types
    */
-  role?: string;
+  role: T extends "Agent" ? string : string | undefined;
 
   /**
    * DID of the party this participant acts for
    * Used when participant is an agent acting on behalf of another party
+   * Required for type "Agent", optional for other types
+   * Can be a single DID or an array of DIDs representing multiple parties
    */
-  for?: DID;
+  for: T extends "Agent" ? DID | DID[] : DID | undefined;
 
   /**
    * List of policies that apply to this participant
