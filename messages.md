@@ -113,7 +113,7 @@ Initiates a virtual asset transfer between parties.
       },
       {
         "@id": "did:pkh:eip155:1:0x1234a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb",
-        "role": "settlementAddress"
+        "role": "SettlementAddress"
       }
     ]
   }
@@ -202,7 +202,7 @@ Initiates a payment request from a merchant to a customer.
       {
         "@id": "did:web:merchant.vasp",
         "for": "did:web:merchant.vasp",
-        "role": "MerchantService"
+        "role": "CustodialService"
       }
     ]
   }
@@ -709,7 +709,7 @@ The body object must contain:
     "@type": "https://tap.rsvp/schema/1.0#ConfirmRelationship",
     "@id": "did:pkh:eip155:1:0x1234a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb",
     "for": "did:web:beneficiary.vasp",
-    "role": "settlementAddress"
+    "role": "SettlementAddress"
   },
   "attachments": [
     {
@@ -742,7 +742,7 @@ The body object must contain:
     "@type": "https://tap.rsvp/schema/1.0#ConfirmRelationship",
     "@id": "did:web:custodian.service",
     "for": "did:web:beneficiary.vasp",
-    "role": "custodian"
+    "role": "CustodialService"
   }
 }
 ```
@@ -1249,7 +1249,7 @@ Represents a service involved in executing transactions.
 | Attribute | Type | Required | Status | Description |
 |-----------|------|----------|---------|-------------|
 | @id | string | Yes | Review ([TAIP-5]) | DID of the agent |
-| role | string | Yes | Review ([TAIP-5]) | Role of the agent (e.g., "SettlementAddress", "SourceAddress", "CustodialService", "WalletProvider", "MerchantService") |
+| role | string | Yes | Review ([TAIP-5]) | Role of the agent (e.g., "SettlementAddress", "SourceAddress", "CustodialService") |
 | for | string or array of strings | Yes | Review ([TAIP-5]) | Reference to the Party or Parties this agent represents. Can be either a single DID string or an array of DID strings when the agent acts on behalf of multiple entities simultaneously |
 
 #### Agent Examples
@@ -1277,7 +1277,7 @@ Represents a service involved in executing transactions.
 {
   "@id": "did:web:superwallet.com",
   "for": ["did:web:goodbyefiat.com", "did:web:hellocrypto.com"],
-  "role": "WalletProvider"
+  "role": "CustodialService"
 }
 ```
 
@@ -1536,7 +1536,7 @@ Demonstrates a cross-VASP transfer with:
       {
         "@id": "did:web:superwallet.com",
         "for": ["did:web:goodbyefiat.com", "did:web:hellocrypto.com"],
-        "role": "WalletProvider"
+        "role": "CustodialService"
       },
       {
         "@id": "did:pkh:eip155:1:0xabcda96D359eC26a11e2C2b3d8f8B8942d5Bfcdb",
@@ -1635,7 +1635,7 @@ Note that all messages in this flow share the same thread ID (`payment-123`) to 
       {
         "@id": "did:web:merchant.vasp",
         "for": "did:web:merchant.vasp",
-        "role": "MerchantService"
+        "role": "CustodialService"
       }
     ]
   }
@@ -1671,7 +1671,7 @@ Note that all messages in this flow share the same thread ID (`payment-123`) to 
       {
         "@id": "did:web:merchant.vasp",
         "for": "did:web:merchant.vasp",
-        "role": "MerchantService"
+        "role": "CustodialService"
       }
     ]
   }
@@ -1851,7 +1851,7 @@ Note that all messages in this flow share the same thread ID (`payment-123`) to 
     "agent": {
       "@id": "did:pkh:eip155:1:0x1234a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb",
       "for": "did:web:beneficiary.vasp",
-      "role": "custodian"
+      "role": "CustodialService"
     }
   }
 }
@@ -2007,7 +2007,7 @@ Note that all messages in this flow share the same thread ID (`payment-123`) to 
       {
         "@id": "did:web:merchant.vasp",
         "for": "did:web:merchant.vasp",
-        "role": "MerchantService"
+        "role": "CustodialService"
       }
     ]
   }

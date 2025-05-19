@@ -5,7 +5,7 @@ author: Pelle Braendgaard <pelle@notabene.id>, Andrés Junge <andres@notabene.id
 status: Review
 type: Standard
 created: 2024-01-22
-updated: 2025-05-14
+updated: 2025-05-19
 discussions-to: https://github.com/TransactionAuthorizationProtocol/TAIPs/pull/7
 requires: 2
 ---
@@ -97,7 +97,7 @@ Example with multiple DIDs in the "for" field:
 {
   "@id":"did:web:shared.wallet.provider",
   "for":["did:web:vasp1.example", "did:web:vasp2.example"],
-  "role":"WalletProvider"
+  "role":"CustodialService"
 }
 ```
 
@@ -138,14 +138,28 @@ For example, the Ethereum address can be represented as:
 
 ### Roles
 
-Different agents can have specific roles specific to a particular transaction type. For example `settlementAddress` is a role in a [TAIP-3] message indicating how a transaction should be settled.
+Different agents can have specific roles specific to a particular transaction type. For example `SettlementAddress` is a role in a [TAIP-3] message indicating how a transaction should be settled.
 
 ```json
 {
   "@id":"did:pkh:eip155:1:0x1234a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb",
-  "role":"settlementAddress"
+  "role":"SettlementAddress"
 }
 ```
+
+#### Standard Role Values
+
+The following standard role values SHOULD be used to maintain consistency across implementations:
+
+| Role Name | Description |
+|-----------|-------------|
+| `SettlementAddress` | Blockchain address receiving transferred assets |
+| `SourceAddress` | Blockchain address sending assets |
+| `CustodialService` | Service that holds custody of assets for customers, provides wallet infrastructure, or offers merchant services |
+
+All role values MUST use PascalCase (e.g., `SettlementAddress` not `settlementAddress`).
+
+Note: `CustodialService` is a general-purpose role that can be used for various service types, including wallet providers and merchant services. Implementations MAY define additional roles as needed, but SHOULD follow the PascalCase naming convention and document them properly.
 
 ### Transaction Graphs
 
@@ -502,7 +516,7 @@ This example demonstrates a transfer where Bob (customer of GoodbyeFiat) sends f
       {
         "@id":"did:web:superwallet.com",
         "for":["did:web:goodbyefiat.com", "did:web:hellocrypto.com"],
-        "role":"WalletProvider"
+        "role":"CustodialService"
       },
       {
         "@id":"did:pkh:eip155:1:0xabcda96D359eC26a11e2C2b3d8f8B8942d5Bfcdb",

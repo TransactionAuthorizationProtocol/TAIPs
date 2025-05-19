@@ -282,7 +282,8 @@ export interface Participant<T extends ParticipantTypes>
 
   /**
    * Role of the participant in the transaction
-   * e.g., "originator", "beneficiary", "agent"
+   * Standard values for Agents are: "SettlementAddress", "SourceAddress", "CustodialService"
+   * All role values MUST use PascalCase
    * Required for type "Agent", optional for other types
    */
   role: T extends "Agent" ? string : string | undefined;
@@ -334,7 +335,7 @@ export interface Policy<T extends string> extends JsonLdObject<T> {
 
   /**
    * Optional role of the party required to fulfill this policy
-   * E.g. 'SettlementAddress' for TAIP-3
+   * E.g. 'SettlementAddress', 'SourceAddress', or 'CustodialService'
    */
   fromRole?: string;
 
@@ -873,7 +874,8 @@ export interface ConfirmRelationship
 
   /**
    * Optional role of the agent
-   * Describes the agent's function in the relationship
+   * Standard values: "SettlementAddress", "SourceAddress", "CustodialService"
+   * All role values MUST use PascalCase
    */
   role?: string;
 
