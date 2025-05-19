@@ -66,7 +66,7 @@ In summary, [TAIP-12] is motivated by the need to **protect PII** during Travel 
     },
     {
       "@id":"did:pkh:eip155:1:0x1234a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb",
-      "role":"settlementAddress"
+      "role":"SettlementAddress"
     }
   ]
 }

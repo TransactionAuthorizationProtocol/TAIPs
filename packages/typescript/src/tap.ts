@@ -235,7 +235,8 @@ export interface DIDCommMessage<T = Record<string, unknown>> {
  * @template T - The type of the message body
  * @extends DIDCommMessage<T>
  */
-export interface DIDCommReply<T = Record<string, unknown>> extends DIDCommMessage<T> {
+export interface DIDCommReply<T = Record<string, unknown>>
+  extends DIDCommMessage<T> {
   /** Thread ID linking this reply to the original message */
   thid: string;
 }
@@ -251,7 +252,8 @@ export interface DIDCommReply<T = Record<string, unknown>> extends DIDCommMessag
 
 export type ParticipantTypes = "Agent" | "Party";
 
-export interface Participant<T extends ParticipantTypes> extends JsonLdObject<T> {
+export interface Participant<T extends ParticipantTypes>
+  extends JsonLdObject<T> {
   /**
    * Unique identifier for the participant
    * Can be either a DID or an IRI
@@ -280,15 +282,19 @@ export interface Participant<T extends ParticipantTypes> extends JsonLdObject<T>
 
   /**
    * Role of the participant in the transaction
-   * e.g., "originator", "beneficiary", "agent"
+   * Standard values for Agents are: "SettlementAddress", "SourceAddress", "CustodialService"
+   * All role values MUST use PascalCase
+   * Required for type "Agent", optional for other types
    */
-  role?: string;
+  role: T extends "Agent" ? string : string | undefined;
 
   /**
    * DID of the party this participant acts for
    * Used when participant is an agent acting on behalf of another party
+   * Required for type "Agent", optional for other types
+   * Can be a single DID or an array of DIDs representing multiple parties
    */
-  for?: DID;
+  for: T extends "Agent" ? DID | DID[] : DID | undefined;
 
   /**
    * List of policies that apply to this participant
@@ -329,7 +335,7 @@ export interface Policy<T extends string> extends JsonLdObject<T> {
 
   /**
    * Optional role of the party required to fulfill this policy
-   * E.g. 'SettlementAddress' for TAIP-3
+   * E.g. 'SettlementAddress', 'SourceAddress', or 'CustodialService'
    */
   fromRole?: string;
 
@@ -394,7 +400,8 @@ export interface RequirePresentation extends Policy<"RequirePresentation"> {
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-7.md | TAIP-7: Policies}
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-9.md | TAIP-9: Proof of Relationship}
  */
-export interface RequireRelationshipConfirmation extends Policy<"RequireRelationshipConfirmation"> {
+export interface RequireRelationshipConfirmation
+  extends Policy<"RequireRelationshipConfirmation"> {
   /**
    * Required nonce for signature
    * Prevents replay attacks
@@ -612,10 +619,10 @@ export interface Connect extends TapMessageObject<"Connect"> {
   };
 
   /**
-   * DID of the represented party
-   * The party the agent acts on behalf of
+   * DID of the represented parties
+   * The parties the agent acts on behalf of
    */
-  for: DID;
+  for: DID | DID[];
 
   /**
    * Transaction constraints
@@ -857,7 +864,8 @@ export interface CACAOAttachment {
  *
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-9.md | TAIP-9: Relationship Proofs}
  */
-export interface ConfirmRelationship extends TapMessageObject<"ConfirmRelationship"> {
+export interface ConfirmRelationship
+  extends TapMessageObject<"ConfirmRelationship"> {
   /**
    * DID of the agent
    * Identifies the agent in the relationship
@@ -866,7 +874,8 @@ export interface ConfirmRelationship extends TapMessageObject<"ConfirmRelationsh
 
   /**
    * Optional role of the agent
-   * Describes the agent's function in the relationship
+   * Standard values: "SettlementAddress", "SourceAddress", "CustodialService"
+   * All role values MUST use PascalCase
    */
   role?: string;
 
@@ -1097,7 +1106,8 @@ export interface RemoveAgentMessage extends DIDCommReply<RemoveAgent> {
  *
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-9.md | TAIP-9: Relationship Proofs}
  */
-export interface ConfirmRelationshipMessage extends DIDCommReply<ConfirmRelationship> {
+export interface ConfirmRelationshipMessage
+  extends DIDCommReply<ConfirmRelationship> {
   /**
    * Message type identifier
    * Must be "https://tap.rsvp/schema/1.0#ConfirmRelationship" for relationship confirmations

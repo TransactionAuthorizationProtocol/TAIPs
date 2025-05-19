@@ -147,8 +147,8 @@ If `originator` and `beneficiary` are different it is known as a third-party tra
 
 The following two roles can be used as attributes on Agents listed in the agents array:
 
-* `SettlementAddress`, The blockchain wallet agent to settle a transaction to
-* `SourceAddress` The blockchain wallet agent used to send the transaction from
+* `SettlementAddress` - The blockchain wallet agent to settle a transaction to
+* `SourceAddress` - The blockchain wallet agent used to send the transaction from
 
 Neither of these is required but can be used to specify the blockchain wallets up front.
 
@@ -184,8 +184,8 @@ The following is a minimal first-party request for a transfer of 1.23 ETH from a
         "@id":"did:web:originator.sample"
       },
       {
-        "@id":"did:pkh:eip155:1:0x1234a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb",
-        "role":"settlementAddress"
+        "@id":"did:pkh:eip155:1:0x1234a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb", 
+        "role":"SettlementAddress"
       }
     ]
   }
@@ -214,7 +214,7 @@ The following is a request for a first-party transfer of 1.23 ETH from a crypto 
       },
       {
         "@id":"did:pkh:eip155:1:0x1234a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb",
-        "role":"settlementAddress"
+        "role":"SettlementAddress"
       }
     ]
   }
@@ -281,7 +281,7 @@ The following is an example of a reasonably complete third-party transfer alread
       },
       {
         "@id":"did:pkh:eip155:1:0x1234a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb",
-        "role":"settlementAddress"
+        "role":"SettlementAddress"
       }
     ]
   }
