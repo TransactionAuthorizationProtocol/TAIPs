@@ -6,6 +6,7 @@ type: Standard
 author: Pelle Braendgaard <pelle@notabene.id>
 created: 2024-03-21
 updated: 2024-03-21
+description: Defines an optional SHA-256 hashed name field for originator and beneficiary party data, enabling identity verification without exposing personal information in plaintext. Provides Travel Rule compliance while preserving privacy through a standardized hashing method compatible with VerifyVASP and GTR networks.
 requires: 2, 3, 6, 7, 8
 ---
 

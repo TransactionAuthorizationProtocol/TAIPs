@@ -5,6 +5,7 @@ status: Review
 type: Standard
 author: Pelle Braendgaard <pelle@notabene.id>
 created: 2025-03-05
+description: Integrates Legal Entity Identifiers (LEIs) into TAP messages to uniquely and unambiguously identify institutional participants like VASPs in digital asset transactions. Enables regulatory compliance and institutional recognition without exchanging full identity profiles, maintaining TAP's lightweight and privacy-preserving approach to entity verification.
 requires: 2, 5, 6, 7, 8
 ---
 

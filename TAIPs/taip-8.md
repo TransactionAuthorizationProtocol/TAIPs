@@ -6,6 +6,7 @@ status: Review
 type: Standard
 created: 2024-01-24
 updated: 2025-03-07
+description: Defines a secure method for transaction agents to exchange verified credentials and personally identifiable information (PII) using W3C Verifiable Credentials and DIDComm encrypted messaging. Enables regulatory compliance with data protection laws through selective disclosure that minimizes PII exposure and allows agents to verify transaction counterparties while maintaining privacy.
 discussions-to: https://github.com/TransactionAuthorizationProtocol/TAIPs/pull/10
 requires: 2, 5, 6, 7
 ---

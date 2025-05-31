@@ -6,6 +6,7 @@ status: Review
 type: Standard
 created: 2024-01-22
 updated: 2025-03-07
+description: Defines Transaction Parties as the real-world legal or natural persons involved in blockchain transactions, identified using IRIs or DIDs. Establishes party relationships with agents, party metadata standards, and messaging protocols for securely sharing party information while preserving privacy.
 discussions-to: https://github.com/TransactionAuthorizationProtocol/TAIPs/pull/8
 requires: 2
 ---

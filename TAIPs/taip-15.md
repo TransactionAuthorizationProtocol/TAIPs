@@ -6,6 +6,7 @@ type: Standard
 author: Pelle Braendgaard <pelle@notabene.id>
 created: 2024-03-21
 updated: 2024-03-21
+description: Establishes a protocol for creating secure, authorized connections between TAP agents with predefined transaction constraints and OAuth-style authorization flows. Enables persistent B2B integrations with transaction limits, purpose restrictions, and user control mechanisms for ongoing business relationships while maintaining robust risk management.
 requires: [2, 4, 6, 9, 13]
 ---
 

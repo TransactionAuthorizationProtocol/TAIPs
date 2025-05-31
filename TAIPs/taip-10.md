@@ -6,6 +6,7 @@ type: Standard
 author: Pelle Braendgaard <pelle@notabene.id>
 created: 2024-01-24
 updated: 2024-01-24
+description: Implements FATF Travel Rule compliance by integrating IVMS-101 identity data exchange into TAP using existing policy and selective disclosure mechanisms. Enables secure sharing of counterparty identity information through both proactive and reactive approaches while maintaining privacy through minimal disclosure principles.
 requires: 8
 ---
 

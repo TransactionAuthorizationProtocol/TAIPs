@@ -6,6 +6,7 @@ type: Meta
 author: Pelle Braendgaard <pelle@notabene.id>
 created: 2024-01-09
 updated: 2024-01-09
+description: Establishes the Transaction Authorization Protocol (TAP) framework and defines the process for submitting Transaction Authorization Improvement Proposals (TAIPs). Specifies document formatting requirements, editorial workflow, and governance structure for TAP standard development.
 ---
 ## Transaction Authorization Protocol (TAP) Rationale
 

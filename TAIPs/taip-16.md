@@ -6,6 +6,7 @@ type: Standard
 author: Pelle Braendgaard <pelle@notabene.id>
 created: 2025-04-22
 updated: 2025-04-22
+description: Defines a structured Invoice object format for embedding detailed payment information with line items and tax data in TAIP-14 Payment Requests. Maps to established standards like UBL and W3C Payment Request for interoperability with existing business systems while supporting regulatory compliance requirements.
 requires: 14
 ---
 

@@ -6,6 +6,7 @@ status: Review
 type: Standard
 created: 2024-01-25
 updated: 2025-03-07
+description: Establishes methods for verifying relationships between transaction participants, particularly proving control of blockchain addresses by specific agents or parties. Enables both declarative confirmations and cryptographic proofs using CACAO signatures to verify wallet ownership for KYC, sanctions screening, and Travel Rule compliance.
 discussions-to: https://github.com/TransactionAuthorizationProtocol/TAIPs/pull/12
 requires: 2, 5, 7
 ---
