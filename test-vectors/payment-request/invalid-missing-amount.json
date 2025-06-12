@@ -3,7 +3,7 @@
   "purpose": "Validates that payment requests must include an amount",
   "shouldPass": false,
   "version": "1.0.0",
-  "taips": ["taip-2", "taip-4"],
+  "taips": ["taip-2", "taip-14"],
   "message": {
     "id": "payment-req-125",
     "type": "https://tap.rsvp/schema/1.0#Payment",
@@ -20,7 +20,14 @@
       "merchant": {
         "@id": "did:web:merchant.vasp",
         "name": "Example Store"
-      }
+      },
+      "agents": [
+        {
+          "@id": "did:web:merchant.vasp",
+          "role": "Merchant",
+          "for": "merchant"
+        }
+      ]
     }
   },
   "expectedResult": {

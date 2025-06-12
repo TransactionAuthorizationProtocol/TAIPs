@@ -11,9 +11,11 @@
     "to": ["did:web:beneficiary.vasp"],
     "thid": "1234567890",
     "created_time": 1516269022,
+    "expires_time": 1516385931,
     "body": {
       "@context": "https://tap.rsvp/schema/1.0",
       "@type": "https://tap.rsvp/schema/1.0#Cancel",
+      "by": "originator",
       "reason": "User requested cancellation"
     }
   },

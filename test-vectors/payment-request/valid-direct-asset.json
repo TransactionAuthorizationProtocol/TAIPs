@@ -3,13 +3,14 @@
   "purpose": "Validates a payment request specifying a direct crypto asset amount",
   "shouldPass": true,
   "version": "1.0.0",
-  "taips": ["taip-2", "taip-4"],
+  "taips": ["taip-2", "taip-14"],
   "message": {
     "id": "payment-req-124",
     "type": "https://tap.rsvp/schema/1.0#Payment",
     "from": "did:web:merchant.vasp",
     "to": ["did:web:customer.vasp"],
     "created_time": 1516269022,
+    "expires_time": 1516385931,
     "body": {
       "@context": "https://tap.rsvp/schema/1.0",
       "@type": "https://tap.rsvp/schema/1.0#Payment",
@@ -17,12 +18,14 @@
       "amount": "100.00",
       "merchant": {
         "@id": "did:web:merchant.vasp",
-        "name": "Example Store"
+        "name": "Example Store",
+        "mcc": "5411"
       },
       "agents": [
         {
           "@id": "did:web:merchant.vasp",
-          "for": "did:web:merchant.vasp"
+          "role": "Merchant",
+          "for": "merchant"
         }
       ]
     }

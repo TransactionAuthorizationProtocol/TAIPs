@@ -15,9 +15,14 @@
       "@type": "https://tap.rsvp/schema/1.0#Transfer",
       "asset": "eip155:1/slip44:60",
       "amount": "1.23",
+      "originator": {
+        "@id": "did:web:originator.vasp"
+      },
       "agents": [
         {
-          "@id": "did:web:originator.vasp"
+          "@id": "did:web:originator.vasp",
+          "role": "Originator",
+          "for": "originator"
         }
       ]
     }

@@ -14,6 +14,7 @@
     "body": {
       "@context": "https://tap.rsvp/schema/1.0",
       "@type": "https://tap.rsvp/schema/1.0#Cancel",
+      "by": "originator",
       "reason": "Service agreement terminated"
     }
   },

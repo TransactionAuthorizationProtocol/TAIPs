@@ -3,7 +3,7 @@
   "purpose": "Validates a payment request specifying a fiat amount with supported crypto assets",
   "shouldPass": true,
   "version": "1.0.0",
-  "taips": ["taip-2", "taip-4"],
+  "taips": ["taip-2", "taip-14"],
   "message": {
     "id": "payment-req-123",
     "type": "https://tap.rsvp/schema/1.0#Payment",
@@ -22,21 +22,21 @@
       ],
       "merchant": {
         "@id": "did:web:merchant.vasp",
-        "name": "Example Store"
+        "name": "Example Store",
+        "mcc": "5411"
       },
       "invoice": "https://example.com/invoice/123",
       "expiry": "2024-04-21T12:00:00Z",
       "agents": [
         {
           "@id": "did:web:merchant.vasp",
-          "for": "did:web:merchant.vasp",
+          "role": "Merchant",
+          "for": "merchant",
           "policies": [
             {
               "@type": "RequirePresentation",
-              "@context": ["https://schema.org/Person"],
               "fromAgent": "originator",
-              "aboutParty": "originator",
-              "presentationDefinition": "https://tap.rsvp/presentation-definitions/email/v1"
+              "credentialType": "email"
             }
           ]
         }
