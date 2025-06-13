@@ -767,7 +767,9 @@ The body object must contain:
       "type": "ServiceAgent",
       "serviceUrl": "https://b2b-service/did-comm"
     },
-    "for": "did:example:business-customer",
+    "principal": {
+      "@id": "did:example:business-customer"
+    },
     "constraints": {
       "purposes": ["BEXP", "SUPP"],
       "categoryPurposes": ["CASH", "CCRD"],
@@ -797,7 +799,9 @@ The body object must contain:
       "name": "Example Store",
       "type": "Merchant"
     },
-    "for": "did:web:merchant.vasp",
+    "principal": {
+      "@id": "did:web:merchant.vasp"
+    },
     "constraints": {
       "purposes": ["RCPT"],
       "categoryPurposes": ["EPAY"],
@@ -904,7 +908,7 @@ Requests a connection between agents with specified constraints.
 | @context | string | Yes | Draft ([TAIP-15]) | JSON-LD context "https://tap.rsvp/schema/1.0" |
 | @type | string | Yes | Draft ([TAIP-15]) | JSON-LD type "https://tap.rsvp/schema/1.0#Connect" |
 | agent | object | No | Draft ([TAIP-15]) | Details of the requesting agent |
-| for | string | Yes | Draft ([TAIP-15]) | DID of the party the agent represents |
+| principal | [Party](#party) | Yes | Draft ([TAIP-15]) | Party object representing the principal the agent acts on behalf of |
 | constraints | object | Yes | Draft ([TAIP-15]) | Transaction constraints for the connection |
 | expiry | string | No | Draft ([TAIP-15]) | ISO 8601 datetime indicating when the connection request expires |
 
@@ -926,7 +930,9 @@ Requests a connection between agents with specified constraints.
       "type": "ServiceAgent",
       "serviceUrl": "https://b2b-service/did-comm"
     },
-    "for": "did:example:business-customer",
+    "principal": {
+      "@id": "did:example:business-customer"
+    },
     "constraints": {
       "purposes": ["BEXP", "SUPP"],
       "categoryPurposes": ["CASH", "CCRD"],
@@ -983,7 +989,7 @@ This flow demonstrates establishing a connection between a B2B service and a VAS
 #### 1. Connect Request
 ```json
 {
-  "id": "123e4567-e89b-12d3-a456-426614174000",
+  "id": "connect-123",
   "type": "https://tap.rsvp/schema/1.0#Connect",
   "from": "did:example:b2b-service",
   "to": ["did:example:vasp"],
@@ -998,7 +1004,9 @@ This flow demonstrates establishing a connection between a B2B service and a VAS
       "type": "ServiceAgent",
       "serviceUrl": "https://b2b-service/did-comm"
     },
-    "for": "did:example:business-customer",
+    "principal": {
+      "@id": "did:example:business-customer"
+    },
     "constraints": {
       "purposes": ["BEXP", "SUPP"],
       "categoryPurposes": ["CASH", "CCRD"],
@@ -1050,12 +1058,12 @@ This flow demonstrates establishing a connection between a B2B service and a VAS
 #### 4. Using the connection for a transfer
 ```json
 {
-  "id": "456789ab-e89b-12d3-a456-426614174005",
+  "id": "transfer-123",
   "type": "https://tap.rsvp/schema/1.0#Transfer",
   "from": "did:example:b2b-service",
   "to": ["did:example:vasp"],
-  "pthid": "123e4567-e89b-12d3-a456-426614174000",
-  "created_time": 1516269026,
+  "pthid": "connect-123",
+  "created_time": 1516269024,
   "body": {
     "@context": "https://tap.rsvp/schema/1.0",
     "@type": "https://tap.rsvp/schema/1.0#Transfer",
@@ -1066,7 +1074,10 @@ This flow demonstrates establishing a connection between a B2B service and a VAS
     },
     "agents": [
       {
-        "@id": "did:example:b2b-service"
+        "@id": "did:example:b2b-service",
+        "principal": {
+          "@id": "did:example:business-customer"
+        }
       },
       {
         "@id": "did:example:vasp"

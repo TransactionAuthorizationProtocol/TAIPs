@@ -20,7 +20,9 @@
         "type": "ServiceAgent",
         "serviceUrl": "https://b2b-service.example/did-comm"
       },
-      "for": "did:web:business-customer.example",
+      "principal": {
+        "@id": "did:web:business-customer.example"
+      },
       "constraints": {
         "purposes": ["BEXP", "SUPP"],
         "categoryPurposes": ["CASH", "CCRD"],

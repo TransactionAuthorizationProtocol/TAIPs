@@ -17,7 +17,9 @@
         "@id": "did:web:b2b-service.example",
         "name": "B2B Payment Service"
       },
-      "for": "did:web:business-customer.example"
+      "principal": {
+        "@id": "did:web:business-customer.example"
+      }
     }
   },
   "expectedResult": {

@@ -619,10 +619,10 @@ export interface Connect extends TapMessageObject<"Connect"> {
   };
 
   /**
-   * DID of the represented parties
-   * The parties the agent acts on behalf of
+   * Party object representing the principal the agent acts on behalf of
+   * As defined in TAIP-6
    */
-  for: DID | DID[];
+  principal: Participant<"Party">;
 
   /**
    * Transaction constraints
