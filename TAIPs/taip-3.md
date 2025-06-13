@@ -49,7 +49,7 @@ As specified in [TAIP-2] the message body is [JSON-LD]. The following attributes
 * `@type` - REQUIRED the JSON-LD type `https://tap.rsvp/schema/1.0#Transfer`
 * `asset` - REQUIRED the [CAIP-19](CAIP-19) or [DTI] identifier of the asset
 * `amount` - OPTIONAL for NFTs and REQUIRED for fungible tokens. Specified as a string with the full amount as a decimal representation of the token
-* `originator` - REQUIRED an object representing the originating (aka the sender) party (see [TAIP-6](TAIP-6))
+* `originator` - OPTIONAL an object representing the originating (aka the sender) party (see [TAIP-6](TAIP-6))
 * `beneficiary` - OPTIONAL an object representing the beneficiary (aka the recipient) party if different than the `originator` (see [TAIP-6](TAIP-6))
 * `settlementId` - OPTIONAL a [CAIP-220](https://github.com/ChainAgnostic/CAIPs/pull/221/files) identifier of the underlying settlement transaction on a blockchain. For more details see below.
 * `agents` - REQUIRED an array of identity objects representing the agents who help execute the transaction. See [TAIP-5](TAIP-5) for more.
@@ -113,7 +113,7 @@ https://example.com/path?_oobid=2e9e257c-2839-4fae-b0c4-dcd4e2159f4e
 ```
 
 Where the `_oob` parameter contains the base64url-encoded Out-of-Band message, or the `_oobid` parameter contains a unique identifier that can be resolved to retrieve the full Out-of-Band message.
-  
+
 #### Transfer Amounts
 
 The amount of a transfer is specified as `amount` and represents the decimal value of the asset. This approach is more intuitive for most users and application developers. It is the responsibility of library and tool developers to handle any necessary conversions when interacting with blockchain protocols that may require amounts in their smallest units.
@@ -140,7 +140,7 @@ eip155:1:tx/0x3edb98c24d46d148eb926c714f4fbaa117c47b0c0821f38bfce9763604457c33
 
 If the `originator` is moving funds on their own behalf between their own wallets or accounts at different providers it is known as a first-party transfer. In this case only the `originator` is REQUIRED. The `beneficiary` can still OPTIONALLY be included for first-party transfers to indicate additional information such as account identifiers useful to the beneficiary institution.
 
-If `originator` and `beneficiary` are different it is known as a third-party transfer. 
+If `originator` and `beneficiary` are different it is known as a third-party transfer.
 
 ### Agent Roles
 
@@ -185,7 +185,7 @@ The following is a minimal first-party request for a transfer of 1.23 ETH from a
         "@id":"did:web:originator.sample"
       },
       {
-        "@id":"did:pkh:eip155:1:0x1234a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb", 
+        "@id":"did:pkh:eip155:1:0x1234a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb",
         "role":"SettlementAddress"
       }
     ]
@@ -323,7 +323,7 @@ Agents SHOULD minimize the use of end-user PII in this message, but it can be en
 [CAIP-19]: https://chainagnostic.org/CAIPs/caip-19
 [DTI]: https://www.iso.org/obp/ui/en/#iso:std:iso:24165:-1:ed-1:v1:en
 [JSON]: https://datatracker.ietf.org/doc/html/rfc8259
-[JSON-LD]: https://www.w3.org/TR/json-ld  
+[JSON-LD]: https://www.w3.org/TR/json-ld
 
 ## Copyright
 

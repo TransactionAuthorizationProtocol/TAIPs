@@ -487,7 +487,7 @@ export interface Transfer extends TapMessageObject<"Transfer"> {
    * Details of the transfer originator
    * The party initiating the transfer
    */
-  originator: Participant<"Party">;
+  originator?: Participant<"Party">;
 
   /**
    * Optional details of the transfer beneficiary

@@ -81,7 +81,7 @@ Initiates a virtual asset transfer between parties.
 | @type | string | Yes | Review ([TAIP-3]) | JSON-LD type "https://tap.rsvp/schema/1.0#Transfer" |
 | asset | string | Yes | Review ([TAIP-3]) | CAIP-19 identifier of the asset |
 | amount | string | Yes | Review ([TAIP-3]) | Decimal amount of the asset |
-| originator | [Party](#party) | Yes | Review ([TAIP-3]) | Party for the sender |
+| originator | [Party](#party) | No | Review ([TAIP-3]) | Party for the sender |
 | beneficiary | [Party](#party) | No | Review ([TAIP-3]) | Party for the recipient |
 | agents | array of [Agent](#agent) | Yes | Review ([TAIP-3]) | Array of Agents |
 | settlementId | string | No | Review ([TAIP-3]) | CAIP-220 identifier of settlement transaction |
