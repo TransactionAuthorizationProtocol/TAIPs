@@ -34,7 +34,7 @@ By standardizing these connection aspects, we enable secure B2B integrations whi
 
 ### Message Types
 
-All messages implement [TAIP-2] and are sent between [TAIP-5 Agents][TAIP-5]. Each message type has specific requirements for its body object.
+All messages implement [TAIP-2] and are sent between [TAIP-5 Agents][TAIP-5]. Each message type has specific requirements for its body object. The principal-agent relationship follows the model defined in [TAIP-6], where agents act on behalf of real-world parties.
 
 ### Connect Message
 
@@ -47,7 +47,9 @@ A message sent by an agent requesting connection to another agent:
   - `name` - OPTIONAL string human-readable name of the agent
   - `type` - OPTIONAL string type of agent (e.g. "ServiceAgent", "WalletAgent")
   - `serviceUrl` - OPTIONAL string URL for the agent's DIDComm endpoint
-- `for` - REQUIRED string DID of the party the agent represents
+- `principal` - REQUIRED [TAIP-6] Party object representing the party the agent acts on behalf of:
+  - `@id` - REQUIRED string DID or IRI of the principal party
+  - Additional attributes MAY be included as defined in [TAIP-6], such as country code, merchant category code, or other party metadata
 - `constraints` - REQUIRED object specifying the requested transaction constraints:
   - `purposes` - OPTIONAL array of [TAIP-13] purpose codes
   - `categoryPurposes` - OPTIONAL array of [TAIP-13] category purpose codes
@@ -72,8 +74,6 @@ A message sent to approve a connection request:
 
 - `@context` - REQUIRED the JSON-LD context `https://tap.rsvp/schema/1.0`
 - `@type` - REQUIRED the JSON-LD type `https://tap.rsvp/schema/1.0#Authorize`
-- `connection` - REQUIRED object containing:
-  - `id` - REQUIRED string unique identifier for the approved connection
 
 ### Reject Message
 
@@ -85,11 +85,11 @@ A message sent to reject a connection request:
 
 ### Cancel Message
 
-A message sent to terminate an existing connection:
+A message sent by principal to terminate an existing connection:
 
 - `@context` - REQUIRED the JSON-LD context `https://tap.rsvp/schema/1.0`
 - `@type` - REQUIRED the JSON-LD type `https://tap.rsvp/schema/1.0#Cancel`
-- `connection_id` - REQUIRED string identifier of the connection to cancel
+- `by` - REQUIRED should be `principal`
 - `reason` - OPTIONAL string human-readable reason for cancellation
 
 ### Connection Flow
@@ -158,7 +158,9 @@ Example Out-of-Band message with Connect request:
             "@id": "did:example:b2b-service",
             "name": "B2B Payment Service"
           },
-          "for": "did:example:business-customer",
+          "principal": {
+            "@id": "did:example:business-customer"
+          },
           "constraints": {
             "purposes": ["BEXP", "SUPP"]
           }
@@ -193,7 +195,7 @@ sequenceDiagram
     participant VASP
     participant Customer
 
-    B2B->>VASP: Connect [constraints, for: customer]
+    B2B->>VASP: Connect [constraints, principal: {id: customer, ...}]
     VASP->>Customer: Out-of-band notification
     Customer->>VASP: Review & Authorize
     VASP->>B2B: Authorize
@@ -208,7 +210,7 @@ sequenceDiagram
     participant VASP
     participant Customer
 
-    B2B->>VASP: Connect [constraints, for: customer]
+    B2B->>VASP: Connect [constraints, principal: {id: customer, ...}]
     VASP->>B2B: AuthorizationRequired [URL]
     B2B->>Customer: Redirect to authorization URL
     Customer->>VASP: Authenticate & Review
@@ -310,7 +312,9 @@ The following are example plaintext messages. See [TAIP-2] for how to sign the m
       "type": "ServiceAgent",
       "serviceUrl": "https://b2b-service/did-comm"
     },
-    "for": "did:example:business-customer",
+    "principal": {
+      "@id": "did:example:business-customer"
+    },
     "constraints": {
       "purposes": ["BEXP", "SUPP"],
       "categoryPurposes": ["CASH", "CCRD"],
@@ -422,12 +426,22 @@ The following example shows a [TAIP-3] Transfer message sent by a B2B service us
     "originator": {
       "@id": "did:example:business-customer"
     },
+    "beneficiary": {
+      "@id": "did:example:merchant"
+    },
     "agents": [
       {
-        "@id": "did:example:b2b-service"
+        "@id": "did:example:b2b-service",
+        "principal": {
+          "@id": "did:example:business-customer"
+        }
       },
       {
-        "@id": "did:example:vasp"
+        "@id": "did:example:vasp",
+        "principal": {
+          "@id": "did:example:merchant"
+        },
+        "role": "BeneficiaryVASP"
       }
     ]
   }
@@ -439,7 +453,8 @@ The receiving agent MUST:
 2. Validate that the transaction complies with the connection's constraints:
    - Check that the purpose (if specified) is allowed
    - Verify the amount is within the per-transaction and daily limits
-   - Confirm the originator matches the connection's `for` party
+   - Confirm the originator's `@id` matches the connection's `principal.@id` value
+   - Verify the agent has permission to act for the specified principal
 3. Process the transaction according to [TAIP-4] if all checks pass 
 
 
