@@ -284,9 +284,9 @@ export interface Participant<T extends ParticipantTypes>
    * Role of the participant in the transaction
    * Standard values for Agents are: "SettlementAddress", "SourceAddress", "CustodialService"
    * All role values MUST use PascalCase
-   * Required for type "Agent", optional for other types
+   * Optional for all participant types
    */
-  role: T extends "Agent" ? string : string | undefined;
+  role?: string;
 
   /**
    * DID of the party this participant acts for
