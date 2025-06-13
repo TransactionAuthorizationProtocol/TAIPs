@@ -93,6 +93,8 @@ Initiates a virtual asset transfer between parties.
 #### Examples
 
 ##### Simple first-party transfer
+This example demonstrates agents with and without the optional `role` parameter.
+
 ```json
 {
   "id": "123e4567-e89b-12d3-a456-426614174000",
@@ -1260,8 +1262,10 @@ Represents a service involved in executing transactions.
 | Attribute | Type | Required | Status | Description |
 |-----------|------|----------|---------|-------------|
 | @id | string | Yes | Review ([TAIP-5]) | DID of the agent |
-| role | string | Yes | Review ([TAIP-5]) | Role of the agent (e.g., "SettlementAddress", "SourceAddress", "CustodialService") |
-| for | string or array of strings | Yes | Review ([TAIP-5]) | Reference to the Party or Parties this agent represents. Can be either a single DID string or an array of DID strings when the agent acts on behalf of multiple entities simultaneously |
+| role | string | No | Review ([TAIP-5]) | Role of the agent (e.g., "SettlementAddress", "SourceAddress", "CustodialService") |
+| for | string or array of strings | No | Review ([TAIP-5]) | Reference to the Party or Parties this agent represents. Can be either a single DID string or an array of DID strings when the agent acts on behalf of multiple entities simultaneously |
+
+**Note:** Both `role` and `for` parameters are optional to support flexible agent configurations. The `role` parameter may be omitted when the agent's function is implicit from context or when using generic service agents. The `for` parameter may be omitted for standalone agents or when the relationship is established through other means.
 
 #### Agent Examples
 
@@ -1277,8 +1281,8 @@ Represents a service involved in executing transactions.
 ##### 2. Agent Acting for Multiple Parties
 ```json
 {
-  "@id": "did:web:goodbyefiat.com",
-  "for": ["did:eg:bob", "did:eg:alice"],
+  "@id": "did:web:shared.wallet",
+  "for": ["did:eg:alice", "did:eg:bob"],
   "role": "CustodialService"
 }
 ```
@@ -1286,9 +1290,24 @@ Represents a service involved in executing transactions.
 ##### 3. Shared Wallet Provider Acting for Multiple VASPs
 ```json
 {
-  "@id": "did:web:superwallet.com",
-  "for": ["did:web:goodbyefiat.com", "did:web:hellocrypto.com"],
+  "@id": "did:web:shared.wallet",
+  "for": ["did:web:vasp1.com", "did:web:vasp2.com"],
   "role": "CustodialService"
+}
+```
+
+##### 4. Agent Without Specific Role
+```json
+{
+  "@id": "did:web:generic.service",
+  "for": "did:eg:alice"
+}
+```
+
+##### 5. Standalone Agent (No Role or For Parameters)
+```json
+{
+  "@id": "did:web:standalone.service"
 }
 ```
 

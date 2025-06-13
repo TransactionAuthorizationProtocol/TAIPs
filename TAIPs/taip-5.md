@@ -75,7 +75,7 @@ The following example shows its use in a [TAIP-3] message:
 The following are the attributes of an object in the `agents` array:
 
 - `@id` - REQUIRED the [DID] of the Agent
-- `role` - REQUIRED a string or an array of strings as specified for the particular kind of transaction. Eg. `SettlementAddress` for [TAIP-3]
+- `role` - OPTIONAL a string or an array of strings as specified for the particular kind of transaction. Eg. `SettlementAddress` for [TAIP-3]
 - `for` - REQUIRED a [DID] or an array of DIDs of another Agent or Party that this agent acts on behalf of in this transaction.
 - `policies` - OPTIONAL an array of [TAIP-7 Policies][TAIP-7]
 
@@ -603,7 +603,7 @@ The following are example plaintext messages. See [TAIP-2] for how to sign the m
 
 ## Security Considerations
 <!--Please add an explicit list of intra-actor assumptions and known risk factors if applicable. Any normative definition of an interface requires these to be implementable; assumptions and risks should be at both individual interaction/use-case scale and systemically, should the interface specified gain ecosystem-namespace adoption. -->
-As in any decentralized messaging protocol, it is paramount that the recipient of messages trust the senders in the context of a particular transaction. The DIDComm Messaging defined in [TAIP-2] verifies that messages are created by a specific agent. This does not mean you can necessarily trust their statements. 
+As in any decentralized messaging protocol, it is paramount that the recipient of messages trust the senders in the context of a particular transaction. The DIDComm Messaging defined in [TAIP-2] verifies that messages are created by a specific agent. This does not mean you can necessarily trust their statements.
 
 As an example a message from `did:web:originator.vasp` proves that someone allowed access to creating files the website at the domain `originator.vasp` created a [WEB-DID] with the public keys. But leaves a lot of other questions open:
 
@@ -637,7 +637,7 @@ As such internal and external trust tools need to be handled. This is out of sco
 - [DIDCommOOB] DIDComm Out-of-Band
 - [PKH-DID] `did:pkh` specification
 - [WEB-DID] `did:web` specification
-  
+
 [TAIP-2]: ./taip-2
 [TAIP-3]: ./taip-3
 [TAIP-4]: ./taip-4
