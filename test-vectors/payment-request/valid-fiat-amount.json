@@ -35,7 +35,7 @@
           "policies": [
             {
               "@type": "RequirePresentation",
-              "fromAgent": "originator",
+              "fromAgent": "customer",
               "credentialType": "email"
             }
           ]
