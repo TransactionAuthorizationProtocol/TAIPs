@@ -88,6 +88,7 @@ Initiates a virtual asset transfer between parties.
 | purpose | string | No | Draft ([TAIP-13]) | ISO 20022 purpose code indicating the reason for the transfer |
 | categoryPurpose | string | No | Draft ([TAIP-13]) | ISO 20022 category purpose code for high-level classification |
 | expiry | string | No | Review ([TAIP-3]) | ISO 8601 datetime indicating when the transfer request expires |
+| policies | array of [Policy](#policy) | No | Review ([TAIP-3]) | Array of policy objects defining requirements for the transaction |
 
 #### Examples
 
@@ -178,6 +179,7 @@ Initiates a payment request from a merchant to a customer.
 | merchant | [Party](#party) | Yes | Review ([TAIP-14]) | Party for the merchant (beneficiary) |
 | customer | [Party](#party) | No | Review ([TAIP-14]) | Party for the customer (originator) |
 | agents | array of [Agent](#agent) | Yes | Review ([TAIP-14]) | Array of agents involved in the payment request |
+| policies | array of [Policy](#policy) | No | Review ([TAIP-14]) | Array of policy objects defining requirements that must be satisfied by the customer's agent |
 
 #### Examples
 
@@ -391,6 +393,7 @@ Terminates an existing transaction or connection. When used with transactions, i
 |-----------|------|----------|---------|-------------|
 | @context | string | Yes | Review ([TAIP-4]) | JSON-LD context "https://tap.rsvp/schema/1.0" |
 | @type | string | Yes | Review ([TAIP-4]) | JSON-LD type "https://tap.rsvp/schema/1.0#Cancel" |
+| by | string | Yes | Review ([TAIP-4]) | The party of the transaction wishing to cancel it (e.g., "originator" or "beneficiary" for Transfer messages) |
 | reason | string | No | Review ([TAIP-4]) | Human readable reason for cancellation |
 
 #### Example Cancel Message
@@ -405,6 +408,7 @@ Terminates an existing transaction or connection. When used with transactions, i
   "body": {
     "@context": "https://tap.rsvp/schema/1.0",
     "@type": "https://tap.rsvp/schema/1.0#Cancel",
+    "by": "originator",
     "reason": "user_requested"
   }
 }
@@ -1067,6 +1071,7 @@ Terminates an existing connection.
 |-----------|------|----------|---------|-------------|
 | @context | string | Yes | Draft ([TAIP-4]) | JSON-LD context "https://tap.rsvp/schema/1.0" |
 | @type | string | Yes | Draft ([TAIP-4]) | JSON-LD type "https://tap.rsvp/schema/1.0#Cancel" |
+| by | string | Yes | Draft ([TAIP-4]) | The party of the transaction wishing to cancel it (e.g., "originator" or "beneficiary" for Transfer messages) |
 | reason | string | No | Draft ([TAIP-4]) | Human readable reason for cancellation |
 
 #### Example Cancel Message
@@ -1080,6 +1085,7 @@ Terminates an existing connection.
   "body": {
     "@context": "https://tap.rsvp/schema/1.0",
     "@type": "https://tap.rsvp/schema/1.0#Cancel",
+    "by": "customer",
     "reason": "User declined payment request"
   }
 }
@@ -1340,6 +1346,55 @@ Represents a service involved in executing transactions.
   "aboutAgent": "did:pkh:eip155:1:0x1234a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb",
   "reason": "Please confirm control of the settlement address"
 }
+```
+
+## Out-of-Band Message Initiation
+
+### Overview
+[TAIP-3], [TAIP-14] - Review
+
+When parties haven't established communication, TAP messages can be initiated using DIDComm Out-of-Band (OOB) messages. This enables sharing transaction requests through URLs or QR codes.
+
+### Requirements
+
+1. MUST use the `https://didcomm.org/out-of-band/2.0` protocol
+2. MUST include the appropriate goal_code:
+   - `tap.transfer` for Transfer messages
+   - `tap.payment` for Payment messages
+3. SHOULD be shared as URLs according to the [Out-of-Band message spec](https://identity.foundation/didcomm-messaging/spec/v2.1/#out-of-band-messages)
+4. MUST include the TAP message as a signed DIDComm message in the attachment
+
+### Example Out-of-Band Transfer
+
+```json
+{
+  "type": "https://didcomm.org/out-of-band/2.0/invitation",
+  "id": "2e9e257c-2839-4fae-b0c4-dcd4e2159f4e",
+  "from": "did:example:originator",
+  "body": {
+    "goal_code": "tap.transfer",
+    "goal": "Process transfer request",
+    "accept": ["didcomm/v2"]
+  },
+  "attachments": [{
+    "id": "transfer-1",
+    "mime_type": "application/didcomm-signed+json",
+    "data": {
+      "json": {
+        "payload": "eyJpZCI6IjU5OWY3MjIwLTYxNDktNGM0NS1hZGJiLTg2ZDk2YzhlMDYwOCIsInR5cGUiOiJodHRwczovL3RhcC5yc3ZwL3NjaGVtYS8xLjAjVHJhbnNmZXIiLCJmcm9tIjoiZGlkOmV4YW1wbGU6b3JpZ2luYXRvciIsImJvZHkiOnsiQGNvbnRleHQiOiJodHRwczovL3RhcC5yc3ZwL3NjaGVtYS8xLjAiLCJAdHlwZSI6Imh0dHBzOi8vdGFwLnJzdnAvc2NoZW1hLzEuMCNUcmFuc2ZlciIsImFzc2V0IjoiZWlwMTU1OjEvc2xpcDQ0OjYwIiwiYW1vdW50IjoiMTAwLjAwIn19",
+        "signatures": [{
+          "protected": "eyJ0eXAiOiJKV1QiLCJhbGciOiJFZERTQSIsImtpZCI6ImRpZDpleGFtcGxlOm9yaWdpbmF0b3Ija2V5LTEifQ",
+          "signature": "FW33NnvOHV0Ted9-F7GZbkia-vYAfBKtH4oBxbrttWAhBZ6UFJMxcGjL3lwOl4YohI3kyyd2LqvFHsEFk7R7Cg"
+        }]
+      }
+    }
+  }]
+}
+```
+
+The corresponding URL format would be:
+```
+https://example.com/tap?_oob=eyJ0eXAiOiJKV1QiLCJhbGciOiJFZERTQSJ9...
 ```
 
 ## Message Flow Examples
@@ -1719,6 +1774,7 @@ Note that all messages in this flow share the same thread ID (`payment-123`) to 
   "body": {
     "@context": "https://tap.rsvp/schema/1.0",
     "@type": "https://tap.rsvp/schema/1.0#Cancel",
+    "by": "customer",
     "reason": "User declined payment request"
   }
 }
@@ -1738,6 +1794,7 @@ Note that all messages in this flow share the same thread ID (`payment-123`) to 
   "body": {
     "@context": "https://tap.rsvp/schema/1.0",
     "@type": "https://tap.rsvp/schema/1.0#Cancel",
+    "by": "originator",
     "reason": "User cancelled the request"
   }
 }
@@ -1755,6 +1812,7 @@ Note that all messages in this flow share the same thread ID (`payment-123`) to 
   "body": {
     "@context": "https://tap.rsvp/schema/1.0",
     "@type": "https://tap.rsvp/schema/1.0#Cancel",
+    "by": "originator",
     "reason": "Service agreement terminated"
   }
 }
