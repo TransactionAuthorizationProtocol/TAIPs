@@ -43,30 +43,6 @@ The Authorize message indicates the beneficiary approves the transaction after c
 - Provides the originator legal clearance to execute the transaction
 - Creates an audit trail of approval for regulatory purposes
 
-### Complete
-
-The Complete message is specifically used in the Payment flow, sent by the merchant's agent to indicate the transaction is ready for settlement. It replaces the previously confusing use of Authorize for this purpose.
-
-**Business Implications**:
-- Clearly distinguishes merchant readiness for settlement from general authorization
-- Provides the settlement address where funds should be sent
-- Can specify an adjusted final amount (which must be less than or equal to the original requested amount)
-- Enables flexible payment scenarios like partial fulfillment or applied discounts
-- Creates a precise payment instruction for the customer's agent to follow
-
-```mermaid
-sequenceDiagram
-    participant Customer as Customer (Originator)
-    participant Merchant as Merchant (Beneficiary)
-    Merchant->>Customer: Payment (initial request)
-    Note over Customer: Customer reviews and decides
-    Customer->>Merchant: Authorize (accepts payment)
-    Note over Merchant: Process payment request
-    Merchant->>Customer: Complete (with settlement address, optional adjusted amount)
-    Note over Customer: Execute on-chain payment
-    Customer->>Merchant: Settle (with settlement proof and matching amount)
-```
-
 ### Reject
 
 The Reject message indicates the beneficiary cannot approve the transaction. A clear reason must be provided to help the originator understand the compliance issue.
@@ -94,7 +70,7 @@ The Settle message confirms that the originator has executed the authorized tran
 - Creates a record linking off-chain authorization to on-chain settlement
 - Enables reconciliation between compliance systems and blockchain transactions
 - Completes the authorization-settlement cycle for audit purposes
-- May include an amount field that must match any amount specified in a preceding Complete message
+- May include an amount field that must match any amount specified in a preceding Authorize message
 - Supports partial payment scenarios when used with the amount field
 
 ### Cancel
@@ -141,7 +117,7 @@ sequenceDiagram
 
 ### Payment Flow
 
-When using the Payment message type, the flow now includes the Complete message to clearly indicate settlement readiness.
+When using the Payment message type, the flow follows a request-response pattern where the merchant initiates and the customer responds.
 
 ```mermaid
 sequenceDiagram
@@ -149,18 +125,18 @@ sequenceDiagram
     participant Merchant as Merchant (Beneficiary)
     Merchant->>Customer: Payment
     Note over Customer: Customer reviews and decides
-    Customer->>Merchant: Authorize (accepts payment)
+    Customer->>Merchant: Authorize (with settlementAsset)
     Note over Merchant: Process payment request
-    Merchant->>Customer: Complete (provides settlement address, optional adjusted amount)
+    Merchant->>Customer: Authorize (with settlementAddress)
     Note over Customer: Execute on-chain payment
-    Customer->>Merchant: Settle (with settlement proof and matching amount)
+    Customer->>Merchant: Settle (with settlement proof)
 ```
 
-This improved flow:
-- Clearly separates the customer's acceptance of the payment (Authorize) from the merchant's readiness to receive it (Complete)
-- Allows merchants to specify a final settlement amount that may differ from the original requested amount
-- Ensures the customer's wallet sends the correct amount specified in the Complete message
-- Creates a more intuitive payment experience that mirrors traditional payment flows
+This flow:
+- Allows the customer to specify which asset they'll use for payment (when multiple supportedAssets are available)
+- Enables the merchant to provide the settlement address after knowing which asset will be used
+- Creates a clear authorization chain before on-chain settlement
+- Mirrors traditional payment authorization flows
 
 ### Authorization with Travel Rule Information
 
