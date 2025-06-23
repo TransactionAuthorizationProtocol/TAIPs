@@ -28,7 +28,7 @@
         "categoryPurposes": ["CASH", "CCRD"],
         "limits": {
           "per_transaction": "10000.00",
-          "daily": "50000.00",
+          "per_day": "50000.00",
           "currency": "USD"
         }
       }

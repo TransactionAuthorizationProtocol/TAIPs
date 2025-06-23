@@ -635,6 +635,12 @@ export interface Connect extends TapMessageObject<"Connect"> {
    * Indicates when the connection request expires
    */
   expiry?: ISO8601DateTime;
+
+  /**
+   * Optional agreement reference
+   * URL or identifier of terms agreed to by the principal
+   */
+  agreement?: string;
 }
 
 /**
@@ -906,13 +912,31 @@ export interface TransactionConstraints {
      * Maximum amount per transaction
      * Decimal string representation
      */
-    per_transaction: Amount;
+    per_transaction?: Amount;
 
     /**
-     * Maximum daily total
+     * Maximum per-day total
      * Decimal string representation
      */
-    daily: Amount;
+    per_day?: Amount;
+
+    /**
+     * Maximum weekly total
+     * Decimal string representation
+     */
+    per_week?: Amount;
+
+    /**
+     * Maximum monthly total
+     * Decimal string representation
+     */
+    per_month?: Amount;
+
+    /**
+     * Maximum yearly total
+     * Decimal string representation
+     */
+    per_year?: Amount;
 
     /**
      * Currency for the limits

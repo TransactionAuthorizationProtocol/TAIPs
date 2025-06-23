@@ -16,19 +16,24 @@ A standard protocol for establishing secure, authorized connections between agen
 
 ## Abstract
 
-This TAIP defines a protocol for agents to establish secure, authorized connections with each other, particularly for ongoing business relationships. It builds on [TAIP-2] messaging, [TAIP-9] relationship proofs, and [TAIP-13] purpose codes to provide a standardized way for agents to request and authorize connections with transaction constraints. The protocol includes OAuth-style authorization flows, allowing interactive user consent when needed, and supports defining transaction limits and allowed purposes upfront.
+This TAIP defines a protocol for agents to establish secure, authorized connections with each other, particularly for ongoing business relationships like agentic initiated transaction workflows as well as recurring and metered billing. It builds on [TAIP-2] messaging, [TAIP-9] relationship proofs, and [TAIP-13] purpose codes to provide a standardized way for agents to request and authorize connections with transaction constraints. The protocol includes OAuth-style authorization flows, allowing interactive user consent when needed, and supports defining transaction limits and allowed purposes upfront.
 
 ## Motivation
 
 The Transaction Authorization Protocol enables secure communication between different agents (AI Agents, VASPs, wallets, custodians, etc.). However, for ongoing business relationships, agents need a way to establish persistent, authorized connections with predefined constraints. Current implementations often rely on ad-hoc methods or require repeated authorizations. This TAIP addresses several key needs:
 
-1. **Business Integration:** B2B services need to connect securely with their customers' accounts at VASPs or custodians for ongoing transactions on behalf of the customer.
-2. **User Authorization:** Account holders must explicitly authorize agent connections through familiar OAuth-style flows.
-3. **Transaction Constraints:** Connections should specify upfront what types of transactions are allowed (purposes, limits).
-4. **Relationship Verification:** Agents must prove their relationship to the parties they represent.
-5. **Risk Management:** Receiving agents need to maintain state and manage risk in real-time.
+1. **AI Agent Transactions:** Autonomous AI agents executing trades, payments, or financial operations within user-defined limits and purposes (e.g., trading bot with $10k daily limit for crypto arbitrage).
+2. **Subscription & Recurring Payments:** SaaS platforms, streaming services, and membership organizations collecting recurring fees (e.g., monthly Netflix subscription, annual software licenses, usage-based cloud billing).
+3. **Self-Onboarding Services:** Entities directly onboarding with service providers where the agent and principal are the same party (e.g., a merchant directly connecting to a payment processor's API, a business self-registering with a financial platform).
 
-By standardizing these connection aspects, we enable secure B2B integrations while maintaining user control and risk management.
+4. **Corporate Treasury Management:** CFO tools and treasury platforms managing cash flows, vendor payments, and payroll on behalf of businesses (e.g., automated supplier payments, cross-border payroll processing).
+5. **Expense Management Systems:** Corporate payment wallet programs and expense platforms processing employee reimbursements and vendor payments (e.g., Expensify submitting reimbursements, Ramp processing corporate card settlements).
+6. **Marketplace & Platform Payouts:** E-commerce platforms, gig economy apps, and creator platforms distributing earnings (e.g., Shopify merchant payouts, Uber driver payments, YouTube creator revenue sharing).
+7. **Automated Compliance & Reporting:** RegTech solutions performing automated transaction monitoring, tax withholding, and regulatory reporting (e.g., automatic tax payments, AML transaction screening).
+8. **Cross-Border Payment Services:** International payment providers and remittance services executing FX conversions and transfers (e.g., Wise business accounts, payroll providers handling multi-currency payments).
+9. **DeFi Protocol Integration:** Decentralized protocols performing automated yield farming, liquidity provision, or collateral management (e.g., auto-compounding vaults, algorithmic trading strategies).
+
+By standardizing these connection aspects, we enable secure B2B integrations while maintaining user control and risk management. Each connection enforces specific constraints including transaction limits, allowed purposes, and time boundaries.
 
 ## Specification
 
@@ -43,7 +48,7 @@ A message sent by an agent requesting connection to another agent:
 - `@context` - REQUIRED the JSON-LD context `https://tap.rsvp/schema/1.0`
 - `@type` - REQUIRED the JSON-LD type `https://tap.rsvp/schema/1.0#Connect`
 - `agent` - OPTIONAL object containing information about the requesting agent:
-  - `@id` - REQUIRED string DID of the requesting agent
+  - `@id` - REQUIRED string DID of the requesting agent. If the `agent` object is included, the `@id` MUST match the `from` field of the surrounding DIDComm message
   - `name` - OPTIONAL string human-readable name of the agent
   - `type` - OPTIONAL string type of agent (e.g. "ServiceAgent", "WalletAgent")
   - `serviceUrl` - OPTIONAL string URL for the agent's DIDComm endpoint
@@ -55,8 +60,12 @@ A message sent by an agent requesting connection to another agent:
   - `categoryPurposes` - OPTIONAL array of [TAIP-13] category purpose codes
   - `limits` - OPTIONAL object containing transaction limits:
     - `per_transaction` - OPTIONAL string decimal amount
-    - `daily` - OPTIONAL string decimal amount
+    - `per_day` - OPTIONAL string decimal amount
+    - `per_week` - OPTIONAL string decimal amount
+    - `per_month` - OPTIONAL string decimal amount
+    - `per_year` - OPTIONAL string decimal amount
     - `currency` - REQUIRED string ISO 4217 currency code if limits are specified
+- `agreement` - OPTIONAL string URL pointing to terms of service or agreement between the principal and requesting agent
 - `expiry` - OPTIONAL timestamp in ISO 8601 format indicating when the connection request expires. After this time, if no authorization has occurred, the connection request should be considered invalid. This is distinct from the technical message expiry handled by the DIDComm `expires_time` header.
 
 ### AuthorizationRequired Message
@@ -98,7 +107,7 @@ A message sent by principal to terminate an existing connection:
    - Their identity and endpoints
    - The party they represent
    - Desired transaction constraints
-   
+
 2. Agent B chooses an authorization method:
    - Option 1: Out-of-band Authorization
      - Notifies customer through existing channels
@@ -163,7 +172,8 @@ Example Out-of-Band message with Connect request:
           },
           "constraints": {
             "purposes": ["BEXP", "SUPP"]
-          }
+          },
+          "agreement": "https://b2b-service.com/terms"
         },
         "attachments": [],
         "created_time": 1516269022
@@ -320,10 +330,11 @@ The following are example plaintext messages. See [TAIP-2] for how to sign the m
       "categoryPurposes": ["CASH", "CCRD"],
       "limits": {
         "per_transaction": "10000.00",
-        "daily": "50000.00",
+        "per_day": "50000.00",
         "currency": "USD"
       }
     },
+    "agreement": "https://b2b-service.com/terms/api-agreement",
     "expiry": "2024-03-22T15:00:00Z"
   }
 }
@@ -402,6 +413,51 @@ The following are example plaintext messages. See [TAIP-2] for how to sign the m
 }
 ```
 
+### Self-Onboarding Example
+
+The following example shows a merchant directly onboarding with a payment processor where the agent and principal are the same entity:
+
+```json
+{
+  "id": "789abcde-e89b-12d3-a456-426614174006",
+  "type": "https://tap.rsvp/schema/1.0#Connect",
+  "from": "did:example:merchant",
+  "to": ["did:example:payment-processor"],
+  "created_time": 1516269027,
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#Connect",
+    "agent": {
+      "@id": "did:example:merchant",
+      "name": "Example Merchant",
+      "type": "ServiceAgent"
+    },
+    "principal": {
+      "@id": "did:example:merchant",
+      "name": "Example Merchant Inc.",
+      "countryCode": "US",
+      "merchantCategoryCode": "5411"
+    },
+    "constraints": {
+      "purposes": ["SALA", "GDDS"],
+      "limits": {
+        "per_transaction": "5000.00",
+        "per_day": "25000.00",
+        "currency": "USD"
+      }
+    },
+    "agreement": "https://payment-processor.com/merchant-agreement",
+    "expiry": "2024-03-25T00:00:00Z"
+  }
+}
+```
+
+In this self-onboarding case:
+- The `agent.@id` and `principal.@id` are the same DID (`did:example:merchant`)
+- The `agent.@id` matches the `from` field of the DIDComm message
+- The merchant is acting as both the technical agent and the business principal
+- The `agreement` field points to the merchant agreement terms
+
 ## Using Connections for Transactions
 
 Once a connection is established, the connecting agent can perform transactions on behalf of the customer. All transactions related to a connection MUST include the connection's `id` as the `pthid` (parent thread ID) in the message header. This allows receiving agents to validate the transaction against the connection's constraints.
@@ -455,7 +511,7 @@ The receiving agent MUST:
    - Verify the amount is within the per-transaction and daily limits
    - Confirm the originator's `@id` matches the connection's `principal.@id` value
    - Verify the agent has permission to act for the specified principal
-3. Process the transaction according to [TAIP-4] if all checks pass 
+3. Process the transaction according to [TAIP-4] if all checks pass
 
 
 ## References
