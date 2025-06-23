@@ -39,8 +39,8 @@ The following attributes from DIDComm are used in TAP:
 * `type` - REQUIRED. A URI that associates the `type` of message being sent in the body. A URI that associates the body of a plaintext message with a published and versioned schema. Core TAP Messages defined as part of TAIPs SHOULD be use an URI in the `https://tap.rsvp/taips/N` namespace.
 * `from` - REQUIRED. The DID of the sender
 * `to` - REQUIRED. An array containing the DIDs of the recipients
-* `thid` - OPTIONAL. Thread identifier. Uniquely identifies the thread that the message belongs to. If not included, the id property of the message MUST be treated as the value of the thid. 
-* `pthid` - OPTIONAL. Parent thread identifier. If the message is a child of a thread the pthid will uniquely identify which thread is the parent.
+* `thid` - OPTIONAL. Thread identifier. Uniquely identifies the thread that the message belongs to. If not included, the id property of the message MUST be treated as the value of the thid.
+* `pthid` - OPTIONAL. Parent thread identifier. If the message is a child of a thread the pthid will uniquely identify which thread is the parent. Within TAP this is used to identity parent transactions as part of complex payment work flows.
 * `body` - REQUIRED. The message body, which MUST contain a valid [JSON-LD] object.
 * `created_time` - REQUIRED. The time the message was created.
 * `expires_time` - OPTIONAL. The time the message expires. A recipient MUST ignore the message after this time. This applies to the technical expiration of the message itself.
@@ -56,7 +56,7 @@ Message signing SHOULD use one of the following algorithms, that are commonly us
 * EdDSA (with crv=Ed25519) - Elliptic curve digital signature with Edwards curves and SHA-512
 * ES256K - Elliptic curve digital signature with Secp256k1 keys
 
-#### Verification of a Signed Message 
+#### Verification of a Signed Message
 
 Public key resolution should be performed as specified in DIDComm by looking up the messages `kid` in the senders [DID Document](https://www.w3.org/TR/did-core/#authentication).
 

@@ -46,7 +46,7 @@ sequenceDiagram
     Originator -->> Originating Wallet: Authorize
     Originating Wallet->>Blockchain: Submit Transaction
     Blockchain ->> Beneficiary Wallet: Validated Transaction
-    Beneficiary Wallet -->> Beneficiary: Notify      
+    Beneficiary Wallet -->> Beneficiary: Notify
 ```
 
 Once a transaction is authorized and submitted to the blockchain by the originating wallet’s key holders, it is impossible by design to reverse the transaction, representing a significant change over traditional payment systems that separate payment authorizations from the underlying settlement.
@@ -105,7 +105,9 @@ Any agent can authorize the transaction by replying as a thread to the initial m
 
 - `@context` - REQUIRED the JSON-LD context `https://tap.rsvp/schema/1.0`
 - `@type` - REQUIRED the JSON-LD type `https://tap.rsvp/schema/1.0#Authorize`
-- `settlementAddress` - OPTIONAL string representing the intended destination address of the transaction specified in [CAIP-10](CAIP-10) format. If sent by a VASP representing the beneficiary this is REQUIRED unless the original request contains an agent with the `settlementAddress` role. For all others it is OPTIONAL.
+- `settlementAddress` - OPTIONAL string representing the intended destination address of the transaction specified in [CAIP-10](CAIP-10) format. If sent by an Agent representing the beneficiary this is REQUIRED unless the original request contains an agent with the `settlementAddress` role. For all others it is OPTIONAL.
+- `settlementAsset` - OPTIONAL string representing an asset for settlement in [CAIP-19] format. If multiple `supportedAssets` are presentented in the Transaction message (eg. `Payment` from [TAIP-14]) then an agent representing the sending side of the transaction is REQUIRED to specify the `settlementAsset` as part of their authorization, so the receiving side can specify the correct `settlementAddress`
+- `amount` - OPTIONAL string with the full amount as a decimal representation of the `settlementAsset` in case it is different than the original `Payment` or `Transfer` message.
 - `expiry` - OPTIONAL timestamp in ISO 8601 format indicating when the authorization expires. After this time, if settlement has not occurred, the authorization should be considered invalid and settlement should not proceed. In merchant payment flows, the customer's wallet may either repeat the merchant's specified expiration time or override it with a different time.
 
 By not providing a `settlementAddress` until after `Authorization`, beneficiary agents can reject incoming blockchain transactions for the first time.
@@ -139,7 +141,7 @@ sequenceDiagram
     Participant Originating Agent
     Participant Beneficiary WalletAPI
     Participant Beneficiary Agent
-    
+
     Originating Agent ->> Beneficiary Agent: Transfer
     Beneficiary Agent ->> Originating Agent: Authorize
     Beneficiary WalletAPI ->> Originating Agent: Authorize [settlementAddress]
@@ -154,7 +156,7 @@ An originating agent notifies the other agents in the same thread that they are 
 - `@context` - REQUIRED the JSON-LD context `https://tap.rsvp/schema/1.0`
 - `@type` - REQUIRED the JSON-LD type `https://tap.rsvp/schema/1.0#Settle`
 - `settlementId` - OPTIONAL a [CAIP-220](https://github.com/ChainAgnostic/CAIPs/pull/221/files) identifier of the underlying settlement transaction on a blockchain. REQUIRED by at least one agent representing the originator.
-- `amount` - OPTIONAL string containing a decimal representation of the settled amount. If specified, this MUST be less than or equal to the amount in the original transaction message. If a `Complete` message was received with an amount specified, then the amount in the `Settle` message MUST match that value. If omitted, the full amount from the original transaction message is implied.
+- `amount` - OPTIONAL string containing a decimal representation of the settled amount. If specified, this MUST be less than or equal to the amount in the original transaction message. If a `Authorize` message was received with an amount specified, then the amount in the `Settle` message MUST match that value. If omitted, the full amount from the original transaction message is implied.
 
 The following shows an simplified authorization flow with a succesfull outcome (transaction settled):
 
@@ -177,7 +179,7 @@ sequenceDiagram
     Participant Beneficiary Agent
 
     Originating Agent ->> Beneficiary Agent: Transfer
-    Beneficiary Agent ->> Originating Agent: Authorize    
+    Beneficiary Agent ->> Originating Agent: Authorize
     Originating Agent ->> Beneficiary Agent: Settle
     Originating WalletAPI ->> Beneficiary Agent: Settle [settlementId]
 ```
@@ -217,7 +219,7 @@ sequenceDiagram
 
     Originating Agent ->> Beneficiary Agent: Transfer
     Beneficiary Agent ->> Originating Agent: Reject
-    
+
 ```
 
 Any agent can `Reject` a Transfer. Even after others have authorized it. As an example an originating agent could reject a transaction authorized by the beneficiary agent, after the `settlementAddress` had too high a risk score.
@@ -230,7 +232,7 @@ sequenceDiagram
     Originating Agent ->> Beneficiary Agent: Transfer
     Beneficiary Agent ->> Originating Agent: Authorize [settlementAddress]
     Originating Agent ->> Originating Agent: Reject
-    
+
 ```
 
 ### Cancel
@@ -254,7 +256,7 @@ sequenceDiagram
     Participant Beneficiary Agent
 
     Originating Agent ->> Beneficiary Agent: Transfer
-    Originating Agent ->> Originating Agent: Cancel    
+    Originating Agent ->> Originating Agent: Cancel
 ```
 
 Any party can `Cancel` a Transfer through an agent acting on their behalf. Even after others have authorized it. As an example an originating cancel could reject a transaction authorized by the beneficiary agent because it took too long to authorize.
@@ -267,12 +269,12 @@ sequenceDiagram
     Originating Agent ->> Beneficiary Agent: Transfer
     Beneficiary Agent ->> Originating Agent: Authorize [settlementAddress]
     Originating Agent ->> Originating Agent: Cancel
-    
+
 ```
 
 ### Revert
 
-Agents acting on behalf of customers may need to request reversal of a transaction after it has been settled. This could be as part of a dispute resolution, post-transaction compliance checks or other reasons. 
+Agents acting on behalf of customers may need to request reversal of a transaction after it has been settled. This could be as part of a dispute resolution, post-transaction compliance checks or other reasons.
 
 A `Revert` message could be `Settled`, `Authorized` or `Rejected` or simply ignored by the other agents involved.
 
@@ -389,7 +391,7 @@ The following are example plaintext messages. See [TAIP-2] for how to sign the m
  "body": {
     "@context": "https://tap.rsvp/schema/1.0",
     "@type": "https://tap.rsvp/schema/1.0#Settle",
-    "settlementId":"eip155:1:tx/0x3edb98c24d46d148eb926c714f4fbaa117c47b0c0821f38bfce9763604457c33",  
+    "settlementId":"eip155:1:tx/0x3edb98c24d46d148eb926c714f4fbaa117c47b0c0821f38bfce9763604457c33",
     "amount": "100.00"
   }
 }
@@ -463,15 +465,17 @@ The only potential PII that could be shared and leaked through this flow are pub
 - [TAIP-5] Transaction Agents
 - [TAIP-6] Transaction Parties
 - [TAIP-7] Policies
+- [TAIP-14] Payments
 - [CAIP-10] Describes chainagnostic Account ID Specification
 - [CAIP-19] Describes chainagnostic Asset ID specification
-  
+
 
 [TAIP-2]: ./taip-2
 [TAIP-3]: ./taip-3
 [TAIP-5]: ./taip-5
 [TAIP-6]: ./taip-6
 [TAIP-7]: ./taip-7
+[TAIP-14]: ./taip-14
 [CAIP-10]: <https://chainagnostic.org/CAIPs/caip-10>
 [CAIP-19]: <https://chainagnostic.org/CAIPs/caip-19>
 [TAIP Whitepaper]: <https://docs.google.com/document/d/1z16nPRjiCFGsnMqr7GiBRMCMMPBG6laaS337s4oJrEw/edit#heading=h.ujq0dkl3njwc>

@@ -12,7 +12,7 @@ requires: 2, 3, 4, 6, 7, 8, 9, 16
 
 ## Simple Summary
 
-A standard for **Payments** that allows a *merchant* to request a blockchain payment from a *customer*. This proposal defines a Payment message including the amount due (in either a specific asset or fiat currency), the destination address, and any required customer information.
+A standard for **Payments** workflows that allows a *merchant* to request a blockchain payment from a *customer*. This proposal defines a Payment message including the amount due (in either a specific asset or fiat currency), the destination address, and any required customer information.
 
 ## Abstract
 
@@ -22,7 +22,7 @@ Traditional on-chain transactions are push-only and irreversible [TAIP-4], makin
 
 **User-Friendly Crypto Payments:** Today's blockchain payments lack a built-in request/response flow comparable to invoicing or checkout in traditional payments. By enabling merchants to send Payments to customers, we facilitate typical e-commerce use cases where a customer is prompted to pay a specified amount to a merchant. Using **"customer"** and **"merchant"** terminology (instead of originator/beneficiary) makes the roles more intuitive in retail contexts, without changing their underlying meaning (payer and payee).
 
-**Flexible Asset/Currency Support:** A merchant may want payment in a particular cryptocurrency or in an amount of fiat currency. This proposal ensures a Payment can specify **either a crypto asset or a fiat currency** (one is required). If a fiat currency (per ISO 4217 code, e.g. USD) is given, the request may include a list of acceptable crypto assets that the merchant supports for settling that currency amount. This gives customers flexibility in *how* to pay (e.g. choose USDC or DAI to settle a $100.00 invoice) while ensuring the merchant's requirements are clear. It also lays groundwork for dynamic currency conversion by wallets if needed.
+**Flexible Asset/Currency Support:** A merchant may want payment in a particular cryptocurrency or in an amount of fiat currency. This proposal ensures a Payment can specify **either a crypto asset or a fiat currency** (one is required). If a fiat currency (per ISO 4217 code, e.g. USD) is given, the request may include a list of acceptable crypto assets that the merchant supports for settling that currency amount. This gives customers flexibility in *how* to pay (e.g. choose USDC or DAI to settle a $100.00 invoice) while ensuring the merchant's requirements are clear. It also lays groundwork for dynamic currency conversion by wallets if needed and allows for composability with multiple blockchain transactions through linked `Transfer` messages.
 
 **Improved Compliance and Data Privacy:** Merchants often need additional customer details (for compliance with regulations like the Travel Rule, or for business purposes like shipping). Instead of including personally identifiable information in the payment request (which would risk exposure to other parties) [TAIP-8], the merchant can declare a `RequirePresentation` policy (as per [TAIP-8]) in the Payment. This signals that the customer's wallet must present certain credentials (e.g. proof of identity, email, shipping address) privately to the merchant's agent before or alongside payment. By leveraging [TAIP-8] selective disclosure, sensitive data is exchanged **only** between the requesting merchant and the customer, minimizing privacy risks.
 
@@ -38,7 +38,7 @@ A **Payment** is a [DIDComm] message (per [TAIP-2]) initiated by the merchant's 
 - **`asset`** – *Optional*, **string** ([CAIP-19] or [DTI] identifier) for the specific cryptocurrency being requested. Must be a blockchain asset identifier. Either `asset` OR `currency` is required (one must be present); if both are given, they should be consistent, with `asset` having precedence (the wallet should send in the asset specified, not based on currency).
 - **`currency`** – *Optional*, **string** (ISO 4217 currency code, e.g. "USD" or "EUR") for fiat-denominated payments. Either `asset` OR `currency` is required (one must be present). If `currency` is present, a wallet might not know which crypto asset the merchant prefers to settle this fiat amount; this is addressed by the `supportedAssets` field.
 - **`supportedAssets`** – *Optional*, **array of strings** ([CAIP-19] or [DTI] asset identifiers). If `currency` is given (fiat-denominated request), this field can list which crypto assets are acceptable to settle that currency amount. Each entry is an asset the merchant will accept as payment for the given fiat amount. For example, a Payment might specify `"currency": "EUR", "amount": "50.00", "supportedAssets": ["eip155:1/erc20:0xA0b86991..."]` to indicate €50.00 can be paid in USDC on Ethereum (asset listed) or potentially other listed stablecoins. If `supportedAssets` is omitted for a fiat request, it implies the customer's wallet may choose any asset to settle that amount, subject to the merchant and wallet's out-of-band agreement or policy.
-- **`expiry`** – *Optional*, **timestamp** indicating an expiration time for the request. After this time the merchant may no longer honor the payment (e.g. if exchange rates or inventory changed). The customer's wallet SHOULD treat an expired Payment as invalid and not allow payment. If omitted, the request is considered valid until canceled or fulfilled. This field SHOULD align with the DIDComm `expires_time` header (as specified in [TAIP-2]) to ensure consistency. In hotel reservation scenarios, for example, a merchant might set an expiry to the checkout date, indicating that if the payment is not completed by then, the reservation will be lost.
+- **`expiry`** – *Optional*, **timestamp** indicating an expiration time for the request. After this time the merchant may no longer honor the payment (e.g. if exchange rates or inventory changed). The customer's wallet SHOULD treat an expired Payment as invalid and not allow payment. If omitted, the request is considered valid until canceled or fulfilled. This field SHOULD align with the DIDComm `expires_time` header (as specified in [TAIP-2]) to ensure consistency. In hotel reservation scenarios, for example, a merchant might set an expiry to the checkout date, indicating that if the payment is not authorized by then, the reservation will be lost.
 - **`amount`** – **Required**, **string** containing a decimal representation of the payment amount. The amount must be a valid positive number expressed as a string. Leading zeroes may be omitted (e.g. "0.5" or ".5" for half a unit). Trailing zeroes may be present (e.g. "10.00" for exactly ten units). The amount is denominated in the `asset` token units or the `currency` fiat units as appropriate.
 - **`invoice`** – *Optional*, **Invoice** per [TAIP-16] or **URI** providing additional details about the payment being requested (e.g. a link to an external invoice). This can provide further context for the customer, though the basic payment details should always be present directly in the Payment message itself.
 - **`policies`** – *Optional*, **array of policy objects** defining requirements that must be satisfied by the customer's agent. Each policy object conforms to [TAIP-7] and may include:
@@ -46,16 +46,6 @@ A **Payment** is a [DIDComm] message (per [TAIP-2]) initiated by the merchant's 
 - **`customer`** – *Optional*, **object** for information about the customer (payer). In many cases, the merchant may not know the customer's identity at the time of issuing the request (for example, if the Payment is delivered via a public QR code or link). This object can be omitted or left minimal in such cases. If the merchant does know the customer's identity or wants to bind the request to a specific customer, they MAY include an identifier here (e.g. the customer's DID or reference). The `customer` object could simply be: `{ "@id": "did:example:alice" }` to target a specific party. Even if provided, this field is mainly informational; the DIDComm transport (to the customer's agent) or context of delivery typically ensures the request reaches the intended customer.
 - **`merchant`** – **Required**, **object** with information about the merchant (payee). This includes the merchant's identity (DID) and may include additional descriptive information such as a name or website to help the customer recognize the merchant. The merchant object **MUST** include an `@id` attribute with the merchant's DID. The merchant object **MAY** include an `mcc` attribute with the ISO 18245 Merchant Category Code to identify the type of business (e.g., "5411" for grocery stores or "5812" for restaurants).
 - **`agents`** – **Required**, **array of objects** representing agents involved in the payment process. Each agent object must have an `@id` attribute with the agent's DID. At minimum, one agent MUST be associated with the merchant to handle the Payment. The agent's capabilities (and any policies it enforces) are defined according to the Agent specification [TAIP-6].
-
-### Complete Message
-
-A **Complete** message is sent by the merchant's agent to indicate that the transaction is ready for settlement. This replaces the previous approach of using an `Authorize` message for this purpose. The message structure is defined as follows (fields in **bold** are required):
-
-- **`@type`** – Type identifier of the message, e.g. `"Complete"` (in context of TAIP message types).
-- **`settlementAddress`** – **Required**, **string** representing the intended destination address where funds should be sent, specified in [CAIP-10] format.
-- **`amount`** – *Optional*, **string** containing a decimal representation of the final payment amount. If specified, this MUST be less than or equal to the amount in the original Payment message. The amount must be a valid positive number expressed as a string, following the same formatting rules as the amount in the Payment message. If omitted, the full amount from the original Payment message is implied.
-
-When a merchant's agent sends a Complete message with an amount specified, the customer's agent MUST verify that the amount is correct before sending a settlement with that amount. This allows merchants to adjust the final settlement amount if necessary (for example, to account for partial fulfillment of an order or application of discounts), while ensuring the customer approves the final amount.
 
 ### Payment Flow
 
@@ -96,8 +86,8 @@ sequenceDiagram
     participant Customer
     Merchant->>Customer: **Payment** (amount, asset/currency, etc.)
     Note over Customer: Customer reviews the request details
-    Customer-->>Merchant: Authorize
-    Merchant-->>Customer: Complete (provides settlement address)
+    Customer-->>Merchant: Authorize (provides settlement asset)
+    Merchant-->>Customer: Authorize (provides settlement address)
     Customer-->>Merchant: Settle (on-chain transfer of funds)
     Merchant-->>Customer: Provide goods/service (out of band)
 ```
@@ -131,7 +121,7 @@ sequenceDiagram
     end
 
     opt Merchant approves transaction
-        PSP-->>CustomerWallet: Send Complete message
+        PSP-->>CustomerWallet: Send Authorize message
     end
 
     CustomerWallet->>Blockchain: Submit transaction
@@ -141,9 +131,9 @@ sequenceDiagram
     Merchant->>Customer: Fulfill order
 ```
 
-*Description:* This detailed sequence involves the **Merchant's agent (Payment Service Provider - PSP)** and **Customer's agent (CustomerWallet)** exchanging messages. The merchant's PSP creates a Payment that the **Merchant** presents to the customer, including the **amount** and a policy requiring additional information (for example, an email for receipt, and shipping address for delivery). The Customer's wallet alerts the **Customer** (user) with the details and asks for the required information and approval. The user approves the transfer and sharing of data, which the wallet packages into a **Verifiable Presentation** (per [TAIP-8]) and returns to the merchant's wallet. The merchant's wallet verifies the credentials (ensuring they meet policy). Once satisfied, the merchant's wallet (or the merchant) sends a **Complete** message indicating everything is in order containing the settlement address. The **CustomerWallet** now automatically submits the blockchain transaction to the **Blockchain** network (this is depicted as a `Settle` action and the actual on-chain transfer). When the blockchain confirms the payment, the Merchant's wallet is notified (by listening to the blockchain or via an event). Finally, the **Merchant** is informed and can now consider the payment complete—at which point they deliver the product or service to the customer (this last step occurs off-chain, but is triggered by the confirmed payment).
+*Description:* This detailed sequence involves the **Merchant's agent (Payment Service Provider - PSP)** and **Customer's agent (CustomerWallet)** exchanging messages. The merchant's PSP creates a Payment that the **Merchant** presents to the customer, including the **amount** and a policy requiring additional information (for example, an email for receipt, and shipping address for delivery). The Customer's wallet alerts the **Customer** (user) with the details and asks for the required information and approval. The user approves the transfer and sharing of data, which the wallet packages into a **Verifiable Presentation** (per [TAIP-8]) and returns to the merchant's wallet. The merchant's wallet verifies the credentials (ensuring they meet policy). Once satisfied, the merchant's wallet (or the merchant) sends a **Authorize** message indicating everything is in order containing the settlement address. The **CustomerWallet** now automatically submits the blockchain transaction to the **Blockchain** network (this is depicted as a `Settle` action and the actual on-chain transfer). When the blockchain confirms the payment, the Merchant's wallet is notified (by listening to the blockchain or via an event). Finally, the **Merchant** is informed and can now consider the payment complete—at which point they deliver the product or service to the customer (this last step occurs off-chain, but is triggered by the confirmed payment).
 
-**Notes:** In this flow, if any required presentation was missing or invalid, the merchant's agent could send a **Reject** instead of Complete, or simply not authorize the payment (the customer might then choose not to pay).
+**Notes:** In this flow, if any required presentation was missing or invalid, the merchant's agent could send a **Reject** instead of Authorize, or simply not authorize the payment (the customer might then choose not to pay).
 
 #### Figure 4: Payment Flow with Cancellation (Failure Scenario)
 
@@ -167,6 +157,31 @@ sequenceDiagram
 ```
 
 *Description:* In this failure scenario, the merchant's wallet sends a Payment, but the customer decides not to proceed (for any reason – maybe they canceled the checkout or disagreed with the terms). The **Customer's wallet** then sends a **Cancel** message to the **Merchant's wallet**, notifying that the request is aborted. Both sides consider the payment request closed. The merchant's wallet may notify the merchant system to void the invoice or record the cancellation. Similarly, if the merchant needed to cancel (e.g. the order was out-of-stock or expired), the merchant's wallet would send a Cancel to the customer's wallet, which would inform the user. In either case, the Cancel message definitively ends that Payment thread. This differs from a **Reject** in that it isn't necessarily due to rule violations; it's a voluntary termination (any outstanding authorization or info exchange stops here). After a Cancel, the customer is not expected to send payment, and the merchant should not accept a payment if one somehow arrives late (they might refund it or handle it out of band).
+
+### Composability
+
+Most simple payments involving a single blockchain and a single token transfer can be implemented using the `Payment` -> `Authorize` -> `Authorize` -> `Settle` flow. More complex payments may include a Forex swap between different stablecoins or bridging between blockchain networks. For full transparency these can be implemented using multiple `Transfer` messages refering to the parent Payment through the `pthid` field (see [TAIP-2]).
+
+```mermaid
+sequenceDiagram
+    participant CustomerWallet
+    participant LiquidityProvider
+    participant PSP
+    participant Blockchain
+
+    PSP->>CustomerWallet: Payment (USDT)
+    CustomerWallet-->>PSP: AddAgent (LiquidityProvider)
+
+    CustomerWallet->>LiquidityProvider: Transfer (EURC)
+    LiquidityProvider-->>CustomerWallet: Authorize (with EURC settlementAddress)
+    CustomerWallet-->>PSP: Authorize
+    PSP-->>LiquidityProvider: Authorize (with USDT settlementAddress)
+
+    CustomerWallet-)Blockchain: Submit EURC transaction
+    CustomerWallet-->>LiquidityProvider: Settle (EURC)
+    LiquidityProvider-)Blockchain: Submit USDT
+    LiquidityProvider-->>PSP: Settle (USDT)
+```
 
 ### Out-of-Band Initiation
 
