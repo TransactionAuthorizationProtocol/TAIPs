@@ -127,8 +127,8 @@ export type CAIP19 = `${CAIP2}/${string}:${string}`;
  * Digital Trust Identifier (DTI)
  * A standardized identifier for digital assets in traditional finance.
  *
- * @example "iban:GB29NWBK60161331926819"
- * @see {@link https://www.iso.org/standard/80601.html | ISO 23897}
+ * @example "V15WLZJMF"
+ * @see {@link https://www.iso.org/standard/85546.html | ISO 24165}
  */
 export type DTI = string;
 
@@ -138,7 +138,7 @@ export type DTI = string;
  * Used to identify assets in a chain-agnostic way across different financial systems.
  *
  * @example "eip155:1/erc20:0x6b175474e89094c44da98b954eedeac495271d0f" // DAI token on Ethereum mainnet
- * @example "iban:GB29NWBK60161331926819" // Bank account in traditional finance
+ * @example "V15WLZJMF" // Bank account in traditional finance
  */
 export type Asset = CAIP19 | DTI;
 
@@ -635,28 +635,6 @@ export interface Connect extends TapMessageObject<"Connect"> {
    * Indicates when the connection request expires
    */
   expiry?: ISO8601DateTime;
-}
-
-/**
- * Complete Message
- * Indicates that a transaction is ready for settlement, sent by the merchant's agent.
- * Used in the Payment flow to provide settlement address to the customer.
- *
- * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-14.md | TAIP-14: Payments}
- */
-export interface Complete extends TapMessageObject<"Complete"> {
-  /**
-   * Settlement address
-   * The blockchain address where funds should be sent, specified in CAIP-10 format
-   */
-  settlementAddress: CAIP10;
-
-  /**
-   * Optional final payment amount
-   * If specified, must be less than or equal to the amount in the original Payment message
-   * If omitted, the full amount from the original Payment message is implied
-   */
-  amount?: Amount;
 }
 
 /**
