@@ -777,7 +777,7 @@ The body object must contain:
       "categoryPurposes": ["CASH", "CCRD"],
       "limits": {
         "per_transaction": "10000.00",
-        "daily": "50000.00",
+        "per_day": "50000.00",
         "currency": "USD"
       }
     }
@@ -809,7 +809,7 @@ The body object must contain:
       "categoryPurposes": ["EPAY"],
       "limits": {
         "per_transaction": "5000.00",
-        "daily": "25000.00",
+        "per_day": "25000.00",
         "currency": "USD"
       }
     }
@@ -913,6 +913,7 @@ Requests a connection between agents with specified constraints.
 | principal | [Party](#party) | Yes | Draft ([TAIP-15]) | Party object representing the principal the agent acts on behalf of |
 | constraints | object | Yes | Draft ([TAIP-15]) | Transaction constraints for the connection |
 | expiry | string | No | Draft ([TAIP-15]) | ISO 8601 datetime indicating when the connection request expires |
+| agreement | string | No | Draft ([TAIP-15]) | URL or identifier of terms agreed to by the principal |
 
 #### Example Connect Message
 ```json
@@ -940,10 +941,11 @@ Requests a connection between agents with specified constraints.
       "categoryPurposes": ["CASH", "CCRD"],
       "limits": {
         "per_transaction": "10000.00",
-        "daily": "50000.00",
+        "per_day": "50000.00",
         "currency": "USD"
       }
-    }
+    },
+    "agreement": "https://example.com/terms/v2.1"
   }
 }
 ```
@@ -1014,7 +1016,7 @@ This flow demonstrates establishing a connection between a B2B service and a VAS
       "categoryPurposes": ["CASH", "CCRD"],
       "limits": {
         "per_transaction": "10000.00",
-        "daily": "50000.00",
+        "per_day": "50000.00",
         "currency": "USD"
       }
     }
@@ -1085,6 +1087,46 @@ This flow demonstrates establishing a connection between a B2B service and a VAS
         "@id": "did:example:vasp"
       }
     ]
+  }
+}
+```
+
+#### Self-Onboarding Connect Example
+
+In self-onboarding scenarios, the agent and principal can be the same entity (e.g., a VASP onboarding itself):
+
+```json
+{
+  "id": "self-onboard-456",
+  "type": "https://tap.rsvp/schema/1.0#Connect",
+  "from": "did:example:wallet-service",
+  "to": ["did:example:vasp"],
+  "created_time": 1516269025,
+  "expires_time": 1516385931,
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#Connect",
+    "agent": {
+      "@id": "did:example:wallet-service",
+      "name": "Wallet Service Provider",
+      "type": "VASP",
+      "serviceUrl": "https://wallet-service.com/did-comm"
+    },
+    "principal": {
+      "@id": "did:example:wallet-service",
+      "name": "Wallet Service Provider",
+      "type": "VASP"
+    },
+    "constraints": {
+      "purposes": ["CASH", "CGOO", "GSRV"],
+      "categoryPurposes": ["CASH", "CCRD", "CDCD"],
+      "limits": {
+        "per_transaction": "50000.00",
+        "per_day": "250000.00",
+        "currency": "USD"
+      }
+    },
+    "agreement": "https://wallet-service.com/terms-of-service/v3.0"
   }
 }
 ```
