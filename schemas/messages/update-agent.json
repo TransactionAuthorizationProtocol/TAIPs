@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://taips.tap.rsvp/schemas/messages/update-agent.json",
+  "title": "UpdateAgent Message",
+  "description": "Updates agent information in a TAP session",
+  "type": "object",
+  "allOf": [
+    {
+      "$ref": "../common/didcomm-base.json#/$defs/didcommHeader"
+    }
+  ],
+  "properties": {
+    "type": {
+      "const": "https://taprsvp.com/034.56.789/protocols/transaction-authorization-protocol/1.0/update-agent"
+    },
+    "body": {
+      "type": "object",
+      "required": ["agent"],
+      "properties": {
+        "agent": {
+          "$ref": "../data-structures/agent.json",
+          "description": "Updated agent information"
+        },
+        "previousDid": {
+          "$ref": "../common/base-types.json#/$defs/did",
+          "description": "Previous DID if the agent DID has changed"
+        },
+        "reason": {
+          "type": "string",
+          "description": "Reason for the update"
+        },
+        "effective": {
+          "$ref": "../common/base-types.json#/$defs/iso8601DateTime",
+          "description": "When the update becomes effective"
+        }
+      }
+    }
+  },
+  "required": ["type", "body"]
+}

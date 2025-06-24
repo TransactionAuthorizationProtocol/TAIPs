@@ -1,0 +1,120 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://taips.tap.rsvp/schemas/messages/out-of-band-invitation.json",
+  "title": "Out-of-Band Invitation Message",
+  "description": "Invitation to establish a TAP connection via out-of-band channel",
+  "type": "object",
+  "required": ["@type", "@id", "handshake_protocols", "services"],
+  "properties": {
+    "@type": {
+      "const": "https://didcomm.org/out-of-band/2.0/invitation"
+    },
+    "@id": {
+      "$ref": "../common/base-types.json#/$defs/uuid",
+      "description": "Unique invitation identifier"
+    },
+    "handshake_protocols": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "format": "uri"
+      },
+      "description": "Supported handshake protocols"
+    },
+    "services": {
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {
+            "type": "string",
+            "$ref": "../common/base-types.json#/$defs/did"
+          },
+          {
+            "type": "object",
+            "required": ["id", "type", "serviceEndpoint"],
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string"
+              },
+              "serviceEndpoint": {
+                "oneOf": [
+                  {
+                    "$ref": "../common/base-types.json#/$defs/url"
+                  },
+                  {
+                    "type": "array",
+                    "items": {
+                      "$ref": "../common/base-types.json#/$defs/url"
+                    }
+                  }
+                ]
+              },
+              "recipientKeys": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "routingKeys": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "minItems": 1,
+      "description": "Service endpoints for connection"
+    },
+    "label": {
+      "type": "string",
+      "description": "Human-readable label for the inviter"
+    },
+    "goal": {
+      "type": "string",
+      "description": "Purpose of the invitation"
+    },
+    "goal_code": {
+      "type": "string",
+      "description": "Standardized goal code"
+    },
+    "accept": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Accepted DIDComm message formats"
+    },
+    "requests~attach": {
+      "type": "array",
+      "items": {
+        "$ref": "../common/didcomm-base.json#/$defs/attachment"
+      },
+      "description": "Attached request messages"
+    },
+    "tap": {
+      "type": "object",
+      "properties": {
+        "party": {
+          "$ref": "../data-structures/party.json",
+          "description": "Party information for TAP context"
+        },
+        "agent": {
+          "$ref": "../data-structures/agent.json",
+          "description": "Agent information for TAP context"
+        },
+        "purpose": {
+          "type": "string",
+          "enum": ["transaction", "query", "relationship", "general"],
+          "description": "TAP-specific connection purpose"
+        }
+      },
+      "description": "TAP-specific invitation data"
+    }
+  }
+}

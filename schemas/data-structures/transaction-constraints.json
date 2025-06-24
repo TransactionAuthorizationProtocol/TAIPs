@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://taips.tap.rsvp/schemas/data-structures/transaction-constraints.json",
+  "title": "TransactionConstraints",
+  "description": "Constraints on a virtual asset transaction",
+  "type": "object",
+  "properties": {
+    "maxAmount": {
+      "$ref": "../common/base-types.json#/$defs/amount",
+      "description": "Maximum transaction amount"
+    },
+    "minAmount": {
+      "$ref": "../common/base-types.json#/$defs/amount",
+      "description": "Minimum transaction amount"
+    },
+    "currency": {
+      "$ref": "../common/base-types.json#/$defs/iso4217CurrencyCode",
+      "description": "Currency for amount constraints"
+    },
+    "validFrom": {
+      "$ref": "../common/base-types.json#/$defs/iso8601DateTime",
+      "description": "Start of validity period"
+    },
+    "validUntil": {
+      "$ref": "../common/base-types.json#/$defs/iso8601DateTime",
+      "description": "End of validity period"
+    },
+    "allowedPurposes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Allowed transaction purpose codes"
+    },
+    "allowedAssets": {
+      "type": "array",
+      "items": {
+        "$ref": "../common/caip-types.json#/$defs/caip19"
+      },
+      "description": "Allowed asset types"
+    },
+    "blockedCountries": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[A-Z]{2}$"
+      },
+      "description": "ISO 3166-1 alpha-2 country codes to block"
+    },
+    "allowedCountries": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[A-Z]{2}$"
+      },
+      "description": "ISO 3166-1 alpha-2 country codes to allow"
+    }
+  }
+}

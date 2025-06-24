@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://taips.tap.rsvp/schemas/common/caip-types.json",
+  "title": "CAIP Type Definitions",
+  "description": "Chain Agnostic Improvement Proposal (CAIP) type definitions",
+  "$defs": {
+    "caip2": {
+      "type": "string",
+      "pattern": "^[-a-z0-9]{3,8}:[-_a-zA-Z0-9]{1,32}$",
+      "description": "CAIP-2 blockchain ID (e.g., 'eip155:1' for Ethereum mainnet)",
+      "examples": ["eip155:1", "bip122:000000000019d6689c085ae165831e93", "cosmos:cosmoshub-4"]
+    },
+    "caip10": {
+      "type": "string",
+      "pattern": "^[-a-z0-9]{3,8}:[-_a-zA-Z0-9]{1,32}:[a-zA-Z0-9]{1,64}$",
+      "description": "CAIP-10 account ID (blockchain_id:address)",
+      "examples": [
+        "eip155:1:0x0000000000000000000000000000000000000000",
+        "bip122:000000000019d6689c085ae165831e93:1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa"
+      ]
+    },
+    "caip19": {
+      "type": "string",
+      "pattern": "^[-a-z0-9]{3,8}:[-_a-zA-Z0-9]{1,32}/[-a-z0-9]{3,8}:[-_a-zA-Z0-9]{1,64}$",
+      "description": "CAIP-19 asset type (blockchain_id/asset_namespace:asset_reference)",
+      "examples": [
+        "eip155:1/erc20:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "eip155:1/erc721:0x06012c8cf97BEaD5deAe237070F9587f8E7A266d",
+        "bip122:000000000019d6689c085ae165831e93/slip44:0"
+      ]
+    },
+    "caip220": {
+      "type": "string",
+      "pattern": "^[-a-z0-9]{3,8}:[-_a-zA-Z0-9]{1,32}:[a-zA-Z0-9]{1,64}@[-a-z0-9]{3,8}:[-_a-zA-Z0-9]{1,32}/[-a-z0-9]{3,8}:[-_a-zA-Z0-9]{1,64}$",
+      "description": "CAIP-220 asset ID (account_id@asset_type)",
+      "examples": [
+        "eip155:1:0x0000000000000000000000000000000000000000@eip155:1/erc20:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
+      ]
+    }
+  }
+}

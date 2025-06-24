@@ -1,0 +1,14 @@
+{
+  "name": "@taprsvp/schemas",
+  "version": "1.0.0",
+  "description": "JSON Schema definitions for TAP messages",
+  "scripts": {
+    "validate": "node validate-test-vectors.js",
+    "install-deps": "npm install"
+  },
+  "devDependencies": {
+    "ajv": "^8.12.0",
+    "ajv-formats": "^2.1.1"
+  },
+  "license": "MIT"
+}

@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://taips.tap.rsvp/schemas/messages/transfer.json",
+  "title": "Transfer Message",
+  "description": "Initiates a virtual asset transfer in TAP",
+  "type": "object",
+  "allOf": [
+    {
+      "$ref": "../common/didcomm-base.json#/$defs/didcommHeader"
+    }
+  ],
+  "properties": {
+    "type": {
+      "const": "https://taprsvp.com/034.56.789/protocols/transaction-authorization-protocol/1.0/transfer"
+    },
+    "body": {
+      "type": "object",
+      "required": ["asset", "amount", "settlementAddress", "agents"],
+      "properties": {
+        "asset": {
+          "$ref": "../common/caip-types.json#/$defs/caip19",
+          "description": "Asset being transferred"
+        },
+        "assetId": {
+          "$ref": "../common/caip-types.json#/$defs/caip220",
+          "description": "Specific asset instance (e.g., NFT)"
+        },
+        "amount": {
+          "$ref": "../common/base-types.json#/$defs/amount",
+          "description": "Amount to transfer"
+        },
+        "settlementAddress": {
+          "$ref": "../common/caip-types.json#/$defs/caip10",
+          "description": "Destination address for settlement"
+        },
+        "originator": {
+          "$ref": "../data-structures/party.json",
+          "description": "Party initiating the transfer"
+        },
+        "beneficiary": {
+          "$ref": "../data-structures/party.json",
+          "description": "Party receiving the transfer"
+        },
+        "agents": {
+          "type": "array",
+          "items": {
+            "$ref": "../data-structures/agent.json"
+          },
+          "minItems": 1,
+          "description": "Agents involved in the transaction"
+        },
+        "constraints": {
+          "$ref": "../data-structures/transaction-constraints.json",
+          "description": "Optional transaction constraints"
+        },
+        "purpose": {
+          "type": "string",
+          "description": "Purpose code for the transfer"
+        },
+        "memo": {
+          "type": "string",
+          "description": "Optional memo for the transfer"
+        },
+        "exchangeRate": {
+          "type": "object",
+          "properties": {
+            "rate": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "from": {
+              "$ref": "../common/base-types.json#/$defs/iso4217CurrencyCode"
+            },
+            "to": {
+              "$ref": "../common/base-types.json#/$defs/iso4217CurrencyCode"
+            }
+          }
+        }
+      }
+    }
+  },
+  "required": ["type", "body"]
+}

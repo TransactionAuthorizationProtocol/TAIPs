@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://taips.tap.rsvp/schemas/messages/update-policies.json",
+  "title": "UpdatePolicies Message",
+  "description": "Updates policies for an agent",
+  "type": "object",
+  "allOf": [
+    {
+      "$ref": "../common/didcomm-base.json#/$defs/didcommHeader"
+    }
+  ],
+  "properties": {
+    "type": {
+      "const": "https://taprsvp.com/034.56.789/protocols/transaction-authorization-protocol/1.0/update-policies"
+    },
+    "body": {
+      "type": "object",
+      "required": ["agent", "policies"],
+      "properties": {
+        "agent": {
+          "$ref": "../common/base-types.json#/$defs/did",
+          "description": "DID of the agent whose policies are being updated"
+        },
+        "policies": {
+          "type": "array",
+          "items": {
+            "$ref": "../data-structures/policy.json"
+          },
+          "description": "New set of policies for the agent"
+        },
+        "action": {
+          "type": "string",
+          "enum": ["replace", "add", "remove"],
+          "default": "replace",
+          "description": "How to apply the policy update"
+        },
+        "reason": {
+          "type": "string",
+          "description": "Reason for the policy update"
+        },
+        "effective": {
+          "$ref": "../common/base-types.json#/$defs/iso8601DateTime",
+          "description": "When the update becomes effective"
+        }
+      }
+    }
+  },
+  "required": ["type", "body"]
+}

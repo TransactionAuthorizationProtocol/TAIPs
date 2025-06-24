@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://taips.tap.rsvp/schemas/messages/add-agents.json",
+  "title": "AddAgents Message",
+  "description": "Adds new agents to a TAP session",
+  "type": "object",
+  "allOf": [
+    {
+      "$ref": "../common/didcomm-base.json#/$defs/didcommHeader"
+    }
+  ],
+  "properties": {
+    "type": {
+      "const": "https://taprsvp.com/034.56.789/protocols/transaction-authorization-protocol/1.0/add-agents"
+    },
+    "body": {
+      "type": "object",
+      "required": ["agents"],
+      "properties": {
+        "agents": {
+          "type": "array",
+          "items": {
+            "$ref": "../data-structures/agent.json"
+          },
+          "minItems": 1,
+          "description": "Agents to add to the session"
+        },
+        "reason": {
+          "type": "string",
+          "description": "Reason for adding the agents"
+        },
+        "requireConfirmation": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether existing agents must confirm the addition"
+        },
+        "effective": {
+          "$ref": "../common/base-types.json#/$defs/iso8601DateTime",
+          "description": "When the addition becomes effective"
+        }
+      }
+    }
+  },
+  "required": ["type", "body"]
+}

@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://taips.tap.rsvp/schemas/messages/cancel.json",
+  "title": "Cancel Message",
+  "description": "Cancels a TAP transaction",
+  "type": "object",
+  "allOf": [
+    {
+      "$ref": "../common/didcomm-base.json#/$defs/didcommHeader"
+    }
+  ],
+  "properties": {
+    "type": {
+      "const": "https://taprsvp.com/034.56.789/protocols/transaction-authorization-protocol/1.0/cancel"
+    },
+    "body": {
+      "type": "object",
+      "required": ["reason", "by"],
+      "properties": {
+        "reason": {
+          "type": "string",
+          "description": "Reason for cancellation"
+        },
+        "reasonCode": {
+          "type": "string",
+          "description": "Standardized cancellation code"
+        },
+        "by": {
+          "$ref": "../common/base-types.json#/$defs/did",
+          "description": "DID of the agent initiating cancellation"
+        },
+        "details": {
+          "type": "object",
+          "description": "Additional cancellation details"
+        },
+        "timestamp": {
+          "$ref": "../common/base-types.json#/$defs/iso8601DateTime",
+          "description": "Cancellation timestamp"
+        }
+      }
+    }
+  },
+  "required": ["type", "body"]
+}

@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://taips.tap.rsvp/schemas/messages/reject.json",
+  "title": "Reject Message",
+  "description": "Rejects a TAP transaction or request",
+  "type": "object",
+  "allOf": [
+    {
+      "$ref": "../common/didcomm-base.json#/$defs/didcommHeader"
+    }
+  ],
+  "properties": {
+    "type": {
+      "const": "https://taprsvp.com/034.56.789/protocols/transaction-authorization-protocol/1.0/reject"
+    },
+    "body": {
+      "type": "object",
+      "required": ["reason"],
+      "properties": {
+        "reason": {
+          "type": "string",
+          "description": "Human-readable reason for rejection"
+        },
+        "reasonCode": {
+          "type": "string",
+          "description": "Standardized rejection code"
+        },
+        "details": {
+          "type": "object",
+          "description": "Additional details about the rejection"
+        },
+        "suggestedAction": {
+          "type": "string",
+          "description": "Suggested action to resolve the rejection"
+        },
+        "retryable": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether the request can be retried"
+        },
+        "retryAfter": {
+          "$ref": "../common/base-types.json#/$defs/iso8601DateTime",
+          "description": "Earliest time to retry the request"
+        }
+      }
+    }
+  },
+  "required": ["type", "body"]
+}

@@ -1,0 +1,158 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://taips.tap.rsvp/schemas/data-structures/invoice.json",
+  "title": "Invoice",
+  "description": "Payment request details",
+  "type": "object",
+  "required": ["payee", "items", "total"],
+  "properties": {
+    "invoiceNumber": {
+      "type": "string",
+      "description": "Unique invoice identifier"
+    },
+    "invoiceDate": {
+      "$ref": "../common/base-types.json#/$defs/iso8601DateTime",
+      "description": "Date the invoice was issued"
+    },
+    "dueDate": {
+      "$ref": "../common/base-types.json#/$defs/iso8601DateTime",
+      "description": "Payment due date"
+    },
+    "payee": {
+      "$ref": "party.json",
+      "description": "Party receiving payment"
+    },
+    "payer": {
+      "$ref": "party.json",
+      "description": "Party making payment"
+    },
+    "items": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/invoiceItem"
+      },
+      "minItems": 1,
+      "description": "Line items on the invoice"
+    },
+    "subtotal": {
+      "$ref": "#/$defs/currencyAmount",
+      "description": "Sum of all items before taxes and discounts"
+    },
+    "taxes": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/taxItem"
+      },
+      "description": "Applied taxes"
+    },
+    "discounts": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/discountItem"
+      },
+      "description": "Applied discounts"
+    },
+    "total": {
+      "$ref": "#/$defs/currencyAmount",
+      "description": "Total amount due"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Additional notes or terms"
+    },
+    "paymentInstructions": {
+      "type": "object",
+      "properties": {
+        "settlementAddress": {
+          "$ref": "../common/caip-types.json#/$defs/caip10",
+          "description": "Address for payment settlement"
+        },
+        "asset": {
+          "$ref": "../common/caip-types.json#/$defs/caip19",
+          "description": "Accepted asset for payment"
+        },
+        "reference": {
+          "type": "string",
+          "description": "Payment reference to include"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "currencyAmount": {
+      "type": "object",
+      "required": ["amount", "currency"],
+      "properties": {
+        "amount": {
+          "$ref": "../common/base-types.json#/$defs/amount"
+        },
+        "currency": {
+          "$ref": "../common/base-types.json#/$defs/iso4217CurrencyCode"
+        }
+      }
+    },
+    "invoiceItem": {
+      "type": "object",
+      "required": ["description", "quantity", "unitPrice", "total"],
+      "properties": {
+        "description": {
+          "type": "string",
+          "description": "Item description"
+        },
+        "quantity": {
+          "type": "number",
+          "minimum": 0
+        },
+        "unitPrice": {
+          "$ref": "#/$defs/currencyAmount"
+        },
+        "total": {
+          "$ref": "#/$defs/currencyAmount"
+        },
+        "taxRate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Tax rate as decimal (e.g., 0.1 for 10%)"
+        }
+      }
+    },
+    "taxItem": {
+      "type": "object",
+      "required": ["name", "rate", "amount"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Tax name (e.g., 'VAT', 'GST')"
+        },
+        "rate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "amount": {
+          "$ref": "#/$defs/currencyAmount"
+        }
+      }
+    },
+    "discountItem": {
+      "type": "object",
+      "required": ["name", "amount"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Discount description"
+        },
+        "amount": {
+          "$ref": "#/$defs/currencyAmount"
+        },
+        "percentage": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Discount as percentage"
+        }
+      }
+    }
+  }
+}

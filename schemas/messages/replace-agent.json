@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://taips.tap.rsvp/schemas/messages/replace-agent.json",
+  "title": "ReplaceAgent Message",
+  "description": "Replaces an existing agent with a new one",
+  "type": "object",
+  "allOf": [
+    {
+      "$ref": "../common/didcomm-base.json#/$defs/didcommHeader"
+    }
+  ],
+  "properties": {
+    "type": {
+      "const": "https://taprsvp.com/034.56.789/protocols/transaction-authorization-protocol/1.0/replace-agent"
+    },
+    "body": {
+      "type": "object",
+      "required": ["oldAgent", "newAgent"],
+      "properties": {
+        "oldAgent": {
+          "$ref": "../common/base-types.json#/$defs/did",
+          "description": "DID of the agent being replaced"
+        },
+        "newAgent": {
+          "$ref": "../data-structures/agent.json",
+          "description": "New agent replacing the old one"
+        },
+        "reason": {
+          "type": "string",
+          "description": "Reason for the replacement"
+        },
+        "transferState": {
+          "type": "boolean",
+          "default": true,
+          "description": "Whether to transfer state from old to new agent"
+        },
+        "effective": {
+          "$ref": "../common/base-types.json#/$defs/iso8601DateTime",
+          "description": "When the replacement becomes effective"
+        }
+      }
+    }
+  },
+  "required": ["type", "body"]
+}

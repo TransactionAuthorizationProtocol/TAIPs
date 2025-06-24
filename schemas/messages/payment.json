@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://taips.tap.rsvp/schemas/messages/payment.json",
+  "title": "Payment Message",
+  "description": "Payment request with invoice details",
+  "type": "object",
+  "allOf": [
+    {
+      "$ref": "../common/didcomm-base.json#/$defs/didcommHeader"
+    }
+  ],
+  "properties": {
+    "type": {
+      "const": "https://taprsvp.com/034.56.789/protocols/transaction-authorization-protocol/1.0/payment"
+    },
+    "body": {
+      "type": "object",
+      "required": ["invoice", "agents"],
+      "properties": {
+        "invoice": {
+          "$ref": "../data-structures/invoice.json",
+          "description": "Invoice details for the payment"
+        },
+        "agents": {
+          "type": "array",
+          "items": {
+            "$ref": "../data-structures/agent.json"
+          },
+          "minItems": 1,
+          "description": "Agents involved in the payment"
+        },
+        "constraints": {
+          "$ref": "../data-structures/transaction-constraints.json",
+          "description": "Optional payment constraints"
+        },
+        "purpose": {
+          "type": "string",
+          "description": "Purpose code for the payment"
+        },
+        "requestedSettlement": {
+          "type": "object",
+          "properties": {
+            "asset": {
+              "$ref": "../common/caip-types.json#/$defs/caip19",
+              "description": "Requested asset for payment"
+            },
+            "settlementAddress": {
+              "$ref": "../common/caip-types.json#/$defs/caip10",
+              "description": "Address to receive payment"
+            }
+          }
+        }
+      }
+    }
+  },
+  "required": ["type", "body"]
+}

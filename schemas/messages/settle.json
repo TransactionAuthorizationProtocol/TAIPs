@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://taips.tap.rsvp/schemas/messages/settle.json",
+  "title": "Settle Message",
+  "description": "Indicates settlement has been initiated on-chain",
+  "type": "object",
+  "allOf": [
+    {
+      "$ref": "../common/didcomm-base.json#/$defs/didcommHeader"
+    }
+  ],
+  "properties": {
+    "type": {
+      "const": "https://taprsvp.com/034.56.789/protocols/transaction-authorization-protocol/1.0/settle"
+    },
+    "body": {
+      "type": "object",
+      "required": ["txid", "asset", "amount", "settlementAddress"],
+      "properties": {
+        "txid": {
+          "type": "string",
+          "description": "On-chain transaction identifier"
+        },
+        "asset": {
+          "$ref": "../common/caip-types.json#/$defs/caip19",
+          "description": "Asset being settled"
+        },
+        "assetId": {
+          "$ref": "../common/caip-types.json#/$defs/caip220",
+          "description": "Specific asset instance (e.g., NFT)"
+        },
+        "amount": {
+          "$ref": "../common/base-types.json#/$defs/amount",
+          "description": "Amount being settled"
+        },
+        "settlementAddress": {
+          "$ref": "../common/caip-types.json#/$defs/caip10",
+          "description": "Destination address for settlement"
+        },
+        "originatorAddress": {
+          "$ref": "../common/caip-types.json#/$defs/caip10",
+          "description": "Source address of the settlement"
+        },
+        "confirmations": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of blockchain confirmations"
+        },
+        "blockHeight": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Block height of the transaction"
+        },
+        "blockHash": {
+          "type": "string",
+          "description": "Hash of the block containing the transaction"
+        },
+        "timestamp": {
+          "$ref": "../common/base-types.json#/$defs/iso8601DateTime",
+          "description": "Settlement timestamp"
+        },
+        "fee": {
+          "type": "object",
+          "properties": {
+            "amount": {
+              "$ref": "../common/base-types.json#/$defs/amount"
+            },
+            "asset": {
+              "$ref": "../common/caip-types.json#/$defs/caip19"
+            }
+          },
+          "description": "Transaction fee details"
+        }
+      }
+    }
+  },
+  "required": ["type", "body"]
+}

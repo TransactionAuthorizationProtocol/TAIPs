@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://taips.tap.rsvp/schemas/messages/confirm-relationship.json",
+  "title": "ConfirmRelationship Message",
+  "description": "Confirms a relationship between parties",
+  "type": "object",
+  "allOf": [
+    {
+      "$ref": "../common/didcomm-base.json#/$defs/didcommHeader"
+    }
+  ],
+  "properties": {
+    "type": {
+      "const": "https://taprsvp.com/034.56.789/protocols/transaction-authorization-protocol/1.0/confirm-relationship"
+    },
+    "body": {
+      "type": "object",
+      "required": ["relationship", "status"],
+      "properties": {
+        "relationship": {
+          "type": "object",
+          "required": ["type", "parties"],
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": ["customer", "correspondent", "affiliate", "service-provider"],
+              "description": "Type of relationship"
+            },
+            "parties": {
+              "type": "array",
+              "items": {
+                "$ref": "../data-structures/party.json"
+              },
+              "minItems": 2,
+              "maxItems": 2,
+              "description": "Parties in the relationship"
+            },
+            "establishedDate": {
+              "$ref": "../common/base-types.json#/$defs/iso8601DateTime",
+              "description": "When the relationship was established"
+            },
+            "reference": {
+              "type": "string",
+              "description": "External reference for the relationship"
+            }
+          }
+        },
+        "status": {
+          "type": "string",
+          "enum": ["confirmed", "pending", "rejected", "terminated"],
+          "description": "Relationship status"
+        },
+        "validFrom": {
+          "$ref": "../common/base-types.json#/$defs/iso8601DateTime",
+          "description": "Start of relationship validity"
+        },
+        "validUntil": {
+          "$ref": "../common/base-types.json#/$defs/iso8601DateTime",
+          "description": "End of relationship validity"
+        },
+        "details": {
+          "type": "object",
+          "description": "Additional relationship details"
+        }
+      }
+    }
+  },
+  "required": ["type", "body"]
+}
