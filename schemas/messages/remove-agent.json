@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://taips.tap.rsvp/schemas/messages/remove-agent.json",
+  "title": "RemoveAgent Message",
+  "description": "Removes an agent from a TAP session",
+  "type": "object",
+  "allOf": [
+    {
+      "$ref": "../common/didcomm-base.json#/$defs/didcommHeader"
+    }
+  ],
+  "properties": {
+    "type": {
+      "const": "https://taprsvp.com/034.56.789/protocols/transaction-authorization-protocol/1.0/remove-agent"
+    },
+    "body": {
+      "type": "object",
+      "required": ["agent"],
+      "properties": {
+        "agent": {
+          "$ref": "../common/base-types.json#/$defs/did",
+          "description": "DID of the agent to remove"
+        },
+        "reason": {
+          "type": "string",
+          "description": "Reason for removing the agent"
+        },
+        "replacement": {
+          "$ref": "../common/base-types.json#/$defs/did",
+          "description": "DID of agent taking over responsibilities"
+        },
+        "effective": {
+          "$ref": "../common/base-types.json#/$defs/iso8601DateTime",
+          "description": "When the removal becomes effective"
+        }
+      }
+    }
+  },
+  "required": ["type", "body"]
+}

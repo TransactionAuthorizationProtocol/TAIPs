@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://taips.tap.rsvp/schemas/data-structures/party.json",
+  "title": "Party",
+  "description": "Represents a participant in a TAP transaction",
+  "type": "object",
+  "properties": {
+    "lei": {
+      "$ref": "../common/base-types.json#/$defs/lei",
+      "description": "Legal Entity Identifier for the party"
+    },
+    "name": {
+      "type": "string",
+      "description": "Human-readable name of the party"
+    },
+    "nameHash": {
+      "$ref": "../common/base-types.json#/$defs/base64",
+      "description": "Hash of the party's name for privacy-preserving matching"
+    },
+    "ivms101": {
+      "type": "object",
+      "description": "IVMS101 data structure for Travel Rule compliance"
+    }
+  },
+  "oneOf": [
+    {
+      "required": ["lei"]
+    },
+    {
+      "required": ["name"]
+    },
+    {
+      "required": ["nameHash"]
+    }
+  ]
+}

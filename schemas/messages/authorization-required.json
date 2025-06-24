@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://taips.tap.rsvp/schemas/messages/authorization-required.json",
+  "title": "AuthorizationRequired Message",
+  "description": "Indicates that authorization is required to proceed",
+  "type": "object",
+  "allOf": [
+    {
+      "$ref": "../common/didcomm-base.json#/$defs/didcommHeader"
+    }
+  ],
+  "properties": {
+    "type": {
+      "const": "https://taprsvp.com/034.56.789/protocols/transaction-authorization-protocol/1.0/authorization-required"
+    },
+    "body": {
+      "type": "object",
+      "required": ["requirements"],
+      "properties": {
+        "requirements": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["type"],
+            "properties": {
+              "type": {
+                "type": "string",
+                "description": "Type of requirement"
+              },
+              "description": {
+                "type": "string",
+                "description": "Human-readable description"
+              },
+              "required": {
+                "type": "boolean",
+                "default": true,
+                "description": "Whether this requirement is mandatory"
+              },
+              "options": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                },
+                "description": "Available options to fulfill the requirement"
+              }
+            }
+          },
+          "minItems": 1,
+          "description": "List of authorization requirements"
+        },
+        "presentationDefinition": {
+          "type": "object",
+          "description": "Presentation Exchange definition for credential requirements"
+        },
+        "challengeNonce": {
+          "type": "string",
+          "description": "Nonce for challenge-response authentication"
+        },
+        "validUntil": {
+          "$ref": "../common/base-types.json#/$defs/iso8601DateTime",
+          "description": "Deadline for providing authorization"
+        },
+        "fallbackInstructions": {
+          "type": "string",
+          "description": "Instructions if requirements cannot be met"
+        }
+      }
+    }
+  },
+  "required": ["type", "body"]
+}

@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://taips.tap.rsvp/schemas/messages/connect.json",
+  "title": "Connect Message",
+  "description": "Establishes a TAP connection between agents",
+  "type": "object",
+  "allOf": [
+    {
+      "$ref": "../common/didcomm-base.json#/$defs/didcommHeader"
+    }
+  ],
+  "properties": {
+    "type": {
+      "const": "https://taprsvp.com/034.56.789/protocols/transaction-authorization-protocol/1.0/connect"
+    },
+    "body": {
+      "type": "object",
+      "required": ["purpose"],
+      "properties": {
+        "purpose": {
+          "type": "string",
+          "enum": ["transaction", "query", "relationship", "general"],
+          "description": "Purpose of the connection"
+        },
+        "agent": {
+          "$ref": "../data-structures/agent.json",
+          "description": "Agent initiating the connection"
+        },
+        "party": {
+          "$ref": "../data-structures/party.json",
+          "description": "Party the agent represents"
+        },
+        "capabilities": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Agent capabilities and supported features"
+        },
+        "protocols": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uri"
+          },
+          "description": "Supported protocol versions"
+        },
+        "sessionTimeout": {
+          "type": "integer",
+          "minimum": 60,
+          "description": "Requested session timeout in seconds"
+        },
+        "metadata": {
+          "type": "object",
+          "description": "Additional connection metadata"
+        }
+      }
+    }
+  },
+  "required": ["type", "body"]
+}

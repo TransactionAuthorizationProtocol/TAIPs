@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://taips.tap.rsvp/schemas/data-structures/agent.json",
+  "title": "Agent",
+  "description": "Represents software acting on behalf of a participant",
+  "type": "object",
+  "required": ["did", "role"],
+  "properties": {
+    "did": {
+      "$ref": "../common/base-types.json#/$defs/did",
+      "description": "Decentralized Identifier of the agent"
+    },
+    "role": {
+      "type": "string",
+      "enum": ["originator", "beneficiary", "vasp", "wallet", "mediator", "observer"],
+      "description": "Role of the agent in the transaction"
+    },
+    "for": {
+      "$ref": "../common/base-types.json#/$defs/did",
+      "description": "DID of the party this agent represents"
+    },
+    "policies": {
+      "type": "array",
+      "items": {
+        "$ref": "policy.json"
+      },
+      "description": "Policies enforced by this agent"
+    }
+  }
+}

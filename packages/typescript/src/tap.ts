@@ -691,6 +691,12 @@ export interface Cancel extends TapMessageObject<"Cancel"> {
    * Human readable explanation
    */
   reason?: string;
+
+  /**
+   * DID of the agent initiating cancellation
+   * Identifies who is cancelling the transaction
+   */
+  by: DID;
 }
 
 /**
@@ -1159,16 +1165,6 @@ export interface AuthorizationRequiredMessage
 }
 
 /**
- * Complete Message Wrapper
- * DIDComm envelope for a Complete message.
- *
- * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-14.md | TAIP-14: Payments}
- */
-export interface CompleteMessage extends DIDCommReply<Complete> {
-  type: "https://tap.rsvp/schema/1.0#Complete";
-}
-
-/**
  * TAP Message
  * Union type of all possible TAP messages.
  * Used for type-safe message handling in TAP implementations.
@@ -1192,7 +1188,6 @@ export type TAPMessage =
   | ConfirmRelationshipMessage
   | UpdatePoliciesMessage
   | ConnectMessage
-  | AuthorizationRequiredMessage
-  | CompleteMessage;
+  | AuthorizationRequiredMessage;
 
 // All types and interfaces are now exported directly in their declarations

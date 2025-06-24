@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://taips.tap.rsvp/schemas/messages/update-party.json",
+  "title": "UpdateParty Message",
+  "description": "Updates party information in a TAP session",
+  "type": "object",
+  "allOf": [
+    {
+      "$ref": "../common/didcomm-base.json#/$defs/didcommHeader"
+    }
+  ],
+  "properties": {
+    "type": {
+      "const": "https://taprsvp.com/034.56.789/protocols/transaction-authorization-protocol/1.0/update-party"
+    },
+    "body": {
+      "type": "object",
+      "required": ["party", "role"],
+      "properties": {
+        "party": {
+          "$ref": "../data-structures/party.json",
+          "description": "Updated party information"
+        },
+        "role": {
+          "type": "string",
+          "enum": ["originator", "beneficiary"],
+          "description": "Role of the party being updated"
+        },
+        "previousParty": {
+          "$ref": "../data-structures/party.json",
+          "description": "Previous party information for verification"
+        },
+        "reason": {
+          "type": "string",
+          "description": "Reason for the update"
+        },
+        "effective": {
+          "$ref": "../common/base-types.json#/$defs/iso8601DateTime",
+          "description": "When the update becomes effective"
+        }
+      }
+    }
+  },
+  "required": ["type", "body"]
+}

@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://taips.tap.rsvp/schemas/messages/revert.json",
+  "title": "Revert Message",
+  "description": "Reverts a previously settled transaction",
+  "type": "object",
+  "allOf": [
+    {
+      "$ref": "../common/didcomm-base.json#/$defs/didcommHeader"
+    }
+  ],
+  "properties": {
+    "type": {
+      "const": "https://taprsvp.com/034.56.789/protocols/transaction-authorization-protocol/1.0/revert"
+    },
+    "body": {
+      "type": "object",
+      "required": ["originalTxid", "revertTxid", "reason"],
+      "properties": {
+        "originalTxid": {
+          "type": "string",
+          "description": "Transaction ID of the original settlement"
+        },
+        "revertTxid": {
+          "type": "string",
+          "description": "Transaction ID of the revert transaction"
+        },
+        "reason": {
+          "type": "string",
+          "description": "Reason for reverting the transaction"
+        },
+        "reasonCode": {
+          "type": "string",
+          "description": "Standardized revert reason code"
+        },
+        "asset": {
+          "$ref": "../common/caip-types.json#/$defs/caip19",
+          "description": "Asset being reverted"
+        },
+        "assetId": {
+          "$ref": "../common/caip-types.json#/$defs/caip220",
+          "description": "Specific asset instance being reverted"
+        },
+        "amount": {
+          "$ref": "../common/base-types.json#/$defs/amount",
+          "description": "Amount being reverted"
+        },
+        "settlementAddress": {
+          "$ref": "../common/caip-types.json#/$defs/caip10",
+          "description": "Address receiving the reverted funds"
+        },
+        "timestamp": {
+          "$ref": "../common/base-types.json#/$defs/iso8601DateTime",
+          "description": "Revert timestamp"
+        },
+        "fee": {
+          "type": "object",
+          "properties": {
+            "amount": {
+              "$ref": "../common/base-types.json#/$defs/amount"
+            },
+            "asset": {
+              "$ref": "../common/caip-types.json#/$defs/caip19"
+            }
+          },
+          "description": "Revert transaction fee details"
+        }
+      }
+    }
+  },
+  "required": ["type", "body"]
+}

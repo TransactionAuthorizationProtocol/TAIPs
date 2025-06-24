@@ -1,0 +1,106 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://taips.tap.rsvp/schemas/common/base-types.json",
+  "title": "TAP Base Types",
+  "description": "Common base type definitions used across TAP message schemas",
+  "$defs": {
+    "uuid": {
+      "type": "string",
+      "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+      "description": "UUID v4 format"
+    },
+    "did": {
+      "type": "string",
+      "pattern": "^did:[a-z0-9]+:[a-zA-Z0-9._%-]*[a-zA-Z0-9._%-]$",
+      "description": "Decentralized Identifier (DID) format"
+    },
+    "iri": {
+      "type": "string",
+      "format": "iri",
+      "description": "Internationalized Resource Identifier"
+    },
+    "iso8601DateTime": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 date-time format"
+    },
+    "iso4217CurrencyCode": {
+      "type": "string",
+      "pattern": "^[A-Z]{3}$",
+      "description": "ISO 4217 3-letter currency code"
+    },
+    "amount": {
+      "type": "string",
+      "pattern": "^[0-9]+(\\.[0-9]+)?$",
+      "description": "Decimal amount as string to preserve precision"
+    },
+    "lei": {
+      "type": "string",
+      "pattern": "^[A-Z0-9]{20}$",
+      "description": "Legal Entity Identifier (LEI) - 20 alphanumeric characters"
+    },
+    "base64": {
+      "type": "string",
+      "contentEncoding": "base64",
+      "description": "Base64 encoded data"
+    },
+    "email": {
+      "type": "string",
+      "format": "email",
+      "description": "Email address"
+    },
+    "phone": {
+      "type": "string",
+      "pattern": "^\\+?[1-9]\\d{1,14}$",
+      "description": "E.164 phone number format"
+    },
+    "url": {
+      "type": "string",
+      "format": "uri",
+      "description": "URL format"
+    },
+    "jsonLdContext": {
+      "oneOf": [
+        {
+          "type": "string",
+          "format": "uri"
+        },
+        {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "type": "string",
+                "format": "uri"
+              },
+              {
+                "type": "object"
+              }
+            ]
+          }
+        },
+        {
+          "type": "object"
+        }
+      ],
+      "description": "JSON-LD context definition"
+    },
+    "locale": {
+      "type": "string",
+      "pattern": "^[a-z]{2}(-[A-Z]{2})?$",
+      "description": "Language locale code (e.g., 'en', 'en-US')"
+    },
+    "base64Binary": {
+      "type": "object",
+      "required": ["type", "value"],
+      "properties": {
+        "type": {
+          "const": "https://didcomm.org/codecs/1.0/base64"
+        },
+        "value": {
+          "$ref": "#/$defs/base64"
+        }
+      }
+    }
+  }
+}

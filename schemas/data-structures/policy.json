@@ -1,0 +1,100 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://taips.tap.rsvp/schemas/data-structures/policy.json",
+  "title": "Policy",
+  "description": "Base policy type for TAP agents",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/requirePresentation"
+    },
+    {
+      "$ref": "#/$defs/requirePurpose"
+    },
+    {
+      "$ref": "#/$defs/requireConfirmation"
+    },
+    {
+      "$ref": "#/$defs/custom"
+    }
+  ],
+  "$defs": {
+    "requirePresentation": {
+      "type": "object",
+      "required": ["type", "types"],
+      "properties": {
+        "type": {
+          "const": "https://taprsvp.com/policies/require-presentation"
+        },
+        "types": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uri"
+          },
+          "minItems": 1,
+          "description": "Required credential types"
+        },
+        "inputDescriptors": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          },
+          "description": "Presentation Exchange input descriptors"
+        }
+      }
+    },
+    "requirePurpose": {
+      "type": "object",
+      "required": ["type", "codes"],
+      "properties": {
+        "type": {
+          "const": "https://taprsvp.com/policies/require-purpose"
+        },
+        "codes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "description": "Required purpose codes"
+        }
+      }
+    },
+    "requireConfirmation": {
+      "type": "object",
+      "required": ["type", "agent"],
+      "properties": {
+        "type": {
+          "const": "https://taprsvp.com/policies/require-confirmation"
+        },
+        "agent": {
+          "$ref": "../common/base-types.json#/$defs/did",
+          "description": "DID of agent whose confirmation is required"
+        },
+        "timeout": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Timeout in seconds for confirmation"
+        }
+      }
+    },
+    "custom": {
+      "type": "object",
+      "required": ["type"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "format": "uri",
+          "not": {
+            "enum": [
+              "https://taprsvp.com/policies/require-presentation",
+              "https://taprsvp.com/policies/require-purpose",
+              "https://taprsvp.com/policies/require-confirmation"
+            ]
+          }
+        }
+      },
+      "additionalProperties": true
+    }
+  }
+}
