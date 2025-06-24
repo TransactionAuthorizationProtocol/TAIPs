@@ -1165,6 +1165,110 @@ export interface AuthorizationRequiredMessage
 }
 
 /**
+ * Escrow Message
+ * Requests an agent to hold assets in escrow on behalf of parties.
+ * Enables payment guarantees, asset swaps, and conditional payments.
+ *
+ * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-17.md | TAIP-17: Composable Escrow}
+ */
+export interface Escrow extends TapMessageObject<"Escrow"> {
+  /**
+   * Asset to be held in escrow
+   * CAIP-19 identifier for blockchain assets
+   * Either asset OR currency is required
+   */
+  asset?: CAIP19;
+
+  /**
+   * ISO 4217 currency code
+   * For fiat-denominated escrows
+   * Either asset OR currency is required
+   */
+  currency?: IsoCurrency;
+
+  /**
+   * Amount to be held in escrow
+   * String representation of the decimal amount
+   */
+  amount: Amount;
+
+  /**
+   * Party whose assets will be placed in escrow
+   * The party providing the funds
+   */
+  originator: Participant<"Party">;
+
+  /**
+   * Party who will receive the assets when released
+   * The intended recipient of the escrowed funds
+   */
+  beneficiary: Participant<"Party">;
+
+  /**
+   * Expiration timestamp
+   * After this time, funds automatically return to originator
+   */
+  expiry: ISO8601DateTime;
+
+  /**
+   * Optional agreement reference
+   * URL or URI of the escrow terms and conditions
+   */
+  agreement?: string;
+
+  /**
+   * List of agents involved in the escrow
+   * Exactly one agent MUST have role "EscrowAgent"
+   */
+  agents: Participant<"Agent">[];
+}
+
+/**
+ * Capture Message
+ * Authorizes the release of escrowed funds to the beneficiary.
+ * Sent by an agent acting for the beneficiary.
+ *
+ * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-17.md | TAIP-17: Composable Escrow}
+ */
+export interface Capture extends TapMessageObject<"Capture"> {
+  /**
+   * Optional amount to capture
+   * If omitted, captures full escrow amount
+   * Must be less than or equal to original escrow amount
+   */
+  amount?: Amount;
+
+  /**
+   * Optional settlement address
+   * Blockchain address for settlement
+   * If omitted, uses address from earlier Authorize
+   */
+  settlementAddress?: CAIP10;
+}
+
+/**
+ * Escrow Message Wrapper
+ * DIDComm envelope for an Escrow message.
+ *
+ * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-2.md | TAIP-2: Message Format}
+ * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-17.md | TAIP-17: Composable Escrow}
+ */
+export interface EscrowMessage extends DIDCommMessage<Escrow> {
+  type: "https://tap.rsvp/schema/1.0#Escrow";
+}
+
+/**
+ * Capture Message Wrapper
+ * DIDComm envelope for a Capture message.
+ *
+ * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-2.md | TAIP-2: Message Format}
+ * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-17.md | TAIP-17: Composable Escrow}
+ */
+export interface CaptureMessage extends DIDCommReply<Capture> {
+  type: "https://tap.rsvp/schema/1.0#Capture";
+}
+
+/**
  * TAP Message
  * Union type of all possible TAP messages.
  * Used for type-safe message handling in TAP implementations.
@@ -1188,6 +1292,8 @@ export type TAPMessage =
   | ConfirmRelationshipMessage
   | UpdatePoliciesMessage
   | ConnectMessage
-  | AuthorizationRequiredMessage;
+  | AuthorizationRequiredMessage
+  | EscrowMessage
+  | CaptureMessage;
 
 // All types and interfaces are now exported directly in their declarations
