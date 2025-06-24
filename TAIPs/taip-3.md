@@ -5,7 +5,7 @@ status: Review
 type: Standard
 author: Pelle Braendgaard <pelle@notabene.id>
 created: 2024-01-12
-updated: 2025-03-07
+updated: 2025-06-13
 description: Defines a chain-agnostic Transfer message format for moving digital assets between parties with standardized metadata for compliance and record-keeping. Specifies required JSON-LD fields including asset identifiers, amounts, originator/beneficiary information, and settlement details for both fungible and non-fungible tokens.
 discussions-to: https://github.com/TransactionAuthorizationProtocol/TAIPs/pull/5
 requires: 2, 5, 6

@@ -5,7 +5,7 @@ status: Review
 type: Standard
 author: Pelle Braendgaard <pelle@notabene.id>
 created: 2024-03-21
-updated: 2025-04-22
+updated: 2025-06-23
 description: Defines a merchant-initiated Payment message standard for requesting blockchain payments with specified amounts in either crypto assets or fiat currencies. Enables selective disclosure of customer information for compliance and business purposes while facilitating standard e-commerce and invoice payment flows with privacy protection.
 requires: 2, 3, 4, 6, 7, 8, 9, 16
 ---

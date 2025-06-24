@@ -5,7 +5,7 @@ author: Pelle Braendgaard <pelle@notabene.id>, Andrés Junge <andres@notabene.id
 status: Review
 type: Standard
 created: 2024-01-22
-updated: 2025-05-19
+updated: 2025-06-13
 description: Establishes Transaction Agents as services that execute transactions, including exchanges, wallets, and DeFi protocols, using DIDs for identification and authentication. Defines agent interaction protocols for adding, replacing, or removing agents in transaction flows, enabling collaboration between centralized and decentralized participants.
 discussions-to: https://github.com/TransactionAuthorizationProtocol/TAIPs/pull/7
 requires: 2
