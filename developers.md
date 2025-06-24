@@ -1,6 +1,7 @@
 ---
 layout: default
 title: Developer Resources
+permalink: /developers/
 ---
 
 # Developer Resources

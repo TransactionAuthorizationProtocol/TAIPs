@@ -1,6 +1,7 @@
 ---
 layout: default
 title: Changelog
+permalink: /changelog/
 ---
 
 # Changelog
@@ -13,7 +14,7 @@ This changelog focuses on:
 - Protocol structural changes
 - Breaking changes
 
-## [Unreleased]
+## [2025-06-24]
 
 ### Added
 - JSON Schema definitions for all TAP message types in `/schemas/` directory
