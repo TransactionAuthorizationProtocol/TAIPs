@@ -31,6 +31,7 @@ header_pages:
   - tap-overview.md
   - messages.md
   - developers.md
+  - CHANGELOG.md
 
 # Build settings
 markdown: kramdown
