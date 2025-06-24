@@ -38,6 +38,11 @@ This changelog focuses on:
 ### Added
 - JSON Schema definitions for all TAP message types in `/schemas/` directory
 - Developer resources page with implementation guides
+- TAIP-17: Composable Escrow workflow (Draft)
+  - New `Escrow` message type for holding assets on behalf of parties
+  - New `Capture` message type for releasing escrowed funds
+  - Supports both cryptocurrency assets and fiat currency denominations
+  - Enables payment guarantees and asset swap use cases
 - TypeScript fixes: Added `by` field to Cancel interface
 
 ### Removed

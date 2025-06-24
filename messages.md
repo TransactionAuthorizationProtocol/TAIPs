@@ -12,12 +12,14 @@ permalink: /messages/
 - [Transaction Message](#transaction-message)
   - [Transfer](#transfer)
   - [Payment](#payment)
+  - [Escrow](#escrow)
 - [Authorization Flow Messages](#authorization-flow-messages)
   - [Authorize](#authorize)
   - [Settle](#settle)
   - [Reject](#reject)
   - [Cancel](#cancel)
   - [Revert](#revert)
+  - [Capture](#capture)
 - [Participant Management Messages](#participant-management-messages)
   - [UpdateAgent](#updateagent)
   - [UpdateParty](#updateparty)
@@ -271,6 +273,104 @@ Initiates a payment request from a merchant to a customer.
 }
 ```
 
+### Escrow
+[TAIP-17] - Draft
+
+Requests an agent to hold assets in escrow on behalf of parties, enabling payment guarantees and asset swaps.
+
+| Attribute | Type | Required | Status | Description |
+|-----------|------|----------|---------|-------------|
+| @context | string | Yes | Draft ([TAIP-17]) | JSON-LD context "https://tap.rsvp/schema/1.0" |
+| @type | string | Yes | Draft ([TAIP-17]) | JSON-LD type "https://tap.rsvp/schema/1.0#Escrow" |
+| asset | string | No | Draft ([TAIP-17]) | CAIP-19 identifier for the specific cryptocurrency asset. Either asset OR currency must be present |
+| currency | string | No | Draft ([TAIP-17]) | ISO 4217 currency code for fiat-denominated escrows. Either asset OR currency must be present |
+| amount | string | Yes | Draft ([TAIP-17]) | Amount to be held in escrow (decimal string) |
+| originator | [Party](#party) | Yes | Draft ([TAIP-17]) | Party whose assets will be placed in escrow |
+| beneficiary | [Party](#party) | Yes | Draft ([TAIP-17]) | Party who will receive the assets when released |
+| expiry | string | Yes | Draft ([TAIP-17]) | ISO 8601 timestamp after which the escrow automatically expires |
+| agreement | string | No | Draft ([TAIP-17]) | URL or URI referencing the terms and conditions of the escrow |
+| agents | array of [Agent](#agent) | Yes | Draft ([TAIP-17]) | Array of agents involved in the escrow. Exactly one agent MUST have role "EscrowAgent" |
+
+#### Examples
+
+##### Payment guarantee escrow
+```json
+{
+  "id": "123e4567-e89b-12d3-a456-426614174000",
+  "type": "https://tap.rsvp/schema/1.0#Escrow",
+  "from": "did:web:merchant.example",
+  "to": ["did:web:paymentprocessor.example"],
+  "created_time": 1719226800,
+  "expires_time": 1719313200,
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#Escrow",
+    "asset": "eip155:1/erc20:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+    "amount": "100.00",
+    "originator": {
+      "@id": "did:eg:customer"
+    },
+    "beneficiary": {
+      "@id": "did:web:merchant.example"
+    },
+    "expiry": "2025-06-25T00:00:00Z",
+    "agreement": "https://merchant.example/order/12345/terms",
+    "agents": [
+      {
+        "@id": "did:web:merchant.example",
+        "for": "did:web:merchant.example"
+      },
+      {
+        "@id": "did:web:paymentprocessor.example",
+        "role": "EscrowAgent"
+      },
+      {
+        "@id": "did:web:customer.wallet",
+        "for": "did:eg:customer"
+      }
+    ]
+  }
+}
+```
+
+##### Fiat currency escrow
+```json
+{
+  "id": "789e0123-e89b-12d3-a456-426614174003",
+  "type": "https://tap.rsvp/schema/1.0#Escrow",
+  "from": "did:web:marketplace.example",
+  "to": ["did:web:escrow.bank"],
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#Escrow",
+    "currency": "USD",
+    "amount": "500.00",
+    "originator": {
+      "@id": "did:eg:buyer"
+    },
+    "beneficiary": {
+      "@id": "did:eg:seller"
+    },
+    "expiry": "2025-07-01T00:00:00Z",
+    "agreement": "https://marketplace.example/purchase/98765",
+    "agents": [
+      {
+        "@id": "did:web:marketplace.example",
+        "for": "did:eg:seller"
+      },
+      {
+        "@id": "did:web:buyer.bank",
+        "for": "did:eg:buyer"
+      },
+      {
+        "@id": "did:web:escrow.bank",
+        "role": "EscrowAgent"
+      }
+    ]
+  }
+}
+```
+
 ## Authorization Flow Messages
 
 ### Authorize
@@ -442,6 +542,55 @@ Requests a reversal of a settled transaction. This could be part of a dispute re
     "@type": "https://tap.rsvp/schema/1.0#Revert",
     "settlementAddress": "eip155:1:0x1234a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb",
     "reason": "Insufficient Originator Information"
+  }
+}
+```
+
+### Capture
+[TAIP-17] - Draft
+
+Authorizes the release of escrowed funds to the beneficiary. Only agents acting for the beneficiary can send this message.
+
+| Attribute | Type | Required | Status | Description |
+|-----------|------|----------|---------|-------------|
+| @context | string | Yes | Draft ([TAIP-17]) | JSON-LD context "https://tap.rsvp/schema/1.0" |
+| @type | string | Yes | Draft ([TAIP-17]) | JSON-LD type "https://tap.rsvp/schema/1.0#Capture" |
+| amount | string | No | Draft ([TAIP-17]) | Amount to capture (decimal string). If omitted, captures full escrow amount. Must be ≤ original amount |
+| settlementAddress | string | No | Draft ([TAIP-17]) | Blockchain address for settlement. If omitted, uses address from earlier Authorize |
+
+> **Note:** The message refers to the original Escrow message via the DIDComm `thid` (thread ID) in the message envelope.
+
+#### Examples
+
+##### Full capture
+```json
+{
+  "id": "capture-123",
+  "type": "https://tap.rsvp/schema/1.0#Capture",
+  "from": "did:web:merchant.example",
+  "to": ["did:web:paymentprocessor.example"],
+  "thid": "123e4567-e89b-12d3-a456-426614174000",
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#Capture",
+    "settlementAddress": "eip155:1:0x742d35Cc6634C0532925a3b844Bc9e7595f1234"
+  }
+}
+```
+
+##### Partial capture
+```json
+{
+  "id": "capture-456",
+  "type": "https://tap.rsvp/schema/1.0#Capture",
+  "from": "did:web:merchant.example",
+  "to": ["did:web:paymentprocessor.example"],
+  "thid": "123e4567-e89b-12d3-a456-426614174000",
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#Capture",
+    "amount": "95.00",
+    "settlementAddress": "eip155:1:0x742d35Cc6634C0532925a3b844Bc9e7595f1234"
   }
 }
 ```

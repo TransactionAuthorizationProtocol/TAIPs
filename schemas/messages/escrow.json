@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://taips.tap.rsvp/schemas/messages/escrow.json",
+  "title": "Escrow Message",
+  "description": "Requests an agent to hold assets in escrow on behalf of parties",
+  "type": "object",
+  "allOf": [
+    {
+      "$ref": "../common/didcomm-base.json#/$defs/didcommHeader"
+    }
+  ],
+  "properties": {
+    "type": {
+      "const": "https://tap.rsvp/schema/1.0#Escrow"
+    },
+    "body": {
+      "type": "object",
+      "required": ["@context", "@type", "amount", "originator", "beneficiary", "expiry", "agents"],
+      "oneOf": [
+        {
+          "required": ["asset"]
+        },
+        {
+          "required": ["currency"]
+        }
+      ],
+      "properties": {
+        "@context": {
+          "const": "https://tap.rsvp/schema/1.0",
+          "description": "JSON-LD context"
+        },
+        "@type": {
+          "const": "https://tap.rsvp/schema/1.0#Escrow",
+          "description": "Type identifier"
+        },
+        "asset": {
+          "$ref": "../common/caip-types.json#/$defs/caip19",
+          "description": "Asset to be held in escrow (CAIP-19 identifier)"
+        },
+        "currency": {
+          "$ref": "../common/base-types.json#/$defs/iso4217CurrencyCode",
+          "description": "ISO 4217 currency code for fiat-denominated escrows"
+        },
+        "amount": {
+          "$ref": "../common/base-types.json#/$defs/amount",
+          "description": "Amount to be held in escrow"
+        },
+        "originator": {
+          "$ref": "../data-structures/party.json",
+          "description": "Party whose assets will be placed in escrow"
+        },
+        "beneficiary": {
+          "$ref": "../data-structures/party.json",
+          "description": "Party who will receive the assets when released"
+        },
+        "expiry": {
+          "$ref": "../common/base-types.json#/$defs/iso8601DateTime",
+          "description": "Timestamp after which the escrow expires and funds return to originator"
+        },
+        "agreement": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL or URI referencing the terms and conditions of the escrow"
+        },
+        "agents": {
+          "type": "array",
+          "items": {
+            "$ref": "../data-structures/agent.json"
+          },
+          "minItems": 1,
+          "description": "Agents involved in the escrow. Exactly one agent MUST have role 'EscrowAgent'",
+          "contains": {
+            "type": "object",
+            "properties": {
+              "role": {
+                "const": "EscrowAgent"
+              }
+            },
+            "required": ["role"]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        }
+      }
+    }
+  },
+  "required": ["type", "body"]
+}

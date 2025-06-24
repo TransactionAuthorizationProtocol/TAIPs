@@ -4,20 +4,47 @@
   "title": "Agent",
   "description": "Represents software acting on behalf of a participant",
   "type": "object",
-  "required": ["did", "role"],
+  "required": ["@id"],
   "properties": {
-    "did": {
+    "@id": {
       "$ref": "../common/base-types.json#/$defs/did",
       "description": "Decentralized Identifier of the agent"
     },
+    "@type": {
+      "const": "Agent",
+      "description": "Type identifier for Agent"
+    },
     "role": {
       "type": "string",
-      "enum": ["originator", "beneficiary", "vasp", "wallet", "mediator", "observer"],
-      "description": "Role of the agent in the transaction"
+      "pattern": "^[A-Z][a-zA-Z]*$",
+      "description": "Role of the agent in the transaction (PascalCase). Standard values include: SettlementAddress, SourceAddress, CustodialService, EscrowAgent"
     },
     "for": {
-      "$ref": "../common/base-types.json#/$defs/did",
-      "description": "DID of the party this agent represents"
+      "oneOf": [
+        {
+          "$ref": "../common/base-types.json#/$defs/did"
+        },
+        {
+          "type": "array",
+          "items": {
+            "$ref": "../common/base-types.json#/$defs/did"
+          },
+          "minItems": 1
+        }
+      ],
+      "description": "DID(s) of the party/parties this agent represents"
+    },
+    "name": {
+      "type": "string",
+      "description": "Human-readable name of the agent"
+    },
+    "nameHash": {
+      "$ref": "../common/base-types.json#/$defs/base64",
+      "description": "SHA-256 hash of the normalized agent name"
+    },
+    "lei:leiCode": {
+      "$ref": "../common/base-types.json#/$defs/lei",
+      "description": "Legal Entity Identifier code"
     },
     "policies": {
       "type": "array",
