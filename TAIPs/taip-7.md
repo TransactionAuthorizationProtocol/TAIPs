@@ -5,7 +5,7 @@ author: Pelle Braendgaard <pelle@notabene.id>, Andrés Junge <andres@notabene.id
 status: Review
 type: Standard
 created: 2024-01-23
-updated: 2025-03-07
+updated: 2025-05-31
 description: Defines a policy framework allowing transaction agents to declare their requirements for authorizing digital asset transfers using JSON-LD structured declarations. Establishes standardized policy types including authorization requirements, beneficiary checks, relationship confirmations, and credential presentations to enable trust and compliance in decentralized transaction ecosystems.
 discussions-to: https://github.com/TransactionAuthorizationProtocol/TAIPs/pull/9
 requires: 2, 4, 5, 6

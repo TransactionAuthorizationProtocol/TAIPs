@@ -5,7 +5,7 @@ status: Review
 type: Standard
 author: Pelle Braendgaard <pelle@notabene.id>, Richard Crosby <richard@notabene.id>
 created: 2024-01-09
-updated: 2025-03-07
+updated: 2025-06-23
 description: Implements secure messaging between TAP agents using DIDComm v2, JSON encoding, and digital signatures via JWS with optional JWE encryption. Establishes required message attributes, transport protocols, and Out-of-Band invitation mechanisms to enable private, decentralized communication about digital asset transactions.
 discussions-to: https://github.com/TransactionAuthorizationProtocol/TAIPs/pull/4
 ---

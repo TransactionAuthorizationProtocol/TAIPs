@@ -5,7 +5,7 @@ author: Pelle Braendgaard <pelle@notabene.id>, Andrés Junge <andres@notabene.id
 status: Review
 type: Standard
 created: 2024-01-12
-updated: 2025-03-07
+updated: 2025-06-23
 description: A protocol framework enabling off-chain authorization of blockchain transactions through DID-based agents before settlement. Separates transaction ordering, authorization, and settlement into distinct phases to address compliance, risk management, and operational challenges without changing permissionless blockchain characteristics.
 discussions-to: https://github.com/TransactionAuthorizationProtocol/TAIPs/pull/6
 requires: 2, 5

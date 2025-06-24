@@ -6,7 +6,7 @@ discussions-to: https://github.com/TransactionAuthorizationProtocol/TAIPs/pull/2
 status: Review
 type: Standard
 created: 2024-03-20
-updated: 2024-03-20
+updated: 2025-05-31
 description: Adds standardized ISO 20022 purpose and categoryPurpose fields to Asset Transfer messages, enabling clear indication of payment reasons and improved interoperability with traditional financial systems. Defines a RequirePurpose policy allowing agents to mandate purpose codes for regulatory compliance while maintaining backward compatibility.
 requires: [3,7]
 ---
