@@ -14,6 +14,7 @@ The purpose of TAIPs is to provide the community with a means to propose enhance
 - [Developer Resources](./developers.md) - Quick start guide for developers with examples and usage instructions
 - [JSON Schemas](./schemas/) - Machine-readable JSON Schema definitions for all TAP messages
 - [TypeScript Types](./packages/typescript/) - TypeScript type definitions (`@taprsvp/types` npm package)
+- [Changelog](./CHANGELOG.md) - History of structural changes, new TAIPs, and message format updates
 
 ## TAIP Statuses
 
