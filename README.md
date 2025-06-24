@@ -11,6 +11,9 @@ The purpose of TAIPs is to provide the community with a means to propose enhance
 ## Documentation
 
 - [Message Types and Data Structures](./messages.md) - Comprehensive documentation of all TAP message types and data structures
+- [Developer Resources](./developers.md) - Quick start guide for developers with examples and usage instructions
+- [JSON Schemas](./schemas/) - Machine-readable JSON Schema definitions for all TAP messages
+- [TypeScript Types](./packages/typescript/) - TypeScript type definitions (`@taprsvp/types` npm package)
 
 ## TAIP Statuses
 
@@ -36,6 +39,32 @@ The purpose of TAIPs is to provide the community with a means to propose enhance
 | 12   | [Hashed Participant Name sharing in TAP messages](./TAIPs/taip-12.md)  |
 | 13   | [Transaction Purpose Codes](./TAIPs/taip-13.md)                        |
 | 14   | [Payment Requests](./TAIPs/taip-14.md)                                 |
+| 15   | [Agent Connection Protocol](./TAIPs/taip-15.md)                         |
+| 16   | [Invoices](./TAIPs/taip-16.md)                                         |
+
+## Implementation Resources
+
+### JSON Schemas
+All TAP message types have corresponding JSON Schema definitions available at:
+- **Base URL**: https://taips.tap.rsvp/schemas/
+- **Local Path**: [./schemas/](./schemas/)
+
+Example schemas:
+- Transfer Message: https://taips.tap.rsvp/schemas/messages/transfer.json
+- Payment Message: https://taips.tap.rsvp/schemas/messages/payment.json
+- Party Structure: https://taips.tap.rsvp/schemas/data-structures/party.json
+
+### TypeScript Types
+Official TypeScript type definitions are available as an npm package:
+- **Package**: `@taprsvp/types`
+- **Source**: [./packages/typescript/](./packages/typescript/)
+- **Installation**: `npm install @taprsvp/types`
+
+The package exports:
+- All TAP message type interfaces
+- Data structure types (Party, Agent, Policy, etc.)
+- Common types (CAIP identifiers, ISO types, etc.)
+- Full TypeScript support with comprehensive JSDoc comments
 
 ## Inspiration
 

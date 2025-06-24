@@ -30,6 +30,7 @@ header_pages:
   - index.html
   - tap-overview.md
   - messages.md
+  - developers.md
 
 # Build settings
 markdown: kramdown
