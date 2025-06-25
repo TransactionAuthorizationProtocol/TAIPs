@@ -345,6 +345,11 @@ footer {
   color: var(--color-secondary-fg);
 }
 
+.status-last-call {
+  background-color: #dbeafe;
+  color: #1e40af;
+}
+
 .status-review {
   background-color: #ffedd5;
   color: #9a3412;

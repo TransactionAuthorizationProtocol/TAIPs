@@ -24,33 +24,33 @@ title: Home
     
     <h3>Core TAIPs</h3>
     <div class="taips-grid">
+      {% assign final_taips = site.pages | where_exp: "item", "item.path contains 'TAIPs/taip-'" | where: "status", "Final" | sort: 'taip' %}
+      {% assign lastcall_taips = site.pages | where_exp: "item", "item.path contains 'TAIPs/taip-'" | where: "status", "Last Call" | sort: 'taip' %}
       {% assign review_taips = site.pages | where_exp: "item", "item.path contains 'TAIPs/taip-'" | where: "status", "Review" | sort: 'taip' %}
-      {% assign accepted_taips = site.pages | where_exp: "item", "item.path contains 'TAIPs/taip-'" | where: "status", "Accepted" | sort: 'taip' %}
-      {% assign draft_taips = site.pages | where_exp: "item", "item.path contains 'TAIPs/taip-'" | where: "status", "Draft" | sort: 'taip' %}
       
-      {% comment %} Display Accepted TAIPs first {% endcomment %}
-      {% for taip in accepted_taips %}
+      {% comment %} Display Final TAIPs first {% endcomment %}
+      {% for taip in final_taips %}
         <div class="taip-card">
           <h4><a href="{{ taip.url | relative_url }}">TAIP-{{ taip.taip }}: {{ taip.title }}</a></h4>
-          <span class="status-pill status-{{ taip.status | downcase }}">{{ taip.status }}</span>
+          <span class="status-pill status-{{ taip.status | downcase | replace: ' ', '-' }}">{{ taip.status }}</span>
           <p>{{ taip.description | default: "Defines a standard component of the Transaction Authorization Protocol." }}</p>
         </div>
       {% endfor %}
       
-      {% comment %} Display Review TAIPs next {% endcomment %}
+      {% comment %} Display Last Call TAIPs next {% endcomment %}
+      {% for taip in lastcall_taips %}
+        <div class="taip-card">
+          <h4><a href="{{ taip.url | relative_url }}">TAIP-{{ taip.taip }}: {{ taip.title }}</a></h4>
+          <span class="status-pill status-{{ taip.status | downcase | replace: ' ', '-' }}">{{ taip.status }}</span>
+          <p>{{ taip.description | default: "Defines a standard component of the Transaction Authorization Protocol." }}</p>
+        </div>
+      {% endfor %}
+      
+      {% comment %} Display Review TAIPs last {% endcomment %}
       {% for taip in review_taips %}
         <div class="taip-card">
           <h4><a href="{{ taip.url | relative_url }}">TAIP-{{ taip.taip }}: {{ taip.title }}</a></h4>
-          <span class="status-pill status-{{ taip.status | downcase }}">{{ taip.status }}</span>
-          <p>{{ taip.description | default: "Defines a standard component of the Transaction Authorization Protocol." }}</p>
-        </div>
-      {% endfor %}
-      
-      {% comment %} Display Draft TAIPs last {% endcomment %}
-      {% for taip in draft_taips %}
-        <div class="taip-card">
-          <h4><a href="{{ taip.url | relative_url }}">TAIP-{{ taip.taip }}: {{ taip.title }}</a></h4>
-          <span class="status-pill status-{{ taip.status | downcase }}">{{ taip.status }}</span>
+          <span class="status-pill status-{{ taip.status | downcase | replace: ' ', '-' }}">{{ taip.status }}</span>
           <p>{{ taip.description | default: "Defines a standard component of the Transaction Authorization Protocol." }}</p>
         </div>
       {% endfor %}
