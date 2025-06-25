@@ -1,7 +1,7 @@
 ---
 taip: 10
 title: IVMS101 for Travel Rule Identity Verification in TAP
-status: Review
+status: Last Call
 type: Standard
 author: Pelle Braendgaard <pelle@notabene.id>
 created: 2024-01-24

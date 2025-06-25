@@ -2,7 +2,7 @@
 taip: 8
 title: Selective Disclosure
 author: Pelle Braendgaard <pelle@notabene.id>, Andrés Junge <andres@notabene.id>, Richard Crosby <richard@notabene.id>
-status: Review
+status: Last Call
 type: Standard
 created: 2024-01-24
 updated: 2025-05-31
@@ -41,8 +41,8 @@ In the context of the [W3C Verifiable Credential Model][VCModel] the following p
 * **Subject** - An entity about which claims are made. In the context of [TAIP-4] this MUST be a [Party][TAIP-6] or [Agent][TAIP-5] to the transaction.
 * **Issuer** - A role of an entity that asserts claims about the **Subject** into [VC]. In the context of [TAIP-4] this could be an [Agent][TAIP-5] to the transaction, but as portable KYC becomes more prevalent it doesn't have to be.
 * **Verifier** - A role of an entity that requests and receives [Verifiable Presentations][VP] containing [Verifiable Credentials][VC] for a particular purpose. In the context of [TAIP-4] this MUST be an [Agent][TAIP-5] to the transaction.
-* **Holder** - A role for an entity that holds a combination of [Verifiable Credentials][VC] and generate [Verifiable Presentations][VP] based on requests from **Verifiers**.  In the context of [TAIP-4] this MUST be an [Agent][TAIP-5] to the transaction. 
- 
+* **Holder** - A role for an entity that holds a combination of [Verifiable Credentials][VC] and generate [Verifiable Presentations][VP] based on requests from **Verifiers**.  In the context of [TAIP-4] this MUST be an [Agent][TAIP-5] to the transaction.
+
 Within TAP the **Holder** and **Issuer** are often the same.
 
 ### `RequirePresentation` policy
@@ -244,7 +244,7 @@ In analyzing Personally Identifiable Information (PII) to comply with the Financ
 * [VC] Verifiable Credentials
 * [VP] Verifiable Presentation
 * [IVMS-101] interVASP Messaging Standard 101 (IVMS 101)
-  
+
 [TAIP-2]: ./taip-2
 [TAIP-3]: ./taip-3
 [TAIP-4]: ./taip-4

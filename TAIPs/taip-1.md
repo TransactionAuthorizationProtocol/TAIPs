@@ -1,7 +1,7 @@
 ---
 taip: 1
 title: TAP and TAIP Purpose and Guidelines
-status: Review
+status: Final
 type: Meta
 author: Pelle Braendgaard <pelle@notabene.id>
 created: 2024-01-09
@@ -22,7 +22,7 @@ The TAIP should provide a concise technical specification of the feature and a r
 
 ## TAIP Rationale
 
-Blockchain development is still under very rapid pace. Adding authorization support to new technologies requires a decentralized approach to authoring this. 
+Blockchain development is still under very rapid pace. Adding authorization support to new technologies requires a decentralized approach to authoring this.
 
 TAIPs allows authors to focus on specific aspects of authorization and interactions with new protocols, technologies, and workflows.
 
@@ -163,7 +163,7 @@ The editors don't pass judgment on TAIPs. We merely do the administrative & edit
 
 ## History
 
-This document was derived heavily from [CAIP-1] written by Ligi, which was derived by [Bitcoin's BIP-0001] written by Amir Taaki, which in turn was derived from [Python's PEP-0001]. In many places text was simply copied and modified. Although the PEP-0001 text was written by Barry Warsaw, Jeremy Hylton, and David Goodger, they are not responsible for its use in Transaction Authorization Improvement Proposals, and should not be bothered with technical questions specific to TAIPs. Please direct all comments to the TAIP editors. 
+This document was derived heavily from [CAIP-1] written by Ligi, which was derived by [Bitcoin's BIP-0001] written by Amir Taaki, which in turn was derived from [Python's PEP-0001]. In many places text was simply copied and modified. Although the PEP-0001 text was written by Barry Warsaw, Jeremy Hylton, and David Goodger, they are not responsible for its use in Transaction Authorization Improvement Proposals, and should not be bothered with technical questions specific to TAIPs. Please direct all comments to the TAIP editors.
 
 ### References
 

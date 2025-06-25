@@ -1,7 +1,7 @@
 ---
 taip: 15
 title: Agent Connection Protocol
-status: Draft
+status: Review
 type: Standard
 author: Pelle Braendgaard <pelle@notabene.id>
 created: 2024-03-21

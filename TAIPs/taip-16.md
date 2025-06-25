@@ -1,7 +1,7 @@
 ---
 taip: 16
 title: Invoices
-status: Draft
+status: Review
 type: Standard
 author: Pelle Braendgaard <pelle@notabene.id>
 created: 2025-04-22

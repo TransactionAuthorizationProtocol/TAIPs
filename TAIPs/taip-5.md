@@ -2,7 +2,7 @@
 taip: 5
 title: Transaction Agents
 author: Pelle Braendgaard <pelle@notabene.id>, Andrés Junge <andres@notabene.id>, Richard Crosby <richard@notabene.id>
-status: Review
+status: Last Call
 type: Standard
 created: 2024-01-22
 updated: 2025-06-13

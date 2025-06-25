@@ -2,7 +2,7 @@
 taip: 7
 title: Agent Policies
 author: Pelle Braendgaard <pelle@notabene.id>, Andrés Junge <andres@notabene.id>, Richard Crosby <richard@notabene.id>
-status: Review
+status: Last Call
 type: Standard
 created: 2024-01-23
 updated: 2025-05-31

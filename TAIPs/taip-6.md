@@ -2,7 +2,7 @@
 taip: 6
 title: Transaction Parties
 author: Pelle Braendgaard <pelle@notabene.id>, Andrés Junge <andres@notabene.id>, Richard Crosby <richard@notabene.id>
-status: Review
+status: Last Call
 type: Standard
 created: 2024-01-22
 updated: 2025-05-31
@@ -91,7 +91,7 @@ Future TAIPs can define additional types of parties. Examples.
 * `issuer` of a real world asset
 * `trustee`, `grantor`, `beneficiary` for a trust
 * `customer`, `merchant` for a sales contract
- 
+
 ### Agents for Parties
 
 Any Agent can add a `for` attibute to their Agent object (see [TAIP-5]). This specifies that the agent is an agent for the [DID] or [IRI] for a particular party.

@@ -1,7 +1,7 @@
 ---
 taip: 3
 title: Asset Transfer
-status: Review
+status: Last Call
 type: Standard
 author: Pelle Braendgaard <pelle@notabene.id>
 created: 2024-01-12

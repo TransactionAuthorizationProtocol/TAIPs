@@ -1,7 +1,7 @@
 ---
 taip: 2
 title: Messaging
-status: Review
+status: Last Call
 type: Standard
 author: Pelle Braendgaard <pelle@notabene.id>, Richard Crosby <richard@notabene.id>
 created: 2024-01-09

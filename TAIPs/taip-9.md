@@ -2,7 +2,7 @@
 taip: 9
 title: Proof of Relationship
 author: Pelle Braendgaard <pelle@notabene.id>
-status: Review
+status: Last Call
 type: Standard
 created: 2024-01-25
 updated: 2025-05-31
@@ -252,7 +252,7 @@ The following case the beneficiary vasp confirms that the settlement address act
   ]
 }
 ```
-In addition to this, they 
+In addition to this, they
 
 The following case the beneficiary vasp confirms that they are acting on behalf of the beneficiary customer:
 
@@ -307,7 +307,7 @@ The following case the beneficiary vasp confirms that they are acting on behalf 
 * [VCModel] W3C Verifiable Credentials Data Model
 * [VC] Verifiable Credentials
 * [VP] Verifiable Presentation
-  
+
 [TAIP-2]: ./taip-2
 [TAIP-3]: ./taip-3
 [TAIP-4]: ./taip-4

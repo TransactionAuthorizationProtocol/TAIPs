@@ -14,6 +14,25 @@ This changelog focuses on:
 - Protocol structural changes
 - Breaking changes
 
+## [2025-06-25]
+
+### Changed
+- **TAIP Status Updates**:
+  - TAIP-1: Transaction Authorization Improvement Proposals - Advanced to **Final** status
+  - TAIPs 2-10 - Advanced to **Last Call** status:
+    - TAIP-2: Messaging
+    - TAIP-3: Virtual Asset Transfer
+    - TAIP-4: Transaction Authorization Protocol
+    - TAIP-5: Transaction Agents
+    - TAIP-6: Transaction Parties
+    - TAIP-7: Agent Policies
+    - TAIP-8: Selective Disclosure
+    - TAIP-9: Proof of Relationship
+    - TAIP-10: IVMS101 for Travel Rule
+  - TAIPs 15-16 - Advanced from **Draft** to **Review** status:
+    - TAIP-15: Agent Connection Protocol
+    - TAIP-16: Invoices
+
 ## [2025-06-24]
 
 ### Added
