@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://taips.tap.rsvp/schemas/common/payto-uri.json",
+  "title": "PayTo URI",
+  "description": "RFC 8905 'payto' URI scheme for payments",
+  "type": "string",
+  "pattern": "^payto://[a-z0-9]+/[^?#]+(\\?[^#]*)?(#.*)?$",
+  "examples": [
+    "payto://iban/DE75512108001245126199",
+    "payto://ach/122000247/111000025",
+    "payto://bic/SOGEDEFFXXX",
+    "payto://upi/9999999999@paytm"
+  ]
+}

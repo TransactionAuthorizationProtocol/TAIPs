@@ -30,8 +30,8 @@
           "description": "Amount to transfer"
         },
         "settlementAddress": {
-          "$ref": "../common/caip-types.json#/$defs/caip10",
-          "description": "Destination address for settlement"
+          "$ref": "../common/settlement-address.json",
+          "description": "Destination address for settlement in either CAIP-10 or RFC 8905 format"
         },
         "originator": {
           "$ref": "../data-structures/party.json",

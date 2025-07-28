@@ -14,6 +14,36 @@ This changelog focuses on:
 - Protocol structural changes
 - Breaking changes
 
+## [2025-07-28]
+
+### Added
+- **RFC 8905 PayTo URI Support**: Settlement addresses now support both blockchain (CAIP-10) and traditional payment systems (RFC 8905)
+  - Added to TAIP-4: Authorize, Settle, and Revert messages now accept PayTo URIs for bank transfers
+  - Added to TAIP-14: Payment messages support `fallbackSettlementAddresses` field
+  - Added to Transfer, Capture, and Invoice messages
+- **Fallback Settlement Addresses**: New optional field in Payment messages for redundancy
+  - Supports array of mixed CAIP-10 and RFC 8905 addresses
+  - Enables failover mechanisms for fiat payments and crypto transfers
+- **Purpose Code Types**: Added ISO 20022 External Purpose Code union types to TypeScript package
+  - ExternalPurposeCode: 331 standardized purpose codes
+  - ExternalCategoryPurposeCode: 48 category purpose codes
+
+### Changed
+- **TypeScript Package (@taprsvp/types)**:
+  - Added `PayToURI` type for RFC 8905 support
+  - Created `SettlementAddress` union type (CAIP-10 | PayToURI)
+  - Updated all settlement address fields to use new union type
+  - Converted `IsoCurrency` from enum to union type for better tree-shaking
+  - Converted purpose codes from enums to union types
+- **JSON Schemas**:
+  - Created `payto-uri.json` and `settlement-address.json` common schemas
+  - Updated all message schemas to support new settlement address formats
+  - Fixed DIDComm message type pattern to match body @type format
+
+### Updated
+- TAIP-4: Added RFC 8905 reference and examples for traditional payment settlement
+- TAIP-14: Added `fallbackSettlementAddresses` field specification
+
 ## [2025-06-25]
 
 ### Changed

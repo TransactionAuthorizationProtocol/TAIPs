@@ -1,0 +1,30 @@
+{
+  "id": "599f7220-6149-4c45-adbb-86d96c8e0608",
+  "type": "https://tap.rsvp/schema/1.0#Payment",
+  "from": "did:example:merchant",
+  "to": ["did:example:customer"],
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#Payment",
+    "currency": "EUR",
+    "amount": "250.00",
+    "supportedAssets": [
+      "eip155:1/erc20:0xA0b86991c53D94fa4C0bCBf0C1C4DF2F15F1b7A8",
+      "eip155:137/erc20:0x2791Bca1f2de4661ED88A30C2A8A6b5E7C54fD3A"
+    ],
+    "fallbackSettlementAddresses": [
+      "eip155:137:0x8B5e7A2C3f4D1E6F9A0b3C5e7D9f1A2B4C6E8F0A",
+      "payto://iban/DE89370400440532013000"
+    ],
+    "expiry": "2025-07-30T14:30:00Z",
+    "merchant": {
+      "@id": "did:example:merchant",
+      "name": "Digital Goods Store",
+      "mcc": "5734"
+    },
+    "agents": [{
+      "@id": "did:example:merchant-psp",
+      "role": "PaymentProcessor"
+    }]
+  }
+}

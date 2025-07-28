@@ -1,0 +1,14 @@
+{
+  "id": "770e8400-e29b-41d4-a716-446655440002",
+  "from": "did:web:originator.vasp",
+  "type": "https://tap.rsvp/schema/1.0#Settle",
+  "thid": "599f7220-6149-4c45-adbb-86d96c8e0608",
+  "to": ["did:web:beneficiary.vasp"],
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#Settle",
+    "settlementAddress": "eip155:1:0x1234a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb",
+    "settlementId": "eip155:1:tx/0x3edb98c24d46d148eb926c714f4fbaa117c47b0c0821f38bfce9763604457c33",
+    "amount": "100.00"
+  }
+}

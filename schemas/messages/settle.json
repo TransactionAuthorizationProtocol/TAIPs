@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://taips.tap.rsvp/schemas/messages/settle.json",
   "title": "Settle Message",
-  "description": "Indicates settlement has been initiated on-chain",
+  "description": "Indicates settlement has been initiated on-chain per TAIP-4",
   "type": "object",
   "allOf": [
     {
@@ -11,67 +11,34 @@
   ],
   "properties": {
     "type": {
-      "const": "https://taprsvp.com/034.56.789/protocols/transaction-authorization-protocol/1.0/settle"
+      "const": "https://tap.rsvp/schema/1.0#Settle"
     },
     "body": {
       "type": "object",
-      "required": ["txid", "asset", "amount", "settlementAddress"],
+      "required": ["@context", "@type", "settlementAddress"],
       "properties": {
-        "txid": {
+        "@context": {
+          "const": "https://tap.rsvp/schema/1.0"
+        },
+        "@type": {
+          "const": "https://tap.rsvp/schema/1.0#Settle"
+        },
+        "settlementAddress": {
+          "$ref": "../common/settlement-address.json",
+          "description": "Destination address of the transaction in either CAIP-10 or RFC 8905 format"
+        },
+        "settlementId": {
           "type": "string",
-          "description": "On-chain transaction identifier"
-        },
-        "asset": {
-          "$ref": "../common/caip-types.json#/$defs/caip19",
-          "description": "Asset being settled"
-        },
-        "assetId": {
-          "$ref": "../common/caip-types.json#/$defs/caip220",
-          "description": "Specific asset instance (e.g., NFT)"
+          "pattern": "^[-a-z0-9]{3,8}:[-_a-zA-Z0-9]{1,32}:(tx|txn)/[-%a-zA-Z0-9]{1,128}$",
+          "description": "CAIP-220 identifier of the settlement transaction on a blockchain",
+          "examples": ["eip155:1:tx/0x3edb98c24d46d148eb926c714f4fbaa117c47b0c0821f38bfce9763604457c33"]
         },
         "amount": {
           "$ref": "../common/base-types.json#/$defs/amount",
-          "description": "Amount being settled"
-        },
-        "settlementAddress": {
-          "$ref": "../common/caip-types.json#/$defs/caip10",
-          "description": "Destination address for settlement"
-        },
-        "originatorAddress": {
-          "$ref": "../common/caip-types.json#/$defs/caip10",
-          "description": "Source address of the settlement"
-        },
-        "confirmations": {
-          "type": "integer",
-          "minimum": 0,
-          "description": "Number of blockchain confirmations"
-        },
-        "blockHeight": {
-          "type": "integer",
-          "minimum": 0,
-          "description": "Block height of the transaction"
-        },
-        "blockHash": {
-          "type": "string",
-          "description": "Hash of the block containing the transaction"
-        },
-        "timestamp": {
-          "$ref": "../common/base-types.json#/$defs/iso8601DateTime",
-          "description": "Settlement timestamp"
-        },
-        "fee": {
-          "type": "object",
-          "properties": {
-            "amount": {
-              "$ref": "../common/base-types.json#/$defs/amount"
-            },
-            "asset": {
-              "$ref": "../common/caip-types.json#/$defs/caip19"
-            }
-          },
-          "description": "Transaction fee details"
+          "description": "Amount settled (optional, defaults to full amount from original transaction)"
         }
-      }
+      },
+      "additionalProperties": false
     }
   },
   "required": ["type", "body"]
