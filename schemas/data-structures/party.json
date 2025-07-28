@@ -2,12 +2,28 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://taips.tap.rsvp/schemas/data-structures/party.json",
   "title": "Party",
-  "description": "Represents a participant in a TAP transaction",
+  "description": "Represents a real-world entity (legal or natural person) involved in a transaction",
   "type": "object",
+  "required": ["@id"],
   "properties": {
-    "lei": {
+    "@id": {
+      "oneOf": [
+        {
+          "$ref": "../common/base-types.json#/$defs/did"
+        },
+        {
+          "$ref": "../common/base-types.json#/$defs/iri"
+        }
+      ],
+      "description": "Identifier for the party (DID or IRI)"
+    },
+    "@type": {
+      "const": "Party",
+      "description": "Type identifier for Party"
+    },
+    "lei:leiCode": {
       "$ref": "../common/base-types.json#/$defs/lei",
-      "description": "Legal Entity Identifier for the party"
+      "description": "Legal Entity Identifier code"
     },
     "name": {
       "type": "string",
@@ -15,22 +31,39 @@
     },
     "nameHash": {
       "$ref": "../common/base-types.json#/$defs/base64",
-      "description": "Hash of the party's name for privacy-preserving matching"
+      "description": "SHA-256 hash of the normalized party name for privacy-preserving matching"
     },
     "ivms101": {
       "type": "object",
       "description": "IVMS101 data structure for Travel Rule compliance"
-    }
-  },
-  "oneOf": [
-    {
-      "required": ["lei"]
     },
-    {
-      "required": ["name"]
+    "mcc": {
+      "type": "string",
+      "pattern": "^[0-9]{4}$",
+      "description": "Merchant Category Code (ISO 18245) for merchant parties"
     },
-    {
-      "required": ["nameHash"]
+    "url": {
+      "type": "string",
+      "format": "uri",
+      "description": "URL pointing to the party's website (based on schema.org/Organization)"
+    },
+    "logo": {
+      "type": "string",
+      "format": "uri",
+      "description": "URL pointing to the party's logo image (based on schema.org/Organization)"
+    },
+    "description": {
+      "type": "string",
+      "description": "Description of the party (based on schema.org/Organization)"
+    },
+    "email": {
+      "type": "string",
+      "format": "email",
+      "description": "Contact email address (based on schema.org/Organization)"
+    },
+    "telephone": {
+      "type": "string",
+      "description": "Contact telephone number (based on schema.org/Organization)"
     }
-  ]
+  }
 }

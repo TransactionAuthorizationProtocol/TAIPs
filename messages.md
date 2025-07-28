@@ -151,7 +151,11 @@ This example demonstrates agents with and without the optional `role` parameter.
       {
         "@id": "did:web:originator.vasp",
         "for": "did:org:acmecorp",
-        "role": "CustodialService"
+        "role": "CustodialService",
+        "name": "Originator VASP Services",
+        "url": "https://originator.vasp",
+        "description": "Licensed Virtual Asset Service Provider",
+        "email": "compliance@originator.vasp"
       },
       {
         "@id": "did:web:beneficiary.vasp",
@@ -298,6 +302,11 @@ Initiates a payment request from a merchant to a customer.
     "merchant": {
       "@id": "did:web:merchant.vasp",
       "name": "Digital Goods Store",
+      "url": "https://digitalgoods.example.com",
+      "logo": "https://digitalgoods.example.com/logo.svg",
+      "description": "Leading marketplace for digital assets and NFTs",
+      "email": "support@digitalgoods.example.com",
+      "telephone": "+1-555-0123",
       "mcc": "5734"
     },
     "expiry": "2025-07-30T14:30:00Z",

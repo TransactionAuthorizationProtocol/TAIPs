@@ -5,7 +5,7 @@ author: Pelle Braendgaard <pelle@notabene.id>, Andrés Junge <andres@notabene.id
 status: Last Call
 type: Standard
 created: 2024-01-22
-updated: 2025-06-13
+updated: 2025-07-28
 description: Establishes Transaction Agents as services that execute transactions, including exchanges, wallets, and DeFi protocols, using DIDs for identification and authentication. Defines agent interaction protocols for adding, replacing, or removing agents in transaction flows, enabling collaboration between centralized and decentralized participants.
 discussions-to: https://github.com/TransactionAuthorizationProtocol/TAIPs/pull/7
 requires: 2
@@ -78,6 +78,12 @@ The following are the attributes of an object in the `agents` array:
 - `role` - OPTIONAL a string or an array of strings as specified for the particular kind of transaction. Eg. `SettlementAddress` for [TAIP-3]
 - `for` - REQUIRED a [DID] or an array of DIDs of another Agent or Party that this agent acts on behalf of in this transaction.
 - `policies` - OPTIONAL an array of [TAIP-7 Policies][TAIP-7]
+- `name` - OPTIONAL a string containing the name of the agent organization (based on [schema.org/Organization](https://schema.org/Organization))
+- `url` - OPTIONAL a URL string pointing to the agent's website (based on [schema.org/Organization](https://schema.org/Organization))
+- `logo` - OPTIONAL a URL string pointing to the agent's logo image (based on [schema.org/Organization](https://schema.org/Organization))
+- `description` - OPTIONAL a string containing a description of the agent (based on [schema.org/Organization](https://schema.org/Organization))
+- `email` - OPTIONAL a string containing the agent's contact email address (based on [schema.org/Organization](https://schema.org/Organization))
+- `telephone` - OPTIONAL a string containing the agent's contact telephone number (based on [schema.org/Organization](https://schema.org/Organization))
 
 Future TAIPs are encouraged to extend the agent model with additional functionality.
 
@@ -99,6 +105,20 @@ Example with multiple DIDs in the "for" field:
   "@id":"did:web:shared.wallet.provider",
   "for":["did:web:vasp1.example", "did:web:vasp2.example"],
   "role":"CustodialService"
+}
+```
+
+Example with organization metadata:
+```json
+{
+  "@id":"did:web:originator.vasp",
+  "for":"did:eg:bob",
+  "name":"Originator VASP AG",
+  "url":"https://originator.vasp",
+  "logo":"https://originator.vasp/logo.png",
+  "description":"Licensed Virtual Asset Service Provider in Switzerland",
+  "email":"compliance@originator.vasp",
+  "telephone":"+41 44 123 4567"
 }
 ```
 

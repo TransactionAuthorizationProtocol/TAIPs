@@ -27,6 +27,10 @@ This changelog focuses on:
 - **Purpose Code Types**: Added ISO 20022 External Purpose Code union types to TypeScript package
   - ExternalPurposeCode: 331 standardized purpose codes
   - ExternalCategoryPurposeCode: 48 category purpose codes
+- **schema.org/Organization Attributes**: Added optional organization metadata fields to Agents and Parties
+  - Based on schema.org/Organization standard
+  - Added fields: `name`, `url`, `logo`, `description`, `email`, `telephone`
+  - Available for both Agent (TAIP-5) and Party (TAIP-6) entities
 
 ### Changed
 - **TypeScript Package (@taprsvp/types)**:
@@ -35,13 +39,17 @@ This changelog focuses on:
   - Updated all settlement address fields to use new union type
   - Converted `IsoCurrency` from enum to union type for better tree-shaking
   - Converted purpose codes from enums to union types
+  - Extended `Participant` interface with schema.org/Organization attributes
 - **JSON Schemas**:
   - Created `payto-uri.json` and `settlement-address.json` common schemas
   - Updated all message schemas to support new settlement address formats
   - Fixed DIDComm message type pattern to match body @type format
+  - Enhanced `agent.json` and `party.json` schemas with organization attributes
 
 ### Updated
 - TAIP-4: Added RFC 8905 reference and examples for traditional payment settlement
+- TAIP-5: Added schema.org/Organization attributes to Agent specification
+- TAIP-6: Added schema.org/Organization attributes to Party specification
 - TAIP-14: Added `fallbackSettlementAddresses` field specification
 
 ## [2025-06-25]
