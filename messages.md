@@ -2316,6 +2316,9 @@ Note that all messages in this flow share the same thread ID (`payment-123`) to 
         {
           "id": "1",
           "description": "Widget A",
+          "name": "Premium Widget Model A",
+          "image": "https://example.com/products/widget-a.jpg",
+          "url": "https://example.com/products/widget-a",
           "quantity": 5,
           "unitCode": "EA",
           "unitPrice": 10.00,
@@ -2324,6 +2327,8 @@ Note that all messages in this flow share the same thread ID (`payment-123`) to 
         {
           "id": "2",
           "description": "Widget B",
+          "name": "Standard Widget Model B",
+          "url": "https://example.com/products/widget-b",
           "quantity": 10,
           "unitCode": "EA",
           "unitPrice": 5.00,

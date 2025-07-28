@@ -5,7 +5,7 @@ status: Review
 type: Standard
 author: Pelle Braendgaard <pelle@notabene.id>
 created: 2025-04-22
-updated: 2025-05-31
+updated: 2025-07-28
 description: Defines a structured Invoice object format for embedding detailed payment information with line items and tax data in TAIP-14 Payment Requests. Maps to established standards like UBL and W3C Payment Request for interoperability with existing business systems while supporting regulatory compliance requirements.
 requires: 14
 ---
@@ -40,6 +40,9 @@ An **Invoice** is an object that can be embedded in a TAIP-14 Payment Request to
 - **`lineItems`** – **Required**, **array of objects** representing the individual items being invoiced. Each line item object contains:
   - **`id`** – **Required**, **string** containing a unique identifier for the line item within the invoice.
   - **`description`** – **Required**, **string** describing the item or service.
+  - **`name`** – *Optional*, **string** containing the product name (based on [schema.org/Product](https://schema.org/Product)). If not provided, `description` serves as the display name.
+  - **`image`** – *Optional*, **string** containing a URL to an image of the product (based on [schema.org/Product](https://schema.org/Product)).
+  - **`url`** – *Optional*, **string** containing a URL to the product page (based on [schema.org/Product](https://schema.org/Product)).
   - **`quantity`** – **Required**, **number** indicating the quantity of the item.
   - **`unitCode`** – *Optional*, **string** representing the unit of measure using UBL Unit of Measure Code standard (e.g., "KGM" for kilogram, "LTR" for liter, "PCE" for piece, "EA" for each, "HUR" for hour).
   - **`unitPrice`** – **Required**, **number** representing the price per unit.
@@ -106,6 +109,9 @@ The Invoice object is embedded in a TAIP-14 Payment Request as follows:
         {
           "id": "1",
           "description": "Widget A",
+          "name": "Premium Widget Model A",
+          "image": "https://example.com/products/widget-a.jpg",
+          "url": "https://example.com/products/widget-a",
           "quantity": 5,
           "unitCode": "EA",
           "unitPrice": 10.00,
@@ -161,6 +167,9 @@ The Invoice object is designed to be transformable to and from UBL JSON Invoice 
 | currencyCode | Invoice/DocumentCurrencyCode |
 | lineItems[].id | Invoice/InvoiceLine/ID |
 | lineItems[].description | Invoice/InvoiceLine/Item/Description |
+| lineItems[].name | Invoice/InvoiceLine/Item/Name |
+| lineItems[].image | Invoice/InvoiceLine/Item/ItemInstance/ProductImage |
+| lineItems[].url | Invoice/InvoiceLine/Item/ItemInstance/ItemPropertyGroup/ItemProperty/Value (where Name='URL') |
 | lineItems[].quantity | Invoice/InvoiceLine/InvoicedQuantity |
 | lineItems[].unitCode | Invoice/InvoiceLine/InvoicedQuantity/@unitCode |
 | lineItems[].unitPrice | Invoice/InvoiceLine/Price/PriceAmount |

@@ -99,6 +99,20 @@
           "type": "string",
           "description": "Item description"
         },
+        "name": {
+          "type": "string",
+          "description": "Product name (based on schema.org/Product)"
+        },
+        "image": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL to an image of the product (based on schema.org/Product)"
+        },
+        "url": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL to the product page (based on schema.org/Product)"
+        },
         "quantity": {
           "type": "number",
           "minimum": 0
