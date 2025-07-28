@@ -4,317 +4,316 @@
  *
  * @see {@link https://www.iso.org/iso-4217-currency-codes.html | ISO 4217}
  */
-export enum IsoCurrency {
+export type IsoCurrency =
   /** United Arab Emirates Dirham */
-  AED = "AED",
+  | "AED"
   /** Afghan Afghani */
-  AFN = "AFN",
+  | "AFN"
   /** Albanian Lek */
-  ALL = "ALL",
+  | "ALL"
   /** Armenian Dram */
-  AMD = "AMD",
+  | "AMD"
   /** Netherlands Antillean Guilder */
-  ANG = "ANG",
+  | "ANG"
   /** Angolan Kwanza */
-  AOA = "AOA",
+  | "AOA"
   /** Argentine Peso */
-  ARS = "ARS",
+  | "ARS"
   /** Australian Dollar */
-  AUD = "AUD",
+  | "AUD"
   /** Aruban Florin */
-  AWG = "AWG",
+  | "AWG"
   /** Azerbaijani Manat */
-  AZN = "AZN",
+  | "AZN"
   /** Bosnia and Herzegovina Convertible Mark */
-  BAM = "BAM",
+  | "BAM"
   /** Barbados Dollar */
-  BBD = "BBD",
+  | "BBD"
   /** Bangladeshi Taka */
-  BDT = "BDT",
+  | "BDT"
   /** Bulgarian Lev */
-  BGN = "BGN",
+  | "BGN"
   /** Bahraini Dinar */
-  BHD = "BHD",
+  | "BHD"
   /** Burundian Franc */
-  BIF = "BIF",
+  | "BIF"
   /** Bermudian Dollar */
-  BMD = "BMD",
+  | "BMD"
   /** Brunei Dollar */
-  BND = "BND",
+  | "BND"
   /** Boliviano */
-  BOB = "BOB",
+  | "BOB"
   /** Brazilian Real */
-  BRL = "BRL",
+  | "BRL"
   /** Bahamian Dollar */
-  BSD = "BSD",
+  | "BSD"
   /** Bhutanese Ngultrum */
-  BTN = "BTN",
+  | "BTN"
   /** Botswana Pula */
-  BWP = "BWP",
+  | "BWP"
   /** Belarusian Ruble */
-  BYN = "BYN",
+  | "BYN"
   /** Belize Dollar */
-  BZD = "BZD",
+  | "BZD"
   /** Canadian Dollar */
-  CAD = "CAD",
+  | "CAD"
   /** Congolese Franc */
-  CDF = "CDF",
+  | "CDF"
   /** Swiss Franc */
-  CHF = "CHF",
+  | "CHF"
   /** Chilean Peso */
-  CLP = "CLP",
+  | "CLP"
   /** Chinese Yuan */
-  CNY = "CNY",
+  | "CNY"
   /** Colombian Peso */
-  COP = "COP",
+  | "COP"
   /** Costa Rican Colon */
-  CRC = "CRC",
+  | "CRC"
   /** Cuban Peso */
-  CUP = "CUP",
+  | "CUP"
   /** Cape Verde Escudo */
-  CVE = "CVE",
+  | "CVE"
   /** Czech Koruna */
-  CZK = "CZK",
+  | "CZK"
   /** Djiboutian Franc */
-  DJF = "DJF",
+  | "DJF"
   /** Danish Krone */
-  DKK = "DKK",
+  | "DKK"
   /** Dominican Peso */
-  DOP = "DOP",
+  | "DOP"
   /** Algerian Dinar */
-  DZD = "DZD",
+  | "DZD"
   /** Egyptian Pound */
-  EGP = "EGP",
+  | "EGP"
   /** Eritrean Nakfa */
-  ERN = "ERN",
+  | "ERN"
   /** Ethiopian Birr */
-  ETB = "ETB",
+  | "ETB"
   /** Euro */
-  EUR = "EUR",
+  | "EUR"
   /** Fiji Dollar */
-  FJD = "FJD",
+  | "FJD"
   /** Falkland Islands Pound */
-  FKP = "FKP",
+  | "FKP"
   /** Pound Sterling */
-  GBP = "GBP",
+  | "GBP"
   /** Georgian Lari */
-  GEL = "GEL",
+  | "GEL"
   /** Ghanaian Cedi */
-  GHS = "GHS",
+  | "GHS"
   /** Gibraltar Pound */
-  GIP = "GIP",
+  | "GIP"
   /** Gambian Dalasi */
-  GMD = "GMD",
+  | "GMD"
   /** Guinean Franc */
-  GNF = "GNF",
+  | "GNF"
   /** Guatemalan Quetzal */
-  GTQ = "GTQ",
+  | "GTQ"
   /** Guyanese Dollar */
-  GYD = "GYD",
+  | "GYD"
   /** Hong Kong Dollar */
-  HKD = "HKD",
+  | "HKD"
   /** Honduran Lempira */
-  HNL = "HNL",
+  | "HNL"
   /** Croatian Kuna */
-  HRK = "HRK",
+  | "HRK"
   /** Haitian Gourde */
-  HTG = "HTG",
+  | "HTG"
   /** Hungarian Forint */
-  HUF = "HUF",
+  | "HUF"
   /** Indonesian Rupiah */
-  IDR = "IDR",
+  | "IDR"
   /** Israeli New Shekel */
-  ILS = "ILS",
+  | "ILS"
   /** Indian Rupee */
-  INR = "INR",
+  | "INR"
   /** Iraqi Dinar */
-  IQD = "IQD",
+  | "IQD"
   /** Iranian Rial */
-  IRR = "IRR",
+  | "IRR"
   /** Icelandic Króna */
-  ISK = "ISK",
+  | "ISK"
   /** Jamaican Dollar */
-  JMD = "JMD",
+  | "JMD"
   /** Jordanian Dinar */
-  JOD = "JOD",
+  | "JOD"
   /** Japanese Yen */
-  JPY = "JPY",
+  | "JPY"
   /** Kenyan Shilling */
-  KES = "KES",
+  | "KES"
   /** Kyrgyzstani Som */
-  KGS = "KGS",
+  | "KGS"
   /** Cambodian Riel */
-  KHR = "KHR",
+  | "KHR"
   /** Comoro Franc */
-  KMF = "KMF",
+  | "KMF"
   /** North Korean Won */
-  KPW = "KPW",
+  | "KPW"
   /** South Korean Won */
-  KRW = "KRW",
+  | "KRW"
   /** Kuwaiti Dinar */
-  KWD = "KWD",
+  | "KWD"
   /** Cayman Islands Dollar */
-  KYD = "KYD",
+  | "KYD"
   /** Kazakhstani Tenge */
-  KZT = "KZT",
+  | "KZT"
   /** Lao Kip */
-  LAK = "LAK",
+  | "LAK"
   /** Lebanese Pound */
-  LBP = "LBP",
+  | "LBP"
   /** Sri Lankan Rupee */
-  LKR = "LKR",
+  | "LKR"
   /** Liberian Dollar */
-  LRD = "LRD",
+  | "LRD"
   /** Lesotho Loti */
-  LSL = "LSL",
+  | "LSL"
   /** Libyan Dinar */
-  LYD = "LYD",
+  | "LYD"
   /** Moroccan Dirham */
-  MAD = "MAD",
+  | "MAD"
   /** Moldovan Leu */
-  MDL = "MDL",
+  | "MDL"
   /** Malagasy Ariary */
-  MGA = "MGA",
+  | "MGA"
   /** Macedonian Denar */
-  MKD = "MKD",
+  | "MKD"
   /** Myanmar Kyat */
-  MMK = "MMK",
+  | "MMK"
   /** Mongolian Tugrik */
-  MNT = "MNT",
+  | "MNT"
   /** Macanese Pataca */
-  MOP = "MOP",
+  | "MOP"
   /** Mauritanian Ouguiya */
-  MRU = "MRU",
+  | "MRU"
   /** Mauritian Rupee */
-  MUR = "MUR",
+  | "MUR"
   /** Maldivian Rufiyaa */
-  MVR = "MVR",
+  | "MVR"
   /** Malawian Kwacha */
-  MWK = "MWK",
+  | "MWK"
   /** Mexican Peso */
-  MXN = "MXN",
+  | "MXN"
   /** Malaysian Ringgit */
-  MYR = "MYR",
+  | "MYR"
   /** Mozambican Metical */
-  MZN = "MZN",
+  | "MZN"
   /** Namibian Dollar */
-  NAD = "NAD",
+  | "NAD"
   /** Nigerian Naira */
-  NGN = "NGN",
+  | "NGN"
   /** Nicaraguan Córdoba */
-  NIO = "NIO",
+  | "NIO"
   /** Norwegian Krone */
-  NOK = "NOK",
+  | "NOK"
   /** Nepalese Rupee */
-  NPR = "NPR",
+  | "NPR"
   /** New Zealand Dollar */
-  NZD = "NZD",
+  | "NZD"
   /** Omani Rial */
-  OMR = "OMR",
+  | "OMR"
   /** Panamanian Balboa */
-  PAB = "PAB",
+  | "PAB"
   /** Peruvian Sol */
-  PEN = "PEN",
+  | "PEN"
   /** Papua New Guinean Kina */
-  PGK = "PGK",
+  | "PGK"
   /** Philippine Peso */
-  PHP = "PHP",
+  | "PHP"
   /** Pakistani Rupee */
-  PKR = "PKR",
+  | "PKR"
   /** Polish Złoty */
-  PLN = "PLN",
+  | "PLN"
   /** Paraguayan Guaraní */
-  PYG = "PYG",
+  | "PYG"
   /** Qatari Riyal */
-  QAR = "QAR",
+  | "QAR"
   /** Romanian Leu */
-  RON = "RON",
+  | "RON"
   /** Serbian Dinar */
-  RSD = "RSD",
+  | "RSD"
   /** Russian Ruble */
-  RUB = "RUB",
+  | "RUB"
   /** Rwandan Franc */
-  RWF = "RWF",
+  | "RWF"
   /** Saudi Riyal */
-  SAR = "SAR",
+  | "SAR"
   /** Solomon Islands Dollar */
-  SBD = "SBD",
+  | "SBD"
   /** Seychelles Rupee */
-  SCR = "SCR",
+  | "SCR"
   /** Sudanese Pound */
-  SDG = "SDG",
+  | "SDG"
   /** Swedish Krona */
-  SEK = "SEK",
+  | "SEK"
   /** Singapore Dollar */
-  SGD = "SGD",
+  | "SGD"
   /** Saint Helena Pound */
-  SHP = "SHP",
+  | "SHP"
   /** Sierra Leonean Leone */
-  SLL = "SLL",
+  | "SLL"
   /** Somali Shilling */
-  SOS = "SOS",
+  | "SOS"
   /** Surinamese Dollar */
-  SRD = "SRD",
+  | "SRD"
   /** South Sudanese Pound */
-  SSP = "SSP",
+  | "SSP"
   /** São Tomé and Príncipe Dobra */
-  STN = "STN",
+  | "STN"
   /** Salvadoran Colón */
-  SVC = "SVC",
+  | "SVC"
   /** Syrian Pound */
-  SYP = "SYP",
+  | "SYP"
   /** Swazi Lilangeni */
-  SZL = "SZL",
+  | "SZL"
   /** Thai Baht */
-  THB = "THB",
+  | "THB"
   /** Tajikistani Somoni */
-  TJS = "TJS",
+  | "TJS"
   /** Turkmenistan Manat */
-  TMT = "TMT",
+  | "TMT"
   /** Tunisian Dinar */
-  TND = "TND",
+  | "TND"
   /** Tongan Paʻanga */
-  TOP = "TOP",
+  | "TOP"
   /** Turkish Lira */
-  TRY = "TRY",
+  | "TRY"
   /** Trinidad and Tobago Dollar */
-  TTD = "TTD",
+  | "TTD"
   /** New Taiwan Dollar */
-  TWD = "TWD",
+  | "TWD"
   /** Tanzanian Shilling */
-  TZS = "TZS",
+  | "TZS"
   /** Ukrainian Hryvnia */
-  UAH = "UAH",
+  | "UAH"
   /** Ugandan Shilling */
-  UGX = "UGX",
+  | "UGX"
   /** United States Dollar */
-  USD = "USD",
+  | "USD"
   /** Uruguayan Peso */
-  UYU = "UYU",
+  | "UYU"
   /** Uzbekistan Som */
-  UZS = "UZS",
+  | "UZS"
   /** Venezuelan Bolívar Soberano */
-  VES = "VES",
+  | "VES"
   /** Vietnamese Đồng */
-  VND = "VND",
+  | "VND"
   /** Vanuatu Vatu */
-  VUV = "VUV",
+  | "VUV"
   /** Samoan Tala */
-  WST = "WST",
+  | "WST"
   /** CFA Franc BEAC */
-  XAF = "XAF",
+  | "XAF"
   /** East Caribbean Dollar */
-  XCD = "XCD",
+  | "XCD"
   /** CFA Franc BCEAO */
-  XOF = "XOF",
+  | "XOF"
   /** CFP Franc */
-  XPF = "XPF",
+  | "XPF"
   /** Yemeni Rial */
-  YER = "YER",
+  | "YER"
   /** South African Rand */
-  ZAR = "ZAR",
+  | "ZAR"
   /** Zambian Kwacha */
-  ZMW = "ZMW",
+  | "ZMW"
   /** Zimbabwean Dollar */
-  ZWL = "ZWL",
-}
+  | "ZWL";

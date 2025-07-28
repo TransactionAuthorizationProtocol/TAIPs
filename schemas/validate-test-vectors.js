@@ -12,11 +12,11 @@
 
 const fs = require('fs');
 const path = require('path');
-const Ajv = require('ajv');
+const Ajv2020 = require('ajv/dist/2020');
 const addFormats = require('ajv-formats');
 
 // Initialize AJV with 2020-12 draft support
-const ajv = new Ajv({
+const ajv = new Ajv2020({
   strict: false,
   allErrors: true,
   verbose: true,
@@ -68,11 +68,13 @@ function loadAllSchemas() {
       const relativePath = path.join(basePath, file);
       
       if (fs.statSync(fullPath).isDirectory()) {
+        // Skip node_modules
+        if (file === 'node_modules') return;
         loadSchemasFromDir(fullPath, relativePath);
       } else if (file.endsWith('.json')) {
         try {
           const schema = JSON.parse(fs.readFileSync(fullPath, 'utf8'));
-          if (schema.$id) {
+          if (schema.$id && !schema.$id.includes('node_modules')) {
             schemas[schema.$id] = schema;
             ajv.addSchema(schema, schema.$id);
           }
@@ -93,6 +95,7 @@ function loadAllSchemas() {
 const testVectorToSchemaMap = {
   'valid-transfer.json': 'https://taips.tap.rsvp/schemas/messages/transfer.json',
   'valid-payment.json': 'https://taips.tap.rsvp/schemas/messages/payment.json',
+  'valid-payment-fiat.json': 'https://taips.tap.rsvp/schemas/messages/payment.json',
   'valid-authorize.json': 'https://taips.tap.rsvp/schemas/messages/authorize.json',
   'valid-settle.json': 'https://taips.tap.rsvp/schemas/messages/settle.json',
   'valid-reject.json': 'https://taips.tap.rsvp/schemas/messages/reject.json',
@@ -144,17 +147,15 @@ async function validateTestVectors() {
         throw new Error(`Schema ${schemaId} not found`);
       }
       
-      // Extract the body from DIDComm envelope for validation
-      const dataToValidate = testVector.body || testVector;
-      
-      const valid = validate(dataToValidate);
+      // Validate the full DIDComm message
+      const valid = validate(testVector);
       
       if (valid) {
-        console.log(`✅ ${file} - VALID`);
+        console.log(`✅ ${file} - PASSED`);
         results.passed++;
       } else {
-        console.log(`❌ ${file} - INVALID`);
-        console.log('Validation errors:', JSON.stringify(validate.errors, null, 2));
+        console.log(`❌ ${file} - FAILED`);
+        console.log('   Errors:', JSON.stringify(validate.errors, null, 2));
         results.failed++;
         results.errors.push({
           file,
@@ -175,64 +176,54 @@ async function validateTestVectors() {
 }
 
 /**
- * Main function
+ * Main execution
  */
 async function main() {
-  console.log('TAP Schema Validation Tool\n');
+  console.log('TAP Schema Validation Tool');
+  console.log('');
   
-  try {
-    // Load all schemas
-    console.log('Loading schemas...');
-    loadAllSchemas();
-    
-    // Validate test vectors
-    console.log('\nValidating test vectors...');
-    const results = await validateTestVectors();
-    
-    // Print summary
-    console.log('\n' + '='.repeat(50));
-    console.log('VALIDATION SUMMARY');
-    console.log('='.repeat(50));
-    console.log(`✅ Passed: ${results.passed}`);
-    console.log(`❌ Failed: ${results.failed}`);
-    console.log(`⚠️  Skipped: ${results.skipped}`);
-    console.log(`📊 Total: ${results.passed + results.failed + results.skipped}`);
-    
-    if (results.errors.length > 0) {
-      console.log('\nDETAILED ERRORS:');
-      results.errors.forEach(({ file, errors, error }) => {
-        console.log(`\n${file}:`);
-        if (error) {
-          console.log(`  Error: ${error}`);
-        } else if (errors) {
-          errors.forEach(err => {
-            console.log(`  - ${err.instancePath || '/'}: ${err.message}`);
-            if (err.params) {
-              console.log(`    Parameters: ${JSON.stringify(err.params)}`);
-            }
-          });
-        }
-      });
-    }
-    
-    // Exit with appropriate code
-    process.exit(results.failed > 0 ? 1 : 0);
-    
-  } catch (error) {
-    console.error('Fatal error:', error);
+  console.log('Loading schemas...');
+  loadAllSchemas();
+  console.log('');
+  
+  console.log('Validating test vectors...');
+  const results = await validateTestVectors();
+  console.log('');
+  
+  console.log('==================================================');
+  console.log('VALIDATION SUMMARY');
+  console.log('==================================================');
+  console.log(`✅ Passed: ${results.passed}`);
+  console.log(`❌ Failed: ${results.failed}`);
+  console.log(`⚠️  Skipped: ${results.skipped}`);
+  console.log(`📊 Total: ${results.passed + results.failed + results.skipped}`);
+  
+  if (results.errors.length > 0) {
+    console.log('');
+    console.log('ERRORS:');
+    results.errors.forEach(({ file, errors, error }) => {
+      console.log(`\n${file}:`);
+      if (error) {
+        console.log(`  ${error}`);
+      } else if (errors) {
+        errors.forEach(err => {
+          console.log(`  - ${err.instancePath || '/'}: ${err.message}`);
+          if (err.params) {
+            console.log(`    params: ${JSON.stringify(err.params)}`);
+          }
+        });
+      }
+    });
+  }
+  
+  // Exit with error code if there were failures
+  if (results.failed > 0) {
     process.exit(1);
   }
 }
 
-// Check if AJV is installed
-try {
-  require.resolve('ajv');
-  require.resolve('ajv-formats');
-} catch (e) {
-  console.error('Required dependencies not found. Please run:');
-  console.error('npm install ajv ajv-formats');
-  process.exit(1);
-}
-
 // Run the validation
-main();
+main().catch(error => {
+  console.error('Fatal error:', error);
+  process.exit(1);
+});

@@ -1,9 +1,9 @@
 // TAP Message Types and Data Structures
 // Based on TAIP specifications
 
-import { Purpose, CategoryPurpose } from "@taprsvp/iso20022_external_codes";
 import { IsoCurrency } from "./currencies";
 import { Invoice } from "./invoice";
+import { PurposeCode, CategoryPurposeCode } from "./purpose_codes";
 
 /**
  * Internationalized Resource Identifier (IRI)
@@ -123,6 +123,28 @@ export type CAIP10 = `${CAIP2}:${string}`;
  * @public
  */
 export type CAIP19 = `${CAIP2}/${string}:${string}`;
+
+type PayToAuthority = "ach" | "iban" | "bic" | "upi";
+/**
+ * PayTo URI (RFC 8905)
+ * A standardized URI scheme for identifying payment targets.
+ * Supports various payment systems including IBAN, SEPA, Bitcoin, etc.
+ *
+ * Format: `payto://{authority}/{path}[?{query}]`
+ * - authority: Identifies the payment target type (e.g., 'iban', 'sepa', 'ach', 'upi', 'bic')
+ * - path: Identifies the specific payment target
+ * - query: Optional parameters like amount, receiver name, message
+ *
+ * @example "payto://iban/DE75512108001245126199" // IBAN bank account
+ * @example "payto://iban/SOGEDEFFXXX/DE75512108001245126199" // IBAN bank account with BIC
+ * @example "payto://bic/SOGEDEFFXXX" // BIC
+ * @example "payto://ach/122000661/1234" // ACH transfer with routing and account number
+ * @example "payto://upi/alice@example.com" // UPI payment
+ * @see {@link https://datatracker.ietf.org/doc/rfc8905/ | RFC 8905: The 'payto' URI Scheme for Payments}
+ * @public
+ */
+export type PayToURI = `payto://${PayToAuthority}/${string}`;
+
 /**
  * Digital Trust Identifier (DTI)
  * A standardized identifier for digital assets in traditional finance.
@@ -141,6 +163,17 @@ export type DTI = string;
  * @example "V15WLZJMF" // Bank account in traditional finance
  */
 export type Asset = CAIP19 | DTI;
+
+/**
+ * Settlement Address
+ * Union type representing either a blockchain address (CAIP-10) or a traditional payment target (RFC 8905 PayTo URI).
+ * Used to identify settlement destinations across different payment systems.
+ *
+ * @example "eip155:1:0x742d35Cc6634C0532925a3b844Bc454e4438f44e" // Ethereum address
+ * @example "payto://iban/DE75512108001245126199" // IBAN bank account
+ * @example "payto://sepa/DE75512108001245126199" // SEPA transfer
+ */
+export type SettlementAddress = CAIP10 | PayToURI;
 
 /**
  * Decimal Amount
@@ -179,7 +212,7 @@ export type LEICode = string;
  * @example "CORT" // Trade Settlement Payment
  * @see {@link https://www.iso20022.org/catalogue-messages/additional-content-messages/external-code-sets | ISO 20022 External Code Sets}
  */
-export type ISO20022PurposeCode = Purpose;
+export type ISO20022PurposeCode = PurposeCode;
 
 /**
  * ISO 20022 External Category Purpose Code
@@ -189,7 +222,7 @@ export type ISO20022PurposeCode = Purpose;
  * @example "CORT" // Trade Settlement Payment
  * @see {@link https://www.iso20022.org/catalogue-messages/additional-content-messages/external-code-sets | ISO 20022 External Code Sets}
  */
-export type ISO20022CategoryPurposeCode = CategoryPurpose;
+export type ISO20022CategoryPurposeCode = CategoryPurposeCode;
 
 // Common DIDComm Message Structure
 /**
@@ -550,6 +583,21 @@ export interface Payment extends TapMessageObject<"Payment"> {
   supportedAssets?: CAIP19[];
 
   /**
+   * Optional default settlement address
+   * Either a blockchain address (CAIP-10) or traditional payment target (RFC 8905 PayTo URI)
+   * Primary address for receiving payment
+   */
+  defaultAddress?: SettlementAddress;
+
+  /**
+   * Optional fallback settlement addresses
+   * Array of alternative settlement addresses for redundancy
+   * Each address must match the asset or supported assets
+   * Enables fallback mechanisms for fiat payments or simple crypto transfers
+   */
+  fallbackSettlementAddresses?: SettlementAddress[];
+
+  /**
    * Optional Invoice object or URI to an invoice document
    * Provides additional details about the payment request
    *
@@ -591,9 +639,9 @@ export interface Payment extends TapMessageObject<"Payment"> {
 export interface Authorize extends TapMessageObject<"Authorize"> {
   /**
    * Optional settlement address
-   * The blockchain address where funds should be sent
+   * Either a blockchain address (CAIP-10) or traditional payment target (RFC 8905 PayTo URI)
    */
-  settlementAddress?: CAIP10;
+  settlementAddress?: SettlementAddress;
 
   /**
    * Optional expiration timestamp
@@ -709,9 +757,9 @@ export interface Cancel extends TapMessageObject<"Cancel"> {
 export interface Revert extends TapMessageObject<"Revert"> {
   /**
    * Settlement address for the revert
-   * CAIP-10 identifier for the revert destination
+   * Either a blockchain address (CAIP-10) or traditional payment target (RFC 8905 PayTo URI)
    */
-  settlementAddress: string;
+  settlementAddress: SettlementAddress;
 
   /**
    * Reason for the revert request
@@ -1240,10 +1288,10 @@ export interface Capture extends TapMessageObject<"Capture"> {
 
   /**
    * Optional settlement address
-   * Blockchain address for settlement
+   * Either a blockchain address (CAIP-10) or traditional payment target (RFC 8905 PayTo URI)
    * If omitted, uses address from earlier Authorize
    */
-  settlementAddress?: CAIP10;
+  settlementAddress?: SettlementAddress;
 }
 
 /**

@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://taips.tap.rsvp/schemas/messages/payment.json",
   "title": "Payment Message",
-  "description": "Payment request with invoice details",
+  "description": "Payment request message per TAIP-14",
   "type": "object",
   "allOf": [
     {
@@ -11,15 +11,84 @@
   ],
   "properties": {
     "type": {
-      "const": "https://taprsvp.com/034.56.789/protocols/transaction-authorization-protocol/1.0/payment"
+      "const": "https://tap.rsvp/schema/1.0#Payment"
     },
     "body": {
       "type": "object",
-      "required": ["invoice", "agents"],
+      "required": ["@context", "@type", "amount", "merchant", "agents"],
+      "oneOf": [
+        {
+          "required": ["asset"]
+        },
+        {
+          "required": ["currency"]
+        }
+      ],
       "properties": {
+        "@context": {
+          "const": "https://tap.rsvp/schema/1.0"
+        },
+        "@type": {
+          "const": "https://tap.rsvp/schema/1.0#Payment"
+        },
+        "asset": {
+          "$ref": "../common/caip-types.json#/$defs/caip19",
+          "description": "Specific cryptocurrency being requested (CAIP-19 or DTI identifier)"
+        },
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$",
+          "description": "ISO 4217 currency code for fiat-denominated payments"
+        },
+        "supportedAssets": {
+          "type": "array",
+          "items": {
+            "$ref": "../common/caip-types.json#/$defs/caip19"
+          },
+          "description": "Crypto assets acceptable to settle a fiat currency amount"
+        },
+        "fallbackSettlementAddresses": {
+          "type": "array",
+          "items": {
+            "$ref": "../common/settlement-address.json"
+          },
+          "description": "Alternative settlement addresses in either CAIP-10 or RFC 8905 format"
+        },
+        "expiry": {
+          "$ref": "../common/base-types.json#/$defs/iso8601DateTime",
+          "description": "Expiration time for the payment request"
+        },
+        "amount": {
+          "$ref": "../common/base-types.json#/$defs/amount",
+          "description": "Payment amount in decimal representation"
+        },
         "invoice": {
-          "$ref": "../data-structures/invoice.json",
-          "description": "Invoice details for the payment"
+          "oneOf": [
+            {
+              "$ref": "../data-structures/invoice.json"
+            },
+            {
+              "type": "string",
+              "format": "uri",
+              "description": "URI to external invoice"
+            }
+          ],
+          "description": "Invoice details or URI"
+        },
+        "policies": {
+          "type": "array",
+          "items": {
+            "$ref": "../data-structures/policy.json"
+          },
+          "description": "Policy requirements for the payment"
+        },
+        "customer": {
+          "$ref": "../data-structures/party.json",
+          "description": "Customer (payer) information"
+        },
+        "merchant": {
+          "$ref": "../data-structures/party.json",
+          "description": "Merchant (payee) information"
         },
         "agents": {
           "type": "array",
@@ -27,30 +96,10 @@
             "$ref": "../data-structures/agent.json"
           },
           "minItems": 1,
-          "description": "Agents involved in the payment"
-        },
-        "constraints": {
-          "$ref": "../data-structures/transaction-constraints.json",
-          "description": "Optional payment constraints"
-        },
-        "purpose": {
-          "type": "string",
-          "description": "Purpose code for the payment"
-        },
-        "requestedSettlement": {
-          "type": "object",
-          "properties": {
-            "asset": {
-              "$ref": "../common/caip-types.json#/$defs/caip19",
-              "description": "Requested asset for payment"
-            },
-            "settlementAddress": {
-              "$ref": "../common/caip-types.json#/$defs/caip10",
-              "description": "Address to receive payment"
-            }
-          }
+          "description": "Agents involved in the payment process"
         }
-      }
+      },
+      "additionalProperties": false
     }
   },
   "required": ["type", "body"]

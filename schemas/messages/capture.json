@@ -33,8 +33,8 @@
           "description": "Amount to capture. If omitted, captures full escrow amount. Must be less than or equal to original amount"
         },
         "settlementAddress": {
-          "$ref": "../common/caip-types.json#/$defs/caip10",
-          "description": "Blockchain address for settlement. If omitted, uses address from earlier Authorize"
+          "$ref": "../common/settlement-address.json",
+          "description": "Settlement address in either CAIP-10 or RFC 8905 format. If omitted, uses address from earlier Authorize"
         }
       },
       "required": ["@context", "@type"]

@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://taips.tap.rsvp/schemas/common/settlement-address.json",
+  "title": "Settlement Address",
+  "description": "Settlement address supporting both blockchain (CAIP-10) and traditional payment systems (RFC 8905)",
+  "oneOf": [
+    {
+      "$ref": "./caip-types.json#/$defs/caip10"
+    },
+    {
+      "$ref": "./payto-uri.json"
+    }
+  ]
+}

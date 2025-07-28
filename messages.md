@@ -176,6 +176,7 @@ Initiates a payment request from a merchant to a customer.
 | currency | string | No | Review ([TAIP-14]) | ISO 4217 currency code for fiat amount. Either asset OR currency is required. |
 | amount | string | Yes | Review ([TAIP-14]) | Amount requested in the specified asset or currency |
 | supportedAssets | array | No | Review ([TAIP-14]) | Array of CAIP-19 asset identifiers that can be used to settle a fiat currency amount. Used when currency is specified to indicate which crypto assets can be used. |
+| fallbackSettlementAddresses | array | No | Review ([TAIP-14]) | Array of alternative settlement addresses in either CAIP-10 or RFC 8905 format for redundancy |
 | invoice | object or string | No | Review ([TAIP-14], [TAIP-16]) | Invoice object as defined in TAIP-16 or URI to an invoice document |
 | expiry | string | No | Review ([TAIP-14]) | ISO 8601 timestamp when the request expires |
 | merchant | [Party](#party) | Yes | Review ([TAIP-14]) | Party for the merchant (beneficiary) |
@@ -267,6 +268,43 @@ Initiates a payment request from a merchant to a customer.
             "presentationDefinition": "https://tap.rsvp/presentation-definitions/email/v1"
           }
         ]
+      }
+    ]
+  }
+}
+```
+
+##### Payment with fallback settlement addresses
+```json
+{
+  "id": "123e4567-e89b-12d3-a456-426614174016",
+  "type": "https://tap.rsvp/schema/1.0#Payment",
+  "from": "did:web:merchant.vasp",
+  "to": ["did:web:customer.vasp"],
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#Payment",
+    "currency": "EUR",
+    "amount": "250.00",
+    "supportedAssets": [
+      "eip155:1/erc20:0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+      "eip155:137/erc20:0x2791Bca1f2de4661ED88A30C2A8A6b5E7C54fD3A"
+    ],
+    "fallbackSettlementAddresses": [
+      "eip155:137:0x8B5e7A2C3f4D1E6F9A0b3C5e7D9f1A2B4C6E8F0A",
+      "payto://iban/DE89370400440532013000",
+      "payto://sepa/DE75512108001245126199"
+    ],
+    "merchant": {
+      "@id": "did:web:merchant.vasp",
+      "name": "Digital Goods Store",
+      "mcc": "5734"
+    },
+    "expiry": "2025-07-30T14:30:00Z",
+    "agents": [
+      {
+        "@id": "did:web:merchant-psp",
+        "role": "PaymentProcessor"
       }
     ]
   }
@@ -382,7 +420,7 @@ Approves a transaction after completing compliance checks.
 |-----------|------|----------|---------|-------------|
 | @context | string | Yes | Review ([TAIP-4]) | JSON-LD context "https://tap.rsvp/schema/1.0" |
 | @type | string | Yes | Review ([TAIP-4]) | JSON-LD type "https://tap.rsvp/schema/1.0#Authorize" |
-| settlementAddress | string | No | Review ([TAIP-4]) | Optional CAIP-10 identifier for the settlement address |
+| settlementAddress | string | No | Review ([TAIP-4]) | Optional settlement address in either CAIP-10 or RFC 8905 format |
 | settlementAsset | string | No | Review ([TAIP-4]) | Optional CAIP-19 identifier for the settlement asset |
 | amount | string | No | Review ([TAIP-4]) | Optional decimal amount authorized of the settlementAsset |
 | expiry | string | No | Review ([TAIP-4]) | ISO 8601 datetime indicating when the authorization expires |
@@ -391,6 +429,7 @@ Approves a transaction after completing compliance checks.
 
 #### Examples
 
+##### Authorization with blockchain address
 ```json
 {
   "id": "123e4567-e89b-12d3-a456-426614174002",
@@ -401,6 +440,24 @@ Approves a transaction after completing compliance checks.
   "body": {
     "@context": "https://tap.rsvp/schema/1.0",
     "@type": "https://tap.rsvp/schema/1.0#Authorize",
+    "settlementAddress": "eip155:1:0x742d35Cc6634C0532925a3b844Bc9e7595f1234"
+  }
+}
+```
+
+##### Authorization with bank transfer address (RFC 8905)
+```json
+{
+  "id": "123e4567-e89b-12d3-a456-426614174003",
+  "type": "https://tap.rsvp/schema/1.0#Authorize",
+  "from": "did:web:beneficiary.bank",
+  "to": ["did:web:originator.bank"],
+  "thid": "123e4567-e89b-12d3-a456-426614174001",
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#Authorize",
+    "settlementAddress": "payto://iban/DE75512108001245126199",
+    "expiry": "2024-01-01T12:00:00Z"
   }
 }
 ```
@@ -414,13 +471,15 @@ Confirms the on-chain settlement of a transfer.
 |-----------|------|----------|---------|-------------|
 | @context | string | Yes | Review ([TAIP-4]) | JSON-LD context "https://tap.rsvp/schema/1.0" |
 | @type | string | Yes | Review ([TAIP-4]) | JSON-LD type "https://tap.rsvp/schema/1.0#Settle" |
-| settlementId | string | Yes | Review ([TAIP-4]) | CAIP-220 identifier of the settlement transaction |
+| settlementAddress | string | Yes | Review ([TAIP-4]) | Destination address of the transaction in either CAIP-10 or RFC 8905 format |
+| settlementId | string | No | Review ([TAIP-4]) | Optional CAIP-220 identifier of the settlement transaction on a blockchain |
 | amount | string | No | Review ([TAIP-4]) | Optional settled amount, must be less than or equal to the original amount. If a Authorize message specified an amount, this must match that value. |
 
 > **Note:** The message refers to the original Transfer or Payment message via the DIDComm `thid` (thread ID) in the message envelope.
 
 #### Examples
 
+##### Blockchain settlement
 ```json
 {
   "id": "123e4567-e89b-12d3-a456-426614174006",
@@ -431,7 +490,25 @@ Confirms the on-chain settlement of a transfer.
   "body": {
     "@context": "https://tap.rsvp/schema/1.0",
     "@type": "https://tap.rsvp/schema/1.0#Settle",
+    "settlementAddress": "eip155:1:0x1234a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb",
     "settlementId": "eip155:1:tx/0x3edb98c24d46d148eb926c714f4fbaa117c47b0c0821f38bfce9763604457c33"
+  }
+}
+```
+
+##### Bank transfer settlement
+```json
+{
+  "id": "123e4567-e89b-12d3-a456-426614174007",
+  "type": "https://tap.rsvp/schema/1.0#Settle",
+  "from": "did:web:originator.vasp",
+  "to": ["did:web:beneficiary.vasp"],
+  "thid": "123e4567-e89b-12d3-a456-426614174000",
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#Settle",
+    "settlementAddress": "payto://iban/DE75512108001245126199",
+    "amount": "1000.00"
   }
 }
 ```
@@ -523,13 +600,14 @@ Requests a reversal of a settled transaction. This could be part of a dispute re
 |-----------|------|----------|---------|-------------|
 | @context | string | Yes | Review ([TAIP-4]) | JSON-LD context "https://tap.rsvp/schema/1.0" |
 | @type | string | Yes | Review ([TAIP-4]) | JSON-LD type "https://tap.rsvp/schema/1.0#Revert" |
-| settlementAddress | string | Yes | Review ([TAIP-4]) | CAIP-10 identifier of the proposed settlement address to return the funds to |
+| settlementAddress | string | Yes | Review ([TAIP-4]) | Settlement address to return funds to in either CAIP-10 or RFC 8905 format |
 | reason | string | Yes | Review ([TAIP-4]) | Human readable message describing why the transaction reversal is being requested |
 
 > **Note:** The message refers to the original Transfer message via the DIDComm `thid` (thread ID) in the message envelope.
 
 #### Examples
 
+##### Blockchain revert request
 ```json
 {
   "id": "123e4567-e89b-12d3-a456-426614174005",
@@ -542,6 +620,23 @@ Requests a reversal of a settled transaction. This could be part of a dispute re
     "@type": "https://tap.rsvp/schema/1.0#Revert",
     "settlementAddress": "eip155:1:0x1234a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb",
     "reason": "Insufficient Originator Information"
+  }
+}
+```
+
+##### Bank transfer revert request
+```json
+{
+  "id": "123e4567-e89b-12d3-a456-426614174008",
+  "type": "https://tap.rsvp/schema/1.0#Revert",
+  "from": "did:web:beneficiary.vasp",
+  "to": ["did:web:originator.vasp"],
+  "thid": "123e4567-e89b-12d3-a456-426614174000",
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#Revert",
+    "settlementAddress": "payto://iban/DE75512108001245126199",
+    "reason": "Compliance check failed - missing required documentation"
   }
 }
 ```

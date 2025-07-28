@@ -1,0 +1,30 @@
+{
+  "id": "880e8400-e29b-41d4-a716-446655440003",
+  "type": "https://tap.rsvp/schema/1.0#Payment",
+  "from": "did:example:merchant",
+  "to": ["did:example:customer"],
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#Payment",
+    "currency": "USD",
+    "amount": "100.00",
+    "supportedAssets": [
+      "eip155:1/erc20:0xA0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
+    ],
+    "fallbackSettlementAddresses": [
+      "eip155:1:0x1234a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb",
+      "payto://ach/122000247/111000025",
+      "payto://sepa/DE75512108001245126199"
+    ],
+    "expiry": "2025-08-01T12:00:00Z",
+    "merchant": {
+      "@id": "did:example:merchant",
+      "name": "Example Merchant",
+      "mcc": "5411"
+    },
+    "agents": [{
+      "@id": "did:example:merchant-psp",
+      "role": "PaymentProcessor"
+    }]
+  }
+}

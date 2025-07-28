@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://taips.tap.rsvp/schemas/messages/authorize.json",
   "title": "Authorize Message",
-  "description": "Authorization request or response for a TAP transaction",
+  "description": "Authorization message for a TAP transaction per TAIP-4",
   "type": "object",
   "allOf": [
     {
@@ -11,58 +11,36 @@
   ],
   "properties": {
     "type": {
-      "const": "https://taprsvp.com/034.56.789/protocols/transaction-authorization-protocol/1.0/authorize"
+      "const": "https://tap.rsvp/schema/1.0#Authorize"
     },
     "body": {
       "type": "object",
-      "required": ["action"],
+      "required": ["@context", "@type"],
       "properties": {
-        "action": {
-          "type": "string",
-          "enum": ["authorize", "reject", "pending"],
-          "description": "Authorization decision"
+        "@context": {
+          "const": "https://tap.rsvp/schema/1.0"
         },
-        "reason": {
-          "type": "string",
-          "description": "Reason for the authorization decision"
+        "@type": {
+          "const": "https://tap.rsvp/schema/1.0#Authorize"
         },
-        "reasonCode": {
-          "type": "string",
-          "description": "Standardized code for the reason"
+        "settlementAddress": {
+          "$ref": "../common/settlement-address.json",
+          "description": "Settlement address in either CAIP-10 or RFC 8905 format"
         },
-        "conditions": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "type": {
-                "type": "string",
-                "description": "Condition type"
-              },
-              "description": {
-                "type": "string",
-                "description": "Human-readable condition description"
-              },
-              "value": {
-                "description": "Condition-specific value"
-              }
-            }
-          },
-          "description": "Conditions that must be met for authorization"
+        "settlementAsset": {
+          "$ref": "../common/caip-types.json#/$defs/caip19",
+          "description": "Asset for settlement in CAIP-19 format"
         },
-        "validUntil": {
+        "amount": {
+          "$ref": "../common/base-types.json#/$defs/amount",
+          "description": "Amount to be settled"
+        },
+        "expiry": {
           "$ref": "../common/base-types.json#/$defs/iso8601DateTime",
           "description": "Expiration time for the authorization"
-        },
-        "reference": {
-          "type": "string",
-          "description": "Reference number for the authorization"
-        },
-        "agent": {
-          "$ref": "../data-structures/agent.json",
-          "description": "Agent providing the authorization"
         }
-      }
+      },
+      "additionalProperties": false
     }
   },
   "required": ["type", "body"]

@@ -5,7 +5,7 @@ status: Review
 type: Standard
 author: Pelle Braendgaard <pelle@notabene.id>
 created: 2024-03-21
-updated: 2025-06-23
+updated: 2025-07-28
 description: Defines a merchant-initiated Payment message standard for requesting blockchain payments with specified amounts in either crypto assets or fiat currencies. Enables selective disclosure of customer information for compliance and business purposes while facilitating standard e-commerce and invoice payment flows with privacy protection.
 requires: 2, 3, 4, 6, 7, 8, 9, 16
 ---
@@ -38,6 +38,7 @@ A **Payment** is a [DIDComm] message (per [TAIP-2]) initiated by the merchant's 
 - **`asset`** – *Optional*, **string** ([CAIP-19] or [DTI] identifier) for the specific cryptocurrency being requested. Must be a blockchain asset identifier. Either `asset` OR `currency` is required (one must be present); if both are given, they should be consistent, with `asset` having precedence (the wallet should send in the asset specified, not based on currency).
 - **`currency`** – *Optional*, **string** (ISO 4217 currency code, e.g. "USD" or "EUR") for fiat-denominated payments. Either `asset` OR `currency` is required (one must be present). If `currency` is present, a wallet might not know which crypto asset the merchant prefers to settle this fiat amount; this is addressed by the `supportedAssets` field.
 - **`supportedAssets`** – *Optional*, **array of strings** ([CAIP-19] or [DTI] asset identifiers). If `currency` is given (fiat-denominated request), this field can list which crypto assets are acceptable to settle that currency amount. Each entry is an asset the merchant will accept as payment for the given fiat amount. For example, a Payment might specify `"currency": "EUR", "amount": "50.00", "supportedAssets": ["eip155:1/erc20:0xA0b86991..."]` to indicate €50.00 can be paid in USDC on Ethereum (asset listed) or potentially other listed stablecoins. If `supportedAssets` is omitted for a fiat request, it implies the customer's wallet may choose any asset to settle that amount, subject to the merchant and wallet's out-of-band agreement or policy.
+- `fallbackSettlementAddresses` - OPTIONAL array of strings representing alternative settlement addresses in either [CAIP-10] or [RFC 8905] format. These addresses provide fallback mechanisms for fiat payments or simple crypto transfers. Each address MUST match the asset specified in the `asset` field or one of the assets in `supportedAssets`. If `currency` is specified, the fallback addresses should support settlement of that currency amount. This field enables redundancy for payment settlement and supports scenarios where the primary settlement method may fail or be unavailable.
 - **`expiry`** – *Optional*, **timestamp** indicating an expiration time for the request. After this time the merchant may no longer honor the payment (e.g. if exchange rates or inventory changed). The customer's wallet SHOULD treat an expired Payment as invalid and not allow payment. If omitted, the request is considered valid until canceled or fulfilled. This field SHOULD align with the DIDComm `expires_time` header (as specified in [TAIP-2]) to ensure consistency. In hotel reservation scenarios, for example, a merchant might set an expiry to the checkout date, indicating that if the payment is not authorized by then, the reservation will be lost.
 - **`amount`** – **Required**, **string** containing a decimal representation of the payment amount. The amount must be a valid positive number expressed as a string. Leading zeroes may be omitted (e.g. "0.5" or ".5" for half a unit). Trailing zeroes may be present (e.g. "10.00" for exactly ten units). The amount is denominated in the `asset` token units or the `currency` fiat units as appropriate.
 - **`invoice`** – *Optional*, **Invoice** per [TAIP-16] or **URI** providing additional details about the payment being requested (e.g. a link to an external invoice). This can provide further context for the customer, though the basic payment details should always be present directly in the Payment message itself.
@@ -239,6 +240,47 @@ https://example.com/path?_oobid=2e9e257c-2839-4fae-b0c4-dcd4e2159f4e
 
 Where the `_oob` parameter contains the base64url-encoded Out-of-Band message, or the `_oobid` parameter contains a unique identifier that can be resolved to retrieve the full Out-of-Band message.
 
+### Example Payment with Fallback Settlement Addresses
+
+Here's an example Payment message that includes fallback settlement addresses supporting both blockchain and traditional bank transfer settlement:
+
+```json
+{
+  "id": "payment-example-001",
+  "type": "https://tap.rsvp/schema/1.0#Payment",
+  "from": "did:example:merchant",
+  "to": ["did:example:customer"],
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#Payment",
+    "currency": "EUR",
+    "amount": "250.00",
+    "supportedAssets": [
+      "eip155:1/erc20:0xA0b86991c53D94fa4C0bCBf0C1C4DF2F15F1b7A8",
+      "eip155:137/erc20:0x2791Bca1f2de4661ED88A30C2A8A6b5E7C54fD3A"
+    ],
+    "fallbackSettlementAddresses": [
+      "eip155:137:0x8B5e7A2C3f4D1E6F9A0b3C5e7D9f1A2B4C6E8F0A",
+      "payto://iban/DE89370400440532013000",
+    ],
+    "expiry": "2025-07-30T14:30:00Z",
+    "merchant": {
+      "@id": "did:example:merchant",
+      "name": "Digital Goods Store",
+      "mcc": "5734"
+    },
+    "agents": [{
+      "@id": "did:example:merchant-psp",
+      "role": "paymentProcessor"
+    }]
+  }
+}
+```
+
+In this example, the merchant accepts EUR 250.00 payment through various settlement methods:
+- Primary: USDC on Ethereum mainnet
+- Fallback options: USDC on Polygon, SEPA bank transfer, or IBAN bank transfer
+
 ## Security Considerations
 
 Because Payments involve off-chain negotiation and on-chain settlement, there are security implications on both sides:
@@ -280,6 +322,7 @@ By incorporating selective disclosure and unique payment addresses, the Payment 
 * [BIP-75] Out of Band Address Exchange using Payment Protocol Encryption
 * [DTI] Digital Token Identifier
 * [ISO-4217] Currency Codes
+* [RFC 8905] The 'payto' URI Scheme for Payments
 * [DIDComm] DIDComm Messaging
 
 [TAIP-2]: ./taip-2 "TAP Messaging"
@@ -295,6 +338,7 @@ By incorporating selective disclosure and unique payment addresses, the Payment 
 [BIP-75]: https://github.com/bitcoin/bips/blob/master/bip-0075.mediawiki "Out of Band Address Exchange using Payment Protocol Encryption"
 [DTI]: https://www.iso.org/obp/ui/en/#iso:std:iso:24165:-1:ed-1:v1:en
 [ISO-4217]: https://www.iso.org/iso-4217-currency-codes.html "Currency Codes"
+[RFC 8905]: https://datatracker.ietf.org/doc/rfc8905/ "The 'payto' URI Scheme for Payments"
 [DIDComm]: https://identity.foundation/didcomm-messaging/spec/v2.1/
 
 ## Copyright
