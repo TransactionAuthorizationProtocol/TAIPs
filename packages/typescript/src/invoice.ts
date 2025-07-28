@@ -202,6 +202,31 @@ export interface LineItem {
   description: string;
   
   /**
+   * Product name
+   * Based on schema.org/Product
+   * If not provided, description serves as the display name
+   * 
+   * @example "Premium Widget Model A"
+   */
+  name?: string;
+  
+  /**
+   * URL to an image of the product
+   * Based on schema.org/Product
+   * 
+   * @example "https://example.com/products/widget-a.jpg"
+   */
+  image?: string;
+  
+  /**
+   * URL to the product page
+   * Based on schema.org/Product
+   * 
+   * @example "https://example.com/products/widget-a"
+   */
+  url?: string;
+  
+  /**
    * Quantity of the item
    */
   quantity: number;
