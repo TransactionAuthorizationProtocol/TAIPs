@@ -345,6 +345,41 @@ export interface Participant<T extends ParticipantTypes>
    * @see {@link https://www.iso.org/standard/33365.html | ISO 18245}
    */
   mcc?: string;
+
+  /**
+   * URL pointing to the participant's website
+   * Based on schema.org/Organization
+   * @example "https://example.vasp.com"
+   */
+  url?: string;
+
+  /**
+   * URL pointing to the participant's logo image
+   * Based on schema.org/Organization
+   * @example "https://example.vasp.com/logo.png"
+   */
+  logo?: string;
+
+  /**
+   * Description of the participant
+   * Based on schema.org/Organization
+   * @example "Licensed Virtual Asset Service Provider"
+   */
+  description?: string;
+
+  /**
+   * Contact email address
+   * Based on schema.org/Organization
+   * @example "compliance@example.vasp.com"
+   */
+  email?: string;
+
+  /**
+   * Contact telephone number
+   * Based on schema.org/Organization
+   * @example "+1-555-123-4567"
+   */
+  telephone?: string;
 }
 
 /**

@@ -52,6 +52,29 @@
         "$ref": "policy.json"
       },
       "description": "Policies enforced by this agent"
+    },
+    "url": {
+      "type": "string",
+      "format": "uri",
+      "description": "URL pointing to the agent's website (based on schema.org/Organization)"
+    },
+    "logo": {
+      "type": "string",
+      "format": "uri",
+      "description": "URL pointing to the agent's logo image (based on schema.org/Organization)"
+    },
+    "description": {
+      "type": "string",
+      "description": "Description of the agent (based on schema.org/Organization)"
+    },
+    "email": {
+      "type": "string",
+      "format": "email",
+      "description": "Contact email address (based on schema.org/Organization)"
+    },
+    "telephone": {
+      "type": "string",
+      "description": "Contact telephone number (based on schema.org/Organization)"
     }
   }
 }

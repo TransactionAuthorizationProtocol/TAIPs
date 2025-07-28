@@ -5,7 +5,7 @@ author: Pelle Braendgaard <pelle@notabene.id>, Andrés Junge <andres@notabene.id
 status: Last Call
 type: Standard
 created: 2024-01-22
-updated: 2025-05-31
+updated: 2025-07-28
 description: Defines Transaction Parties as the real-world legal or natural persons involved in blockchain transactions, identified using IRIs or DIDs. Establishes party relationships with agents, party metadata standards, and messaging protocols for securely sharing party information while preserving privacy.
 discussions-to: https://github.com/TransactionAuthorizationProtocol/TAIPs/pull/8
 requires: 2
@@ -30,9 +30,15 @@ Blockchains often use blockchain addresses instead of the ultimate parties to a 
 
 Parties are identified using an [IRI] as the @id attribute in a [JSON-LD] object. IRIs are the internationalized updated version of URIs that most people know today. IRI’s typically used as identifiers today represent [email addresses][MAILTO] and [phone numbers][SMS]. Modern [Decentralized Identifiers (DIDs)][DID], which allow users to create and manage their own identities in a decentralized manner, are also recommended.
 
-Parties represented in [TAIP-2] messages using a straightforward [JSON-LD] node syntax with the following attributes
+Parties represented in [TAIP-2] messages using a straightforward [JSON-LD] node syntax with the following attributes:
 
 * `@id` - REQUIRED the [IRI] of the Party
+* `name` - OPTIONAL a string containing the name of the party (based on [schema.org/Organization](https://schema.org/Organization))
+* `url` - OPTIONAL a URL string pointing to the party's website (based on [schema.org/Organization](https://schema.org/Organization))
+* `logo` - OPTIONAL a URL string pointing to the party's logo image (based on [schema.org/Organization](https://schema.org/Organization))
+* `description` - OPTIONAL a string containing a description of the party (based on [schema.org/Organization](https://schema.org/Organization))
+* `email` - OPTIONAL a string containing the party's contact email address (based on [schema.org/Organization](https://schema.org/Organization))
+* `telephone` - OPTIONAL a string containing the party's contact telephone number (based on [schema.org/Organization](https://schema.org/Organization))
 
 ```json
 {
@@ -72,6 +78,20 @@ For merchant parties, you can add a Merchant Category Code ([ISO 18245](https://
 {
   "@id":"did:web:merchant.com",
   "mcc":"5812" // Restaurant
+}
+```
+
+Example with full organization metadata:
+```json
+{
+  "@id":"did:web:merchant.com",
+  "name":"Digital Goods Store Inc.",
+  "url":"https://merchant.com",
+  "logo":"https://merchant.com/assets/logo.svg",
+  "description":"Online marketplace for digital assets and collectibles",
+  "email":"support@merchant.com",
+  "telephone":"+1-555-123-4567",
+  "mcc":"5734"
 }
 ```
 
