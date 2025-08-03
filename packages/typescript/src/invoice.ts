@@ -11,46 +11,46 @@ import { IsoCurrency } from "./currencies";
  */
 export enum UnitCode {
   // Mass
-  KGM = "KGM", // Kilogram
-  GRM = "GRM", // Gram
-  MGM = "MGM", // Milligram
-  TNE = "TNE", // Tonne (metric ton)
+  Kilogram = "KGM",
+  Gram = "GRM",
+  Milligram = "MGM",
+  Tonne = "TNE",
   
   // Volume
-  LTR = "LTR", // Liter
-  MLT = "MLT", // Milliliter
-  MMQ = "MMQ", // Cubic millimeter
-  CMQ = "CMQ", // Cubic centimeter
-  DMQ = "DMQ", // Cubic decimeter
-  MTQ = "MTQ", // Cubic meter
+  Liter = "LTR",
+  Milliliter = "MLT",
+  CubicMillimeter = "MMQ",
+  CubicCentimeter = "CMQ",
+  CubicDecimeter = "DMQ",
+  CubicMeter = "MTQ",
   
   // Length
-  MMT = "MMT", // Millimeter
-  CMT = "CMT", // Centimeter
-  DMT = "DMT", // Decimeter
-  MTR = "MTR", // Meter
-  KMT = "KMT", // Kilometer
+  Millimeter = "MMT",
+  Centimeter = "CMT",
+  Decimeter = "DMT",
+  Meter = "MTR",
+  Kilometer = "KMT",
   
   // Area
-  MTK = "MTK", // Square meter
+  SquareMeter = "MTK",
   
   // Count
-  EA = "EA",   // Each
-  PCE = "PCE", // Piece
-  NPR = "NPR", // Number of pairs
+  Each = "EA",
+  Piece = "PCE",
+  NumberOfPairs = "NPR",
   
   // Time
-  SEC = "SEC", // Second
-  MIN = "MIN", // Minute
-  HUR = "HUR", // Hour
-  DAY = "DAY", // Day
-  WEE = "WEE", // Week
-  MON = "MON", // Month
-  ANN = "ANN", // Year
+  Second = "SEC",
+  Minute = "MIN",
+  Hour = "HUR",
+  Day = "DAY",
+  Week = "WEE",
+  Month = "MON",
+  Year = "ANN",
   
   // Other
-  KWH = "KWH", // Kilowatt hour
-  NAR = "NAR", // Number of articles
+  KilowattHour = "KWH",
+  NumberOfArticles = "NAR",
 }
 
 /**
@@ -61,24 +61,24 @@ export enum UnitCode {
  * @see {@link https://docs.peppol.eu/poacc/billing/3.0/codelist/UNCL5305/ | PEPPOL BIS 3.0 Tax Category Codes}
  */
 export enum TaxCategoryCode {
-  S = "S",     // Standard rate
-  Z = "Z",     // Zero rated goods
-  E = "E",     // Exempt from tax
-  AE = "AE",   // VAT Reverse Charge
-  G = "G",     // Free export item, tax not charged
-  O = "O",     // Services outside scope of tax
-  K = "K",     // VAT exempt for EEA intra-community supply
-  L = "L",     // Canary Islands general indirect tax
-  M = "M",     // Tax for production, services and importation in Ceuta and Melilla
-  H = "H",     // Higher rate
-  AA = "AA",   // Lower rate
-  B = "B",     // Transferred (VAT)
-  A = "A",     // Mixed tax rate
-  AB = "AB",   // Exempt for resale
-  AC = "AC",   // VAT Reverse Charge (alternative to AE)
-  AD = "AD",   // VAT exempt for EEA intra-community supply (alternative to K)
-  C = "C",     // Exempt from tax (deprecated, use E instead)
-  D = "D",     // Exempt based on article 309
+  StandardRate = "S",
+  ZeroRated = "Z",
+  ExemptFromTax = "E",
+  VATReverseCharge = "AE",
+  FreeExportItem = "G",
+  OutsideScopeOfTax = "O",
+  VATExemptIntraCommunity = "K",
+  CanaryIslandsIndirectTax = "L",
+  CeutaMelillaTax = "M",
+  HigherRate = "H",
+  LowerRate = "AA",
+  TransferredVAT = "B",
+  MixedTaxRate = "A",
+  ExemptForResale = "AB",
+  VATReverseChargeAlt = "AC",
+  VATExemptIntraCommunityAlt = "AD",
+  ExemptFromTaxDeprecated = "C",
+  ExemptArticle309 = "D",
 }
 
 /**
@@ -88,28 +88,28 @@ export enum TaxCategoryCode {
  * @see {@link http://docs.oasis-open.org/ubl/os-UBL-2.1/cl/gc/default/TaxScheme-2.1.gc | UBL Tax Scheme Codes}
  */
 export enum TaxSchemeCode {
-  AAA = "AAA", // Profit tax
-  AAB = "AAB", // Corporate income tax
-  AAC = "AAC", // Personal income tax
-  AAD = "AAD", // Social security tax
-  AAE = "AAE", // Property tax
-  AAF = "AAF", // Inheritance tax
-  AAG = "AAG", // Gift tax
-  AAH = "AAH", // Capital gains tax
-  AAI = "AAI", // Wealth tax
-  AAJ = "AAJ", // Stamp duty
-  CST = "CST", // Consumption tax
-  CUS = "CUS", // Customs duty
-  ENV = "ENV", // Environmental tax
-  EXC = "EXC", // Excise tax
-  EXP = "EXP", // Export tax
-  FRT = "FRT", // Freight tax
-  GST = "GST", // Goods and Services Tax
-  IMP = "IMP", // Import tax
-  OTH = "OTH", // Other tax
-  SAL = "SAL", // Sales tax
-  TOT = "TOT", // Turnover tax
-  VAT = "VAT", // Value Added Tax
+  ProfitTax = "AAA",
+  CorporateIncomeTax = "AAB",
+  PersonalIncomeTax = "AAC",
+  SocialSecurityTax = "AAD",
+  PropertyTax = "AAE",
+  InheritanceTax = "AAF",
+  GiftTax = "AAG",
+  CapitalGainsTax = "AAH",
+  WealthTax = "AAI",
+  StampDuty = "AAJ",
+  ConsumptionTax = "CST",
+  CustomsDuty = "CUS",
+  EnvironmentalTax = "ENV",
+  ExciseTax = "EXC",
+  ExportTax = "EXP",
+  FreightTax = "FRT",
+  GoodsAndServicesTax = "GST",
+  ImportTax = "IMP",
+  OtherTax = "OTH",
+  SalesTax = "SAL",
+  TurnoverTax = "TOT",
+  ValueAddedTax = "VAT",
 }
 
 /**
@@ -161,9 +161,9 @@ export interface TaxCategory {
    * Tax category identifier
    * Uses UBL Tax Category Code standard
    * 
-   * @example "S" // Standard rate
-   * @example "Z" // Zero rated goods
-   * @example "E" // Exempt from tax
+   * @example TaxCategoryCode.StandardRate
+   * @example TaxCategoryCode.ZeroRated
+   * @example TaxCategoryCode.ExemptFromTax
    */
   id: TaxCategoryCode;
   
@@ -179,9 +179,9 @@ export interface TaxCategory {
    * Tax scheme identifier
    * Uses UBL Tax Scheme Code standard
    * 
-   * @example "VAT" // Value Added Tax
-   * @example "GST" // Goods and Services Tax
-   * @example "SAL" // Sales Tax
+   * @example TaxSchemeCode.ValueAddedTax
+   * @example TaxSchemeCode.GoodsAndServicesTax
+   * @example TaxSchemeCode.SalesTax
    */
   taxScheme: TaxSchemeCode | string;
 }
@@ -235,9 +235,9 @@ export interface LineItem {
    * Unit of measure code
    * Uses UBL Unit of Measure Code standard
    * 
-   * @example "EA" // Each
-   * @example "KGM" // Kilogram
-   * @example "HUR" // Hour
+   * @example UnitCode.Each
+   * @example UnitCode.Kilogram
+   * @example UnitCode.Hour
    */
   unitCode?: UnitCode;
   
