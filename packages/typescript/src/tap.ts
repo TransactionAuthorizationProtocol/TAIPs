@@ -189,9 +189,9 @@ export type Amount = `${number}.${number}` | `${number}`;
  * Chain Agnostic Transaction Identifier (CAIP-220)
  * Represents a transaction on a specific blockchain in a chain-agnostic way.
  *
- * Format: `{caip2}/tx/{txid}`
+ * Format: `{caip2}:tx/{txid}`
  *
- * @example "eip155:1/tx/0x4a563af33c4871b51a8b108aa2fe1dd5280a30dfb7236170ae5e5e7957eb6392"
+ * @example "eip155:1:tx/0x4a563af33c4871b51a8b108aa2fe1dd5280a30dfb7236170ae5e5e7957eb6392"
  * @see {@link https://github.com/ChainAgnostic/CAIPs/blob/master/CAIPs/caip-220.md | CAIP-220 Specification}
  */
 export type CAIP220 = string;
@@ -722,8 +722,22 @@ export interface Authorize extends TapMessageObject<"Authorize"> {
   /**
    * Optional settlement address
    * Either a blockchain address (CAIP-10) or traditional payment target (RFC 8905 PayTo URI)
+   * REQUIRED if sent by beneficiary agent and original request lacks settlementAddress role agent
    */
   settlementAddress?: SettlementAddress;
+
+  /**
+   * Optional settlement asset
+   * CAIP-19 identifier specifying the asset for settlement
+   * REQUIRED when multiple supportedAssets are present in transaction message
+   */
+  settlementAsset?: CAIP19;
+
+  /**
+   * Optional amount
+   * Decimal representation if different from original transaction amount
+   */
+  amount?: Amount;
 
   /**
    * Optional expiration timestamp
@@ -778,15 +792,22 @@ export interface Connect extends TapMessageObject<"Connect"> {
  */
 export interface Settle extends TapMessageObject<"Settle"> {
   /**
-   * Settlement transaction identifier
-   * CAIP-220 identifier for the on-chain settlement transaction
+   * Settlement address
+   * REQUIRED destination address in CAIP-10 or RFC 8905 format
    */
-  settlementId: CAIP220;
+  settlementAddress: SettlementAddress;
+
+  /**
+   * Optional settlement transaction identifier
+   * CAIP-220 identifier for the on-chain settlement transaction
+   * REQUIRED by at least one agent representing the originator
+   */
+  settlementId?: CAIP220;
 
   /**
    * Optional settled amount
    * If specified, must be less than or equal to the amount in the original transaction
-   * If a Complete message specified an amount, this must match that value
+   * If an Authorize message specified an amount, this must match that value
    */
   amount?: Amount;
 }
@@ -799,10 +820,10 @@ export interface Settle extends TapMessageObject<"Settle"> {
  */
 export interface Reject extends TapMessageObject<"Reject"> {
   /**
-   * Reason for rejection
-   * Explanation of why the transfer was rejected
+   * Optional reason for rejection
+   * Human readable explanation of why the transfer was rejected
    */
-  reason: string;
+  reason?: string;
 }
 
 /**

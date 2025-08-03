@@ -11,13 +11,16 @@
     },
     "did": {
       "type": "string",
-      "pattern": "^did:[a-z0-9]+:[a-zA-Z0-9._%-]*[a-zA-Z0-9._%-]$",
+      "pattern": "^did:[a-z0-9]+:.+$",
       "description": "Decentralized Identifier (DID) format"
     },
     "iri": {
       "type": "string",
-      "format": "iri",
-      "description": "Internationalized Resource Identifier"
+      "pattern": "^[a-zA-Z][a-zA-Z0-9+.-]*:.+$",
+      "not": {
+        "pattern": "^did:"
+      },
+      "description": "Internationalized Resource Identifier (IRI), excluding DIDs"
     },
     "iso8601DateTime": {
       "type": "string",

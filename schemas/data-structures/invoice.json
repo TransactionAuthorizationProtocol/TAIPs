@@ -2,102 +2,92 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://taips.tap.rsvp/schemas/data-structures/invoice.json",
   "title": "Invoice",
-  "description": "Payment request details",
+  "description": "Invoice object for detailed payment information per TAIP-16",
   "type": "object",
-  "required": ["payee", "items", "total"],
+  "required": ["id", "issueDate", "currencyCode", "lineItems", "total"],
   "properties": {
-    "invoiceNumber": {
+    "id": {
       "type": "string",
-      "description": "Unique invoice identifier"
+      "description": "Unique identifier for the invoice",
+      "examples": ["INV001", "2025-001"]
     },
-    "invoiceDate": {
-      "$ref": "../common/base-types.json#/$defs/iso8601DateTime",
-      "description": "Date the invoice was issued"
+    "issueDate": {
+      "type": "string",
+      "format": "date",
+      "description": "Date the invoice was issued (ISO 8601 date format YYYY-MM-DD)",
+      "examples": ["2025-04-20"]
     },
-    "dueDate": {
-      "$ref": "../common/base-types.json#/$defs/iso8601DateTime",
-      "description": "Payment due date"
+    "currencyCode": {
+      "type": "string",
+      "pattern": "^[A-Z]{3}$",
+      "description": "ISO 4217 currency code for invoice amounts",
+      "examples": ["USD", "EUR", "GBP"]
     },
-    "payee": {
-      "$ref": "party.json",
-      "description": "Party receiving payment"
-    },
-    "payer": {
-      "$ref": "party.json",
-      "description": "Party making payment"
-    },
-    "items": {
+    "lineItems": {
       "type": "array",
       "items": {
-        "$ref": "#/$defs/invoiceItem"
+        "$ref": "#/$defs/lineItem"
       },
       "minItems": 1,
-      "description": "Line items on the invoice"
+      "description": "Individual items being invoiced"
     },
-    "subtotal": {
-      "$ref": "#/$defs/currencyAmount",
-      "description": "Sum of all items before taxes and discounts"
-    },
-    "taxes": {
-      "type": "array",
-      "items": {
-        "$ref": "#/$defs/taxItem"
-      },
-      "description": "Applied taxes"
-    },
-    "discounts": {
-      "type": "array",
-      "items": {
-        "$ref": "#/$defs/discountItem"
-      },
-      "description": "Applied discounts"
+    "taxTotal": {
+      "$ref": "#/$defs/taxTotal",
+      "description": "Aggregate tax information"
     },
     "total": {
-      "$ref": "#/$defs/currencyAmount",
-      "description": "Total amount due"
+      "type": "number",
+      "minimum": 0,
+      "description": "Total amount of the invoice, including taxes"
     },
-    "notes": {
+    "subTotal": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Sum of line totals before taxes"
+    },
+    "dueDate": {
       "type": "string",
-      "description": "Additional notes or terms"
+      "format": "date",
+      "description": "Payment due date (ISO 8601 date format YYYY-MM-DD)",
+      "examples": ["2025-05-20"]
     },
-    "paymentInstructions": {
-      "type": "object",
-      "properties": {
-        "settlementAddress": {
-          "$ref": "../common/settlement-address.json",
-          "description": "Address for payment settlement in either CAIP-10 or RFC 8905 format"
-        },
-        "asset": {
-          "$ref": "../common/caip-types.json#/$defs/caip19",
-          "description": "Accepted asset for payment"
-        },
-        "reference": {
-          "type": "string",
-          "description": "Payment reference to include"
-        }
-      }
+    "note": {
+      "type": "string",
+      "description": "Additional notes or terms for the invoice"
+    },
+    "paymentTerms": {
+      "type": "string",
+      "description": "Terms of payment",
+      "examples": ["Net 30", "Due on receipt", "2/10 net 30"]
+    },
+    "accountingCost": {
+      "type": "string",
+      "description": "Buyer's accounting code for routing costs to specific accounts"
+    },
+    "orderReference": {
+      "$ref": "#/$defs/orderReference",
+      "description": "Information about a related order"
+    },
+    "additionalDocumentReference": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/documentReference"
+      },
+      "description": "References to additional documents"
     }
   },
   "$defs": {
-    "currencyAmount": {
+    "lineItem": {
       "type": "object",
-      "required": ["amount", "currency"],
+      "required": ["id", "description", "quantity", "unitPrice", "lineTotal"],
       "properties": {
-        "amount": {
-          "$ref": "../common/base-types.json#/$defs/amount"
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the line item within the invoice"
         },
-        "currency": {
-          "$ref": "../common/base-types.json#/$defs/iso4217CurrencyCode"
-        }
-      }
-    },
-    "invoiceItem": {
-      "type": "object",
-      "required": ["description", "quantity", "unitPrice", "total"],
-      "properties": {
         "description": {
           "type": "string",
-          "description": "Item description"
+          "description": "Description of the item or service"
         },
         "name": {
           "type": "string",
@@ -115,58 +105,123 @@
         },
         "quantity": {
           "type": "number",
-          "minimum": 0
+          "minimum": 0,
+          "description": "Quantity of the item"
+        },
+        "unitCode": {
+          "type": "string",
+          "description": "Unit of measure using UBL Unit of Measure Code standard",
+          "examples": ["KGM", "LTR", "PCE", "EA", "HUR"]
         },
         "unitPrice": {
-          "$ref": "#/$defs/currencyAmount"
-        },
-        "total": {
-          "$ref": "#/$defs/currencyAmount"
-        },
-        "taxRate": {
           "type": "number",
           "minimum": 0,
-          "maximum": 1,
-          "description": "Tax rate as decimal (e.g., 0.1 for 10%)"
+          "description": "Price per unit"
+        },
+        "lineTotal": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Total amount for this line item (typically quantity × unitPrice)"
+        },
+        "taxCategory": {
+          "$ref": "#/$defs/taxCategory",
+          "description": "Tax information for the line item"
         }
       }
     },
-    "taxItem": {
+    "taxCategory": {
       "type": "object",
-      "required": ["name", "rate", "amount"],
+      "required": ["id", "percent", "taxScheme"],
       "properties": {
-        "name": {
+        "id": {
           "type": "string",
-          "description": "Tax name (e.g., 'VAT', 'GST')"
+          "description": "Tax category code according to UN/ECE 5305 Tax Category Code list",
+          "examples": ["S", "Z", "E"]
         },
-        "rate": {
+        "percent": {
           "type": "number",
           "minimum": 0,
-          "maximum": 1
+          "description": "Tax rate percentage"
         },
-        "amount": {
-          "$ref": "#/$defs/currencyAmount"
+        "taxScheme": {
+          "type": "string",
+          "description": "Tax scheme according to UN/ECE 5305 Tax Type Code list",
+          "examples": ["VAT", "GST", "SAL"]
         }
       }
     },
-    "discountItem": {
+    "taxTotal": {
       "type": "object",
-      "required": ["name", "amount"],
+      "required": ["taxAmount"],
       "properties": {
-        "name": {
-          "type": "string",
-          "description": "Discount description"
-        },
-        "amount": {
-          "$ref": "#/$defs/currencyAmount"
-        },
-        "percentage": {
+        "taxAmount": {
           "type": "number",
           "minimum": 0,
-          "maximum": 1,
-          "description": "Discount as percentage"
+          "description": "Total tax amount for the invoice"
+        },
+        "taxSubtotal": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/taxSubtotal"
+          },
+          "description": "Tax breakdown by category"
+        }
+      }
+    },
+    "taxSubtotal": {
+      "type": "object",
+      "required": ["taxableAmount", "taxAmount", "taxCategory"],
+      "properties": {
+        "taxableAmount": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Amount subject to this tax"
+        },
+        "taxAmount": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Tax amount for this category"
+        },
+        "taxCategory": {
+          "$ref": "#/$defs/taxCategory"
+        }
+      }
+    },
+    "orderReference": {
+      "type": "object",
+      "required": ["id"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Order identifier"
+        },
+        "issueDate": {
+          "type": "string",
+          "format": "date",
+          "description": "Date when the order was issued (ISO 8601 date format)"
+        }
+      }
+    },
+    "documentReference": {
+      "type": "object",
+      "required": ["id"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Document identifier"
+        },
+        "documentType": {
+          "type": "string",
+          "description": "Type of document using UBL Document Type Code standard",
+          "examples": ["Invoice", "CreditNote", "DebitNote", "Order", "Contract", "Timesheet"]
+        },
+        "url": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL where the document can be accessed"
         }
       }
     }
-  }
+  },
+  "additionalProperties": false
 }
