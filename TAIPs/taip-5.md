@@ -75,6 +75,7 @@ The following example shows its use in a [TAIP-3] message:
 The following are the attributes of an object in the `agents` array:
 
 - `@id` - REQUIRED the [DID] of the Agent
+- `@type` - OPTIONAL a [JSON-LD] type identifier. Most commonly `https://schema.org/Organization` for institutional agents
 - `role` - OPTIONAL a string or an array of strings as specified for the particular kind of transaction. Eg. `SettlementAddress` for [TAIP-3]
 - `for` - REQUIRED a [DID] or an array of DIDs of another Agent or Party that this agent acts on behalf of in this transaction.
 - `policies` - OPTIONAL an array of [TAIP-7 Policies][TAIP-7]
@@ -84,6 +85,8 @@ The following are the attributes of an object in the `agents` array:
 - `description` - OPTIONAL a string containing a description of the agent (based on [schema.org/Organization](https://schema.org/Organization))
 - `email` - OPTIONAL a string containing the agent's contact email address (based on [schema.org/Organization](https://schema.org/Organization))
 - `telephone` - OPTIONAL a string containing the agent's contact telephone number (based on [schema.org/Organization](https://schema.org/Organization))
+
+When using schema.org types in the `@type` field, implementations can leverage the rich vocabulary and tooling available for schema.org, enabling better interoperability with web standards and search engines.
 
 Future TAIPs are encouraged to extend the agent model with additional functionality.
 
@@ -112,6 +115,7 @@ Example with organization metadata:
 ```json
 {
   "@id":"did:web:originator.vasp",
+  "@type":"https://schema.org/Organization",
   "for":"did:eg:bob",
   "name":"Originator VASP AG",
   "url":"https://originator.vasp",

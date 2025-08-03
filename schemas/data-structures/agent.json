@@ -11,8 +11,16 @@
       "description": "Decentralized Identifier of the agent"
     },
     "@type": {
-      "const": "Agent",
-      "description": "Type identifier for Agent"
+      "oneOf": [
+        {
+          "const": "Agent"
+        },
+        {
+          "type": "string",
+          "format": "uri"
+        }
+      ],
+      "description": "JSON-LD type identifier. Can be 'Agent' or a schema.org type like 'https://schema.org/Organization'"
     },
     "role": {
       "type": "string",
