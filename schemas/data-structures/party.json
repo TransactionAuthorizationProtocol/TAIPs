@@ -18,8 +18,16 @@
       "description": "Identifier for the party (DID or IRI)"
     },
     "@type": {
-      "const": "Party",
-      "description": "Type identifier for Party"
+      "oneOf": [
+        {
+          "const": "Party"
+        },
+        {
+          "type": "string",
+          "format": "uri"
+        }
+      ],
+      "description": "JSON-LD type identifier. Can be 'Party' or a schema.org type like 'https://schema.org/Organization' or 'https://schema.org/Person'"
     },
     "lei:leiCode": {
       "$ref": "../common/base-types.json#/$defs/lei",

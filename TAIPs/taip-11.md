@@ -36,13 +36,13 @@ In TAP message schemas (as defined in [TAIP-2]), each *Party* object that repres
 
 ```json
 {
-  "@context": { "lei": "https://schema.org/leiCode" },
+  "@type": "https://schema.org/Organization",
   "@id": "did:web:example.vasp.com",
-  "lei:leiCode": "5493001KJTIIGC8Y1R12"
+  "leiCode": "5493001KJTIIGC8Y1R12"
 }
 ```
 
-In this example, the party's decentralized identifier (DID) or other IRI remains the primary identifier for routing and reference (`@id`). The additional `"lei:leiCode"` field – introduced via the context alias `"lei"` – carries the institution's LEI (here represented by a 20-character code). By using a well-known ontology (Schema.org's `leiCode` property), any party receiving this data can interpret the LEI correctly. The LEI MUST be a 20-character alpha-numeric string conforming to the ISO 17442 standard format (no spaces or delimiters). If the sending institution has an LEI, it **MUST include** it in its party object. If a customer (originator or beneficiary) of a transaction is itself a legal entity (e.g. a business or organization), and has an LEI, that LEI SHOULD also be included in the relevant party object for the originator or beneficiary.
+In this example, the party's decentralized identifier (DID) or other IRI remains the primary identifier for routing and reference (`@id`). The additional `"leiCode"` field – carries the institution's LEI (here represented by a 20-character code). By using a well-known ontology (Schema.org's `leiCode` property), any party receiving this data can interpret the LEI correctly. The LEI MUST be a 20-character alpha-numeric string conforming to the ISO 17442 standard format (no spaces or delimiters). If the sending institution has an LEI, it **MUST include** it in its party object. If a customer (originator or beneficiary) of a transaction is itself a legal entity (e.g. a business or organization), and has an LEI, that LEI SHOULD also be included in the relevant party object for the originator or beneficiary.
 
 Per [TAIP-5], institutional participants in a transaction are often represented as *Agents* (e.g. a VASP acting on behalf of a customer). In such cases, the Agent can indicate the legal entity it represents by using the `for` attribute pointing to the Party (entity) object [TAIP-6-Parties]. The Party object for that institution would contain the LEI as shown above. For example, a VASP's Agent identified by a DID could have a corresponding Party entry that includes the VASP's LEI. This indirection allows the agent (which might be a specific service endpoint) to be linked to the broader legal entity identity. Implementations MAY also choose to include the LEI directly as part of an Agent's metadata, but the recommended approach is to use the Party construct so that the legal entity's details are cleanly separated.
 
@@ -69,10 +69,7 @@ An Agent can declare a policy that it requires the counterparty's institution to
     "policies": [
       {
         "@type": "RequirePresentation",
-        "@context": [
-          "https://schema.org/Organization",
-          "https://www.gleif.org/ontology/Base/Entity"
-        ],
+        "@context": "https://schema.org/Organization",
         "fromAgent": "beneficiary",
         "aboutAgent": "beneficiary",
         "purpose": "Require beneficiary institution LEI for compliance",
@@ -102,9 +99,9 @@ When initiating a transaction, if the originator's institution or the originator
     "@context": "https://tap.rsvp/schema/1.0",
     "@type": "https://tap.rsvp/schema/1.0#Transfer",
     "originator": {
-      "@context": { "lei": "https://schema.org/leiCode" },
+      "@type": "https://schema.org/Organization",
       "@id": "did:org:acmecorp-123",
-      "lei:leiCode": "3M5E1GQKGL17HI8CPN20",
+      "leiCode": "3M5E1GQKGL17HI8CPN20",
       "name": "ACME Corporation"
     },
     "beneficiary": {

@@ -33,12 +33,13 @@ Parties are identified using an [IRI] as the @id attribute in a [JSON-LD] object
 Parties represented in [TAIP-2] messages using a straightforward [JSON-LD] node syntax with the following attributes:
 
 * `@id` - REQUIRED the [IRI] of the Party
-* `name` - OPTIONAL a string containing the name of the party (based on [schema.org/Organization](https://schema.org/Organization))
+* `@type` - OPTIONAL a [JSON-LD] type identifier. Most commonly `https://schema.org/Organization` for institutional parties or `https://schema.org/Person` for individual parties
+* `name` - OPTIONAL a string containing the name of the party (based on [schema.org/Organization](https://schema.org/Organization) or [schema.org/Person](https://schema.org/Person))
 * `url` - OPTIONAL a URL string pointing to the party's website (based on [schema.org/Organization](https://schema.org/Organization))
 * `logo` - OPTIONAL a URL string pointing to the party's logo image (based on [schema.org/Organization](https://schema.org/Organization))
 * `description` - OPTIONAL a string containing a description of the party (based on [schema.org/Organization](https://schema.org/Organization))
-* `email` - OPTIONAL a string containing the party's contact email address (based on [schema.org/Organization](https://schema.org/Organization))
-* `telephone` - OPTIONAL a string containing the party's contact telephone number (based on [schema.org/Organization](https://schema.org/Organization))
+* `email` - OPTIONAL a string containing the party's contact email address (based on [schema.org/Organization](https://schema.org/Organization) or [schema.org/Person](https://schema.org/Person))
+* `telephone` - OPTIONAL a string containing the party's contact telephone number (based on [schema.org/Organization](https://schema.org/Organization) or [schema.org/Person](https://schema.org/Person))
 
 ```json
 {
@@ -85,6 +86,7 @@ Example with full organization metadata:
 ```json
 {
   "@id":"did:web:merchant.com",
+  "@type":"https://schema.org/Organization",
   "name":"Digital Goods Store Inc.",
   "url":"https://merchant.com",
   "logo":"https://merchant.com/assets/logo.svg",
@@ -94,6 +96,18 @@ Example with full organization metadata:
   "mcc":"5734"
 }
 ```
+
+Example for an individual person:
+```json
+{
+  "@id":"did:eg:alice",
+  "@type":"https://schema.org/Person",
+  "name":"Alice Johnson",
+  "email":"alice@example.com"
+}
+```
+
+When using schema.org types in the `@type` field, implementations can leverage the rich vocabulary and tooling available for schema.org, enabling better interoperability with web standards and search engines. The distinction between `https://schema.org/Organization` and `https://schema.org/Person` helps clarify whether the party is an institutional or individual participant.
 
 Future TAIPs can add additional attributes to parties. Since it is JSON-LD, you could add additional data from other contexts.
 

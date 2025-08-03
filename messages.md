@@ -141,15 +141,18 @@ This example demonstrates agents with and without the optional `role` parameter.
     "amount": "1.23",
     "originator": {
       "@id": "did:org:acmecorp",
+      "@type": "https://schema.org/Organization",
       "lei:leiCode": "3M5E1GQKGL17HI8CPN20",
       "name": "ACME Corporation"
     },
     "beneficiary": {
-      "@id": "did:eg:alice"
+      "@id": "did:eg:alice",
+      "@type": "https://schema.org/Person"
     },
     "agents": [
       {
         "@id": "did:web:originator.vasp",
+        "@type": "https://schema.org/Organization",
         "for": "did:org:acmecorp",
         "role": "CustodialService",
         "name": "Originator VASP Services",
