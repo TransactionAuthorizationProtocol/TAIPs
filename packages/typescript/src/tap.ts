@@ -428,11 +428,18 @@ export interface Agent extends Partial<Organization> {
    * is resolvable from the agent's DID document. Particularly useful for self-hosted
    * and decentralized agents. For security purposes, this field SHOULD be ignored
    * if a valid DIDComm service endpoint is already listed in the DID document.
-   * 
+   *
    * @example "https://agent.example.com/didcomm"
    */
   serviceUrl?: IRI;
 }
+
+type PartyType =
+  | "originator"
+  | "beneficiary"
+  | "customer"
+  | "merchant"
+  | "principal";
 
 /**
  * Base interface for all TAP policy types.
@@ -463,7 +470,7 @@ export interface Policy<T extends string> extends JsonLdObject<T> {
    * Optional agent representing a party required to fulfill this policy
    * E.g. 'originator' or 'beneficiary' in TAIP-3
    */
-  fromAgent?: "originator" | "beneficiary" | "customer" | "merchant";
+  fromAgent?: PartyType;
 
   /**
    * Optional human-readable description of the policy's purpose
@@ -1108,17 +1115,30 @@ export interface TransactionConstraints {
 
 /**
  * Authorization Required Message
- * Response providing an authorization URL for connection approval.
+ * Response providing an authorization URL for transaction or connection approval.
+ * An agent can require that an end user opens up the authorizationUrl in a web browser or app.
+ * An agent may require this to ensure that the end user authorizes a payment or connection.
  *
+ * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-4.md | TAIP-4: Transaction Authorization Protocol}
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-15.md | TAIP-15: Agent Connection Protocol}
  */
 export interface AuthorizationRequired
   extends TapMessageObject<"AuthorizationRequired"> {
   /**
-   * URL for connection authorization
-   * Where the customer can review and approve
+   * URL for authorization
+   * Where the user can authorize the transaction or connection
    */
-  authorization_url: string;
+  authorizationUrl: string;
+
+  /**
+   * Optional party type required to open the URL
+   * Indicates the party type (e.g., "customer", "principal", or "originator") that is required to open the URL
+   *
+   * @example "customer"
+   * @example "principal" 
+   * @example "originator"
+   */
+  from?: PartyType;
 
   /**
    * Expiration timestamp
