@@ -38,11 +38,18 @@ Each party in TAP is identified through:
 
 Parties in TAP may have various attributes that describe their characteristics:
 
-1. **Name**: Human-readable identifier for the party
+1. **Name**: Human-readable identifier for the party (based on schema.org/Organization or schema.org/Person)
 2. **Legal Entity Identifier (LEI)**: For institutional parties, a globally recognized identifier
 3. **Merchant Category Code (MCC)**: Optional ISO 18245 code for merchant parties that identifies their business type (e.g., "5411" for grocery stores, "5812" for restaurants)
-4. **Contact Information**: Methods for reaching the party outside of the TAP protocol
-5. **Regulatory Status**: Information about regulatory compliance and licensing
+4. **Contact Information**: Methods for reaching the party outside of the TAP protocol, including:
+   - **URL**: Website address (based on schema.org/Organization)
+   - **Email**: Contact email address (based on schema.org/Organization or schema.org/Person) 
+   - **Telephone**: Contact phone number (based on schema.org/Organization or schema.org/Person)
+5. **Branding Information**: Visual identity elements:
+   - **Logo**: URL to the party's logo image (based on schema.org/Organization)
+   - **Description**: Textual description of the party (based on schema.org/Organization)
+6. **Type Information**: JSON-LD type identifiers (e.g., "https://schema.org/Organization" for institutions, "https://schema.org/Person" for individuals)
+7. **Regulatory Status**: Information about regulatory compliance and licensing
 
 ## Party Management Messages
 
@@ -78,4 +85,6 @@ When designing party support in TAP:
 
 ## Technical Integration
 
-For technical details on party data structures and message formats, see the [full message reference](/messages/#data-elements).
+Parties can be enhanced with schema.org attributes to provide richer metadata while maintaining compatibility with existing implementations. The schema.org vocabulary enables better interoperability with web standards and search engines.
+
+For technical details on party data structures, message formats, and the complete list of supported schema.org attributes, see the [full message reference](/messages/#data-elements).

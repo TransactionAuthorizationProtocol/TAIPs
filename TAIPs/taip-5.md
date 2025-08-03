@@ -85,6 +85,7 @@ The following are the attributes of an object in the `agents` array:
 - `description` - OPTIONAL a string containing a description of the agent (based on [schema.org/Organization](https://schema.org/Organization))
 - `email` - OPTIONAL a string containing the agent's contact email address (based on [schema.org/Organization](https://schema.org/Organization))
 - `telephone` - OPTIONAL a string containing the agent's contact telephone number (based on [schema.org/Organization](https://schema.org/Organization))
+- `serviceUrl` - OPTIONAL a string URL for the agent's DIDComm endpoint. This field SHOULD only be used as a fallback when no DIDComm service endpoint is resolvable from the agent's DID document. Particularly useful for self-hosted and decentralized agents. For security purposes, this field SHOULD be ignored if a valid DIDComm service endpoint is already listed in the DID document
 
 When using schema.org types in the `@type` field, implementations can leverage the rich vocabulary and tooling available for schema.org, enabling better interoperability with web standards and search engines.
 
@@ -133,6 +134,15 @@ There are three primary ways of interacting with agents:
 - Centralized Agents, who can interact in real-time with [TAIP-2 DIDComm Messages][TAIP-2] through a server endpoint defined in the [DIDComm Transports][DIDCommTransports]
 - End-user-controlled software, such as self-hosted wallets, can receive [TAIP-2 DIDComm Messages][TAIP-2] in an interactive User Interface using [DIDComm Out of Band][DIDCommOOB]
 - Decentralized Protocol agents, such as DeFi protocols that can only communicate through blockchain transactions, possibly through an implementation of [CAIP-74]
+
+### DIDComm Endpoint Resolution
+
+TAP agents resolve DIDComm endpoints using the following priority order:
+
+1. **DID Document Service Endpoints**: Primary method using the agent's DID document service section
+2. **Fallback Service URL**: Optional `serviceUrl` field in agent metadata when DID document endpoints are unavailable
+
+The `serviceUrl` field is particularly useful for self-hosted and decentralized agents that may not have reliable DID document hosting infrastructure. For security purposes, agents MUST prioritize DID document service endpoints over the fallback `serviceUrl` when both are available, and SHOULD validate that the `serviceUrl` actually belongs to the DID holder through appropriate verification mechanisms.
 
 ### Identifying Agents
 
@@ -639,6 +649,16 @@ As an example a message from `did:web:originator.vasp` proves that someone allow
 * Can I trust that they will answer correctly to any messages I send them?
 
 As such internal and external trust tools need to be handled. This is out of scope of this proposal.
+
+### Service URL Security
+
+When using the optional `serviceUrl` field for DIDComm endpoint fallback:
+
+- Agents MUST prioritize DID document service endpoints over `serviceUrl` when both are available
+- The `serviceUrl` MUST use HTTPS for secure communication
+- Agents SHOULD validate that the `serviceUrl` actually belongs to the DID holder through appropriate verification mechanisms
+- The `serviceUrl` SHOULD only be used when no valid DIDComm service endpoint is resolvable from the DID document
+- Implementations SHOULD log when fallback URLs are used for security monitoring purposes
 
 ## Privacy Considerations
 <!--Please add an explicit list of intra-actor assumptions and known risk factors if applicable. Any normative definition of an interface requires these to be implementable; assumptions and risks should be at both individual interaction/use-case scale and systemically, should the interface specified gain ecosystem-namespace adoption. -->

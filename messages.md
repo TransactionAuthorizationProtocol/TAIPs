@@ -1399,20 +1399,17 @@ Represents a participant in a transaction (originator or beneficiary).
 | Attribute | Type | Required | Status | Description |
 |-----------|------|----------|---------|-------------|
 | @id | string | Yes | Review ([TAIP-6]) | DID or IRI of the party |
-| lei:leiCode | string | No | Draft ([TAIP-11]) | LEI code for legal entities. Must be a 20-character alpha-numeric string conforming to ISO 17442 |
-| name | string | No | Review ([TAIP-6]) | Human-readable name |
+| @type | string | No | Review ([TAIP-6]) | JSON-LD type identifier. Most commonly "https://schema.org/Organization" for institutional parties or "https://schema.org/Person" for individual parties |
+| leiCode | string | No | Draft ([TAIP-11]) | LEI code for legal entities. Must be a 20-character alpha-numeric string conforming to ISO 17442 |
+| name | string | No | Review ([TAIP-6]) | Human-readable name (based on schema.org/Organization or schema.org/Person) |
 | nameHash | string | No | Draft ([TAIP-12]) | SHA-256 hash of the normalized name (uppercase, no whitespace) |
 | mcc | string | No | Review ([TAIP-14]) | Merchant Category Code (ISO 18245) that identifies the type of business (e.g., "5411" for grocery stores) |
+| url | string | No | Review ([TAIP-6]) | URL pointing to the party's website (based on schema.org/Organization) |
+| logo | string | No | Review ([TAIP-6]) | URL pointing to the party's logo image (based on schema.org/Organization) |
+| description | string | No | Review ([TAIP-6]) | Description of the party (based on schema.org/Organization) |
+| email | string | No | Review ([TAIP-6]) | Contact email address (based on schema.org/Organization or schema.org/Person) |
+| telephone | string | No | Review ([TAIP-6]) | Contact telephone number (based on schema.org/Organization or schema.org/Person) |
 
-When including an LEI, the Party MUST include the appropriate JSON-LD context:
-
-```json
-{
-  "@context": { "lei": "https://schema.org/leiCode" },
-  "@id": "did:web:example.vasp.com",
-  "lei:leiCode": "5493001KJTIIGC8Y1R12"
-}
-```
 
 If a customer (originator or beneficiary) is a legal entity and has an LEI, that LEI SHOULD be included in their Party. For institutions (VASPs), if they have an LEI, they MUST include it in their Party.
 
@@ -1475,6 +1472,9 @@ Each line item in the `lineItems` array contains:
 |-----------|------|----------|---------|-------------|
 | id | string | Yes | Review ([TAIP-16]) | Unique identifier for the line item within the invoice |
 | description | string | Yes | Review ([TAIP-16]) | Description of the item or service |
+| name | string | No | Review ([TAIP-16]) | Product name (based on schema.org/Product). If not provided, description serves as the display name |
+| image | string | No | Review ([TAIP-16]) | URL to an image of the product (based on schema.org/Product) |
+| url | string | No | Review ([TAIP-16]) | URL to the product page (based on schema.org/Product) |
 | quantity | number | Yes | Review ([TAIP-16]) | Quantity of the item |
 | unitCode | string | No | Review ([TAIP-16]) | Unit of measure code (e.g., "EA" for each, "KGM" for kilogram) |
 | unitPrice | number | Yes | Review ([TAIP-16]) | Price per unit |
@@ -1535,8 +1535,16 @@ Represents a service involved in executing transactions.
 | Attribute | Type | Required | Status | Description |
 |-----------|------|----------|---------|-------------|
 | @id | string | Yes | Review ([TAIP-5]) | DID of the agent |
+| @type | string | No | Review ([TAIP-5]) | JSON-LD type identifier. Most commonly "https://schema.org/Organization" for institutional agents |
 | role | string | No | Review ([TAIP-5]) | Role of the agent (e.g., "SettlementAddress", "SourceAddress", "CustodialService") |
 | for | string or array of strings | No | Review ([TAIP-5]) | Reference to the Party or Parties this agent represents. Can be either a single DID string or an array of DID strings when the agent acts on behalf of multiple entities simultaneously |
+| name | string | No | Review ([TAIP-5]) | Name of the agent organization (based on schema.org/Organization) |
+| url | string | No | Review ([TAIP-5]) | URL pointing to the agent's website (based on schema.org/Organization) |
+| logo | string | No | Review ([TAIP-5]) | URL pointing to the agent's logo image (based on schema.org/Organization) |
+| description | string | No | Review ([TAIP-5]) | Description of the agent (based on schema.org/Organization) |
+| email | string | No | Review ([TAIP-5]) | Contact email address (based on schema.org/Organization) |
+| telephone | string | No | Review ([TAIP-5]) | Contact telephone number (based on schema.org/Organization) |
+| serviceUrl | string | No | Review ([TAIP-15]) | Optional DIDComm service endpoint URL. Should only be used as a fallback when no DIDComm service endpoint is resolvable from the agent's DID document. Particularly useful for self-hosted and decentralized agents |
 
 **Note:** Both `role` and `for` parameters are optional to support flexible agent configurations. The `role` parameter may be omitted when the agent's function is implicit from context or when using generic service agents. The `for` parameter may be omitted for standalone agents or when the relationship is established through other means.
 
