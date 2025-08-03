@@ -14,6 +14,7 @@ permalink: /messages/
   - [Payment](#payment)
   - [Escrow](#escrow)
 - [Authorization Flow Messages](#authorization-flow-messages)
+  - [AuthorizationRequired](#authorizationrequired)
   - [Authorize](#authorize)
   - [Settle](#settle)
   - [Reject](#reject)
@@ -422,6 +423,40 @@ Requests an agent to hold assets in escrow on behalf of parties, enabling paymen
 ```
 
 ## Authorization Flow Messages
+
+### AuthorizationRequired
+[TAIP-4] - Review
+
+An agent can require that an end user opens up an authorization URL in a web browser or app before proceeding with the transaction. An agent may require this to ensure that the end user authorizes a payment.
+
+| Attribute | Type | Required | Status | Description |
+|-----------|------|----------|---------|-------------|
+| @context | string | Yes | Review ([TAIP-4]) | JSON-LD context "https://tap.rsvp/schema/1.0" |
+| @type | string | Yes | Review ([TAIP-4]) | JSON-LD type "https://tap.rsvp/schema/1.0#AuthorizationRequired" |
+| authorizationUrl | string | Yes | Review ([TAIP-4]) | URL where the user can authorize the transaction |
+| expires | string | Yes | Review ([TAIP-4]) | ISO 8601 timestamp when the authorization URL expires |
+| from | string | No | Review ([TAIP-4]) | Optional party type (e.g., "customer", "principal", or "originator") that is required to open the URL |
+
+> **Note:** The message refers to the original Transfer or Payment message via the DIDComm `thid` (thread ID) in the message envelope.
+
+#### Examples
+
+```json
+{
+  "id": "123e4567-e89b-12d3-a456-426614174001",
+  "type": "https://tap.rsvp/schema/1.0#AuthorizationRequired",
+  "from": "did:web:beneficiary.vasp",
+  "to": ["did:web:originator.vasp"],
+  "thid": "123e4567-e89b-12d3-a456-426614174000",
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#AuthorizationRequired",
+    "authorizationUrl": "https://beneficiary.vasp/authorize?request=abc123",
+    "expires": "2024-01-01T12:00:00Z",
+    "from": "customer"
+  }
+}
+```
 
 ### Authorize
 [TAIP-4] - Review
@@ -1060,7 +1095,7 @@ The body object must contain:
   "body": {
     "@context": "https://tap.rsvp/schema/1.0",
     "@type": "https://tap.rsvp/schema/1.0#AuthorizationRequired",
-    "authorization_url": "https://beneficiary.vasp/authorize?request=abc123",
+    "authorizationUrl": "https://beneficiary.vasp/authorize?request=abc123",
     "expires": "2024-03-22T15:00:00Z"
   }
 }
@@ -1078,7 +1113,7 @@ The body object must contain:
   "body": {
     "@context": "https://tap.rsvp/schema/1.0",
     "@type": "https://tap.rsvp/schema/1.0#AuthorizationRequired",
-    "authorization_url": "https://payment.provider/merchant/onboard?id=xyz789",
+    "authorizationUrl": "https://payment.provider/merchant/onboard?id=xyz789",
     "expires": "2024-03-22T15:00:00Z"
   }
 }
@@ -1188,7 +1223,7 @@ Provides an authorization URL for interactive connection approval.
 |-----------|------|----------|---------|-------------|
 | @context | string | Yes | Draft ([TAIP-15]) | JSON-LD context "https://tap.rsvp/schema/1.0" |
 | @type | string | Yes | Draft ([TAIP-15]) | JSON-LD type "https://tap.rsvp/schema/1.0#AuthorizationRequired" |
-| authorization_url | string | Yes | Draft ([TAIP-15]) | URL where the customer can review and approve the connection |
+| authorizationUrl | string | Yes | Draft ([TAIP-15]) | URL where the customer can review and approve the connection |
 | expires | string | Yes | Draft ([TAIP-15]) | ISO 8601 timestamp when the authorization URL expires |
 
 #### Example AuthorizationRequired Message
@@ -1204,7 +1239,7 @@ Provides an authorization URL for interactive connection approval.
   "body": {
     "@context": "https://tap.rsvp/schema/1.0",
     "@type": "https://tap.rsvp/schema/1.0#AuthorizationRequired",
-    "authorization_url": "https://vasp.com/authorize?request=abc123",
+    "authorizationUrl": "https://vasp.com/authorize?request=abc123",
     "expires": "2024-03-22T15:00:00Z"
   }
 }
@@ -1266,7 +1301,7 @@ This flow demonstrates establishing a connection between a B2B service and a VAS
   "body": {
     "@context": "https://tap.rsvp/schema/1.0",
     "@type": "https://tap.rsvp/schema/1.0#AuthorizationRequired",
-    "authorization_url": "https://vasp.com/authorize?request=abc123",
+    "authorizationUrl": "https://vasp.com/authorize?request=abc123",
     "expires": "2024-03-22T15:00:00Z"
   }
 }

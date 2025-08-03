@@ -5,7 +5,7 @@ status: Review
 type: Standard
 author: Pelle Braendgaard <pelle@notabene.id>
 created: 2024-03-21
-updated: 2025-06-23
+updated: 2025-08-03
 description: Establishes a protocol for creating secure, authorized connections between TAP agents with predefined transaction constraints and OAuth-style authorization flows. Enables persistent B2B integrations with transaction limits, purpose restrictions, and user control mechanisms for ongoing business relationships while maintaining robust risk management.
 requires: [2, 4, 6, 9, 13]
 ---
@@ -70,12 +70,15 @@ A message sent by an agent requesting connection to another agent:
 
 ### AuthorizationRequired Message
 
-A message sent in response to a Connect request when interactive authorization is needed:
+A message sent in response to a Connect request when interactive authorization is needed. This message follows the specification defined in [TAIP-4] for interactive authorization flows.
 
 - `@context` - REQUIRED the JSON-LD context `https://tap.rsvp/schema/1.0`
 - `@type` - REQUIRED the JSON-LD type `https://tap.rsvp/schema/1.0#AuthorizationRequired`
-- `authorization_url` - REQUIRED string URL where the user can authorize the connection
+- `authorizationUrl` - REQUIRED string URL where the user can authorize the connection
 - `expires` - REQUIRED string ISO 8601 timestamp when the authorization URL expires
+- `from` - OPTIONAL the party type (e.g., `customer`, `principal`, or `originator`) that is required to open the URL
+
+For the complete specification of this message type, see [TAIP-4].
 
 ### Authorize Message
 
@@ -359,7 +362,7 @@ The following are example plaintext messages. See [TAIP-2] for how to sign the m
   "body": {
     "@context": "https://tap.rsvp/schema/1.0",
     "@type": "https://tap.rsvp/schema/1.0#AuthorizationRequired",
-    "authorization_url": "https://vasp.com/authorize?request=abc123",
+    "authorizationUrl": "https://vasp.com/authorize?request=abc123",
     "expires": "2024-03-22T15:00:00Z"
   }
 }

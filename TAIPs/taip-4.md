@@ -5,7 +5,7 @@ author: Pelle Braendgaard <pelle@notabene.id>, Andrés Junge <andres@notabene.id
 status: Last Call
 type: Standard
 created: 2024-01-12
-updated: 2025-07-28
+updated: 2025-08-03
 description: A protocol framework enabling off-chain authorization of blockchain transactions through DID-based agents before settlement. Separates transaction ordering, authorization, and settlement into distinct phases to address compliance, risk management, and operational challenges without changing permissionless blockchain characteristics.
 discussions-to: https://github.com/TransactionAuthorizationProtocol/TAIPs/pull/6
 requires: 2, 5
@@ -89,8 +89,9 @@ Messages implement [TAIP-2] and are sent between [TAIP-5 Agents][TAIP-5] after a
 
 It is essential to understand that this is, strictly speaking, a messaging standard. No shared state is implied between agents except the ultimate settlement on a blockchain.
 
-There are three primary actions an agent can take:
+There are four primary actions an agent can take:
 
+- `AuthorizationRequired` - Request that an end user opens an authorization URL to approve the transaction.
 - `Settle` - They announce they will send the transaction to the blockchain.
 - `Authorize` - Authorize or signal to other agents that they are free to `settle` a transaction.
 - `Cancel` - Signal to other agents that they are canceling the transaction.
@@ -98,6 +99,16 @@ There are three primary actions an agent can take:
 - `Revert` - Request a Reversal of the transaction.
 
 All messages are sent as replies to an initial request by specifying the `id` of the original request in the `thid` attribute.
+
+### AuthorizationRequired
+
+Any agent can require that an end user opens up an authorization URL in a web browser or app before proceeding with the transaction. An agent may require this to ensure that the end user authorizes a payment. The following shows the attributes of the `body` object:
+
+- `@context` - REQUIRED the JSON-LD context `https://tap.rsvp/schema/1.0`
+- `@type` - REQUIRED the JSON-LD type `https://tap.rsvp/schema/1.0#AuthorizationRequired`
+- `authorizationUrl` - REQUIRED string URL where the user can authorize the transaction
+- `expires` - REQUIRED string ISO 8601 timestamp when the authorization URL expires
+- `from` - OPTIONAL the party type (e.g., `customer`, `principal`, or `originator`) that is required to open the URL
 
 ### Authorize
 
@@ -363,6 +374,24 @@ It is very important to understand that messages are just messages. Agents may o
 ## Test Cases
 <!--Please add diverse test cases here if applicable. Any normative definition of an interface requires test cases to be implementable. -->
 The following are example plaintext messages. See [TAIP-2] for how to sign the messages.
+
+### AuthorizationRequired
+
+```json
+{
+  "from": "did:web:beneficiary.vasp",
+  "type": "https://tap.rsvp/schema/1.0#AuthorizationRequired",
+  "thid": "ID of transfer request",
+  "to": ["did:web:originator.vasp"],
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#AuthorizationRequired",
+    "authorizationUrl": "https://beneficiary.vasp/authorize?request=abc123",
+    "expires": "2024-01-01T12:00:00Z",
+    "from": "customer"
+  }
+}
+```
 
 ### Authorize
 
