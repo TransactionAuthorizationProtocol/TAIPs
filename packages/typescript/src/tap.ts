@@ -283,23 +283,15 @@ export interface DIDCommReply<T = Record<string, unknown>>
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-6.md | TAIP-6: Party Identification}
  */
 
-export type ParticipantTypes = "Agent" | "Party";
-
-export interface Participant<T extends ParticipantTypes>
-  extends JsonLdObject<T> {
+export interface Participant {
   /**
    * Unique identifier for the participant
    * Can be either a DID or an IRI
    */
   "@id": DID | IRI;
 
-  "@type": T;
-
-  /**
-   * Legal Entity Identifier code
-   * Used to uniquely identify legal entities involved in financial transactions
-   */
-  "lei:leiCode"?: LEICode;
+  "@context"?: string | string[];
+  "@type"?: string | string[];
 
   /**
    * Human-readable name of the participant
@@ -308,32 +300,56 @@ export interface Participant<T extends ParticipantTypes>
   name?: string;
 
   /**
+   * Contact email address
+   * Based on schema.org/Organization and schema.org/Person
+   * @example "compliance@example.vasp.com"
+   */
+  email?: string;
+
+  /**
+   * Contact telephone number
+   * Based on schema.org/Organization and schema.org/Person
+   * @example "+1-555-123-4567"
+   */
+  telephone?: string;
+}
+
+export interface Person extends Participant {
+  "@type": "https://schema.org/Person";
+
+  /**
    * SHA-256 hash of the normalized participant name
    * Used for privacy-preserving name matching per TAIP-12
    */
   nameHash?: string;
+}
+
+export interface Organization extends Participant {
+  "@type": "https://schema.org/Organization";
 
   /**
-   * Role of the participant in the transaction
-   * Standard values for Agents are: "SettlementAddress", "SourceAddress", "CustodialService"
-   * All role values MUST use PascalCase
-   * Optional for all participant types
+   * Legal Entity Identifier code
+   * Used to uniquely identify legal entities involved in financial transactions
    */
-  role?: string;
+  leiCode?: LEICode;
 
   /**
-   * DID of the party this participant acts for
-   * Used when participant is an agent acting on behalf of another party
-   * Required for type "Agent", optional for other types
-   * Can be a single DID or an array of DIDs representing multiple parties
+   * Legal name of the organization
+   * Optional to support privacy requirements
    */
-  for: T extends "Agent" ? DID | DID[] : DID | undefined;
+  legalName?: string;
 
   /**
-   * List of policies that apply to this participant
-   * Defines requirements and constraints on the participant's actions
+   * Tax identification number of the organization
+   * Optional to support privacy requirements
    */
-  policies?: Policies[];
+  taxId?: string;
+
+  /**
+   * Value Added Tax identification number of the organization
+   * Optional to support privacy requirements
+   */
+  vatId?: string;
 
   /**
    * Merchant Category Code (ISO 18245)
@@ -366,20 +382,50 @@ export interface Participant<T extends ParticipantTypes>
    * @example "Licensed Virtual Asset Service Provider"
    */
   description?: string;
+}
+
+export type Party = Person | Organization;
+
+type AgentRoles =
+  | "SettlementAddress"
+  | "SourceAddress"
+  | "CustodialService"
+  | "EscrowAgent"
+  | string;
+
+export interface Agent extends Partial<Organization> {
+  /**
+   * Unique identifier for the participant
+   * Can be either a DID or an IRI
+   */
+  "@id": DID | IRI;
 
   /**
-   * Contact email address
-   * Based on schema.org/Organization
-   * @example "compliance@example.vasp.com"
+   * Role of the participant in the transaction
+   * Standard values for Agents are: "SettlementAddress", "SourceAddress", "CustodialService"
+   * All role values MUST use PascalCase
+   * Optional for all participant types
    */
-  email?: string;
+  role?: AgentRoles;
 
   /**
-   * Contact telephone number
-   * Based on schema.org/Organization
-   * @example "+1-555-123-4567"
+   * DID of the party this participant acts for
+   * Used when participant is an agent acting on behalf of another party
+   * Required for type "Agent", optional for other types
+   * Can be a single DID or an array of DIDs representing multiple parties
    */
-  telephone?: string;
+  for: DID | DID[];
+
+  /**
+   * List of policies that apply to this participant
+   * Defines requirements and constraints on the participant's actions
+   */
+  policies?: Policies[];
+
+  /**
+   * URL for requesting input by agent from a party.
+   */
+  serviceUrl?: IRI;
 }
 
 /**
@@ -399,19 +445,19 @@ export interface Policy<T extends string> extends JsonLdObject<T> {
    * Optional DID of the party or agent required to fulfill this policy
    * Can be a single DID or an array of DIDs
    */
-  from?: string;
+  from?: DID | IRI;
 
   /**
    * Optional role of the party required to fulfill this policy
    * E.g. 'SettlementAddress', 'SourceAddress', or 'CustodialService'
    */
-  fromRole?: string;
+  fromRole?: AgentRoles;
 
   /**
    * Optional agent representing a party required to fulfill this policy
    * E.g. 'originator' or 'beneficiary' in TAIP-3
    */
-  fromAgent?: string;
+  fromAgent?: "originator" | "beneficiary" | "customer" | "merchant";
 
   /**
    * Optional human-readable description of the policy's purpose
@@ -440,13 +486,13 @@ export interface RequirePresentation extends Policy<"RequirePresentation"> {
    * Optional DID of the party the presentation is about
    * Used when requesting credentials about a specific party
    */
-  aboutParty?: string;
+  aboutParty?: DID | IRI;
 
   /**
    * Optional DID of the agent the presentation is about
    * Used when requesting credentials about a specific agent
    */
-  aboutAgent?: string;
+  aboutAgent?: DID | IRI;
 
   /**
    * Presentation Exchange definition
@@ -510,8 +556,9 @@ export type Policies =
  *
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-3.md | TAIP-3: Transfer Message}
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-14.md | TAIP-14: Payment Request}
+ * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-17.md | TAIP-17: Escrow}
  */
-export type Transactions = Transfer | Payment;
+export type Transactions = Transfer | Payment | Escrow;
 
 /**
  * Transfer Message
@@ -555,19 +602,19 @@ export interface Transfer extends TapMessageObject<"Transfer"> {
    * Details of the transfer originator
    * The party initiating the transfer
    */
-  originator?: Participant<"Party">;
+  originator?: Party;
 
   /**
    * Optional details of the transfer beneficiary
    * The party receiving the transfer
    */
-  beneficiary?: Participant<"Party">;
+  beneficiary?: Party;
 
   /**
    * List of agents involved in the transfer
    * Includes compliance, custody, and other service providers
    */
-  agents: Participant<"Agent">[];
+  agents: Agent[];
 
   /**
    * Optional settlement transaction identifier
@@ -650,19 +697,19 @@ export interface Payment extends TapMessageObject<"Payment"> {
    * Details of the merchant requesting payment
    * The party requesting to receive the payment
    */
-  merchant: Participant<"Party">;
+  merchant: Party;
 
   /**
    * Optional details of the customer
    * The party from whom payment is requested
    */
-  customer?: Participant<"Party">;
+  customer?: Party;
 
   /**
    * List of agents involved in the payment
    * Must include at least one merchant agent with policies
    */
-  agents: Participant<"Agent">[];
+  agents: Agent[];
 }
 
 /**
@@ -696,16 +743,13 @@ export interface Connect extends TapMessageObject<"Connect"> {
    * Details of the requesting agent
    * Includes identity and endpoints
    */
-  agent?: Participant<"Agent"> & {
-    /** Service URL */
-    serviceUrl?: IRI;
-  };
+  agent?: Agent;
 
   /**
    * Party object representing the principal the agent acts on behalf of
    * As defined in TAIP-6
    */
-  principal: Participant<"Party">;
+  principal: Party;
 
   /**
    * Transaction constraints
@@ -814,7 +858,7 @@ export interface UpdateAgent extends TapMessageObject<"UpdateAgent"> {
    * Updated agent details
    * Complete agent information including any changes
    */
-  agent: Participant<"Agent">;
+  agent: Agent;
 }
 
 /**
@@ -828,7 +872,7 @@ export interface UpdateParty extends TapMessageObject<"UpdateParty"> {
    * Updated party details
    * Complete party information including any changes
    */
-  party: Participant<"Party">;
+  party: Party;
 }
 
 /**
@@ -842,7 +886,7 @@ export interface AddAgents extends TapMessageObject<"AddAgents"> {
    * List of agents to add
    * Complete details for each new agent
    */
-  agents: Participant<"Agent">[];
+  agents: Agent[];
 }
 
 /**
@@ -862,7 +906,7 @@ export interface ReplaceAgent extends TapMessageObject<"ReplaceAgent"> {
    * Details of the replacement agent
    * Complete information for the new agent
    */
-  replacement: Participant<"Agent">;
+  replacement: Agent;
 }
 
 /**
@@ -1279,13 +1323,13 @@ export interface Escrow extends TapMessageObject<"Escrow"> {
    * Party whose assets will be placed in escrow
    * The party providing the funds
    */
-  originator: Participant<"Party">;
+  originator: Party;
 
   /**
    * Party who will receive the assets when released
    * The intended recipient of the escrowed funds
    */
-  beneficiary: Participant<"Party">;
+  beneficiary: Party;
 
   /**
    * Expiration timestamp
@@ -1303,7 +1347,7 @@ export interface Escrow extends TapMessageObject<"Escrow"> {
    * List of agents involved in the escrow
    * Exactly one agent MUST have role "EscrowAgent"
    */
-  agents: Participant<"Agent">[];
+  agents: Agent[];
 }
 
 /**
