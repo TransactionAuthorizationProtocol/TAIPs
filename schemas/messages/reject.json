@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://taips.tap.rsvp/schemas/messages/reject.json",
   "title": "Reject Message",
-  "description": "Rejects a TAP transaction or request",
+  "description": "Rejects a TAP transaction or request per TAIP-4",
   "type": "object",
   "allOf": [
     {
@@ -11,38 +11,24 @@
   ],
   "properties": {
     "type": {
-      "const": "https://taprsvp.com/034.56.789/protocols/transaction-authorization-protocol/1.0/reject"
+      "const": "https://tap.rsvp/schema/1.0#Reject"
     },
     "body": {
       "type": "object",
-      "required": ["reason"],
+      "required": ["@context", "@type"],
       "properties": {
+        "@context": {
+          "const": "https://tap.rsvp/schema/1.0"
+        },
+        "@type": {
+          "const": "https://tap.rsvp/schema/1.0#Reject"
+        },
         "reason": {
           "type": "string",
-          "description": "Human-readable reason for rejection"
-        },
-        "reasonCode": {
-          "type": "string",
-          "description": "Standardized rejection code"
-        },
-        "details": {
-          "type": "object",
-          "description": "Additional details about the rejection"
-        },
-        "suggestedAction": {
-          "type": "string",
-          "description": "Suggested action to resolve the rejection"
-        },
-        "retryable": {
-          "type": "boolean",
-          "default": false,
-          "description": "Whether the request can be retried"
-        },
-        "retryAfter": {
-          "$ref": "../common/base-types.json#/$defs/iso8601DateTime",
-          "description": "Earliest time to retry the request"
+          "description": "Optional human-readable reason for rejection"
         }
-      }
+      },
+      "additionalProperties": false
     }
   },
   "required": ["type", "body"]
