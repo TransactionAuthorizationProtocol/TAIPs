@@ -423,7 +423,13 @@ export interface Agent extends Partial<Organization> {
   policies?: Policies[];
 
   /**
-   * URL for requesting input by agent from a party.
+   * Optional DIDComm service endpoint URL
+   * This field SHOULD only be used as a fallback when no DIDComm service endpoint
+   * is resolvable from the agent's DID document. Particularly useful for self-hosted
+   * and decentralized agents. For security purposes, this field SHOULD be ignored
+   * if a valid DIDComm service endpoint is already listed in the DID document.
+   * 
+   * @example "https://agent.example.com/didcomm"
    */
   serviceUrl?: IRI;
 }

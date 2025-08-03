@@ -136,6 +136,19 @@ TAP agents can support multiple DID methods to enable flexible identity scenario
 
 Additional DID methods can be supported based on specific implementation needs.
 
+## Agent Metadata
+
+TAP agents can include rich metadata based on schema.org/Organization standards to provide better identification and discovery:
+
+- **Name**: Human-readable name of the agent organization
+- **URL**: Website address of the agent
+- **Logo**: URL to the agent's logo image for visual identification
+- **Description**: Textual description of the agent's services and capabilities
+- **Contact Information**: Email and telephone contact details
+- **Type Information**: JSON-LD type identifiers (typically "https://schema.org/Organization")
+
+This metadata enhances the user experience by providing clear identification of service providers while maintaining compatibility with existing implementations.
+
 ## Agent-to-Agent Communication
 
 Agents communicate with each other using the DIDComm v2 messaging protocol, which provides:
@@ -144,6 +157,15 @@ Agents communicate with each other using the DIDComm v2 messaging protocol, whic
 - **Authentication**: Every message can be cryptographically verified
 - **Asynchronous Messaging**: Messages can be sent and processed asynchronously
 - **Transport Flexibility**: Support for HTTPS, WebSockets, and other transport methods
+
+### DIDComm Endpoint Resolution
+
+TAP agents resolve DIDComm endpoints in the following priority order:
+
+1. **DID Document Service Endpoints**: Primary method using the agent's DID document
+2. **Fallback Service URL**: Optional `serviceUrl` field in agent metadata when DID document endpoints are unavailable
+
+The `serviceUrl` field is particularly useful for self-hosted and decentralized agents that may not have reliable DID document hosting. For security purposes, agents should prioritize DID document endpoints over the fallback service URL when both are available.
 
 ## Implementation Considerations
 
@@ -157,4 +179,6 @@ When designing TAP agents:
 
 ## Technical Integration
 
-For technical details on agent data structures and message formats, see the [full message reference](/messages/#participant-management-messages).
+Agents can be enhanced with schema.org attributes to provide richer organizational metadata while maintaining backward compatibility. The schema.org vocabulary enables better integration with web standards and enhances user experience through clearer service provider identification.
+
+For technical details on agent data structures, message formats, and the complete list of supported schema.org attributes, see the [full message reference](/messages/#participant-management-messages).

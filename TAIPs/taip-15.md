@@ -51,7 +51,7 @@ A message sent by an agent requesting connection to another agent:
   - `@id` - REQUIRED string DID of the requesting agent. If the `agent` object is included, the `@id` MUST match the `from` field of the surrounding DIDComm message
   - `name` - OPTIONAL string human-readable name of the agent
   - `type` - OPTIONAL string type of agent (e.g. "ServiceAgent", "WalletAgent")
-  - `serviceUrl` - OPTIONAL string URL for the agent's DIDComm endpoint
+  - `serviceUrl` - OPTIONAL string URL for the agent's DIDComm endpoint. This field SHOULD only be used as a fallback when no DIDComm service endpoint is resolvable from the agent's DID document. This is particularly useful for self-hosted and decentralized agents that may not have reliable DID document hosting. For security purposes, this field SHOULD be ignored if a valid DIDComm service endpoint is already listed in the DID document
 - `principal` - REQUIRED [TAIP-6] Party object representing the party the agent acts on behalf of:
   - `@id` - REQUIRED string DID or IRI of the principal party
   - Additional attributes MAY be included as defined in [TAIP-6], such as country code, merchant category code, or other party metadata
@@ -273,6 +273,11 @@ sequenceDiagram
 - Authorization MUST be performed through secure, authenticated channels
 - Authorization URLs MUST use HTTPS and include CSRF protection
 - Connection identifiers should be unique and unpredictable
+- When using `serviceUrl` in the agent object:
+  - The URL MUST use HTTPS for security
+  - Agents MUST prioritize DIDComm service endpoints from the DID document over the `serviceUrl` field
+  - The `serviceUrl` SHOULD only be used when no valid DIDComm service endpoint is resolvable from the DID document
+  - Agents SHOULD validate that the `serviceUrl` actually belongs to the DID holder through appropriate verification mechanisms
 
 ## Rationale
 

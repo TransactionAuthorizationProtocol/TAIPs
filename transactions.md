@@ -44,6 +44,7 @@ The **Payment** message type extends TAP to support merchant payment scenarios w
 - **Customer Experience Focus**: Designed for consumer-friendly payment flows with clear merchant identification
 - **Merchant Classification**: Supports ISO 18245 Merchant Category Codes (MCC) for business type identification (e.g., restaurants, grocery stores)
 - **Flexible Settlement**: Supports flexible asset selection through the `supportedAssets` field, allowing customers to choose their preferred payment method
+- **Fallback Settlement Options**: Includes `fallbackSettlementAddresses` field supporting both blockchain (CAIP-10) and traditional payment systems (RFC 8905 PayTo URIs) for redundancy
 - **Invoice Support**: Includes comprehensive invoice functionality as defined in [TAIP-16](/TAIPs/taip-16.md), supporting detailed line items, tax information, and payment terms
 - **Policy Support**: Can include policy requirements (e.g., RequirePresentation) for customer information needed for the transaction
 
