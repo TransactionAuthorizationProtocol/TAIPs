@@ -14,6 +14,17 @@ This changelog focuses on:
 - Protocol structural changes
 - Breaking changes
 
+## [2025-08-03]
+
+### Changed
+- **AuthorizationRequired Message**: Moved from TAIP-15 to TAIP-4 as standard authorization message
+  - AuthorizationRequired is now part of the core transaction authorization protocol (TAIP-4)
+  - Added optional `from` field to specify party type (customer, principal, originator) required to open URL
+  - TAIP-15 now references TAIP-4 for complete AuthorizationRequired specification
+  - Updated TypeScript interface with enhanced documentation for both transaction and connection authorization
+  - Added comprehensive test case example to TAIP-4
+  - Updated messages.md to document AuthorizationRequired as part of authorization flow
+
 ## [2025-07-28]
 
 ### Added
