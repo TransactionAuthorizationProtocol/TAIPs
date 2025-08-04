@@ -1,9 +1,62 @@
-// TAP Message Types and Data Structures
-// Based on TAIP specifications
+/**
+ * @fileoverview TAP Message Types and Data Structures
+ * 
+ * This module provides TypeScript type definitions for the Transaction Authorization Protocol (TAP).
+ * TAP is a standardized protocol for multi-party transaction authorization before blockchain settlement.
+ * 
+ * ## Key Features
+ * - **Type Safety**: Comprehensive TypeScript interfaces for all TAP message types
+ * - **JSON-LD Compatible**: All message types support JSON-LD contexts and type identifiers
+ * - **DIDComm Integration**: Built on DIDComm messaging for secure agent communication
+ * - **Chain Agnostic**: Support for multiple blockchains via CAIP standards
+ * - **Compliance Ready**: IVMS101 integration for travel rule compliance
+ * 
+ * ## Core Message Types
+ * - `Transfer` - Initiate asset transfers between parties
+ * - `Payment` - Request payments from customers (merchant-initiated)
+ * - `Escrow` - Hold assets in escrow with conditional release
+ * - `Authorize` - Approve transactions after compliance checks
+ * - `Connect` - Establish connections between agents
+ * - `Settle` - Confirm on-chain settlement
+ * 
+ * ## Usage Example
+ * ```typescript
+ * import { Transfer, TransferMessage } from '@taprsvp/types';
+ * 
+ * const transfer: Transfer = {
+ *   "@context": "https://tap.rsvp/schema/1.0",
+ *   "@type": "Transfer",
+ *   asset: "eip155:1/erc20:0x6b175474e89094c44da98b954eedeac495271d0f",
+ *   amount: "100.00",
+ *   originator: { ... },
+ *   agents: [...]
+ * };
+ * 
+ * const message: TransferMessage = {
+ *   id: "uuid-here",
+ *   type: "https://tap.rsvp/schema/1.0#Transfer",
+ *   from: "did:example:sender",
+ *   to: ["did:example:receiver"],
+ *   created_time: Date.now(),
+ *   body: transfer
+ * };
+ * ```
+ * 
+ * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs | TAIP Specifications}
+ * @see {@link https://tap.rsvp | TAP Protocol Documentation}
+ * @version 1.5.0
+ * @author Transaction Authorization Protocol Working Group
+ */
 
 import { IsoCurrency } from "./currencies";
 import { Invoice } from "./invoice";
 import { PurposeCode, CategoryPurposeCode } from "./purpose_codes";
+import { IVMS101_2020, IVMS101_2023 } from "ivms101/dist/";
+
+// ============================================================================
+// FUNDAMENTAL TYPES
+// ============================================================================
+// Core identifier and addressing types used throughout TAP
 
 /**
  * Internationalized Resource Identifier (IRI)
@@ -13,8 +66,6 @@ import { PurposeCode, CategoryPurposeCode } from "./purpose_codes";
  * @see {@link https://www.w3.org/TR/json-ld11/#iris | JSON-LD 1.1 IRIs}
  */
 export type IRI = `${string}:${string}`;
-
-// Common Types
 /**
  * Decentralized Identifier (DID)
  * A globally unique persistent identifier that doesn't require a centralized registration authority.
@@ -64,6 +115,11 @@ export interface TapMessageObject<T extends string> extends JsonLdObject<T> {
   "@context": TAPContext | Record<string, IRI>;
   "@type": T;
 }
+
+// ============================================================================
+// DATETIME AND IDENTIFIER TYPES
+// ============================================================================
+
 /**
  * ISO 8601 DateTime string
  * Represents date and time in a standardized format.
@@ -72,6 +128,12 @@ export interface TapMessageObject<T extends string> extends JsonLdObject<T> {
  * @see {@link https://www.iso.org/iso-8601-date-and-time-format.html | ISO 8601}
  */
 export type ISO8601DateTime = string;
+
+// ============================================================================
+// CHAIN AGNOSTIC IDENTIFIERS (CAIP)
+// ============================================================================
+// Blockchain and asset identifiers following Chain Agnostic Improvement Proposals
+
 /**
  * Chain Agnostic Blockchain Identifier (CAIP-2)
  * Represents a blockchain in a chain-agnostic way following the CAIP-2 specification.
@@ -124,7 +186,13 @@ export type CAIP10 = `${CAIP2}:${string}`;
  */
 export type CAIP19 = `${CAIP2}/${string}:${string}`;
 
+// ============================================================================
+// TRADITIONAL FINANCE IDENTIFIERS
+// ============================================================================
+// Payment and asset identifiers for traditional financial systems
+
 type PayToAuthority = "ach" | "iban" | "bic" | "upi";
+
 /**
  * PayTo URI (RFC 8905)
  * A standardized URI scheme for identifying payment targets.
@@ -153,6 +221,11 @@ export type PayToURI = `payto://${PayToAuthority}/${string}`;
  * @see {@link https://www.iso.org/standard/85546.html | ISO 24165}
  */
 export type DTI = string;
+
+// ============================================================================
+// UNIFIED ASSET AND ADDRESS TYPES
+// ============================================================================
+// Cross-system types supporting both blockchain and traditional finance
 
 /**
  * Asset Identifier
@@ -195,6 +268,12 @@ export type Amount = `${number}.${number}` | `${number}`;
  * @see {@link https://github.com/ChainAgnostic/CAIPs/blob/master/CAIPs/caip-220.md | CAIP-220 Specification}
  */
 export type CAIP220 = string;
+
+// ============================================================================
+// REGULATORY AND COMPLIANCE IDENTIFIERS
+// ============================================================================
+// Standard codes for regulatory compliance and transaction classification
+
 /**
  * Legal Entity Identifier (LEI)
  * A 20-character alphanumeric code that uniquely identifies legal entities globally.
@@ -224,10 +303,33 @@ export type ISO20022PurposeCode = PurposeCode;
  */
 export type ISO20022CategoryPurposeCode = CategoryPurposeCode;
 
-// Common DIDComm Message Structure
+// ============================================================================
+// DIDCOMM MESSAGING FOUNDATION
+// ============================================================================
+// Base structures for secure messaging between agents
 /**
  * Common DIDComm Message Structure
  * Base interface for all DIDComm messages in TAP.
+ *
+ * @example
+ * ```typescript
+ * const transferMessage: DIDCommMessage<Transfer> = {
+ *   id: "7c9de123-a456-4789-b012-3456789abcde",
+ *   type: "https://tap.rsvp/schema/1.0#Transfer",
+ *   from: "did:web:sender.example.com",
+ *   to: ["did:web:receiver.example.com"],
+ *   created_time: 1704067200, // Unix timestamp
+ *   expires_time: 1704153600, // Optional expiration
+ *   thid: "parent-thread-id", // Optional thread ID
+ *   body: {
+ *     "@context": "https://tap.rsvp/schema/1.0",
+ *     "@type": "Transfer",
+ *     asset: "eip155:1/erc20:0x6b175474e89094c44da98b954eedeac495271d0f",
+ *     amount: "100.00",
+ *     // ... other Transfer properties
+ *   }
+ * };
+ * ```
  *
  * @see {@link https://identity.foundation/didcomm-messaging/spec/ | DIDComm Messaging Specification}
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-2.md | TAIP-2: Message Format}
@@ -273,7 +375,11 @@ export interface DIDCommReply<T = Record<string, unknown>>
   /** Thread ID linking this reply to the original message */
   thid: string;
 }
-// Participant Data Structure
+
+// ============================================================================
+// PARTICIPANT DATA STRUCTURES
+// ============================================================================
+// Identification and representation of parties and agents in transactions
 /**
  * Participant in a TAP transaction
  * Represents either a party (originator/beneficiary) or an agent in the transaction.
@@ -289,15 +395,8 @@ export interface Participant {
    * Can be either a DID or an IRI
    */
   "@id": DID | IRI;
-
   "@context"?: string | string[];
   "@type"?: string | string[];
-
-  /**
-   * Human-readable name of the participant
-   * Optional to support privacy requirements
-   */
-  name?: string;
 
   /**
    * Contact email address
@@ -322,6 +421,16 @@ export interface Person extends Participant {
    * Used for privacy-preserving name matching per TAIP-12
    */
   nameHash?: string;
+  customerIdentification?: string;
+  name?: string | IVMS101_2023.NaturalPersonNameId[];
+  geographicAddress: IVMS101_2023.Address[];
+  nationalIdentifier?: IVMS101_2020.NationalIdentification<IVMS101_2020.NaturalPersonNationalIdentifierTypeCode>;
+  /** Date and place of birth of a person */
+  dateAndPlaceOfBirth?: {
+    dateOfBirth: string;
+    placeOfBirth: string;
+  };
+  countryOfResidence?: IVMS101_2023.CountryCode;
 }
 
 export interface Organization extends Participant {
@@ -337,19 +446,9 @@ export interface Organization extends Participant {
    * Legal name of the organization
    * Optional to support privacy requirements
    */
-  legalName?: string;
-
-  /**
-   * Tax identification number of the organization
-   * Optional to support privacy requirements
-   */
-  taxId?: string;
-
-  /**
-   * Value Added Tax identification number of the organization
-   * Optional to support privacy requirements
-   */
-  vatId?: string;
+  name?: string | IVMS101_2023.LegalPersonNameId[];
+  customerIdentification?: string;
+  nationalIdentifier?: IVMS101_2020.NationalIdentification<IVMS101_2020.LegalEntityNationalIdentifierTypeCode>;
 
   /**
    * Merchant Category Code (ISO 18245)
@@ -382,6 +481,15 @@ export interface Organization extends Participant {
    * @example "Licensed Virtual Asset Service Provider"
    */
   description?: string;
+
+  /**
+   * Physical address of the organization
+   * Based on schema.org/Organization address property
+   * Can be either a PostalAddress object or a simple text string
+   */
+  geographicAddress: IVMS101_2023.Address[];
+
+  countryOfRegistration?: IVMS101_2023.CountryCode;
 }
 
 export type Party = Person | Organization;
@@ -393,6 +501,37 @@ type AgentRoles =
   | "EscrowAgent"
   | string;
 
+/**
+ * Agent Interface
+ * Represents software acting on behalf of participants in TAP transactions.
+ * Agents handle communication, compliance, and transaction processing.
+ *
+ * @example
+ * ```typescript
+ * const originatorAgent: Agent = {
+ *   "@id": "did:web:vasp.example.com",
+ *   role: "SourceAddress",
+ *   for: "did:example:customer123",
+ *   name: "Example VASP Agent",
+ *   leiCode: "969500KN90DZLPGW6898",
+ *   url: "https://vasp.example.com",
+ *   email: "compliance@vasp.example.com",
+ *   geographicAddress: [{
+ *     addressType: IVMS101_2023.AddressType.HOME,
+ *     streetName: "123 Main St",
+ *     buildingNumber: "123",
+ *     postCode: "12345",
+ *     townName: "Example City",
+ *     country: IVMS101_2023.CountryCode.US
+ *   }],
+ *   policies: [{
+ *     "@type": "RequireAuthorization",
+ *     purpose: "AML compliance verification"
+ *   }],
+ *   serviceUrl: "https://vasp.example.com/didcomm"
+ * };
+ * ```
+ */
 export interface Agent extends Partial<Organization> {
   /**
    * Unique identifier for the participant
@@ -441,6 +580,11 @@ type PartyType =
   | "merchant"
   | "principal";
 
+// ============================================================================
+// POLICY FRAMEWORK
+// ============================================================================
+// Transaction requirements and constraints definition system
+
 /**
  * Base interface for all TAP policy types.
  * Policies define requirements and constraints that must be satisfied during a transaction.
@@ -478,7 +622,6 @@ export interface Policy<T extends string> extends JsonLdObject<T> {
    */
   purpose?: string;
 }
-// Policy Types
 /**
  * Policy requiring authorization before proceeding
  * Used to ensure specific agents authorize a transaction.
@@ -560,7 +703,10 @@ export type Policies =
   | RequireRelationshipConfirmation
   | RequirePurpose;
 
-// Core TAP Data Structures
+// ============================================================================
+// CORE TAP TRANSACTION MESSAGES
+// ============================================================================
+// Primary transaction initiation and processing message types
 
 /**
  * Transaction Types
@@ -577,6 +723,30 @@ export type Transactions = Transfer | Payment | Escrow;
  * Transfer Message
  * Initiates a transfer of assets between parties.
  * Core message type for asset transfers in TAP.
+ *
+ * @example
+ * ```typescript
+ * const transfer: Transfer = {
+ *   "@context": "https://tap.rsvp/schema/1.0",
+ *   "@type": "Transfer",
+ *   asset: "eip155:1/erc20:0x6b175474e89094c44da98b954eedeac495271d0f", // DAI token
+ *   amount: "100.00",
+ *   purpose: "CASH", // Cash management transfer
+ *   originator: {
+ *     "@id": "did:example:originator",
+ *     "@type": "https://schema.org/Person",
+ *     geographicAddress: [...]
+ *   },
+ *   agents: [{
+ *     "@id": "did:example:originator-agent",
+ *     for: "did:example:originator",
+ *     role: "SourceAddress",
+ *     policies: [{
+ *       "@type": "RequireAuthorization"
+ *     }]
+ *   }]
+ * };
+ * ```
  *
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-3.md | TAIP-3: Transfer Message}
  */
@@ -646,6 +816,36 @@ export interface Transfer extends TapMessageObject<"Transfer"> {
  * Payment Message
  * Requests payment from a customer, optionally specifying supported assets.
  * Used for merchant-initiated payment flows.
+ *
+ * @example
+ * ```typescript
+ * const payment: Payment = {
+ *   "@context": "https://tap.rsvp/schema/1.0",
+ *   "@type": "Payment",
+ *   currency: "USD",
+ *   amount: "49.99",
+ *   supportedAssets: [
+ *     "eip155:1/erc20:0x6b175474e89094c44da98b954eedeac495271d0f", // DAI
+ *     "eip155:1/erc20:0xa0b86a33e6e0a7c0d4e19e40dce0000000000000"  // USDC
+ *   ],
+ *   defaultAddress: "eip155:1:0x742d35Cc6634C0532925a3b844Bc454e4438f44e",
+ *   merchant: {
+ *     "@id": "did:example:merchant",
+ *     "@type": "https://schema.org/Organization",
+ *     name: "Coffee Shop LLC",
+ *     mcc: "5812", // Restaurant MCC
+ *     geographicAddress: [...]
+ *   },
+ *   agents: [{
+ *     "@id": "did:example:merchant-agent",
+ *     for: "did:example:merchant",
+ *     role: "SettlementAddress",
+ *     policies: [{
+ *       "@type": "RequireAuthorization"
+ *     }]
+ *   }]
+ * };
+ * ```
  *
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-14.md | TAIP-14: Payment Request}
  */
@@ -724,6 +924,11 @@ export interface Payment extends TapMessageObject<"Payment"> {
    */
   agents: Agent[];
 }
+
+// ============================================================================
+// AUTHORIZATION AND LIFECYCLE MESSAGES
+// ============================================================================
+// Transaction authorization, settlement, and lifecycle management
 
 /**
  * Authorization Message
@@ -881,6 +1086,11 @@ export interface Revert extends TapMessageObject<"Revert"> {
   reason: string;
 }
 
+// ============================================================================
+// AGENT AND PARTY MANAGEMENT MESSAGES
+// ============================================================================
+// Dynamic updates to transaction participants and their properties
+
 /**
  * Update Agent Message
  * Updates the details or policies of an existing agent.
@@ -956,6 +1166,11 @@ export interface RemoveAgent extends TapMessageObject<"RemoveAgent"> {
    */
   agent: DID;
 }
+
+// ============================================================================
+// RELATIONSHIP AND CONNECTION MESSAGES
+// ============================================================================
+// Agent connections, relationship proofs, and policy management
 
 /**
  * CACAO Attachment
@@ -1135,7 +1350,7 @@ export interface AuthorizationRequired
    * Indicates the party type (e.g., "customer", "principal", or "originator") that is required to open the URL
    *
    * @example "customer"
-   * @example "principal" 
+   * @example "principal"
    * @example "originator"
    */
   from?: PartyType;
@@ -1147,8 +1362,10 @@ export interface AuthorizationRequired
   expires: ISO8601DateTime;
 }
 
-/**
- * DIDComm Message Wrappers
+// ============================================================================
+// DIDCOMM MESSAGE WRAPPERS
+// ============================================================================
+// DIDComm envelope structures for all TAP message types
 
 /**
  * Transfer Message Wrapper
@@ -1469,5 +1686,55 @@ export type TAPMessage =
   | AuthorizationRequiredMessage
   | EscrowMessage
   | CaptureMessage;
+
+// ============================================================================
+// TAIP SPECIFICATION CROSS-REFERENCE
+// ============================================================================
+/**
+ * TAP Message Type to TAIP Specification Mapping
+ * 
+ * This comprehensive mapping shows which TAIP specification defines each message type:
+ * 
+ * **Core Protocol Framework:**
+ * - TAIP-1: Transaction Authorization Protocol Overview
+ * - TAIP-2: Message Format (DIDComm structure) → {@link DIDCommMessage}, {@link DIDCommReply}
+ * 
+ * **Transaction Messages:**
+ * - TAIP-3: Transfer Message → {@link Transfer}, {@link TransferMessage}
+ * - TAIP-4: Authorization Flow → {@link Authorize}, {@link Settle}, {@link Reject}, {@link Cancel}, {@link Revert}, {@link AuthorizationRequired}
+ * - TAIP-14: Payment Request → {@link Payment}, {@link PaymentMessage}
+ * - TAIP-17: Composable Escrow → {@link Escrow}, {@link Capture}, {@link EscrowMessage}, {@link CaptureMessage}
+ * 
+ * **Participant Management:**
+ * - TAIP-5: Agents → {@link Agent}, {@link UpdateAgent}, {@link AddAgents}, {@link ReplaceAgent}, {@link RemoveAgent}
+ * - TAIP-6: Party Identification → {@link Party}, {@link Person}, {@link Organization}, {@link UpdateParty}
+ * 
+ * **Policy and Compliance:**
+ * - TAIP-7: Policies → {@link Policy}, {@link RequireAuthorization}, {@link RequirePresentation}, {@link RequirePurpose}, {@link UpdatePolicies}
+ * - TAIP-8: Verifiable Credentials → {@link RequirePresentation}
+ * - TAIP-9: Proof of Relationship → {@link RequireRelationshipConfirmation}, {@link ConfirmRelationship}
+ * - TAIP-12: Privacy-Preserving Name Matching → {@link Person.nameHash}
+ * - TAIP-13: Purpose Codes → {@link ISO20022PurposeCode}, {@link ISO20022CategoryPurposeCode}, {@link RequirePurpose}
+ * 
+ * **Connection Management:**
+ * - TAIP-15: Agent Connection Protocol → {@link Connect}, {@link ConnectMessage}, {@link TransactionConstraints}
+ * 
+ * **Invoice and Documentation:**
+ * - TAIP-16: Invoices → {@link Payment.invoice} (Invoice type imported from ./invoice)
+ * 
+ * **Standards Integration:**
+ * - CAIP-2: Chain ID → {@link CAIP2}
+ * - CAIP-10: Account ID → {@link CAIP10}
+ * - CAIP-19: Asset ID → {@link CAIP19}
+ * - CAIP-74: CACAO → {@link CACAOAttachment}
+ * - CAIP-220: Transaction ID → {@link CAIP220}
+ * - RFC 8905: PayTo URI → {@link PayToURI}
+ * - ISO 24165: Digital Trust Identifier → {@link DTI}
+ * - ISO 17442: Legal Entity Identifier → {@link LEICode}
+ * - ISO 20022: Purpose Codes → {@link ISO20022PurposeCode}, {@link ISO20022CategoryPurposeCode}
+ * - IVMS101: Travel Rule Data → {@link Person}, {@link Organization}
+ * 
+ * For the complete specifications, visit: https://github.com/TransactionAuthorizationProtocol/TAIPs
+ */
 
 // All types and interfaces are now exported directly in their declarations
