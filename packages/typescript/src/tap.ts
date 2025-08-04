@@ -1,16 +1,16 @@
 /**
  * @fileoverview TAP Message Types and Data Structures
- * 
+ *
  * This module provides TypeScript type definitions for the Transaction Authorization Protocol (TAP).
  * TAP is a standardized protocol for multi-party transaction authorization before blockchain settlement.
- * 
+ *
  * ## Key Features
  * - **Type Safety**: Comprehensive TypeScript interfaces for all TAP message types
  * - **JSON-LD Compatible**: All message types support JSON-LD contexts and type identifiers
  * - **DIDComm Integration**: Built on DIDComm messaging for secure agent communication
  * - **Chain Agnostic**: Support for multiple blockchains via CAIP standards
  * - **Compliance Ready**: IVMS101 integration for travel rule compliance
- * 
+ *
  * ## Core Message Types
  * - `Transfer` - Initiate asset transfers between parties
  * - `Payment` - Request payments from customers (merchant-initiated)
@@ -18,11 +18,11 @@
  * - `Authorize` - Approve transactions after compliance checks
  * - `Connect` - Establish connections between agents
  * - `Settle` - Confirm on-chain settlement
- * 
+ *
  * ## Usage Example
  * ```typescript
  * import { Transfer, TransferMessage } from '@taprsvp/types';
- * 
+ *
  * const transfer: Transfer = {
  *   "@context": "https://tap.rsvp/schema/1.0",
  *   "@type": "Transfer",
@@ -31,7 +31,7 @@
  *   originator: { ... },
  *   agents: [...]
  * };
- * 
+ *
  * const message: TransferMessage = {
  *   id: "uuid-here",
  *   type: "https://tap.rsvp/schema/1.0#Transfer",
@@ -41,7 +41,7 @@
  *   body: transfer
  * };
  * ```
- * 
+ *
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs | TAIP Specifications}
  * @see {@link https://tap.rsvp | TAP Protocol Documentation}
  * @version 1.5.0
@@ -413,41 +413,222 @@ export interface Participant {
   telephone?: string;
 }
 
+/**
+ * Person Interface
+ * Represents a natural person (individual) in TAP transactions.
+ * Supports both schema.org/Person properties and IVMS101 identity data for compliance.
+ * 
+ * **Privacy Considerations**: For natural person information, consider using selective disclosure 
+ * (TAIP-8) to protect sensitive data, especially when including IVMS101 fields like national 
+ * identifiers and detailed addresses.
+ *
+ * @example
+ * ```typescript
+ * // Basic person with schema.org properties
+ * const basicPerson: Person = {
+ *   "@id": "did:example:alice",
+ *   "@type": "https://schema.org/Person",
+ *   name: "Alice Johnson",
+ *   email: "alice@example.com"
+ * };
+ *
+ * // Person with IVMS101 compliance data
+ * const compliancePerson: Person = {
+ *   "@id": "did:example:bob", 
+ *   "@type": "https://schema.org/Person",
+ *   name: [{
+ *     primaryIdentifier: "Robert",
+ *     secondaryIdentifier: "Smith", 
+ *     nameIdentifierType: "LEGL"
+ *   }],
+ *   geographicAddress: [{
+ *     addressType: "HOME",
+ *     streetName: "123 Main Street",
+ *     buildingNumber: "123",
+ *     postCode: "12345",
+ *     townName: "Example City",
+ *     country: "US"
+ *   }],
+ *   nationalIdentifier: {
+ *     nationalIdentifier: "123-45-6789",
+ *     nationalIdentifierType: "ARNU", // Social Security Number
+ *     countryOfIssue: "US"
+ *   },
+ *   dateAndPlaceOfBirth: {
+ *     dateOfBirth: "1990-01-15",
+ *     placeOfBirth: "New York, NY, US"
+ *   },
+ *   countryOfResidence: "US"
+ * };
+ * ```
+ *
+ * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-6.md | TAIP-6: Party Identification}
+ * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-8.md | TAIP-8: Selective Disclosure}
+ */
 export interface Person extends Participant {
   "@type": "https://schema.org/Person";
 
   /**
    * SHA-256 hash of the normalized participant name
    * Used for privacy-preserving name matching per TAIP-12
+   * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-12.md | TAIP-12: Privacy-Preserving Name Matching}
    */
   nameHash?: string;
+
+  /**
+   * Customer identification string
+   * Internal identifier used by the institution for this person
+   * @example "CUST-123456"
+   */
   customerIdentification?: string;
+
+  /**
+   * Person's name
+   * Can be a simple string or structured IVMS101 name identifiers
+   * For compliance use cases, IVMS101 format provides more detailed name structure
+   * @example "Alice Johnson" // Simple string
+   * @example [{ primaryIdentifier: "Alice", secondaryIdentifier: "Johnson", nameIdentifierType: "LEGL" }] // IVMS101
+   */
   name?: string | IVMS101_2023.NaturalPersonNameId[];
-  geographicAddress: IVMS101_2023.Address[];
+
+  /**
+   * Geographic addresses associated with the person
+   * IVMS101 format addresses for travel rule compliance
+   * Supports multiple address types (HOME, BIZZ, etc.)
+   * @example [{ addressType: "HOME", streetName: "123 Main St", townName: "City", country: "US" }]
+   */
+  geographicAddress?: IVMS101_2023.Address[];
+
+  /**
+   * National identification documents
+   * Government-issued identifiers like passport, SSN, driver's license
+   * **Privacy**: Consider selective disclosure for sensitive ID information
+   * @example { nationalIdentifier: "123-45-6789", nationalIdentifierType: "ARNU", countryOfIssue: "US" }
+   */
   nationalIdentifier?: IVMS101_2020.NationalIdentification<IVMS101_2020.NaturalPersonNationalIdentifierTypeCode>;
-  /** Date and place of birth of a person */
+
+  /**
+   * Date and place of birth information
+   * Used for identity verification and compliance
+   * **Privacy**: Highly sensitive data - recommend selective disclosure
+   */
   dateAndPlaceOfBirth?: {
+    /** Date of birth in ISO 8601 format (YYYY-MM-DD) */
     dateOfBirth: string;
+    /** Place of birth (city, state/province, country) */
     placeOfBirth: string;
   };
+
+  /**
+   * Country of residence
+   * ISO 3166-1 alpha-2 country code where the person resides
+   * @example "US"
+   * @example "CA" 
+   * @example "GB"
+   */
   countryOfResidence?: IVMS101_2023.CountryCode;
 }
 
+/**
+ * Organization Interface
+ * Represents a legal entity (company, institution, merchant) in TAP transactions.
+ * Supports both schema.org/Organization properties and IVMS101 identity data for compliance.
+ * 
+ * Organizations typically have less privacy concerns than natural persons, making direct
+ * inclusion of IVMS101 data more common for transparency and compliance purposes.
+ *
+ * @example
+ * ```typescript
+ * // Basic organization with schema.org properties
+ * const basicOrg: Organization = {
+ *   "@id": "did:web:example.com",
+ *   "@type": "https://schema.org/Organization",
+ *   name: "Example Corp",
+ *   url: "https://example.com",
+ *   email: "contact@example.com"
+ * };
+ *
+ * // VASP with full compliance data
+ * const vasp: Organization = {
+ *   "@id": "did:web:vasp.example.com",
+ *   "@type": "https://schema.org/Organization", 
+ *   name: "Example Virtual Asset Service Provider",
+ *   leiCode: "969500KN90DZLPGW6898",
+ *   url: "https://vasp.example.com",
+ *   logo: "https://vasp.example.com/logo.png",
+ *   description: "Licensed Virtual Asset Service Provider",
+ *   email: "compliance@vasp.example.com",
+ *   telephone: "+1-555-123-4567",
+ *   geographicAddress: [{
+ *     addressType: "BIZZ",
+ *     streetName: "456 Financial District",
+ *     buildingNumber: "456",
+ *     postCode: "10005",
+ *     townName: "New York",
+ *     country: "US"
+ *   }],
+ *   nationalIdentifier: {
+ *     nationalIdentifier: "12-3456789", 
+ *     nationalIdentifierType: "TXID", // Tax ID
+ *     countryOfIssue: "US"
+ *   },
+ *   countryOfRegistration: "US"
+ * };
+ *
+ * // Merchant with MCC
+ * const merchant: Organization = {
+ *   "@id": "did:web:coffee.example.com",
+ *   "@type": "https://schema.org/Organization",
+ *   name: "Downtown Coffee Shop",
+ *   mcc: "5812", // Restaurant
+ *   url: "https://coffee.example.com",
+ *   geographicAddress: [{
+ *     addressType: "BIZZ",
+ *     streetName: "123 Main Street", 
+ *     buildingNumber: "123",
+ *     postCode: "12345",
+ *     townName: "Anytown",
+ *     country: "US"
+ *   }]
+ * };
+ * ```
+ *
+ * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-6.md | TAIP-6: Party Identification}
+ * @see {@link https://schema.org/Organization | schema.org/Organization}
+ */
 export interface Organization extends Participant {
   "@type": "https://schema.org/Organization";
 
   /**
-   * Legal Entity Identifier code
+   * Legal Entity Identifier (LEI) code
+   * 20-character alphanumeric code that uniquely identifies legal entities globally
    * Used to uniquely identify legal entities involved in financial transactions
+   * @example "969500KN90DZLPGW6898"
+   * @see {@link https://www.iso.org/standard/59771.html | ISO 17442}
    */
   leiCode?: LEICode;
 
   /**
    * Legal name of the organization
-   * Optional to support privacy requirements
+   * Can be a simple string or structured IVMS101 name identifiers
+   * For regulated entities, IVMS101 format may be required for compliance
+   * @example "Example Corporation Inc." // Simple string
+   * @example [{ legalPersonName: "Example Corp", legalPersonNameIdentifierType: "LEGL" }] // IVMS101
    */
   name?: string | IVMS101_2023.LegalPersonNameId[];
+
+  /**
+   * Customer identification string
+   * Internal identifier used by the institution for this organization
+   * @example "CORP-789012"
+   */
   customerIdentification?: string;
+
+  /**
+   * National identification documents
+   * Government-issued identifiers like tax ID, business registration number
+   * @example { nationalIdentifier: "12-3456789", nationalIdentifierType: "TXID", countryOfIssue: "US" }
+   */
   nationalIdentifier?: IVMS101_2020.NationalIdentification<IVMS101_2020.LegalEntityNationalIdentifierTypeCode>;
 
   /**
@@ -457,38 +638,53 @@ export interface Organization extends Participant {
    *
    * @example "5411" // Grocery stores and supermarkets
    * @example "5812" // Restaurants
+   * @example "5734" // Computer software stores
+   * @example "6012" // Financial institutions
    * @see {@link https://www.iso.org/standard/33365.html | ISO 18245}
    */
   mcc?: string;
 
   /**
-   * URL pointing to the participant's website
+   * URL pointing to the organization's website
    * Based on schema.org/Organization
    * @example "https://example.vasp.com"
+   * @example "https://merchant.example.com"
    */
   url?: string;
 
   /**
-   * URL pointing to the participant's logo image
+   * URL pointing to the organization's logo image
    * Based on schema.org/Organization
    * @example "https://example.vasp.com/logo.png"
+   * @example "https://cdn.example.com/assets/logo.svg"
    */
   logo?: string;
 
   /**
-   * Description of the participant
+   * Description of the organization
    * Based on schema.org/Organization
    * @example "Licensed Virtual Asset Service Provider"
+   * @example "Online marketplace for digital assets and collectibles"
+   * @example "Full-service financial institution"
    */
   description?: string;
 
   /**
-   * Physical address of the organization
-   * Based on schema.org/Organization address property
-   * Can be either a PostalAddress object or a simple text string
+   * Physical addresses of the organization
+   * IVMS101 format addresses for regulatory compliance
+   * Supports multiple address types (BIZZ for business, etc.)
+   * @example [{ addressType: "BIZZ", streetName: "456 Business Ave", townName: "Finance City", country: "US" }]
    */
-  geographicAddress: IVMS101_2023.Address[];
+  geographicAddress?: IVMS101_2023.Address[];
 
+  /**
+   * Country of registration/incorporation
+   * ISO 3166-1 alpha-2 country code where the organization is legally registered
+   * @example "US" // United States
+   * @example "GB" // United Kingdom  
+   * @example "SG" // Singapore
+   * @example "CH" // Switzerland
+   */
   countryOfRegistration?: IVMS101_2023.CountryCode;
 }
 
@@ -1692,36 +1888,36 @@ export type TAPMessage =
 // ============================================================================
 /**
  * TAP Message Type to TAIP Specification Mapping
- * 
+ *
  * This comprehensive mapping shows which TAIP specification defines each message type:
- * 
+ *
  * **Core Protocol Framework:**
  * - TAIP-1: Transaction Authorization Protocol Overview
  * - TAIP-2: Message Format (DIDComm structure) → {@link DIDCommMessage}, {@link DIDCommReply}
- * 
+ *
  * **Transaction Messages:**
  * - TAIP-3: Transfer Message → {@link Transfer}, {@link TransferMessage}
  * - TAIP-4: Authorization Flow → {@link Authorize}, {@link Settle}, {@link Reject}, {@link Cancel}, {@link Revert}, {@link AuthorizationRequired}
  * - TAIP-14: Payment Request → {@link Payment}, {@link PaymentMessage}
  * - TAIP-17: Composable Escrow → {@link Escrow}, {@link Capture}, {@link EscrowMessage}, {@link CaptureMessage}
- * 
+ *
  * **Participant Management:**
  * - TAIP-5: Agents → {@link Agent}, {@link UpdateAgent}, {@link AddAgents}, {@link ReplaceAgent}, {@link RemoveAgent}
  * - TAIP-6: Party Identification → {@link Party}, {@link Person}, {@link Organization}, {@link UpdateParty}
- * 
+ *
  * **Policy and Compliance:**
  * - TAIP-7: Policies → {@link Policy}, {@link RequireAuthorization}, {@link RequirePresentation}, {@link RequirePurpose}, {@link UpdatePolicies}
  * - TAIP-8: Verifiable Credentials → {@link RequirePresentation}
  * - TAIP-9: Proof of Relationship → {@link RequireRelationshipConfirmation}, {@link ConfirmRelationship}
  * - TAIP-12: Privacy-Preserving Name Matching → {@link Person.nameHash}
  * - TAIP-13: Purpose Codes → {@link ISO20022PurposeCode}, {@link ISO20022CategoryPurposeCode}, {@link RequirePurpose}
- * 
+ *
  * **Connection Management:**
  * - TAIP-15: Agent Connection Protocol → {@link Connect}, {@link ConnectMessage}, {@link TransactionConstraints}
- * 
+ *
  * **Invoice and Documentation:**
  * - TAIP-16: Invoices → {@link Payment.invoice} (Invoice type imported from ./invoice)
- * 
+ *
  * **Standards Integration:**
  * - CAIP-2: Chain ID → {@link CAIP2}
  * - CAIP-10: Account ID → {@link CAIP10}
@@ -1733,7 +1929,7 @@ export type TAPMessage =
  * - ISO 17442: Legal Entity Identifier → {@link LEICode}
  * - ISO 20022: Purpose Codes → {@link ISO20022PurposeCode}, {@link ISO20022CategoryPurposeCode}
  * - IVMS101: Travel Rule Data → {@link Person}, {@link Organization}
- * 
+ *
  * For the complete specifications, visit: https://github.com/TransactionAuthorizationProtocol/TAIPs
  */
 
