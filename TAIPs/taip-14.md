@@ -266,8 +266,25 @@ Here's an example Payment message that includes fallback settlement addresses su
     "expiry": "2025-07-30T14:30:00Z",
     "merchant": {
       "@id": "did:example:merchant",
+      "@type": "https://schema.org/Organization",
       "name": "Digital Goods Store",
-      "mcc": "5734"
+      "mcc": "5734",
+      "url": "https://digitalgoods.example",
+      "email": "support@digitalgoods.example",
+      "leiCode": "969500KN90DZLPGW6898",
+      "geographicAddress": [{
+        "addressType": "BIZZ",
+        "streetName": "789 Commerce Blvd",
+        "buildingNumber": "789",
+        "postCode": "54321",
+        "townName": "Commerce City",
+        "country": "US"
+      }],
+      "nationalIdentifier": {
+        "nationalIdentifier": "98-7654321",
+        "nationalIdentifierType": "TXID",
+        "countryOfIssue": "US"
+      }
     },
     "agents": [{
       "@id": "did:example:merchant-psp",
@@ -278,8 +295,10 @@ Here's an example Payment message that includes fallback settlement addresses su
 ```
 
 In this example, the merchant accepts EUR 250.00 payment through various settlement methods:
-- Primary: USDC on Ethereum mainnet
+- Primary: USDC on Ethereum mainnet  
 - Fallback options: USDC on Polygon, SEPA bank transfer, or IBAN bank transfer
+
+The merchant object includes both schema.org properties (name, url, email) and IVMS101 identity data (leiCode, geographicAddress, nationalIdentifier) to support compliance requirements. For natural person merchants, consider using selective disclosure ([TAIP-8]) to protect sensitive information.
 
 ## Security Considerations
 

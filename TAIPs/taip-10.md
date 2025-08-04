@@ -12,13 +12,13 @@ requires: 8
 
 ## Summary
 
-TAIP-10 describes how to implement Travel Rule data exchange for counterparty identity verification in TAP. It relies exclusively on pre-existing message types and flows, but presents a policy based workflow allowing companies to comply with not only their own regulators requirements, but also take a policy based approach to helping key counterparties be compliant.
+TAIP-10 describes how to implement Travel Rule data exchange for counterparty identity verification in TAP. IVMS101 data can be included directly in party objects alongside schema.org data (per [TAIP-6]) or exchanged through selective disclosure using pre-existing message types and flows. This presents a policy-based workflow allowing companies to comply with not only their own regulators requirements, but also take a policy-based approach to helping key counterparties be compliant.
 
 ## Abstract
 
-This TAIP proposes the integration of [IVMS-101] identity data into TAP to meet FATF Travel Rule requirements. Rather than introducing new message types, TAIP-10 leverages existing mechanisms from [TAIP-7] (updatePolicies with a RequirePresentation directive) and [TAIP-8] (Presentation message with selective disclosure) to enable the secure exchange of identity information.
+This TAIP proposes the integration of [IVMS-101] identity data into TAP to meet FATF Travel Rule requirements. IVMS101 data can be included directly in party objects (per [TAIP-6]) for transparent compliance, or exchanged privately using existing mechanisms from [TAIP-7] (updatePolicies with a RequirePresentation directive) and [TAIP-8] (Presentation message with selective disclosure).
 
-In addition, the proposal supports proactive transmission of Personally Identifiable Information (PII) via a Presentation message in cases where the originator must send the information once the beneficiary has confirmed basic policies (e.g. addressOwnership). This approach preserves TAP's core privacy by keeping PII separate from the primary transaction messages while ensuring regulatory compliance.
+When using direct inclusion, parties may include IVMS101 data alongside schema.org properties in transaction messages. For enhanced privacy, particularly with natural person information, selective disclosure via Presentation messages is recommended. The proposal also supports proactive transmission of Personally Identifiable Information (PII) via a Presentation message in cases where the originator must send the information once the beneficiary has confirmed basic policies (e.g. addressOwnership).
 
 ## Motivation
 

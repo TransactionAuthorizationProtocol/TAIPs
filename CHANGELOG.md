@@ -14,6 +14,38 @@ This changelog focuses on:
 - Protocol structural changes
 - Breaking changes
 
+## [2025-08-04]
+
+### Added
+- **IVMS101 Data Inclusion Documentation**: Explicitly documented existing capability for including IVMS101 identity data directly in party objects alongside schema.org data
+  - Updated TAIP-6: Added explicit specification and examples for IVMS101 data in party objects
+  - Added comprehensive examples showing Person and Organization with IVMS101 fields
+  - Documented geographic addresses, national identifiers, and compliance data inclusion
+  - Added privacy recommendations for selective disclosure of natural person information
+  - Clarified that this capability was always supported by the JSON-LD extensibility but was not explicitly documented
+- **TypeScript Package v1.6.0**: Released enhanced TypeScript library with comprehensive documentation
+  - Added comprehensive JSDoc documentation to all TAP message types
+  - File-level overview with protocol explanation, features, and usage examples
+  - Organized code into logical sections with clear headers
+  - Practical usage examples for Transfer, Payment, DIDCommMessage, and Agent interfaces
+  - Complete TAIP specification cross-reference mapping
+  - Enhanced IntelliSense and documentation tooltips for better developer experience
+
+### Changed
+- **TAIP-6 (Transaction Parties)**: Enhanced documentation to explicitly describe IVMS101 data inclusion
+  - Documented that party objects can include both schema.org and IVMS101 properties
+  - Added concrete examples for natural persons and organizations with compliance data
+  - Added privacy recommendations for selective disclosure of sensitive information
+  - Made explicit what was previously implicit through JSON-LD extensibility
+- **TAIP-10 (IVMS101 Travel Rule)**: Updated to clarify dual approach for IVMS data exchange
+  - Documented direct inclusion in party objects for transparent compliance
+  - Maintained selective disclosure via presentations for enhanced privacy
+  - Clarified that both approaches have always been supported for different use cases
+- **TAIP-14 (Payments)**: Enhanced merchant examples to demonstrate IVMS101 compliance data
+  - Updated examples to show both schema.org and IVMS101 properties
+  - Demonstrated LEI codes, geographic addresses, and national identifiers for organizations
+  - Added privacy considerations for natural person merchants
+
 ## [2025-08-03]
 
 ### Changed
