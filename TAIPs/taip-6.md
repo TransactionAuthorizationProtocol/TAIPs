@@ -49,7 +49,7 @@ Parties represented in [TAIP-2] messages using a straightforward [JSON-LD] node 
 
 #### Specifying additional information about a party
 
-Additional details can be submitted within a party object, using [JSON-LD] to add other meta-data. This MUST not be used to provide private verified information about a natural person such as that obtained through a KYC process. See the Privacy Considerations section below for more. This information can be requested and exchanged using [TAIP-8 Selective Disclosure][TAIP-8].
+Additional details can be submitted within a party object, using [JSON-LD] to add other meta-data. For compliance purposes, parties may include IVMS101 identity data directly in the message alongside schema.org data. For natural person information, we recommend using selective disclosure ([TAIP-8]) to protect privacy, though direct inclusion is permitted when appropriate security measures are in place. This information can also be requested and exchanged separately using [TAIP-8 Selective Disclosure][TAIP-8].
 
 As an example you could add information about the country of a party like this:
 
@@ -106,6 +106,58 @@ Example for an individual person:
   "email":"alice@example.com"
 }
 ```
+
+#### Including IVMS101 data directly in party objects
+
+For compliance with travel rule requirements, parties may include IVMS101 identity data directly alongside schema.org properties. For natural persons, we recommend using selective disclosure to protect privacy:
+
+```json
+{
+  "@id": "did:eg:bob",
+  "@type": "https://schema.org/Person",
+  "name": "Bob Smith",
+  "email": "bob@example.com",
+  "geographicAddress": [{
+    "addressType": "HOME",
+    "streetName": "123 Main Street",
+    "buildingNumber": "123",
+    "postCode": "12345",
+    "townName": "Example City",
+    "country": "US"
+  }],
+  "nationalIdentifier": {
+    "nationalIdentifier": "123-45-6789",
+    "nationalIdentifierType": "ARNU",
+    "countryOfIssue": "US"
+  }
+}
+```
+
+Organization example with IVMS101 data:
+```json
+{
+  "@id": "did:web:merchant.example",
+  "@type": "https://schema.org/Organization",
+  "name": "Example Corp",
+  "leiCode": "969500KN90DZLPGW6898",
+  "url": "https://merchant.example",
+  "geographicAddress": [{
+    "addressType": "BIZZ",
+    "streetName": "456 Business Ave",
+    "buildingNumber": "456",
+    "postCode": "67890",
+    "townName": "Business City",
+    "country": "US"
+  }],
+  "nationalIdentifier": {
+    "nationalIdentifier": "12-3456789",
+    "nationalIdentifierType": "TXID",
+    "countryOfIssue": "US"
+  }
+}
+```
+
+**Privacy Note:** When including natural person IVMS101 data directly in messages, consider using selective disclosure ([TAIP-8]) to limit exposure of sensitive information to only parties that require it for compliance purposes.
 
 When using schema.org types in the `@type` field, implementations can leverage the rich vocabulary and tooling available for schema.org, enabling better interoperability with web standards and search engines. The distinction between `https://schema.org/Organization` and `https://schema.org/Person` helps clarify whether the party is an institutional or individual participant.
 

@@ -1,6 +1,6 @@
 {
   "name": "@taprsvp/types",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "description": "TypeScript types and interfaces for the Transaction Authorization Protocol (TAP)",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -27,7 +27,7 @@
   "license": "MIT",
   "devDependencies": {
     "rimraf": "^6.0.0",
-    "typescript": "^5.8.0"
+    "typescript": "^5.9.0"
   },
   "publishConfig": {
     "access": "public"
