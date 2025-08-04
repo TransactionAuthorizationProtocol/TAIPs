@@ -33,6 +33,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@taprsvp/iso20022_external_codes": "^1.0.0"
+    "@taprsvp/iso20022_external_codes": "^1.0.0",
+    "ivms101": "^1.1.1"
   }
 }
