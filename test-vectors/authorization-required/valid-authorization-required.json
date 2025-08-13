@@ -3,7 +3,7 @@
   "purpose": "Validates an authorization required message with URL and expiry",
   "shouldPass": true,
   "version": "1.0.0",
-  "taips": ["taip-2", "taip-15"],
+  "taips": ["taip-2", "taip-4"],
   "message": {
     "id": "98765432-e89b-12d3-a456-426614174001",
     "type": "https://tap.rsvp/schema/1.0#AuthorizationRequired",

@@ -1,0 +1,36 @@
+{
+  "description": "Invalid escrow request missing beneficiary",
+  "purpose": "Validates that escrow messages must include a beneficiary",
+  "shouldPass": false,
+  "version": "1.0.0",
+  "taips": ["taip-2", "taip-17"],
+  "message": {
+    "id": "550e8400-e29b-41d4-a716-446655440001",
+    "type": "https://tap.rsvp/schema/1.0#Escrow",
+    "from": "did:web:buyer.example",
+    "to": ["did:web:escrow-service.example"],
+    "created_time": 1709654400,
+    "body": {
+      "@context": "https://tap.rsvp/schema/1.0",
+      "@type": "https://tap.rsvp/schema/1.0#Escrow",
+      "asset": "eip155:1/erc20:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+      "amount": "1000.00",
+      "originator": {
+        "@type": "Party",
+        "@id": "did:web:buyer.example",
+        "name": "Buyer Corp",
+        "account": "eip155:1:0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb1"
+      },
+      "conditions": {
+        "releaseOn": "2024-03-10T00:00:00Z"
+      }
+    }
+  },
+  "expectedResult": {
+    "valid": false,
+    "error": {
+      "type": "ValidationError",
+      "message": "Escrow message must include a beneficiary"
+    }
+  }
+}

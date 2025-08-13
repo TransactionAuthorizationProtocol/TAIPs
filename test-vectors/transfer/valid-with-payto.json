@@ -1,0 +1,38 @@
+{
+  "description": "Valid transfer with PayTo URI for traditional bank settlement",
+  "purpose": "Validates transfer message with RFC 8905 PayTo URI settlement address",
+  "shouldPass": true,
+  "version": "1.0.0",
+  "taips": ["taip-2", "taip-3"],
+  "message": {
+    "id": "123e4567-e89b-12d3-a456-426614174010",
+    "type": "https://tap.rsvp/schema/1.0#Transfer",
+    "from": "did:web:originator.example",
+    "to": ["did:web:beneficiary.example"],
+    "created_time": 1709654400,
+    "expires_time": 1709740800,
+    "body": {
+      "@context": "https://tap.rsvp/schema/1.0",
+      "@type": "https://tap.rsvp/schema/1.0#Transfer",
+      "currency": "EUR",
+      "amount": "5000.00",
+      "originator": {
+        "@type": "Party",
+        "@id": "did:web:originator.example",
+        "name": "European Sender Corp",
+        "account": "payto://iban/DE75512108001245126199?receiver-name=European%20Sender%20Corp"
+      },
+      "beneficiary": {
+        "@type": "Party",
+        "@id": "did:web:beneficiary.example",
+        "name": "UK Receiver Ltd",
+        "account": "payto://iban/GB33BUKB20201555555555?receiver-name=UK%20Receiver%20Ltd"
+      },
+      "settlement_address": "payto://iban/GB33BUKB20201555555555",
+      "memo": "Invoice payment #INV-2024-001"
+    }
+  },
+  "expectedResult": {
+    "valid": true
+  }
+}
