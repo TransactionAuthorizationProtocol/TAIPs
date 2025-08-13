@@ -28,12 +28,15 @@
         "name": "Seller Inc",
         "account": "eip155:1:0x5aAeb6053f3E94C9b9A09f33669435E7Ef1BeAed"
       },
-      "conditions": {
-        "releaseOn": "2024-03-10T00:00:00Z",
-        "requiresAuthorization": true,
-        "authorizers": ["did:web:arbiter.example"]
-      },
-      "expires": "2024-03-15T00:00:00Z"
+      "expiry": "2024-03-15T00:00:00Z",
+      "agents": [
+        {
+          "@type": "Agent",
+          "@id": "did:web:escrow-service.example",
+          "role": "EscrowAgent",
+          "name": "Trusted Escrow Service"
+        }
+      ]
     }
   },
   "expectedResult": {

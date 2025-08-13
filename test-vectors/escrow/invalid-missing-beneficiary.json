@@ -21,9 +21,15 @@
         "name": "Buyer Corp",
         "account": "eip155:1:0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb1"
       },
-      "conditions": {
-        "releaseOn": "2024-03-10T00:00:00Z"
-      }
+      "expiry": "2024-03-15T00:00:00Z",
+      "agents": [
+        {
+          "@type": "Agent",
+          "@id": "did:web:escrow-service.example",
+          "role": "EscrowAgent",
+          "name": "Trusted Escrow Service"
+        }
+      ]
     }
   },
   "expectedResult": {
