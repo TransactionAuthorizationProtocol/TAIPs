@@ -14,7 +14,7 @@
     "body": {
       "@context": "https://tap.rsvp/schema/1.0",
       "@type": "https://tap.rsvp/schema/1.0#Transfer",
-      "currency": "EUR",
+      "asset": "eip155:1/erc20:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
       "amount": "5000.00",
       "originator": {
         "@type": "Party",
@@ -28,8 +28,16 @@
         "name": "UK Receiver Ltd",
         "account": "payto://iban/GB33BUKB20201555555555?receiver-name=UK%20Receiver%20Ltd"
       },
-      "settlement_address": "payto://iban/GB33BUKB20201555555555",
-      "memo": "Invoice payment #INV-2024-001"
+      "settlementAddress": "payto://iban/GB33BUKB20201555555555",
+      "memo": "Invoice payment #INV-2024-001",
+      "agents": [
+        {
+          "@type": "Agent",
+          "@id": "did:web:payment-processor.example",
+          "role": "PaymentProcessor",
+          "name": "European Payment Processor"
+        }
+      ]
     }
   },
   "expectedResult": {

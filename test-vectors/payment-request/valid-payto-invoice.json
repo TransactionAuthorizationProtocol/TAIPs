@@ -16,18 +16,23 @@
       "@type": "https://tap.rsvp/schema/1.0#Payment",
       "currency": "USD",
       "amount": "1250.00",
-      "payee": {
+      "merchant": {
         "@type": "Party",
         "@id": "did:web:merchant.example",
         "name": "Merchant Services Inc",
         "account": "payto://ach/122000661/1234567890?receiver-name=Merchant%20Services%20Inc"
       },
-      "reference": "ORDER-2024-03-001",
-      "memo": "Payment for consulting services",
-      "due_date": "2024-03-31",
-      "settlement_address": "payto://ach/122000661/1234567890",
-      "fallback_addresses": [
+      "settlementAddress": "payto://ach/122000661/1234567890",
+      "fallbackSettlementAddresses": [
         "payto://wire/122000661/1234567890"
+      ],
+      "agents": [
+        {
+          "@type": "Agent",
+          "@id": "did:web:payment-gateway.example",
+          "role": "PaymentProcessor",
+          "name": "US Payment Gateway"
+        }
       ]
     }
   },
