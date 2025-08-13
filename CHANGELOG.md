@@ -14,6 +14,16 @@ This changelog focuses on:
 - Protocol structural changes
 - Breaking changes
 
+## [2025-08-13]
+
+### Changed
+- **Test Vectors**: Updated test vectors to reflect recent protocol changes
+  - Updated AuthorizationRequired test vectors to reference TAIP-4 instead of TAIP-15
+  - Added test vectors for TAIP-17 Escrow messages with valid and invalid examples
+  - Added test vectors demonstrating PayTo URI support (RFC 8905) for traditional banking integration
+  - Added examples for Transfer messages with IBAN PayTo URIs
+  - Added Payment request examples with ACH/wire PayTo URIs
+
 ## [2025-08-04]
 
 ### Added
@@ -259,7 +269,7 @@ This changelog focuses on:
 
 ## Message Type Summary
 
-### Current TAP Messages (16 total)
+### Current TAP Messages (18 total)
 1. **Transfer** - Virtual asset transfer initiation
 2. **Payment** - Payment request with invoice support
 3. **Authorize** - Transaction authorization (enhanced to replace Complete)
@@ -275,7 +285,9 @@ This changelog focuses on:
 13. **ConfirmRelationship** - Confirm party-agent relationship
 14. **UpdatePolicies** - Update agent policies
 15. **Connect** - Establish agent connection
-16. **AuthorizationRequired** - Request connection authorization
+16. **AuthorizationRequired** - Request authorization (moved to TAIP-4)
+17. **Escrow** - Hold assets in escrow with conditions (TAIP-17)
+18. **Capture** - Release escrowed funds (TAIP-17)
 
 ### Removed Messages
 - **Complete** (2024-06-12) - Functionality merged into Authorize message
