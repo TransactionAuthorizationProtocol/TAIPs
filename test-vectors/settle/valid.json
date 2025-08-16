@@ -15,6 +15,7 @@
     "body": {
       "@context": "https://tap.rsvp/schema/1.0",
       "@type": "https://tap.rsvp/schema/1.0#Settle",
+      "settlementAddress": "eip155:1:0x1234a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb",
       "settlementId": "eip155:1:tx/0x3edb98c24d46d148eb926c714f4fbaa117c47b0c0821f38bfce9763604457c33"
     }
   },

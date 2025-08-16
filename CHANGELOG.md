@@ -14,6 +14,20 @@ This changelog focuses on:
 - Protocol structural changes
 - Breaking changes
 
+## [2025-08-16]
+
+### Fixed
+- **Test Vector Issues**: Fixed incorrect TAIP references and missing required fields in test vectors
+  - Fixed `authorization-required/valid-authorization-required.json` to reference correct TAIP-4 instead of TAIP-15
+  - Added required `settlementAddress` field to `settle/valid.json` test vector per TAIP-4 specification
+- **Test Vector Organization**: Reorganized test vector file structure for better maintainability
+  - Moved top-level test vectors to appropriate subfolders based on message type
+  - `valid-authorize.json` → `authorize/` subfolder
+  - `valid-payment*.json` → `payment-request/` subfolder
+  - `valid-revert.json` → `revert/` subfolder
+  - `valid-settle.json` → `settle/` subfolder
+  - Ensures consistent organization with existing test vector structure
+
 ## [2025-08-13]
 
 ### Changed
