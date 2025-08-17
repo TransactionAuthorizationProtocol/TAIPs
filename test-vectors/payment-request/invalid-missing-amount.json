@@ -25,7 +25,7 @@
         {
           "@id": "did:web:merchant.vasp",
           "role": "Merchant",
-          "for": "merchant"
+          "for": "did:web:merchant.vasp"
         }
       ]
     }

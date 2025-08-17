@@ -22,7 +22,7 @@
         {
           "@id": "did:web:originator.vasp",
           "role": "Originator",
-          "for": "originator"
+          "for": "did:web:originator.vasp"
         }
       ]
     }
