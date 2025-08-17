@@ -22,10 +22,7 @@
         "name": "Merchant Services Inc",
         "account": "payto://ach/122000661/1234567890?receiver-name=Merchant%20Services%20Inc"
       },
-      "settlementAddress": "payto://ach/122000661/1234567890",
-      "fallbackSettlementAddresses": [
-        "payto://wire/122000661/1234567890"
-      ],
+      "fallbackSettlementAddresses": ["payto://wire/122000661/1234567890"],
       "agents": [
         {
           "@type": "Agent",
