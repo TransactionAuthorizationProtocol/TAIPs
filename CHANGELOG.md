@@ -14,6 +14,19 @@ This changelog focuses on:
 - Protocol structural changes
 - Breaking changes
 
+## [2025-08-18]
+
+### Added
+- **TAIP-12 Name Hashing Implementation**: Added production-ready TypeScript implementation for privacy-preserving name matching
+  - Added `generateNameHash()` function with SHA-256 hashing using Web Crypto API and Node.js crypto fallback
+  - Added `normalizeForHashing()` function for TAIP-12 compliant name normalization (uppercase, whitespace removal)
+  - Cross-platform compatibility supporting browsers and Node.js environments without additional dependencies
+  - Comprehensive test suite with 19 test cases including TAIP-12 specification test vectors
+  - Support for non-Western names (Arabic, Chinese, Korean, Japanese scripts)
+  - Compatible with VerifyVASP and GTR networks per TAIP-12 specification
+  - Added Vitest testing framework for comprehensive validation
+  - Enhanced TypeScript package (@taprsvp/types) with new nameHash utilities
+
 ## [2025-08-16]
 
 ### Fixed

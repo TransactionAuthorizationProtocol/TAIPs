@@ -8,6 +8,8 @@
     "build": "tsc",
     "clean": "rimraf dist",
     "type-check": "tsc --noEmit",
+    "test": "vitest",
+    "test:run": "vitest run",
     "prepublishOnly": "npm run build"
   },
   "files": [
@@ -27,7 +29,8 @@
   "license": "MIT",
   "devDependencies": {
     "rimraf": "^6.0.0",
-    "typescript": "^5.9.0"
+    "typescript": "^5.9.0",
+    "vitest": "^3.2.4"
   },
   "publishConfig": {
     "access": "public"
