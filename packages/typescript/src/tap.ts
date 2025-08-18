@@ -1024,7 +1024,6 @@ export interface Transfer extends TapMessageObject<"Transfer"> {
  *     "eip155:1/erc20:0x6b175474e89094c44da98b954eedeac495271d0f", // DAI
  *     "eip155:1/erc20:0xa0b86a33e6e0a7c0d4e19e40dce0000000000000"  // USDC
  *   ],
- *   defaultAddress: "eip155:1:0x742d35Cc6634C0532925a3b844Bc454e4438f44e",
  *   merchant: {
  *     "@id": "did:example:merchant",
  *     "@type": "https://schema.org/Organization",
@@ -1072,13 +1071,6 @@ export interface Payment extends TapMessageObject<"Payment"> {
    * Used when currency is specified to indicate which crypto assets can be used
    */
   supportedAssets?: CAIP19[];
-
-  /**
-   * Optional default settlement address
-   * Either a blockchain address (CAIP-10) or traditional payment target (RFC 8905 PayTo URI)
-   * Primary address for receiving payment
-   */
-  defaultAddress?: SettlementAddress;
 
   /**
    * Optional fallback settlement addresses
