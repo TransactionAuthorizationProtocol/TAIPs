@@ -17,6 +17,22 @@ This changelog focuses on:
 ## [2025-08-18]
 
 ### Added
+- **TypeScript Package v1.7.0**: Released enhanced TypeScript library with comprehensive documentation and fixes
+  - Added comprehensive README.md with installation guide, quick start examples, and complete API reference
+  - Enhanced examples with current type definitions (Person, Organization, Agent, Party)
+  - Added nameHash examples for travel rule compliance with privacy-preserving name matching
+  - Updated participant type documentation to reflect current schema.org-based interfaces
+  - Added complete participant interfaces documentation (Person, Organization, Agent, Party)
+  - Enhanced travel rule compliance examples with IVMS101 data structures
+  - Improved developer experience with detailed usage examples and standards compliance information
+
+### Fixed
+- **Payment Message Type**: Removed erroneous `defaultAddress` field from Payment interface
+  - Fixed Payment interface to comply with TAIP-14 specification
+  - Settlement addresses should be provided by agents with SettlementAddress role, not as direct fields
+  - Maintained `fallbackSettlementAddresses` field as specified in TAIP-14
+  - Updated JSDoc examples to remove invalid `defaultAddress` references
+
 - **TAIP-12 Name Hashing Implementation**: Added production-ready TypeScript implementation for privacy-preserving name matching
   - Added `generateNameHash()` function with SHA-256 hashing using Web Crypto API and Node.js crypto fallback
   - Added `normalizeForHashing()` function for TAIP-12 compliant name normalization (uppercase, whitespace removal)
