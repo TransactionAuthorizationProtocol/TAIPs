@@ -1,6 +1,6 @@
 {
   "name": "@taprsvp/types",
-  "version": "1.6.1",
+  "version": "1.7.0",
   "description": "TypeScript types and interfaces for the Transaction Authorization Protocol (TAP)",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
