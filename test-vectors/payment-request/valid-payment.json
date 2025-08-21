@@ -22,9 +22,15 @@
       "name": "Digital Goods Store",
       "mcc": "5734"
     },
-    "agents": [{
-      "@id": "did:example:merchant-psp",
-      "role": "PaymentProcessor"
-    }]
+    "agents": [
+      {
+        "@id": "did:example:merchant",
+        "for": "did:example:merchant"
+      },
+      {
+        "@id": "did:example:merchant-psp",
+        "for": "did:example:merchant"
+      }
+    ]
   }
 }

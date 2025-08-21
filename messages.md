@@ -114,7 +114,8 @@ This example demonstrates agents with and without the optional `role` parameter.
     "amount": "1.23",
     "agents": [
       {
-        "@id": "did:web:originator.sample"
+        "@id": "did:web:originator.sample",
+        "for": "did:web:originator.sample"
       },
       {
         "@id": "did:pkh:eip155:1:0x1234a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb",
@@ -316,8 +317,12 @@ Initiates a payment request from a merchant to a customer.
     "expiry": "2025-07-30T14:30:00Z",
     "agents": [
       {
+        "@id": "did:web:merchant.vasp",
+        "for": "did:web:merchant.vasp"
+      },
+      {
         "@id": "did:web:merchant-psp",
-        "role": "PaymentProcessor"
+        "for": "did:web:merchant.vasp"
       }
     ]
   }
@@ -1205,14 +1210,22 @@ Requests a connection between agents with specified constraints.
   "body": {
     "@context": "https://tap.rsvp/schema/1.0",
     "@type": "https://tap.rsvp/schema/1.0#Connect",
-    "agent": {
-      "@id": "did:example:b2b-service",
-      "name": "B2B Payment Service",
-      "serviceUrl": "https://b2b-service/did-comm"
+    "requester": {
+      "@id": "did:example:business-customer",
+      "name": "Business Customer"
     },
     "principal": {
-      "@id": "did:example:business-customer"
+      "@id": "did:example:business-customer",
+      "name": "Business Customer"
     },
+    "agents": [
+      {
+        "@id": "did:example:b2b-service",
+        "name": "B2B Payment Service",
+        "serviceUrl": "https://b2b-service/did-comm",
+        "for": "did:example:business-customer"
+      }
+    ],
     "constraints": {
       "purposes": ["BEXP", "SUPP"],
       "categoryPurposes": ["CASH", "CCRD"],
@@ -1279,14 +1292,22 @@ This flow demonstrates establishing a connection between a B2B service and a VAS
   "body": {
     "@context": "https://tap.rsvp/schema/1.0",
     "@type": "https://tap.rsvp/schema/1.0#Connect",
-    "agent": {
-      "@id": "did:example:b2b-service",
-      "name": "B2B Payment Service",
-      "serviceUrl": "https://b2b-service/did-comm"
+    "requester": {
+      "@id": "did:example:business-customer",
+      "name": "Business Customer"
     },
     "principal": {
-      "@id": "did:example:business-customer"
+      "@id": "did:example:business-customer",
+      "name": "Business Customer"
     },
+    "agents": [
+      {
+        "@id": "did:example:b2b-service",
+        "name": "B2B Payment Service",
+        "serviceUrl": "https://b2b-service/did-comm",
+        "for": "did:example:business-customer"
+      }
+    ],
     "constraints": {
       "purposes": ["BEXP", "SUPP"],
       "categoryPurposes": ["CASH", "CCRD"],
@@ -1382,17 +1403,22 @@ In self-onboarding scenarios, the agent and principal can be the same entity (e.
   "body": {
     "@context": "https://tap.rsvp/schema/1.0",
     "@type": "https://tap.rsvp/schema/1.0#Connect",
-    "agent": {
+    "requester": {
       "@id": "did:example:wallet-service",
-      "name": "Wallet Service Provider",
-      "type": "VASP",
-      "serviceUrl": "https://wallet-service.com/did-comm"
+      "name": "Wallet Service Provider"
     },
     "principal": {
       "@id": "did:example:wallet-service",
-      "name": "Wallet Service Provider",
-      "type": "VASP"
+      "name": "Wallet Service Provider"
     },
+    "agents": [
+      {
+        "@id": "did:example:wallet-service",
+        "name": "Wallet Service Provider",
+        "serviceUrl": "https://wallet-service.com/did-comm",
+        "for": "did:example:wallet-service"
+      }
+    ],
     "constraints": {
       "purposes": ["CASH", "CGOO", "GSRV"],
       "categoryPurposes": ["CASH", "CCRD", "CDCD"],

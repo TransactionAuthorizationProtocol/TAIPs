@@ -32,6 +32,16 @@
       "agents": [
         {
           "@type": "Agent",
+          "@id": "did:web:buyer.example",
+          "for": "did:web:buyer.example"
+        },
+        {
+          "@type": "Agent",
+          "@id": "did:web:seller.example",
+          "for": "did:web:seller.example"
+        },
+        {
+          "@type": "Agent",
           "@id": "did:web:escrow-service.example",
           "role": "EscrowAgent",
           "name": "Trusted Escrow Service"
