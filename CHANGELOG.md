@@ -16,7 +16,37 @@ This changelog focuses on:
 
 ## [2025-08-21]
 
+### Changed
+- **BREAKING: TAIP-15 Agent Connection Protocol**: Major restructure to support multi-party connections
+  - **BREAKING**: Replaced single `agent` field with required `agents` array following TAIP-3 pattern
+  - **BREAKING**: Added required `requester` Party field to distinguish requesting party from principal
+  - Agents array must include at least one agent with `@id` matching DIDComm `from` field and `for` attribute set to requester DID
+  - Added "Parties and Agent Roles" section clarifying two-party connection model
+  - Added support for AddAgents messages to dynamically add agents during connection flow
+  - Updated all examples and diagrams to use Merchant/Customer/PSP Agent terminology
+  - Updated TypeScript interfaces, JSON schemas, and test vectors to match new structure
+  - Removed `type` attributes from all agent examples across codebase for consistency with TAIP-5 specification
+
+### Fixed
+- **Agent Consistency**: Updated TAIP-3 and TAIP-14 to require `for` attributes in agent arrays
+  - Added specification requiring requesting agent (from DIDComm `from` field) to be included in `agents` array with proper `for` attribute
+  - Updated all TAIP-3 examples to include `for` attributes mapping agents to the parties they represent
+  - Updated TAIP-14 example to include merchant agent and proper `for` attributes
+  - Ensures consistency with TAIP-15 and TAIP-17 agent array requirements
+
 ### Added
+- **TypeScript Package v1.9.0**: Released with TAIP-15 agent restructuring support
+  - **Updated Connect Interface**: Restructured to support new requester/principal/agents pattern
+    - Added `requester` and `principal` Party fields to Connect interface
+    - Replaced single `agent` field with required `agents` array
+    - Agents array must include at least one agent with `@id` matching DIDComm `from` field and `for` attribute set to requester DID
+    - Updated JSDoc documentation to reflect TAIP-15 specification changes
+    - Maintained backward compatibility for existing message types
+  - **Enhanced Agent Interface**: Updated agent structure to support multi-party connections
+    - Clarified `for` attribute usage in agent definitions
+    - Updated documentation to reference TAIP-5 specification for agent details
+    - Consistent agent array patterns across Transfer, Payment, and Connect messages
+
 - **TypeScript Package v1.8.0**: Released with enhanced DIDComm v2.1 support and new message types
   - **DIDComm Attachments Support**: Added full DIDComm v2.1 attachments support
     - Added `Attachment` interface following DIDComm v2.1 specification
@@ -38,24 +68,6 @@ This changelog focuses on:
   - **Enhanced Message Type Support**: Expanded TAPMessage union type to include 19 message types
     - Added PresentationMessage to support TAIP-8 selective disclosure
     - Improved cross-reference documentation for all TAIP specifications
-
-### Changed
-- **BREAKING: TAIP-15 Agent Connection Protocol**: Major restructure to support multi-party connections
-  - **BREAKING**: Replaced single `agent` field with required `agents` array following TAIP-3 pattern
-  - **BREAKING**: Added required `requester` Party field to distinguish requesting party from principal
-  - Agents array must include at least one agent with `@id` matching DIDComm `from` field and `for` attribute set to requester DID
-  - Added "Parties and Agent Roles" section clarifying two-party connection model
-  - Added support for AddAgents messages to dynamically add agents during connection flow
-  - Updated all examples and diagrams to use Merchant/Customer/PSP Agent terminology
-  - Updated TypeScript interfaces, JSON schemas, and test vectors to match new structure
-  - Removed `type` attributes from all agent examples across codebase for consistency with TAIP-5 specification
-
-### Fixed
-- **Agent Consistency**: Updated TAIP-3 and TAIP-14 to require `for` attributes in agent arrays
-  - Added specification requiring requesting agent (from DIDComm `from` field) to be included in `agents` array with proper `for` attribute
-  - Updated all TAIP-3 examples to include `for` attributes mapping agents to the parties they represent
-  - Updated TAIP-14 example to include merchant agent and proper `for` attributes
-  - Ensures consistency with TAIP-15 and TAIP-17 agent array requirements
 
 ## [2025-08-18]
 
