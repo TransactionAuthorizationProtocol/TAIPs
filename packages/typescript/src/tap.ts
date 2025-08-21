@@ -1305,16 +1305,23 @@ export interface Authorize extends TapMessageObject<"Authorize"> {
  */
 export interface Connect extends TapMessageObject<"Connect"> {
   /**
-   * Details of the requesting agent
-   * Includes identity and endpoints
+   * Party object representing the party requesting the connection
+   * As defined in TAIP-6
    */
-  agent?: Agent;
+  requester: Party;
 
   /**
-   * Party object representing the principal the agent acts on behalf of
+   * Party object representing the party the requesting agent acts on behalf of
    * As defined in TAIP-6
    */
   principal: Party;
+
+  /**
+   * Array of agent objects representing agents involved in the connection process
+   * Each agent object follows TAIP-5 specification
+   * At minimum, there MUST be one agent whose @id matches the from field of the surrounding DIDComm message and has a for attribute set to the requester DID
+   */
+  agents: Agent[];
 
   /**
    * Transaction constraints

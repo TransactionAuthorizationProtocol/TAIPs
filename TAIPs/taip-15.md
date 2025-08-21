@@ -5,7 +5,7 @@ status: Review
 type: Standard
 author: Pelle Braendgaard <pelle@notabene.id>
 created: 2024-03-21
-updated: 2025-08-03
+updated: 2025-08-21
 description: Establishes a protocol for creating secure, authorized connections between TAP agents with predefined transaction constraints and OAuth-style authorization flows. Enables persistent B2B integrations with transaction limits, purpose restrictions, and user control mechanisms for ongoing business relationships while maintaining robust risk management.
 requires: [2, 4, 6, 9, 13]
 ---
@@ -41,20 +41,35 @@ By standardizing these connection aspects, we enable secure B2B integrations whi
 
 All messages implement [TAIP-2] and are sent between [TAIP-5 Agents][TAIP-5]. Each message type has specific requirements for its body object. The principal-agent relationship follows the model defined in [TAIP-6], where agents act on behalf of real-world parties.
 
+### Parties and Agent Roles
+
+The Agent Connection Protocol involves two distinct parties and their respective agents:
+
+**Requester Party**: The party that initiates the connection request. This is typically a service provider, merchant, or other entity seeking permission to perform transactions on behalf of or with another party. The requester party is represented by one or more agents that handle the technical aspects of the connection process.
+
+**Principal Party**: The party that the requester wants to establish a connection with, and on whose behalf future transactions may be performed. This is typically a customer, user, or business entity that will authorize the connection and set transaction constraints. The principal party may have their own agents (such as wallet providers or custodial services) that act on their behalf.
+
+**Agent Relationships**: 
+- The requester's agent initiates the Connect message and must be included in the `agents` array with a `for` attribute pointing to the requester's DID
+- The principal's agent(s) may be added during the connection process using AddAgent messages as replies to the Connect thread
+- Each agent clearly identifies which party it represents through the `for` attribute as defined in [TAIP-5]
+- Multiple agents can represent the same party for different capabilities (e.g., compliance, wallet services, settlement)
+
+This separation allows for complex B2B relationships where a service provider (requester) wants to act on behalf of their customer (principal) while maintaining clear accountability and authorization chains.
+
 ### Connect Message
 
 A message sent by an agent requesting connection to another agent:
 
 - `@context` - REQUIRED the JSON-LD context `https://tap.rsvp/schema/1.0`
 - `@type` - REQUIRED the JSON-LD type `https://tap.rsvp/schema/1.0#Connect`
-- `agent` - OPTIONAL object containing information about the requesting agent:
-  - `@id` - REQUIRED string DID of the requesting agent. If the `agent` object is included, the `@id` MUST match the `from` field of the surrounding DIDComm message
-  - `name` - OPTIONAL string human-readable name of the agent
-  - `type` - OPTIONAL string type of agent (e.g. "ServiceAgent", "WalletAgent")
-  - `serviceUrl` - OPTIONAL string URL for the agent's DIDComm endpoint. This field SHOULD only be used as a fallback when no DIDComm service endpoint is resolvable from the agent's DID document. This is particularly useful for self-hosted and decentralized agents that may not have reliable DID document hosting. For security purposes, this field SHOULD be ignored if a valid DIDComm service endpoint is already listed in the DID document
-- `principal` - REQUIRED [TAIP-6] Party object representing the party the agent acts on behalf of:
+- `requester` - REQUIRED [TAIP-6] Party object representing the party requesting the connection:
+  - `@id` - REQUIRED string DID or IRI of the requesting party
+  - Additional attributes MAY be included as defined in [TAIP-6], such as country code, merchant category code, or other party metadata
+- `principal` - REQUIRED [TAIP-6] Party object representing the party the requesting agent acts on behalf of:
   - `@id` - REQUIRED string DID or IRI of the principal party
   - Additional attributes MAY be included as defined in [TAIP-6], such as country code, merchant category code, or other party metadata
+- `agents` - REQUIRED array of agent objects representing agents involved in the connection process. Each agent object follows [TAIP-5] specification. At minimum, there MUST be one agent in this array whose `@id` matches the `from` field of the surrounding DIDComm message and has a `for` attribute set to the `requester` DID
 - `constraints` - REQUIRED object specifying the requested transaction constraints:
   - `purposes` - OPTIONAL array of [TAIP-13] purpose codes
   - `categoryPurposes` - OPTIONAL array of [TAIP-13] category purpose codes
@@ -104,11 +119,22 @@ A message sent by principal to terminate an existing connection:
 - `by` - REQUIRED should be `principal`
 - `reason` - OPTIONAL string human-readable reason for cancellation
 
+### AddAgents Message
+
+A message sent to add additional agents to the connection process as defined in [TAIP-5]. This is particularly useful for adding the principal's agent after the initial Connect request:
+
+- `@context` - REQUIRED the JSON-LD context `https://tap.rsvp/schema/1.0`
+- `@type` - REQUIRED the JSON-LD type `https://tap.rsvp/schema/1.0#AddAgents`
+- `agents` - REQUIRED an array of agent objects to add to the connection. Each agent object follows [TAIP-5] specification
+
+For complete specification of this message type, see [TAIP-5].
+
 ### Connection Flow
 
 1. Agent A sends Connect message to Agent B with:
-   - Their identity and endpoints
-   - The party they represent
+   - The requesting party's identity
+   - The principal party they represent
+   - Agent identities and endpoints in the agents array
    - Desired transaction constraints
 
 2. Agent B chooses an authorization method:
@@ -127,7 +153,11 @@ A message sent by principal to terminate an existing connection:
    - Authorize message if approved
    - Reject message if denied
 
-5. Once authorized:
+5. Agent addition (if needed):
+   - Additional agents may be added using AddAgent messages as replies to the Connect thread
+   - This allows the principal's agent to be included if not initially present
+
+6. Once authorized:
    - Connection is established with a unique identifier
    - Future transactions must respect the agreed constraints
    - Either party can Cancel the connection
@@ -166,13 +196,19 @@ Example Out-of-Band message with Connect request:
         "body": {
           "@context": "https://tap.rsvp/schema/1.0",
           "@type": "https://tap.rsvp/schema/1.0#Connect",
-          "agent": {
-            "@id": "did:example:b2b-service",
-            "name": "B2B Payment Service"
+          "requester": {
+            "@id": "did:example:b2b-service"
           },
           "principal": {
             "@id": "did:example:business-customer"
           },
+          "agents": [
+            {
+              "@id": "did:example:b2b-service",
+              "name": "B2B Payment Service",
+              "for": "did:example:b2b-service"
+            }
+          ],
           "constraints": {
             "purposes": ["BEXP", "SUPP"]
           },
@@ -204,32 +240,32 @@ Where the `_oob` parameter contains the base64url-encoded Out-of-Band message, o
 
 ```mermaid
 sequenceDiagram
-    participant B2B as B2B Service
-    participant VASP
+    participant PSP as PSP Agent
+    participant CustomerWallet as Customer Wallet Agent
     participant Customer
 
-    B2B->>VASP: Connect [constraints, principal: {id: customer, ...}]
-    VASP->>Customer: Out-of-band notification
-    Customer->>VASP: Review & Authorize
-    VASP->>B2B: Authorize
-    Note over B2B,VASP: Connection Established
+    PSP->>CustomerWallet: Connect [requester: Merchant, principal: Customer, agents: [PSP]]
+    CustomerWallet->>Customer: Out-of-band notification
+    Customer->>CustomerWallet: Review & Authorize
+    CustomerWallet->>PSP: Authorize
+    Note over PSP,CustomerWallet: Connection Established
 ```
 
 #### Connection Flow with Interactive Authorization
 
 ```mermaid
 sequenceDiagram
-    participant B2B as B2B Service
-    participant VASP
+    participant PSP as PSP Agent
+    participant CustomerWallet as Customer Wallet Agent
     participant Customer
 
-    B2B->>VASP: Connect [constraints, principal: {id: customer, ...}]
-    VASP->>B2B: AuthorizationRequired [URL]
-    B2B->>Customer: Redirect to authorization URL
-    Customer->>VASP: Authenticate & Review
-    Customer->>VASP: Approve
-    VASP->>B2B: Authorize
-    Note over B2B,VASP: Connection Established
+    PSP->>CustomerWallet: Connect [requester: Merchant, principal: Customer, agents: [PSP]]
+    CustomerWallet->>PSP: AuthorizationRequired [URL]
+    PSP->>Customer: Redirect to authorization URL
+    Customer->>CustomerWallet: Authenticate & Review
+    Customer->>CustomerWallet: Approve
+    CustomerWallet->>PSP: Authorize
+    Note over PSP,CustomerWallet: Connection Established
 ```
 
 #### Connection State Machine
@@ -249,24 +285,44 @@ stateDiagram-v2
     Cancelled --> [*]
 ```
 
+#### Connection Flow with AddAgents
+
+The following diagram shows how a customer's wallet agent can join the connection using AddAgents:
+
+```mermaid
+sequenceDiagram
+    participant PSP as PSP Agent
+    participant Customer
+    participant CustomerWallet as Customer Wallet Agent
+
+    PSP->>Customer: Connect [requester: Merchant, principal: Customer, agents: [PSP]]
+    Note over Customer: Customer receives connection request
+    Customer->>CustomerWallet: Open/select preferred wallet
+    CustomerWallet->>PSP: AddAgents [agents: [CustomerWallet]]
+    Note over PSP,CustomerWallet: PSP now knows customer's wallet agent
+    Customer->>CustomerWallet: Review & Authorize connection
+    CustomerWallet->>PSP: Authorize
+    Note over PSP,CustomerWallet: Connection Established with all agents
+```
+
 ### Transaction Flow Using Connection
 
 The following diagram shows how an established connection is used for subsequent transactions:
 
 ```mermaid
 sequenceDiagram
-    participant B2B as B2B Service
-    participant VASP
+    participant PSP as PSP Agent
+    participant CustomerWallet as Customer Wallet Agent
     participant Blockchain
 
-    Note over B2B,VASP: Connection already established
-    B2B->>VASP: Transfer [pthid: connection_id]
-    activate VASP
-    VASP->>VASP: Validate against constraints
-    VASP->>B2B: Authorize [settlementAddress]
-    deactivate VASP
-    B2B->>Blockchain: Submit transaction
-    B2B->>VASP: Settle [settlementId]
+    Note over PSP,CustomerWallet: Connection already established
+    PSP->>CustomerWallet: Payment [pthid: connection_id]
+    activate CustomerWallet
+    CustomerWallet->>CustomerWallet: Validate against constraints
+    CustomerWallet->>PSP: Authorize [settlementAddress]
+    deactivate CustomerWallet
+    CustomerWallet->>Blockchain: Submit transaction
+    CustomerWallet->>PSP: Settle [settlementId]
 ```
 
 ### Connection Security
@@ -324,15 +380,20 @@ The following are example plaintext messages. See [TAIP-2] for how to sign the m
   "body": {
     "@context": "https://tap.rsvp/schema/1.0",
     "@type": "https://tap.rsvp/schema/1.0#Connect",
-    "agent": {
-      "@id": "did:example:b2b-service",
-      "name": "B2B Payment Service",
-      "type": "ServiceAgent",
-      "serviceUrl": "https://b2b-service/did-comm"
+    "requester": {
+      "@id": "did:example:b2b-service"
     },
     "principal": {
       "@id": "did:example:business-customer"
     },
+    "agents": [
+      {
+        "@id": "did:example:b2b-service",
+        "name": "B2B Payment Service",
+        "serviceUrl": "https://b2b-service/did-comm",
+        "for": "did:example:b2b-service"
+      }
+    ],
     "constraints": {
       "purposes": ["BEXP", "SUPP"],
       "categoryPurposes": ["CASH", "CCRD"],
@@ -435,10 +496,8 @@ The following example shows a merchant directly onboarding with a payment proces
   "body": {
     "@context": "https://tap.rsvp/schema/1.0",
     "@type": "https://tap.rsvp/schema/1.0#Connect",
-    "agent": {
-      "@id": "did:example:merchant",
-      "name": "Example Merchant",
-      "type": "ServiceAgent"
+    "requester": {
+      "@id": "did:example:merchant"
     },
     "principal": {
       "@id": "did:example:merchant",
@@ -446,6 +505,13 @@ The following example shows a merchant directly onboarding with a payment proces
       "countryCode": "US",
       "merchantCategoryCode": "5411"
     },
+    "agents": [
+      {
+        "@id": "did:example:merchant",
+        "name": "Example Merchant",
+        "for": "did:example:merchant"
+      }
+    ],
     "constraints": {
       "purposes": ["SALA", "GDDS"],
       "limits": {
@@ -461,9 +527,10 @@ The following example shows a merchant directly onboarding with a payment proces
 ```
 
 In this self-onboarding case:
-- The `agent.@id` and `principal.@id` are the same DID (`did:example:merchant`)
-- The `agent.@id` matches the `from` field of the DIDComm message
-- The merchant is acting as both the technical agent and the business principal
+- The `requester.@id` and `principal.@id` are the same DID (`did:example:merchant`)
+- The agent's `@id` in the `agents` array matches the `from` field of the DIDComm message
+- The merchant is acting as both the requesting party and the business principal
+- There is one agent representing the merchant in the `agents` array
 - The `agreement` field points to the merchant agreement terms
 
 ## Using Connections for Transactions

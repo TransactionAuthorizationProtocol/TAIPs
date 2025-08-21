@@ -39,6 +39,24 @@ This changelog focuses on:
     - Added PresentationMessage to support TAIP-8 selective disclosure
     - Improved cross-reference documentation for all TAIP specifications
 
+### Changed
+- **BREAKING: TAIP-15 Agent Connection Protocol**: Major restructure to support multi-party connections
+  - **BREAKING**: Replaced single `agent` field with required `agents` array following TAIP-3 pattern
+  - **BREAKING**: Added required `requester` Party field to distinguish requesting party from principal
+  - Agents array must include at least one agent with `@id` matching DIDComm `from` field and `for` attribute set to requester DID
+  - Added "Parties and Agent Roles" section clarifying two-party connection model
+  - Added support for AddAgents messages to dynamically add agents during connection flow
+  - Updated all examples and diagrams to use Merchant/Customer/PSP Agent terminology
+  - Updated TypeScript interfaces, JSON schemas, and test vectors to match new structure
+  - Removed `type` attributes from all agent examples across codebase for consistency with TAIP-5 specification
+
+### Fixed
+- **Agent Consistency**: Updated TAIP-3 and TAIP-14 to require `for` attributes in agent arrays
+  - Added specification requiring requesting agent (from DIDComm `from` field) to be included in `agents` array with proper `for` attribute
+  - Updated all TAIP-3 examples to include `for` attributes mapping agents to the parties they represent
+  - Updated TAIP-14 example to include merchant agent and proper `for` attributes
+  - Ensures consistency with TAIP-15 and TAIP-17 agent array requirements
+
 ## [2025-08-18]
 
 ### Added

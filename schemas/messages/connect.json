@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://taips.tap.rsvp/schemas/messages/connect.json",
   "title": "Connect Message",
-  "description": "Establishes a TAP connection between agents",
+  "description": "Requests a connection between agents with specified constraints as per TAIP-15",
   "type": "object",
   "allOf": [
     {
@@ -11,50 +11,51 @@
   ],
   "properties": {
     "type": {
-      "const": "https://taprsvp.com/034.56.789/protocols/transaction-authorization-protocol/1.0/connect"
+      "const": "https://tap.rsvp/schema/1.0#Connect"
     },
     "body": {
       "type": "object",
-      "required": ["purpose"],
+      "required": ["@context", "@type", "requester", "principal", "agents", "constraints"],
       "properties": {
-        "purpose": {
-          "type": "string",
-          "enum": ["transaction", "query", "relationship", "general"],
-          "description": "Purpose of the connection"
+        "@context": {
+          "const": "https://tap.rsvp/schema/1.0",
+          "description": "JSON-LD context for TAP messages"
         },
-        "agent": {
-          "$ref": "../data-structures/agent.json",
-          "description": "Agent initiating the connection"
+        "@type": {
+          "const": "Connect",
+          "description": "TAP message type identifier"
         },
-        "party": {
+        "requester": {
           "$ref": "../data-structures/party.json",
-          "description": "Party the agent represents"
+          "description": "Party requesting the connection"
         },
-        "capabilities": {
+        "principal": {
+          "$ref": "../data-structures/party.json",
+          "description": "Party the requesting agent acts on behalf of"
+        },
+        "agents": {
           "type": "array",
+          "minItems": 1,
           "items": {
-            "type": "string"
+            "$ref": "../data-structures/agent.json"
           },
-          "description": "Agent capabilities and supported features"
+          "description": "Array of agents involved in the connection process. At minimum, one agent must match the from field of the DIDComm message and have a for attribute set to the requester DID"
         },
-        "protocols": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "format": "uri"
-          },
-          "description": "Supported protocol versions"
+        "constraints": {
+          "$ref": "../data-structures/transaction-constraints.json",
+          "description": "Transaction constraints including limits and allowed purposes"
         },
-        "sessionTimeout": {
-          "type": "integer",
-          "minimum": 60,
-          "description": "Requested session timeout in seconds"
+        "expiry": {
+          "$ref": "../common/base-types.json#/$defs/ISO8601DateTime",
+          "description": "Optional expiration timestamp for the connection request"
         },
-        "metadata": {
-          "type": "object",
-          "description": "Additional connection metadata"
+        "agreement": {
+          "type": "string",
+          "format": "uri",
+          "description": "Optional URL pointing to terms of service or agreement"
         }
-      }
+      },
+      "additionalProperties": false
     }
   },
   "required": ["type", "body"]

@@ -1026,16 +1026,23 @@ The body object must contain:
   "expires_time": 1516385931,
   "body": {
     "@context": "https://tap.rsvp/schema/1.0",
-    "@type": "https://tap.rsvp/schema/1.0#Connect",
-    "agent": {
-      "@id": "did:example:b2b-service",
-      "name": "B2B Payment Service",
-      "type": "ServiceAgent",
-      "serviceUrl": "https://b2b-service/did-comm"
+    "@type": "Connect",
+    "requester": {
+      "@id": "did:example:business-customer",
+      "name": "Business Customer"
     },
     "principal": {
-      "@id": "did:example:business-customer"
+      "@id": "did:example:business-customer",
+      "name": "Business Customer"
     },
+    "agents": [
+      {
+        "@id": "did:example:b2b-service",
+        "name": "B2B Payment Service",
+        "serviceUrl": "https://b2b-service/did-comm",
+        "for": "did:example:business-customer"
+      }
+    ],
     "constraints": {
       "purposes": ["BEXP", "SUPP"],
       "categoryPurposes": ["CASH", "CCRD"],
@@ -1054,20 +1061,27 @@ The body object must contain:
 {
   "id": "connect-124",
   "type": "https://tap.rsvp/schema/1.0#Connect",
-  "from": "did:web:merchant.vasp",
+  "from": "did:web:psp.agent",
   "to": ["did:web:payment.provider"],
   "created_time": 1516269022,
   "body": {
     "@context": "https://tap.rsvp/schema/1.0",
-    "@type": "https://tap.rsvp/schema/1.0#Connect",
-    "agent": {
+    "@type": "Connect",
+    "requester": {
       "@id": "did:web:merchant.vasp",
-      "name": "Example Store",
-      "type": "Merchant"
+      "name": "Example Store"
     },
     "principal": {
-      "@id": "did:web:merchant.vasp"
+      "@id": "did:web:merchant.vasp",
+      "name": "Example Store"
     },
+    "agents": [
+      {
+        "@id": "did:web:psp.agent",
+        "name": "PSP Agent",
+        "for": "did:web:merchant.vasp"
+      }
+    ],
     "constraints": {
       "purposes": ["RCPT"],
       "categoryPurposes": ["EPAY"],
@@ -1194,7 +1208,6 @@ Requests a connection between agents with specified constraints.
     "agent": {
       "@id": "did:example:b2b-service",
       "name": "B2B Payment Service",
-      "type": "ServiceAgent",
       "serviceUrl": "https://b2b-service/did-comm"
     },
     "principal": {
@@ -1269,7 +1282,6 @@ This flow demonstrates establishing a connection between a B2B service and a VAS
     "agent": {
       "@id": "did:example:b2b-service",
       "name": "B2B Payment Service",
-      "type": "ServiceAgent",
       "serviceUrl": "https://b2b-service/did-comm"
     },
     "principal": {
