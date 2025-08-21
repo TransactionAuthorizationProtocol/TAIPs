@@ -29,6 +29,11 @@ This changelog focuses on:
   - Enables bundling initial protocol messages (like Connect requests) with invitations
   - Includes goal codes, handshake protocols, and service routing information
   - Compatible with TAIP-15 Agent Connection Protocol for TAP-specific connections
+- **Presentation Message**: Added support for verifiable credential presentations per TAIP-8
+  - Added `PresentationMessage` interface implementing DIDCommReply with empty body
+  - Requires attachments containing verifiable presentations
+  - Follows WACI Present Proof protocol v3.0 specification
+  - Enables selective disclosure for privacy-preserving identity verification
 
 ## [2025-08-18]
 
@@ -328,7 +333,7 @@ This changelog focuses on:
 
 ## Message Type Summary
 
-### Current TAP Messages (18 total)
+### Current TAP Messages (19 total)
 1. **Transfer** - Virtual asset transfer initiation
 2. **Payment** - Payment request with invoice support
 3. **Authorize** - Transaction authorization (enhanced to replace Complete)
@@ -347,6 +352,7 @@ This changelog focuses on:
 16. **AuthorizationRequired** - Request authorization (moved to TAIP-4)
 17. **Escrow** - Hold assets in escrow with conditions (TAIP-17)
 18. **Capture** - Release escrowed funds (TAIP-17)
+19. **Presentation** - Present verifiable credentials (TAIP-8)
 
 ### Removed Messages
 - **Complete** (2024-06-12) - Functionality merged into Authorize message
