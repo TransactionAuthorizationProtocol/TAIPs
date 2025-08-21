@@ -15,6 +15,9 @@ This package provides comprehensive TypeScript type definitions for the Transact
 - **🎯 Type Safety**: Comprehensive TypeScript interfaces for all TAP message types
 - **🔗 JSON-LD Compatible**: Full support for JSON-LD contexts and type identifiers
 - **🔐 DIDComm Integration**: Built on DIDComm messaging for secure agent communication
+- **📎 DIDComm Attachments**: Full v2.1 attachments support for supplementary documents (v1.8.0+)
+- **🤝 Out-of-Band Invitations**: Connection bootstrapping without pre-existing relationships (v1.8.0+)
+- **🔏 Verifiable Presentations**: TAIP-8 selective disclosure support (v1.8.0+)
 - **⛓️ Chain Agnostic**: Multi-blockchain support via CAIP standards (CAIP-10, CAIP-19)
 - **📋 Compliance Ready**: IVMS101 integration for travel rule compliance
 - **🏦 Traditional Banking**: RFC 8905 PayTo URI support for IBAN, SEPA, and other systems
@@ -75,10 +78,12 @@ The package includes TypeScript interfaces for all TAP message types:
 |--------------|-------------|----------------|
 | `Transfer` | Asset transfer requests | [TAIP-3](https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-3.md) |
 | `Payment` | Merchant payment requests | [TAIP-14](https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-14.md) |
-| `Escrow` | Conditional asset holding | [TAIP-15](https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-15.md) |
+| `Escrow` | Conditional asset holding | [TAIP-17](https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-17.md) |
 | `Authorize` | Transaction authorization | [TAIP-4](https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-4.md) |
-| `Connect` | Agent connection establishment | [TAIP-2](https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-2.md) |
+| `Connect` | Agent connection establishment | [TAIP-15](https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-15.md) |
 | `Settle` | Settlement confirmation | [TAIP-4](https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-4.md) |
+| `Presentation` | Verifiable credential presentations | [TAIP-8](https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-8.md) |
+| `OutOfBandInvitation` | Connection bootstrapping | [DIDComm Out-of-Band](https://identity.foundation/didcomm-messaging/spec/v2.1/#out-of-band-messages) |
 | `Cancel`, `Reject`, `Revert` | Response messages | [TAIP-4](https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-4.md) |
 
 ### Address Types
@@ -245,6 +250,132 @@ const customer: Person = {
   // Full PII can be selectively disclosed when needed
   name: "Alice Johnson",
   customerIdentification: "CUST-789012"
+};
+```
+
+### DIDComm Attachments
+
+The package includes full support for DIDComm v2.1 attachments, enabling inclusion of supplementary documents:
+
+```typescript
+import { Attachment, TransferMessage } from '@taprsvp/types';
+
+// Create attachments for KYC documents
+const kycAttachment: Attachment = {
+  id: "kyc-doc-1",
+  description: "KYC verification documents",
+  media_type: "application/pdf",
+  data: {
+    base64: "JVBERi0xLjMKJcTl8uXrp..." // Base64 encoded PDF
+  }
+};
+
+// Attachment with external link and integrity check
+const largeFileAttachment: Attachment = {
+  id: "transaction-history",
+  description: "Transaction history CSV",
+  media_type: "text/csv",
+  byte_count: 1048576,
+  data: {
+    links: ["https://example.com/files/history.csv"],
+    hash: "sha256:2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae"
+  }
+};
+
+// Add attachments to any DIDComm message
+const messageWithAttachments: TransferMessage = {
+  id: "msg-123",
+  type: "https://tap.rsvp/schema/1.0#Transfer",
+  from: "did:example:sender",
+  to: ["did:example:receiver"],
+  created_time: Date.now(),
+  body: { /* transfer details */ },
+  attachments: [kycAttachment, largeFileAttachment]
+};
+```
+
+### Out-of-Band Invitations
+
+Bootstrap connections without pre-existing relationships using Out-of-Band invitations:
+
+```typescript
+import { OutOfBandInvitation, OutOfBandGoal } from '@taprsvp/types';
+
+const invitation: OutOfBandInvitation = {
+  id: "invitation-456",
+  type: "https://didcomm.org/out-of-band/2.0/invitation",
+  from: "did:web:inviter.example.com",
+  to: [], // Broadcast invitation
+  created_time: Date.now(),
+  body: {
+    goal_code: "tap.connect",
+    goal: "Establish TAP connection for transaction authorization",
+    accept: ["didcomm/v2"]
+  },
+  attachments: [
+    {
+      id: "initial-request",
+      media_type: "application/json",
+      data: {
+        json: {
+          "@type": "https://tap.rsvp/schema/1.0#Connect",
+          principal: { /* principal details */ },
+          constraints: { /* transaction constraints */ }
+        }
+      }
+    }
+  ]
+};
+
+// Share invitation via QR code, URL, or email
+const invitationUrl = `https://example.com/invite?c_i=${encodeURIComponent(JSON.stringify(invitation))}`;
+```
+
+### Verifiable Credential Presentations
+
+Support for TAIP-8 selective disclosure using verifiable presentations:
+
+```typescript
+import { PresentationMessage, Attachment } from '@taprsvp/types';
+
+const presentationMessage: PresentationMessage = {
+  id: "presentation-789",
+  type: "https://didcomm.org/present-proof/3.0/presentation",
+  from: "did:web:holder.example.com",
+  to: ["did:web:verifier.example.com"],
+  thid: "transaction-thread-id", // Links to original transaction
+  created_time: Date.now(),
+  body: {}, // Always empty per WACI spec
+  attachments: [
+    {
+      id: "vp-1",
+      media_type: "application/json",
+      format: "dif/presentation-exchange/submission@v1.0",
+      data: {
+        json: {
+          "@context": [
+            "https://www.w3.org/2018/credentials/v1",
+            "https://identity.foundation/presentation-exchange/submission/v1"
+          ],
+          type: ["VerifiablePresentation", "PresentationSubmission"],
+          presentation_submission: {
+            id: "submission-123",
+            definition_id: "kyc-check",
+            descriptor_map: [
+              {
+                id: "credential-1",
+                format: "jwt_vc",
+                path: "$.verifiableCredential[0]"
+              }
+            ]
+          },
+          verifiableCredential: [
+            // JWT or JSON-LD credentials
+          ]
+        }
+      }
+    }
+  ]
 };
 ```
 
