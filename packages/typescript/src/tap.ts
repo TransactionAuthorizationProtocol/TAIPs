@@ -307,6 +307,134 @@ export type ISO20022CategoryPurposeCode = CategoryPurposeCode;
 // DIDCOMM MESSAGING FOUNDATION
 // ============================================================================
 // Base structures for secure messaging between agents
+
+/**
+ * DIDComm Attachment
+ * Structure for embedding or referencing arbitrary content in DIDComm messages.
+ * Supports inline data, external links, and cryptographic integrity verification.
+ *
+ * @example
+ * ```typescript
+ * // Base64 encoded attachment
+ * const base64Attachment: Attachment = {
+ *   id: "document-1",
+ *   description: "Transaction receipt PDF",
+ *   media_type: "application/pdf",
+ *   data: {
+ *     base64: "JVBERi0xLjMKJcTl8uXrp..."
+ *   }
+ * };
+ *
+ * // JSON data attachment
+ * const jsonAttachment: Attachment = {
+ *   id: "metadata-1",
+ *   media_type: "application/json",
+ *   data: {
+ *     json: {
+ *       timestamp: "2024-01-01T12:00:00Z",
+ *       status: "completed"
+ *     }
+ *   }
+ * };
+ *
+ * // External link attachment with hash
+ * const linkedAttachment: Attachment = {
+ *   id: "large-file-1",
+ *   description: "Transaction history CSV",
+ *   media_type: "text/csv",
+ *   byte_count: 1048576,
+ *   data: {
+ *     links: ["https://example.com/files/history.csv"],
+ *     hash: "sha256:2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae"
+ *   }
+ * };
+ * ```
+ *
+ * @see {@link https://identity.foundation/didcomm-messaging/spec/v2.1/#attachments | DIDComm Attachments Specification}
+ */
+export interface Attachment {
+  /**
+   * Optional identifier for the attachment
+   * Used to reference this attachment within the message scope
+   */
+  id?: string;
+
+  /**
+   * Optional human-readable description of the attachment content
+   */
+  description?: string;
+
+  /**
+   * Optional filename suggestion for persistence
+   * Useful when saving the attachment to disk
+   */
+  filename?: string;
+
+  /**
+   * Optional media type of the attachment content
+   * Should follow IANA Media Types (MIME types)
+   * @example "application/pdf"
+   * @example "image/png"
+   * @example "application/json"
+   */
+  media_type?: string;
+
+  /**
+   * Optional additional format details
+   * Can provide extra context beyond media_type
+   */
+  format?: string;
+
+  /**
+   * Optional timestamp of last content modification
+   * Unix timestamp indicating when the content was last modified
+   */
+  lastmod_time?: number;
+
+  /**
+   * Optional estimated size of the content in bytes
+   * Helps recipients prepare for large downloads
+   */
+  byte_count?: number;
+
+  /**
+   * Data payload - at least one property must be present
+   * Contains the actual content or references to it
+   */
+  data: {
+    /**
+     * Detached JWS signature
+     * Used for cryptographic proof of attachment integrity
+     */
+    jws?: string;
+
+    /**
+     * Multi-hash format content integrity check
+     * Format: "{algorithm}:{hash}"
+     * @example "sha256:2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae"
+     */
+    hash?: string;
+
+    /**
+     * Array of URLs where content can be fetched
+     * External references to the attachment content
+     */
+    links?: string[];
+
+    /**
+     * Base64url-encoded inline content
+     * The actual content encoded as base64url string
+     */
+    base64?: string;
+
+    /**
+     * Directly embedded JSON data
+     * For JSON content that doesn't need encoding
+     */
+    json?: Record<string, unknown>;
+  };
+}
+
 /**
  * Common DIDComm Message Structure
  * Base interface for all DIDComm messages in TAP.
@@ -327,7 +455,17 @@ export type ISO20022CategoryPurposeCode = CategoryPurposeCode;
  *     asset: "eip155:1/erc20:0x6b175474e89094c44da98b954eedeac495271d0f",
  *     amount: "100.00",
  *     // ... other Transfer properties
- *   }
+ *   },
+ *   attachments: [
+ *     {
+ *       id: "kyc-docs",
+ *       description: "KYC verification documents",
+ *       media_type: "application/pdf",
+ *       data: {
+ *         base64: "JVBERi0xLjMKJcTl8uXrp..."
+ *       }
+ *     }
+ *   ]
  * };
  * ```
  *
@@ -361,6 +499,13 @@ export interface DIDCommMessage<T = Record<string, unknown>> {
 
   /** Message body containing type-specific content */
   body: T;
+
+  /**
+   * Optional array of attachments
+   * Used to include additional content that doesn't fit in the message body
+   * @see {@link https://identity.foundation/didcomm-messaging/spec/v2.1/#attachments | DIDComm Attachments}
+   */
+  attachments?: Attachment[];
 }
 
 /**
