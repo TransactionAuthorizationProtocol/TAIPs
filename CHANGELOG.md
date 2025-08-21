@@ -17,23 +17,27 @@ This changelog focuses on:
 ## [2025-08-21]
 
 ### Added
-- **DIDComm Attachments Support**: Added full DIDComm v2.1 attachments support to TypeScript package
-  - Added `Attachment` interface following DIDComm v2.1 specification
-  - Added optional `attachments` array to `DIDCommMessage` interface
-  - Supports inline data (base64, JSON), external links, and cryptographic integrity verification (JWS, hash)
-  - Includes comprehensive documentation with usage examples for different attachment types
-  - Enables inclusion of supplementary documents like KYC verification, receipts, and compliance documentation
-- **DIDComm Out-of-Band Messages**: Added support for out-of-band invitation messages
-  - Added `OutOfBandInvitation` interface for bootstrapping connections without pre-existing relationships
-  - Supports QR codes, URLs, emails for sharing invitations
-  - Enables bundling initial protocol messages (like Connect requests) with invitations
-  - Includes goal codes, handshake protocols, and service routing information
-  - Compatible with TAIP-15 Agent Connection Protocol for TAP-specific connections
-- **Presentation Message**: Added support for verifiable credential presentations per TAIP-8
-  - Added `PresentationMessage` interface implementing DIDCommReply with empty body
-  - Requires attachments containing verifiable presentations
-  - Follows WACI Present Proof protocol v3.0 specification
-  - Enables selective disclosure for privacy-preserving identity verification
+- **TypeScript Package v1.8.0**: Released with enhanced DIDComm v2.1 support and new message types
+  - **DIDComm Attachments Support**: Added full DIDComm v2.1 attachments support
+    - Added `Attachment` interface following DIDComm v2.1 specification
+    - Added optional `attachments` array to `DIDCommMessage` interface
+    - Supports inline data (base64, JSON), external links, and cryptographic integrity verification (JWS, hash)
+    - Includes comprehensive documentation with usage examples for different attachment types
+    - Enables inclusion of supplementary documents like KYC verification, receipts, and compliance documentation
+  - **DIDComm Out-of-Band Messages**: Added support for out-of-band invitation messages
+    - Added `OutOfBandInvitation` interface extending `DIDCommMessage<OutOfBandGoal>`
+    - Added `OutOfBandGoal` interface for invitation body fields
+    - Supports QR codes, URLs, emails for sharing invitations
+    - Enables bundling initial protocol messages (like Connect requests) with invitations
+    - Compatible with TAIP-15 Agent Connection Protocol for TAP-specific connections
+  - **Presentation Message**: Added support for verifiable credential presentations per TAIP-8
+    - Added `PresentationMessage` interface implementing DIDCommReply with empty body
+    - Requires attachments containing verifiable presentations
+    - Follows WACI Present Proof protocol v3.0 specification
+    - Enables selective disclosure for privacy-preserving identity verification
+  - **Enhanced Message Type Support**: Expanded TAPMessage union type to include 19 message types
+    - Added PresentationMessage to support TAIP-8 selective disclosure
+    - Improved cross-reference documentation for all TAIP specifications
 
 ## [2025-08-18]
 
