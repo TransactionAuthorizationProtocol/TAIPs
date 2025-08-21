@@ -26,9 +26,14 @@
       "agents": [
         {
           "@type": "Agent",
+          "@id": "did:web:merchant.example",
+          "for": "did:web:merchant.example"
+        },
+        {
+          "@type": "Agent",
           "@id": "did:web:payment-gateway.example",
-          "role": "PaymentProcessor",
-          "name": "US Payment Gateway"
+          "name": "US Payment Gateway",
+          "for": "did:web:merchant.example"
         }
       ]
     }

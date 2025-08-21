@@ -5,7 +5,7 @@ status: Review
 type: Standard
 author: Pelle Braendgaard <pelle@notabene.id>
 created: 2024-03-21
-updated: 2025-07-28
+updated: 2025-08-21
 description: Defines a merchant-initiated Payment message standard for requesting blockchain payments with specified amounts in either crypto assets or fiat currencies. Enables selective disclosure of customer information for compliance and business purposes while facilitating standard e-commerce and invoice payment flows with privacy protection.
 requires: 2, 3, 4, 6, 7, 8, 9, 16
 ---
@@ -46,7 +46,7 @@ A **Payment** is a [DIDComm] message (per [TAIP-2]) initiated by the merchant's 
   - **`requirePresentation`** – *Optional*, **array** of policy objects each of type `RequirePresentation`. This specifies that the merchant requires certain verifiable information from the customer before or alongside payment. Each entry is a request for a verifiable presentation as defined in **TAIP-8**. For example, a merchant might include a policy: `{ "@type": "RequirePresentation", "fromAgent": "originator", "about": "...", "credentialType": "email" }` to require the customer's agent (originator) to present an email credential. In general, a `RequirePresentation` policy will indicate **which party's agent** must present data (e.g. `fromAgent: "originator"` meaning the customer's side) and **what data** is needed (either by specifying credential type, or a schema, etc.) [TAIP-8]. The exact format and additional fields for these policies follow TAIP-8 and TAIP-7 (Agent Policies). When a Payment contains `requirePresentation` entries, the customer's wallet MUST prompt the user to provide the requested credentials or proofs, and return them to the merchant's agent (see Flow below). The merchant's agent will verify the provided information (e.g. check the credentials' validity) before authorizing the payment to proceed.
 - **`customer`** – *Optional*, **object** for information about the customer (payer). In many cases, the merchant may not know the customer's identity at the time of issuing the request (for example, if the Payment is delivered via a public QR code or link). This object can be omitted or left minimal in such cases. If the merchant does know the customer's identity or wants to bind the request to a specific customer, they MAY include an identifier here (e.g. the customer's DID or reference). The `customer` object could simply be: `{ "@id": "did:example:alice" }` to target a specific party. Even if provided, this field is mainly informational; the DIDComm transport (to the customer's agent) or context of delivery typically ensures the request reaches the intended customer.
 - **`merchant`** – **Required**, **object** with information about the merchant (payee). This includes the merchant's identity (DID) and may include additional descriptive information such as a name or website to help the customer recognize the merchant. The merchant object **MUST** include an `@id` attribute with the merchant's DID. The merchant object **MAY** include an `mcc` attribute with the ISO 18245 Merchant Category Code to identify the type of business (e.g., "5411" for grocery stores or "5812" for restaurants).
-- **`agents`** – **Required**, **array of objects** representing agents involved in the payment process. Each agent object must have an `@id` attribute with the agent's DID. At minimum, one agent MUST be associated with the merchant to handle the Payment. The agent's capabilities (and any policies it enforces) are defined according to the Agent specification [TAIP-6].
+- **`agents`** – **Required**, **array of objects** representing agents involved in the payment process. Each agent object must have an `@id` attribute with the agent's DID and a `for` attribute indicating which party they represent. At minimum, there MUST be one agent whose `@id` matches the `from` field of the DIDComm message and has a `for` attribute set to the merchant or customer's DID. The agent's capabilities (and any policies it enforces) are defined according to the Agent specification [TAIP-5].
 
 ### Payment Flow
 
@@ -286,16 +286,22 @@ Here's an example Payment message that includes fallback settlement addresses su
         "countryOfIssue": "US"
       }
     },
-    "agents": [{
-      "@id": "did:example:merchant-psp",
-      "role": "paymentProcessor"
-    }]
+    "agents": [
+      {
+        "@id": "did:example:merchant",
+        "for": "did:example:merchant"
+      },
+      {
+        "@id": "did:example:merchant-psp",
+        "for": "did:example:merchant"
+      }
+    ]
   }
 }
 ```
 
 In this example, the merchant accepts EUR 250.00 payment through various settlement methods:
-- Primary: USDC on Ethereum mainnet  
+- Primary: USDC on Ethereum mainnet
 - Fallback options: USDC on Polygon, SEPA bank transfer, or IBAN bank transfer
 
 The merchant object includes both schema.org properties (name, url, email) and IVMS101 identity data (leiCode, geographicAddress, nationalIdentifier) to support compliance requirements. For natural person merchants, consider using selective disclosure ([TAIP-8]) to protect sensitive information.

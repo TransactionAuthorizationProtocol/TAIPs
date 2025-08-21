@@ -5,7 +5,7 @@ status: Last Call
 type: Standard
 author: Pelle Braendgaard <pelle@notabene.id>
 created: 2024-01-12
-updated: 2025-06-13
+updated: 2025-08-21
 description: Defines a chain-agnostic Transfer message format for moving digital assets between parties with standardized metadata for compliance and record-keeping. Specifies required JSON-LD fields including asset identifiers, amounts, originator/beneficiary information, and settlement details for both fungible and non-fungible tokens.
 discussions-to: https://github.com/TransactionAuthorizationProtocol/TAIPs/pull/5
 requires: 2, 5, 6
@@ -52,7 +52,7 @@ As specified in [TAIP-2] the message body is [JSON-LD]. The following attributes
 * `originator` - OPTIONAL an object representing the originating (aka the sender) party (see [TAIP-6](TAIP-6))
 * `beneficiary` - OPTIONAL an object representing the beneficiary (aka the recipient) party if different than the `originator` (see [TAIP-6](TAIP-6))
 * `settlementId` - OPTIONAL a [CAIP-220](https://github.com/ChainAgnostic/CAIPs/pull/221/files) identifier of the underlying settlement transaction on a blockchain. For more details see below.
-* `agents` - REQUIRED an array of identity objects representing the agents who help execute the transaction. See [TAIP-5](TAIP-5) for more.
+* `agents` - REQUIRED an array of identity objects representing the agents who help execute the transaction. At minimum, there MUST be one agent whose `@id` matches the `from` field of the DIDComm message and has a `for` attribute set to the originator or beneficiary DID to indicate which party they represent. See [TAIP-5](TAIP-5) for more.
 * `memo` - OPTIONAL a human readable UTF-8 string to be provided as-is by the originator to the beneficiary about the transfer
 * `expiry` - OPTIONAL a timestamp in ISO 8601 format indicating when the transfer request expires. After this time, if no authorization has occurred, the transfer should be considered invalid and funds will not be sent. Recipients' agents SHOULD communicate this expiration deadline to their users when presenting the transfer for review.
 
@@ -182,7 +182,8 @@ The following is a minimal first-party request for a transfer of 1.23 ETH from a
     "amount": "1.23",
     "agents":[
       {
-        "@id":"did:web:originator.sample"
+        "@id":"did:web:originator.sample",
+        "for":"did:web:originator.sample"
       },
       {
         "@id":"did:pkh:eip155:1:0x1234a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb",
@@ -211,7 +212,8 @@ The following is a request for a first-party transfer of 1.23 ETH from a crypto 
     "amount": "1.23",
     "agents":[
       {
-        "@id":"did:web:originator.vasp"
+        "@id":"did:web:originator.vasp",
+        "for":"did:eg:bob"
       },
       {
         "@id":"did:pkh:eip155:1:0x1234a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb",
@@ -243,10 +245,12 @@ The following is a request for a third-party transfer of 1.23 ETH from a crypto 
     "amount": "1.23",
     "agents":[
       {
-        "@id":"did:web:originator.vasp"
+        "@id":"did:web:originator.vasp",
+        "for":"did:eg:bob"
       },
       {
-        "@id":"did:web:beneficiary.vasp"
+        "@id":"did:web:beneficiary.vasp",
+        "for":"sms:+15105550101"
       }
     ]
   }
@@ -276,9 +280,11 @@ The following is an example of a reasonably complete third-party transfer alread
     "agents":[
       {
         "@id":"did:web:originator.vasp",
+        "for":"did:eg:bob"
       },
       {
         "@id":"did:beneficiary.vasp",
+        "for":"did:eg:alice"
       },
       {
         "@id":"did:pkh:eip155:1:0x1234a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb",
