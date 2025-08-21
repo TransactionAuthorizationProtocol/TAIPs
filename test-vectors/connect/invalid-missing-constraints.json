@@ -12,14 +12,20 @@
     "created_time": 1516269022,
     "body": {
       "@context": "https://tap.rsvp/schema/1.0",
-      "@type": "https://tap.rsvp/schema/1.0#Connect",
-      "agent": {
-        "@id": "did:web:b2b-service.example",
-        "name": "B2B Payment Service"
+      "@type": "Connect",
+      "requester": {
+        "@id": "did:web:b2b-service.example"
       },
       "principal": {
         "@id": "did:web:business-customer.example"
-      }
+      },
+      "agents": [
+        {
+          "@id": "did:web:b2b-service.example",
+          "name": "B2B Payment Service",
+          "for": "did:web:b2b-service.example"
+        }
+      ]
     }
   },
   "expectedResult": {

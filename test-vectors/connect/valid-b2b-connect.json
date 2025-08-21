@@ -13,16 +13,21 @@
     "expires_time": 1516385931,
     "body": {
       "@context": "https://tap.rsvp/schema/1.0",
-      "@type": "https://tap.rsvp/schema/1.0#Connect",
-      "agent": {
-        "@id": "did:web:b2b-service.example",
-        "name": "B2B Payment Service",
-        "type": "ServiceAgent",
-        "serviceUrl": "https://b2b-service.example/did-comm"
+      "@type": "Connect",
+      "requester": {
+        "@id": "did:web:b2b-service.example"
       },
       "principal": {
         "@id": "did:web:business-customer.example"
       },
+      "agents": [
+        {
+          "@id": "did:web:b2b-service.example",
+          "name": "B2B Payment Service",
+          "serviceUrl": "https://b2b-service.example/did-comm",
+          "for": "did:web:b2b-service.example"
+        }
+      ],
       "constraints": {
         "purposes": ["BEXP", "SUPP"],
         "categoryPurposes": ["CASH", "CCRD"],
@@ -31,7 +36,9 @@
           "per_day": "50000.00",
           "currency": "USD"
         }
-      }
+      },
+      "agreement": "https://b2b-service.example/terms/api-agreement",
+      "expiry": "2024-03-22T15:00:00Z"
     }
   },
   "expectedResult": {
