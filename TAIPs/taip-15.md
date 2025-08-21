@@ -82,6 +82,7 @@ A message sent by an agent requesting connection to another agent:
     - `currency` - REQUIRED string ISO 4217 currency code if limits are specified
 - `agreement` - OPTIONAL string URL pointing to terms of service or agreement between the principal and requesting agent
 - `expiry` - OPTIONAL timestamp in ISO 8601 format indicating when the connection request expires. After this time, if no authorization has occurred, the connection request should be considered invalid. This is distinct from the technical message expiry handled by the DIDComm `expires_time` header.
+- `attachments` - OPTIONAL array of [TAIP-2] message attachments containing transaction messages (such as [TAIP-3] Transfer or [TAIP-14] Payment messages) that should be authorized in the same context as the Connect request. When attachments are present, authorization of the Connect request also authorizes the attached transaction messages. This enables use cases like establishing recurring billing connections with an immediate first payment, or setting up trading permissions with an initial transaction. All attached transaction messages MUST respect the connection's defined constraints.
 
 ### AuthorizationRequired Message
 
@@ -136,6 +137,7 @@ For complete specification of this message type, see [TAIP-5].
    - The principal party they represent
    - Agent identities and endpoints in the agents array
    - Desired transaction constraints
+   - Optionally, transaction messages (Transfer, Payment, etc.) as attachments for immediate authorization
 
 2. Agent B chooses an authorization method:
    - Option 1: Out-of-band Authorization
@@ -147,10 +149,11 @@ For complete specification of this message type, see [TAIP-5].
 
 3. Customer reviews and decides:
    - Views connection details and constraints
+   - Reviews any attached transaction messages for immediate execution
    - Approves or denies through chosen interface
 
 4. Agent B sends final response:
-   - Authorize message if approved
+   - Authorize message if approved (automatically authorizes any attached transactions)
    - Reject message if denied
 
 5. Agent addition (if needed):
@@ -587,6 +590,88 @@ The receiving agent MUST:
    - Confirm the originator's `@id` matches the connection's `principal.@id` value
    - Verify the agent has permission to act for the specified principal
 3. Process the transaction according to [TAIP-4] if all checks pass
+
+### Example Connect with Attached Payment for Recurring Billing
+
+The following example shows a Connect message with an attached Payment message for establishing recurring billing with an immediate first payment:
+
+```json
+{
+  "id": "recurring-connect-001",
+  "type": "https://tap.rsvp/schema/1.0#Connect",
+  "from": "did:web:saas-provider.example",
+  "to": ["did:web:customer.wallet"],
+  "created_time": 1516269030,
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#Connect",
+    "requester": {
+      "@id": "did:web:saas-provider.example",
+      "name": "SaaS Platform Inc"
+    },
+    "principal": {
+      "@id": "did:example:customer",
+      "name": "Enterprise Customer"
+    },
+    "agents": [
+      {
+        "@id": "did:web:saas-provider.example",
+        "name": "SaaS Payment Service",
+        "for": "did:web:saas-provider.example"
+      }
+    ],
+    "constraints": {
+      "purposes": ["SUBS"],
+      "limits": {
+        "per_transaction": "999.99",
+        "per_month": "999.99",
+        "currency": "USD"
+      }
+    },
+    "agreement": "https://saas-provider.example/subscription-terms",
+    "expiry": "2024-04-01T00:00:00Z"
+  },
+  "attachments": [
+    {
+      "id": "first-payment-001",
+      "media_type": "application/didcomm-signed+json",
+      "data": {
+        "json": {
+          "id": "payment-001",
+          "type": "https://tap.rsvp/schema/1.0#Payment",
+          "from": "did:web:saas-provider.example",
+          "to": ["did:web:customer.wallet"],
+          "body": {
+            "@context": "https://tap.rsvp/schema/1.0",
+            "@type": "https://tap.rsvp/schema/1.0#Payment",
+            "currency": "USD",
+            "amount": "99.99",
+            "merchant": {
+              "@id": "did:web:saas-provider.example",
+              "name": "SaaS Platform Inc",
+              "mcc": "5734"
+            },
+            "agents": [
+              {
+                "@id": "did:web:saas-provider.example",
+                "for": "did:web:saas-provider.example"
+              }
+            ],
+            "expiry": "2024-04-01T00:00:00Z"
+          }
+        }
+      }
+    }
+  ]
+}
+```
+
+In this example:
+- The Connect message establishes a recurring billing relationship with monthly subscription limits
+- The attached Payment message requests immediate payment for the first billing cycle
+- Authorization of the Connect automatically authorizes the attached Payment
+- Future recurring payments can reference this connection via `pthid`
+- The attached Payment respects the connection's constraints (amount within limits, correct purpose)
 
 
 ## References
