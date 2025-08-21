@@ -2071,6 +2071,74 @@ export interface CaptureMessage extends DIDCommReply<Capture> {
 }
 
 /**
+ * Presentation Message
+ * DIDComm message for presenting verifiable credentials in response to RequirePresentation policies.
+ * Implements TAIP-8 selective disclosure for privacy-preserving identity verification.
+ * 
+ * The body is intentionally empty as all verifiable presentations are included as attachments.
+ * This follows the WACI Present Proof protocol specification.
+ *
+ * @example
+ * ```typescript
+ * const presentationMessage: PresentationMessage = {
+ *   id: "presentation-123",
+ *   type: "https://didcomm.org/present-proof/3.0/presentation",
+ *   from: "did:web:originator.vasp",
+ *   to: ["did:web:beneficiary.vasp"],
+ *   thid: "transaction-thread-id", // Links to original transaction
+ *   created_time: Date.now(),
+ *   body: {}, // Always empty per spec
+ *   attachments: [ // Required - contains verifiable presentations
+ *     {
+ *       id: "vp-1",
+ *       media_type: "application/json",
+ *       format: "dif/presentation-exchange/submission@v1.0",
+ *       data: {
+ *         json: {
+ *           "@context": [
+ *             "https://www.w3.org/2018/credentials/v1",
+ *             "https://identity.foundation/presentation-exchange/submission/v1"
+ *           ],
+ *           type: ["VerifiablePresentation", "PresentationSubmission"],
+ *           presentation_submission: {
+ *             id: "submission-id",
+ *             definition_id: "definition-id",
+ *             descriptor_map: [...]
+ *           },
+ *           verifiableCredential: [...]
+ *         }
+ *       }
+ *     }
+ *   ]
+ * };
+ * ```
+ *
+ * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-8.md | TAIP-8: Selective Disclosure}
+ * @see {@link https://identity.foundation/waci-didcomm/#step-4-present-proof | WACI Present Proof}
+ * @see {@link https://identity.foundation/presentation-exchange/ | Presentation Exchange}
+ */
+export interface PresentationMessage extends DIDCommReply<Record<string, never>> {
+  /**
+   * Message type for verifiable presentations
+   * Uses DIDComm present-proof protocol v3.0
+   */
+  type: "https://didcomm.org/present-proof/3.0/presentation";
+
+  /**
+   * Message body - always empty for presentations
+   * All content is provided via attachments
+   */
+  body: Record<string, never>;
+
+  /**
+   * Required attachments containing verifiable presentations
+   * Must contain at least one verifiable presentation attachment
+   * Each attachment should include a presentation submission with verifiable credentials
+   */
+  attachments: Attachment[];
+}
+
+/**
  * TAP Message
  * Union type of all possible TAP messages.
  * Used for type-safe message handling in TAP implementations.
@@ -2096,7 +2164,8 @@ export type TAPMessage =
   | ConnectMessage
   | AuthorizationRequiredMessage
   | EscrowMessage
-  | CaptureMessage;
+  | CaptureMessage
+  | PresentationMessage;
 
 // ============================================================================
 // TAIP SPECIFICATION CROSS-REFERENCE
@@ -2122,7 +2191,7 @@ export type TAPMessage =
  *
  * **Policy and Compliance:**
  * - TAIP-7: Policies → {@link Policy}, {@link RequireAuthorization}, {@link RequirePresentation}, {@link RequirePurpose}, {@link UpdatePolicies}
- * - TAIP-8: Verifiable Credentials → {@link RequirePresentation}
+ * - TAIP-8: Verifiable Credentials → {@link RequirePresentation}, {@link PresentationMessage}
  * - TAIP-9: Proof of Relationship → {@link RequireRelationshipConfirmation}, {@link ConfirmRelationship}
  * - TAIP-12: Privacy-Preserving Name Matching → {@link Person.nameHash}
  * - TAIP-13: Purpose Codes → {@link ISO20022PurposeCode}, {@link ISO20022CategoryPurposeCode}, {@link RequirePurpose}
