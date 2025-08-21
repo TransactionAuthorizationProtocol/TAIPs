@@ -23,6 +23,13 @@ This changelog focuses on:
   - Supports inline data (base64, JSON), external links, and cryptographic integrity verification (JWS, hash)
   - Includes comprehensive documentation with usage examples for different attachment types
   - Enables inclusion of supplementary documents like KYC verification, receipts, and compliance documentation
+- **DIDComm Out-of-Band Messages**: Added support for out-of-band invitation messages
+  - Added `OutOfBandInvitation` interface for bootstrapping connections without pre-existing relationships
+  - Added `ServiceEndpoint` interface for defining DIDComm service endpoints
+  - Supports QR codes, URLs, emails for sharing invitations
+  - Enables bundling initial protocol messages (like Connect requests) with invitations
+  - Includes goal codes, handshake protocols, and service routing information
+  - Compatible with TAIP-15 Agent Connection Protocol for TAP-specific connections
 
 ## [2025-08-18]
 
