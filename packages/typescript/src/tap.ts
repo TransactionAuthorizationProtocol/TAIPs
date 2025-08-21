@@ -1696,6 +1696,206 @@ export interface AuthorizationRequired
 }
 
 // ============================================================================
+// OUT-OF-BAND MESSAGES
+// ============================================================================
+// DIDComm Out-of-Band invitation messages for establishing initial connections
+
+/**
+ * Out-of-Band Invitation Message
+ * Used to establish initial connections between agents without a pre-existing relationship.
+ * Supports both DIDComm v2 and includes TAP-specific extensions.
+ *
+ * Out-of-band messages are not regular DIDComm messages - they are plaintext invitations
+ * that can be shared via QR codes, URLs, emails, or other channels to bootstrap connections.
+ *
+ * @example
+ * ```typescript
+ * const oobInvitation: OutOfBandInvitation = {
+ *   "@type": "https://didcomm.org/out-of-band/2.0/invitation",
+ *   "@id": "unique-invitation-id",
+ *   from: "did:web:inviter.example.com",
+ *   body: {
+ *     goal_code: "tap.connect",
+ *     goal: "Establish TAP connection for transaction authorization",
+ *     accept: ["didcomm/v2"],
+ *     label: "Example VASP Agent"
+ *   },
+ *   attachments: [
+ *     {
+ *       id: "request-0",
+ *       media_type: "application/json",
+ *       data: {
+ *         json: {
+ *           "@type": "https://tap.rsvp/schema/1.0#Connect",
+ *           "@id": "connect-request-id",
+ *           principal: { ... },
+ *           constraints: { ... }
+ *         }
+ *       }
+ *     }
+ *   ]
+ * };
+ * ```
+ *
+ * @see {@link https://identity.foundation/didcomm-messaging/spec/v2.1/#out-of-band-messages | DIDComm Out-of-Band Messages}
+ * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-15.md | TAIP-15: Agent Connection Protocol}
+ */
+export interface OutOfBandInvitation {
+  /**
+   * Message type identifier
+   * Must be "https://didcomm.org/out-of-band/2.0/invitation" for out-of-band invitations
+   */
+  "@type": "https://didcomm.org/out-of-band/2.0/invitation";
+
+  /**
+   * Unique identifier for this invitation
+   * Should be a UUID or other globally unique identifier
+   */
+  "@id": string;
+
+  /**
+   * DID of the inviter
+   * The agent sending the invitation
+   */
+  from: DID;
+
+  /**
+   * Invitation body containing connection details
+   */
+  body: {
+    /**
+     * Machine-readable goal code
+     * Standard codes or custom codes prefixed with organization domain
+     * @example "tap.connect" // TAP connection
+     * @example "aries.rel.build" // Aries relationship building
+     * @example "issue.vc" // Issue verifiable credential
+     */
+    goal_code?: string;
+
+    /**
+     * Human-readable description of the invitation's purpose
+     * Explains why the connection is being requested
+     * @example "Connect to authorize virtual asset transfers"
+     * @example "Establish connection for travel rule compliance"
+     */
+    goal?: string;
+
+    /**
+     * Array of accepted protocols
+     * Indicates which DIDComm versions or protocols are supported
+     * @example ["didcomm/v2"]
+     * @example ["didcomm/v2", "didcomm/aip2;env=rfc587"]
+     */
+    accept?: string[];
+
+    /**
+     * Optional human-readable label for the inviter
+     * Friendly name or description of the inviting party
+     * @example "Example Exchange VASP"
+     * @example "Compliance Department"
+     */
+    label?: string;
+
+    /**
+     * Optional image URL for the inviter
+     * Logo or avatar to display in connection requests
+     */
+    imageUrl?: string;
+  };
+
+  /**
+   * Optional handshake protocols
+   * Array of supported handshake protocol URIs
+   * Used to negotiate connection establishment protocols
+   * @example ["https://didcomm.org/didexchange/1.0"]
+   */
+  handshake_protocols?: string[];
+
+  /**
+   * Service endpoints for connection
+   * Either a single DID or an array of service endpoint objects
+   * Provides routing information for establishing the connection
+   */
+  services?: DID | ServiceEndpoint[];
+
+  /**
+   * Optional attachments
+   * Can include initial protocol messages like Connect requests
+   * Allows bundling the first protocol message with the invitation
+   */
+  attachments?: Attachment[];
+
+  /**
+   * Optional requested information
+   * Array of credential types or information requested upon connection
+   * @example ["https://tap.rsvp/credentials/vasp", "https://tap.rsvp/credentials/lei"]
+   */
+  requests?: string[];
+}
+
+/**
+ * Service Endpoint
+ * Defines a DIDComm service endpoint for message delivery.
+ * Used in out-of-band invitations to specify where messages should be sent.
+ *
+ * @example
+ * ```typescript
+ * const serviceEndpoint: ServiceEndpoint = {
+ *   id: "#service-0",
+ *   type: "DIDCommMessaging",
+ *   serviceEndpoint: "https://example.com/didcomm",
+ *   recipientKeys: ["did:key:z6MkhaXgBZDvotDkL5257faiztiGiC2QtKLGpbnnEGta2doK"],
+ *   routingKeys: ["did:key:z6MkpTHR8uNsBxYAAWHut2Geadd9jSwuBV8xRoAnwWsdvktH"]
+ * };
+ * ```
+ */
+export interface ServiceEndpoint {
+  /**
+   * Identifier for this service endpoint
+   * Often a fragment like "#service-0"
+   */
+  id: string;
+
+  /**
+   * Type of service endpoint
+   * Usually "DIDCommMessaging" for DIDComm v2
+   */
+  type: string;
+
+  /**
+   * URL or URI where messages should be sent
+   * The actual endpoint for message delivery
+   */
+  serviceEndpoint: string;
+
+  /**
+   * Recipient public keys
+   * Array of DIDs or key references for message encryption
+   */
+  recipientKeys?: string[];
+
+  /**
+   * Optional routing keys
+   * Used for DIDComm routing when messages need to be forwarded
+   */
+  routingKeys?: string[];
+
+  /**
+   * Optional priority
+   * Used to indicate preference when multiple endpoints are available
+   * Lower numbers = higher priority
+   */
+  priority?: number;
+
+  /**
+   * Optional accepted DIDComm versions
+   * Specifies which versions this endpoint supports
+   * @example ["didcomm/v2"]
+   */
+  accept?: string[];
+}
+
+// ============================================================================
 // DIDCOMM MESSAGE WRAPPERS
 // ============================================================================
 // DIDComm envelope structures for all TAP message types
