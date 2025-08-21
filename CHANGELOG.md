@@ -14,6 +14,16 @@ This changelog focuses on:
 - Protocol structural changes
 - Breaking changes
 
+## [2025-08-21]
+
+### Added
+- **DIDComm Attachments Support**: Added full DIDComm v2.1 attachments support to TypeScript package
+  - Added `Attachment` interface following DIDComm v2.1 specification
+  - Added optional `attachments` array to `DIDCommMessage` interface
+  - Supports inline data (base64, JSON), external links, and cryptographic integrity verification (JWS, hash)
+  - Includes comprehensive documentation with usage examples for different attachment types
+  - Enables inclusion of supplementary documents like KYC verification, receipts, and compliance documentation
+
 ## [2025-08-18]
 
 ### Added
