@@ -21,6 +21,8 @@ import {
   SettlementAddressSchema,
   AmountSchema,
   CurrencyCodeSchema,
+  PurposeCodeSchema,
+  CategoryPurposeCodeSchema,
   AssetSchema,
   
   // Participant validators
@@ -170,13 +172,49 @@ describe('Fundamental Validators', () => {
       expect(CurrencyCodeSchema.safeParse('USD').success).toBe(true);
       expect(CurrencyCodeSchema.safeParse('EUR').success).toBe(true);
       expect(CurrencyCodeSchema.safeParse('GBP').success).toBe(true);
+      expect(CurrencyCodeSchema.safeParse('JPY').success).toBe(true);
+      expect(CurrencyCodeSchema.safeParse('AED').success).toBe(true);
+      expect(CurrencyCodeSchema.safeParse('ZWL').success).toBe(true);
     });
 
     it('should reject invalid currency codes', () => {
       expect(CurrencyCodeSchema.safeParse('usd').success).toBe(false);
       expect(CurrencyCodeSchema.safeParse('US').success).toBe(false);
       expect(CurrencyCodeSchema.safeParse('USDT').success).toBe(false);
+      expect(CurrencyCodeSchema.safeParse('FAKE').success).toBe(false);
       expect(CurrencyCodeSchema.safeParse('').success).toBe(false);
+    });
+  });
+
+  describe('PurposeCodeSchema', () => {
+    it('should validate valid ISO 20022 purpose codes', () => {
+      expect(PurposeCodeSchema.safeParse('SALA').success).toBe(true); // Salary payment
+      expect(PurposeCodeSchema.safeParse('TRAD').success).toBe(true); // Trade services
+      expect(PurposeCodeSchema.safeParse('RENT').success).toBe(true); // Rent payment
+      expect(PurposeCodeSchema.safeParse('INTC').success).toBe(true); // Intra-company payment
+      expect(PurposeCodeSchema.safeParse('SUPP').success).toBe(true); // Supplier payment
+    });
+
+    it('should reject invalid purpose codes', () => {
+      expect(PurposeCodeSchema.safeParse('sala').success).toBe(false); // lowercase
+      expect(PurposeCodeSchema.safeParse('INVALID').success).toBe(false); // not in enum
+      expect(PurposeCodeSchema.safeParse('TEST').success).toBe(false); // not in enum
+      expect(PurposeCodeSchema.safeParse('').success).toBe(false); // empty
+    });
+  });
+
+  describe('CategoryPurposeCodeSchema', () => {
+    it('should validate valid ISO 20022 category purpose codes', () => {
+      expect(CategoryPurposeCodeSchema.safeParse('SALA').success).toBe(true); // Salary
+      expect(CategoryPurposeCodeSchema.safeParse('TRAD').success).toBe(true); // Trade
+      expect(CategoryPurposeCodeSchema.safeParse('SUPP').success).toBe(true); // Supplier
+      expect(CategoryPurposeCodeSchema.safeParse('TAXS').success).toBe(true); // Tax
+    });
+
+    it('should reject invalid category purpose codes', () => {
+      expect(CategoryPurposeCodeSchema.safeParse('sala').success).toBe(false); // lowercase
+      expect(CategoryPurposeCodeSchema.safeParse('INVALID').success).toBe(false); // not in enum  
+      expect(CategoryPurposeCodeSchema.safeParse('').success).toBe(false); // empty
     });
   });
 });
@@ -263,9 +301,24 @@ describe('TAP Message Validators', () => {
         amount: "100.00",
         originator: validPerson,
         beneficiary: validPerson,
-        agents: [validAgent]
+        agents: [validAgent],
+        purposeCode: "TRAD"
       };
       expect(TransferSchema.safeParse(transfer).success).toBe(true);
+    });
+
+    it('should reject transfer with invalid purpose code', () => {
+      const transfer = {
+        "@context": "https://tap.rsvp/schema/1.0",
+        "@type": "Transfer",
+        asset: "eip155:1/erc20:0x6b175474e89094c44da98b954eedeac495271d0f",
+        amount: "100.00",
+        originator: validPerson,
+        beneficiary: validPerson,
+        agents: [validAgent],
+        purposeCode: "INVALID"
+      };
+      expect(TransferSchema.safeParse(transfer).success).toBe(false);
     });
 
     it('should require required fields', () => {
@@ -299,9 +352,24 @@ describe('TAP Message Validators', () => {
         currency: "USD",
         payer: validPerson,
         payee: validPerson,
-        agents: [validAgent]
+        agents: [validAgent],
+        purposeCode: "SALA"
       };
       expect(PaymentSchema.safeParse(payment).success).toBe(true);
+    });
+
+    it('should reject payment with invalid purpose code', () => {
+      const payment = {
+        "@context": "https://tap.rsvp/schema/1.0",
+        "@type": "Payment",
+        amount: "50.00",
+        currency: "USD",
+        payer: validPerson,
+        payee: validPerson,
+        agents: [validAgent],
+        purposeCode: "BADCODE"
+      };
+      expect(PaymentSchema.safeParse(payment).success).toBe(false);
     });
 
     it('should require either asset or currency', () => {
