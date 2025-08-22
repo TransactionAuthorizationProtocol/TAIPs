@@ -10,6 +10,8 @@
  */
 
 import { z } from 'zod';
+import type { IsoCurrency } from './currencies';
+import type { PurposeCode, CategoryPurposeCode } from './purpose_codes';
 
 // ============================================================================
 // FUNDAMENTAL VALIDATORS
@@ -51,8 +53,29 @@ export const SettlementAddressSchema = z.union([CAIP10Schema, PayToURISchema]);
 /** Amount as decimal string validator */
 export const AmountSchema = z.string().regex(/^\d+(\.\d+)?$/);
 
+/** Valid ISO 4217 Currency Codes - extracted from currencies.ts */
+const VALID_CURRENCY_CODES = [
+  "AED", "AFN", "ALL", "AMD", "ANG", "AOA", "ARS", "AUD", "AWG", "AZN", "BAM", "BBD", "BDT", "BGN", "BHD", "BIF", "BMD", "BND", "BOB", "BRL", "BSD", "BTN", "BWP", "BYN", "BZD", "CAD", "CDF", "CHF", "CLP", "CNY", "COP", "CRC", "CUP", "CVE", "CZK", "DJF", "DKK", "DOP", "DZD", "EGP", "ERN", "ETB", "EUR", "FJD", "FKP", "GBP", "GEL", "GHS", "GIP", "GMD", "GNF", "GTQ", "GYD", "HKD", "HNL", "HRK", "HTG", "HUF", "IDR", "ILS", "INR", "IQD", "IRR", "ISK", "JMD", "JOD", "JPY", "KES", "KGS", "KHR", "KMF", "KPW", "KRW", "KWD", "KYD", "KZT", "LAK", "LBP", "LKR", "LRD", "LSL", "LYD", "MAD", "MDL", "MGA", "MKD", "MMK", "MNT", "MOP", "MRU", "MUR", "MVR", "MWK", "MXN", "MYR", "MZN", "NAD", "NGN", "NIO", "NOK", "NPR", "NZD", "OMR", "PAB", "PEN", "PGK", "PHP", "PKR", "PLN", "PYG", "QAR", "RON", "RSD", "RUB", "RWF", "SAR", "SBD", "SCR", "SDG", "SEK", "SGD", "SHP", "SLL", "SOS", "SRD", "SSP", "STN", "SVC", "SYP", "SZL", "THB", "TJS", "TMT", "TND", "TOP", "TRY", "TTD", "TWD", "TZS", "UAH", "UGX", "USD", "UYU", "UZS", "VES", "VND", "VUV", "WST", "XAF", "XCD", "XOF", "XPF", "YER", "ZAR", "ZMW", "ZWL"
+] as const;
+
+/** Valid ISO 20022 Purpose Codes - extracted from purpose_codes.ts */
+const VALID_PURPOSE_CODES = [
+  "ACCT", "ADCS", "ADMG", "ADVA", "AEMP", "AGRT", "AIRB", "ALLW", "ALMY", "AMEX", "ANNI", "ANTS", "AREN", "AUCO", "BBSC", "BCDM", "BCFG", "BECH", "BENE", "BEXP", "BFWD", "BKDF", "BKFE", "BKFM", "BKIP", "BKPP", "BLDM", "BNET", "BOCE", "BOND", "BONU", "BUSB", "CABD", "CAEQ", "CAFI", "CASH", "CBCR", "CBFF", "CBFR", "CBLK", "CBTV", "CCHD", "CCIR", "CCPC", "CCPM", "CCRD", "CCSM", "CDBL", "CDCB", "CDCD", "CDCS", "CDDP", "CDEP", "CDOC", "CDQC", "CFDI", "CFEE", "CGDD", "CHAR", "CLPR", "CMDT", "COLL", "COMC", "COMM", "COMP", "COMT", "CORT", "COST", "CPEN", "CPKC", "CPYR", "CRDS", "CRPR", "CRSP", "CRTL", "CSDB", "CSLP", "CVCF", "DBCR", "DBTC", "DCRD", "DEBT", "DEPD", "DEPT", "DERI", "DICL", "DIVD", "DMEQ", "DNTS", "DSMT", "DVPM", "ECPG", "ECPR", "ECPU", "EDUC", "EFTC", "EFTD", "ELEC", "ENRG", "EPAY", "EQPT", "EQTS", "EQUS", "ESTX", "ETUP", "EXPT", "EXTD", "FACT", "FAND", "FCOL", "FCPM", "FEES", "FERB", "FIXI", "FLCR", "FNET", "FORW", "FREX", "FUTR", "FWBC", "FWCC", "FWLV", "FWSB", "FWSC", "FXNT", "GAFA", "GAHO", "GAMB", "GASB", "GDDS", "GDSV", "GFRP", "GIFT", "GOVI", "GOVT", "GSCB", "GSTX", "GVEA", "GVEB", "GVEC", "GVED", "GWLT", "HEDG", "HLRP", "HLST", "HLTC", "HLTI", "HREC", "HSPC", "HSTX", "ICCP", "ICRF", "IDCP", "IHRP", "INPC", "INPR", "INSC", "INSM", "INSU", "INTC", "INTE", "INTP", "INTX", "INVS", "IPAY", "IPCA", "IPDO", "IPEA", "IPEC", "IPEW", "IPPS", "IPRT", "IPUW", "IVPT", "LBIN", "LBRI", "LCOL", "LFEE", "LICF", "LIFI", "LIMA", "LMEQ", "LMFI", "LMRK", "LOAN", "LOAR", "LOTT", "LREB", "LREV", "LSFL", "LTCF", "MAFC", "MARF", "MARG", "MBSB", "MBSC", "MCDM", "MCFG", "MDCS", "MGCC", "MGSC", "MOMA", "MSVC", "MTUP", "NETT", "NITX", "NOWS", "NWCH", "NWCM", "OCCC", "OCDM", "OCFG", "OFEE", "OPBC", "OPCC", "OPSB", "OPSC", "OPTN", "OTCD", "OTHR", "OTLC", "PADD", "PAYR", "PCOM", "PDEP", "PEFC", "PENO", "PENS", "PHON", "PLDS", "PLRF", "POPE", "PPTI", "PRCP", "PRME", "PTSP", "PTXP", "RAPI", "RCKE", "RCPT", "RDTX", "REBT", "REFU", "RELG", "RENT", "REOD", "REPO", "RETL", "RHBS", "RIMB", "RINP", "RLWY", "RMCO", "ROYA", "RPBC", "RPCC", "RPNT", "RPSB", "RPSC", "RRBN", "RRCT", "RRTP", "RVPM", "RVPO", "SALA", "SASW", "SAVG", "SBSC", "SCIE", "SCIR", "SCRP", "SCVE", "SECU", "SEPI", "SERV", "SHBC", "SHCC", "SHSL", "SLEB", "SLOA", "SLPI", "SPLT", "SPSP", "SSBE", "STDY", "SUBS", "SUPP", "SWBC", "SWCC", "SWFP", "SWPP", "SWPT", "SWRS", "SWSB", "SWSC", "SWUF", "TAXR", "TAXS", "TBAN", "TBAS", "TBBC", "TBCC", "TBIL", "TCSC", "TELI", "TLRF", "TLRR", "TMPG", "TPRI", "TPRP", "TRAD", "TRCP", "TREA", "TRFD", "TRNC", "TRPT", "TRVC", "UBIL", "UNIT", "VATX", "VIEW", "VOST", "WEBI", "WHLD", "WTER", "ZABA"
+] as const;
+
+/** Valid ISO 20022 Category Purpose Codes - extracted from purpose_codes.ts */
+const VALID_CATEGORY_PURPOSE_CODES = [
+  "BONU", "CASH", "CGWV", "CIPC", "CONC", "CORT", "CTDF", "DCRD", "DIVI", "DVPM", "EPAY", "FCDT", "FCIN", "FCOL", "GOVT", "HEDG", "ICCP", "IDCP", "INTC", "INTE", "LBOX", "LOAN", "OTHR", "PENS", "RPRE", "RRCT", "RVPM", "SALA", "SAVG", "SECU", "SSBE", "SUPP", "SWEP", "TAXS", "TOPG", "TRAD", "TREA", "VATX"
+] as const;
+
 /** ISO 4217 Currency Code validator */
-export const CurrencyCodeSchema = z.string().length(3).regex(/^[A-Z]{3}$/);
+export const CurrencyCodeSchema = z.enum(VALID_CURRENCY_CODES);
+
+/** ISO 20022 Purpose Code validator */
+export const PurposeCodeSchema = z.enum(VALID_PURPOSE_CODES);
+
+/** ISO 20022 Category Purpose Code validator */
+export const CategoryPurposeCodeSchema = z.enum(VALID_CATEGORY_PURPOSE_CODES);
 
 /** Asset ID (union of CAIP-19 and ISO 4217 currency code) */
 export const AssetSchema = z.union([CAIP19Schema, CurrencyCodeSchema]);
@@ -156,7 +179,7 @@ export const TransferSchema = TapMessageObjectSchema.merge(z.object({
   beneficiary: PartySchema,
   agents: z.array(AgentSchema),
   settlementAddress: SettlementAddressSchema.optional(),
-  purposeCode: z.string().optional(),
+  purposeCode: PurposeCodeSchema.optional(),
   reference: z.string().optional()
 }));
 
@@ -170,7 +193,7 @@ export const PaymentSchema = TapMessageObjectSchema.merge(z.object({
   payee: PartySchema,
   agents: z.array(AgentSchema),
   settlementAddress: SettlementAddressSchema.optional(),
-  purposeCode: z.string().optional(),
+  purposeCode: PurposeCodeSchema.optional(),
   reference: z.string().optional(),
   invoiceId: z.string().optional()
 })).refine(data => data.asset || data.currency, {
