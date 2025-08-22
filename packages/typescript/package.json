@@ -4,6 +4,18 @@
   "description": "TypeScript types and interfaces for the Transaction Authorization Protocol (TAP)",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./validator": {
+      "import": "./dist/validator.js",
+      "require": "./dist/validator.js",
+      "types": "./dist/validator.d.ts"
+    }
+  },
   "scripts": {
     "build": "tsc",
     "clean": "rimraf dist",
@@ -37,6 +49,7 @@
   },
   "dependencies": {
     "@taprsvp/iso20022_external_codes": "^1.0.0",
-    "ivms101": "^1.1.1"
+    "ivms101": "^1.1.1",
+    "zod": "^4.0.17"
   }
 }

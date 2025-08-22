@@ -16,6 +16,15 @@ This changelog focuses on:
 
 ## [2025-08-21]
 
+### Added
+- **TypeScript Package - Zod v4 Validation**: Added comprehensive runtime validation for TAP messages
+  - New `validator` module available at `@taprsvp/types/validator` 
+  - Zod v4 schemas for all TAP message types (Transfer, Payment, Authorize, etc.)
+  - Validation functions: `validateTAPMessage()`, `parseTAPMessage()`, `isTAPMessage()`
+  - Message-specific validators for each TAP message type
+  - Full CAIP-10, CAIP-19, PayTo URI, and DID validation
+  - Separate module path keeps validators optional for bundle size optimization
+
 ### Changed
 - **BREAKING: TAIP-15 Agent Connection Protocol**: Major restructure to support multi-party connections
   - **BREAKING**: Replaced single `agent` field with required `agents` array following TAIP-3 pattern
