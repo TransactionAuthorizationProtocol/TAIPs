@@ -21,6 +21,7 @@ This package provides comprehensive TypeScript type definitions for the Transact
 - **⛓️ Chain Agnostic**: Multi-blockchain support via CAIP standards (CAIP-10, CAIP-19)
 - **📋 Compliance Ready**: IVMS101 integration for travel rule compliance
 - **🏦 Traditional Banking**: RFC 8905 PayTo URI support for IBAN, SEPA, and other systems
+- **✅ Runtime Validation**: Zod v4 schemas for message validation and parsing
 
 ## Installation
 
@@ -67,6 +68,80 @@ const message: TransferMessage = {
   body: transfer
 };
 ```
+
+## Message Validation
+
+The package includes comprehensive Zod v4 schemas for runtime validation of TAP messages:
+
+```typescript
+import { 
+  validateTAPMessage, 
+  parseTAPMessage, 
+  isTAPMessage,
+  validateTransferMessage,
+  TransferMessageSchema
+} from '@taprsvp/types/validator';
+
+// Safe validation with detailed error information
+const result = validateTAPMessage(someUnknownData);
+if (result.success) {
+  console.log('Valid TAP message:', result.data);
+} else {
+  console.log('Validation errors:', result.error.issues);
+}
+
+// Parse and validate (throws on error)
+try {
+  const validMessage = parseTAPMessage(incomingMessage);
+  // validMessage is now type-safe and validated
+} catch (error) {
+  console.log('Invalid message:', error.message);
+}
+
+// Type guard for checking if data is a valid TAP message
+if (isTAPMessage(data)) {
+  // data is now typed as a valid TAPMessage
+  console.log('Message type:', data.type);
+}
+
+// Validate specific message types
+const transferResult = validateTransferMessage(data);
+if (transferResult.success) {
+  // transferResult.data is typed as TransferMessage
+  console.log('Transfer amount:', transferResult.data.body.amount);
+}
+
+// Direct schema usage
+const isValidTransfer = TransferMessageSchema.safeParse(data).success;
+```
+
+### Available Validators
+
+| Function | Description |
+|----------|-------------|
+| `validateTAPMessage(data)` | Validates any TAP message type |
+| `parseTAPMessage(data)` | Parse and validate (throws on error) |
+| `isTAPMessage(data)` | Type guard function |
+| `validateTransferMessage(data)` | Validate Transfer messages |
+| `validatePaymentMessage(data)` | Validate Payment messages |
+| `validateAuthorizeMessage(data)` | Validate Authorization messages |
+| `validateConnectMessage(data)` | Validate Connect messages |
+| `validateSettleMessage(data)` | Validate Settlement messages |
+| `validateRejectMessage(data)` | Validate Reject messages |
+| `validateCancelMessage(data)` | Validate Cancel messages |
+| `validateRevertMessage(data)` | Validate Revert messages |
+
+### Available Schemas
+
+All Zod schemas are exported for direct use:
+
+- `TAPMessageSchema` - Union of all TAP message types
+- `TransferMessageSchema` - Transfer message wrapper
+- `PaymentMessageSchema` - Payment message wrapper
+- `AuthorizeMessageSchema` - Authorization reply wrapper
+- `DIDCommMessageSchema` - Base DIDComm message
+- `DIDCommReplySchema` - Base DIDComm reply
+- And many more foundational schemas (DID, CAIP-10, CAIP-19, etc.)
 
 ## Core Types
 
@@ -445,6 +520,7 @@ npm test
 src/
 ├── index.ts          # Main exports
 ├── tap.ts           # Core TAP message types
+├── validator.ts     # Zod v4 validation schemas
 ├── currencies.ts    # ISO 4217 currency codes
 ├── invoice.ts       # Invoice-related types
 ├── purpose_codes.ts # ISO 20022 purpose codes
