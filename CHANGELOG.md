@@ -26,6 +26,9 @@ This changelog focuses on:
   - Updated transaction validation requirements to include new constraint checks
   - Enhanced test examples to demonstrate new constraint usage
   - Added CAIP-10 and CAIP-19 references for address and asset identifier standards
+  - **Updated JSON Schemas**: Enhanced transaction-constraints.json schema to validate new constraint fields
+  - **Updated TypeScript Package v1.11.0**: Enhanced TransactionConstraints interface and Zod validators
+    - See [packages/typescript/CHANGELOG.md](packages/typescript/CHANGELOG.md) for complete details
 
 ## [2025-08-21]
 

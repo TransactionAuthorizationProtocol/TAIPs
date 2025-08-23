@@ -2,6 +2,18 @@
 
 All notable changes to the TypeScript package are documented in this file.
 
+## [1.11.0] - 2025-08-23
+
+### Enhanced
+- **TAIP-15 Transaction Constraints**: Enhanced TransactionConstraints interface for improved connection security
+  - Added `allowedBeneficiaries` field: Array of TAIP-6 Party objects for approved payment recipients
+  - Added `allowedSettlementAddresses` field: Array of CAIP-10 addresses for approved settlement addresses  
+  - Added `allowedAssets` field: Array of CAIP-19 asset identifiers for approved transaction assets
+  - Enhanced Zod validator schemas to validate new constraint fields
+  - Added `validateTransactionConstraints()` function for standalone constraint validation
+  - Updated Connect interface examples and JSDoc documentation
+  - Comprehensive constraint validation enables granular control over agent connection permissions
+
 ## [1.10.0] - 2025-08-21
 
 ### Added
