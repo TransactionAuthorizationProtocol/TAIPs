@@ -359,6 +359,54 @@ This example shows an Exchange request broadcast to multiple providers without s
 }
 ```
 
+### Example: Exchange with Escrow
+
+After a Quote is accepted via Authorize, the provider can request escrow using [TAIP-17]:
+
+```json
+{
+  "id": "escrow-for-exchange-123",
+  "type": "https://tap.rsvp/schema/1.0#Escrow",
+  "from": "did:web:lp.example",
+  "to": ["did:web:alice.wallet", "did:web:escrow.service"],
+  "pthid": "quote-456",
+  "created_time": 1719227000,
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#Escrow",
+    "asset": "eip155:1/erc20:0xA0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+    "amount": "1000.00",
+    "originator": {
+      "@id": "did:web:business.example"
+    },
+    "beneficiary": {
+      "@id": "did:web:liquidity.provider"
+    },
+    "expiry": "2025-07-21T01:00:00Z",
+    "agents": [
+      {
+        "@id": "did:web:alice.wallet",
+        "for": "did:web:business.example"
+      },
+      {
+        "@id": "did:web:lp.example",
+        "for": "did:web:liquidity.provider"
+      },
+      {
+        "@id": "did:web:escrow.service",
+        "role": "EscrowAgent"
+      }
+    ]
+  }
+}
+```
+
+Note how the Escrow message:
+- Uses `pthid: "quote-456"` to link to the accepted Quote
+- Sets the requester as `originator` (their funds go into escrow)
+- Sets the provider as `beneficiary` (they receive funds after exchange)
+- Can be sent to the requester's custodial agent if they use one
+
 ### Example: Cross-Currency FX Quote
 
 This example shows a pure FX exchange request between fiat currencies:
@@ -400,11 +448,178 @@ This example shows a pure FX exchange request between fiat currencies:
 
 ## Flow
 
-1. Wallet or orchestrator sends `Exchange` request for USDC → EURC
-2. LP or route engine replies with `Quote`
-3. Wallet sends `Authorize` (per [TAIP-4]) to accept the quote
-4. LP executes swap and sends `Settle` (per [TAIP-4]) with transaction details
-5. Settlement may trigger downstream [TAIP-3] Transfer for fund distribution
+### Exchange State Machine
+
+The following state diagram shows the possible states and transitions for an exchange from the requester's perspective:
+
+```mermaid
+stateDiagram-v2
+    [*] --> Requested : Exchange
+    Requested --> Quoted : Quote received
+    Quoted --> Authorized : Authorize sent
+    Authorized --> EscrowRequested : Escrow received (optional)
+    Authorized --> Settling : Direct settlement
+    EscrowRequested --> EscrowActive : Escrow funded
+    EscrowActive --> Settling : Capture sent
+    Settling --> Settled : Settle received
+    Quoted --> Expired : Quote expires
+    Authorized --> Cancelled : Cancel
+    EscrowActive --> Cancelled : Cancel
+    Settled --> [*]
+    Cancelled --> [*]
+    Expired --> [*]
+```
+
+### Basic Exchange Flow
+
+The simplest exchange flow without escrow:
+
+```mermaid
+sequenceDiagram
+    participant Requester as Requester Agent
+    participant Provider as Provider Agent
+    participant Blockchain
+
+    Requester->>Provider: Exchange (USDC → EURC)
+    Provider->>Requester: Quote (rates & amounts)
+    Note over Requester: User reviews quote
+    Requester->>Provider: Authorize (accept quote)
+    Provider->>Requester: Authorize (settlement address)
+    
+    Requester->>Blockchain: Send USDC
+    Requester->>Provider: Settle (tx hash)
+    
+    Provider->>Blockchain: Send EURC
+    Provider->>Requester: Settle (tx hash)
+    
+    Note over Requester,Provider: Exchange complete
+```
+
+### Exchange Flow with Escrow
+
+Either party can manage counterparty risk by requesting escrow after a Quote is accepted. This leverages [TAIP-17] Escrow messages with the `pthid` field linking to the Quote:
+
+```mermaid
+sequenceDiagram
+    participant Requester as Requester Agent
+    participant Provider as Provider Agent
+    participant Escrow as Escrow Agent
+    participant Blockchain
+
+    Requester->>Provider: Exchange (USDC → EURC)
+    Provider->>Requester: Quote (rates & amounts)
+    Note over Requester: User reviews quote
+    Requester->>Provider: Authorize (accept quote)
+    
+    Note over Provider: Provider wants escrow protection
+    Provider->>Requester: Escrow (pthid: quote-456)
+    Provider->>Escrow: Escrow (pthid: quote-456)
+    
+    Escrow->>Requester: Authorize (accept escrow role)
+    Escrow->>Provider: Authorize (settlement address)
+    
+    Requester->>Blockchain: Send USDC to escrow
+    Requester->>Escrow: Settle (funded escrow)
+    
+    Note over Escrow: Escrow now active
+    
+    Provider->>Blockchain: Send EURC to requester
+    Provider->>Requester: Settle (tx hash)
+    
+    Note over Requester: Verify EURC received
+    
+    Provider->>Escrow: Capture (release funds)
+    Escrow->>Blockchain: Send USDC to provider
+    Escrow->>Provider: Settle (released funds)
+    
+    Note over Requester,Provider: Exchange complete
+```
+
+### Exchange Flow with Dual Escrow
+
+For maximum protection, both parties can use escrow:
+
+```mermaid
+sequenceDiagram
+    participant Requester as Requester Agent
+    participant Provider as Provider Agent
+    participant EscrowA as Escrow Agent A
+    participant EscrowB as Escrow Agent B
+    participant Blockchain
+
+    Requester->>Provider: Exchange (USDC → EURC)
+    Provider->>Requester: Quote (rates & amounts)
+    Requester->>Provider: Authorize (accept quote)
+    
+    par Requester Escrow Setup
+        Provider->>Requester: Escrow A (requester's funds)
+        Provider->>EscrowA: Escrow A (pthid: quote-456)
+        EscrowA->>Requester: Authorize
+        Requester->>Blockchain: Fund Escrow A
+        Requester->>EscrowA: Settle
+    and Provider Escrow Setup
+        Requester->>Provider: Escrow B (provider's funds)
+        Requester->>EscrowB: Escrow B (pthid: quote-456)
+        EscrowB->>Provider: Authorize
+        Provider->>Blockchain: Fund Escrow B
+        Provider->>EscrowB: Settle
+    end
+    
+    Note over EscrowA,EscrowB: Both escrows active
+    
+    par Simultaneous Release
+        Provider->>EscrowA: Capture
+        EscrowA->>Blockchain: Release USDC
+        EscrowA->>Provider: Settle
+    and
+        Requester->>EscrowB: Capture
+        EscrowB->>Blockchain: Release EURC
+        EscrowB->>Requester: Settle
+    end
+    
+    Note over Requester,Provider: Atomic exchange complete
+```
+
+### Broadcast Exchange with Multiple Quotes
+
+When broadcasting to multiple providers:
+
+```mermaid
+sequenceDiagram
+    participant Requester as Requester Agent
+    participant LP1 as Provider 1
+    participant LP2 as Provider 2
+    participant LP3 as Provider 3
+    participant Blockchain
+
+    Requester->>LP1: Exchange (multiple assets)
+    Requester->>LP2: Exchange (multiple assets)
+    Requester->>LP3: Exchange (multiple assets)
+    
+    LP1->>Requester: Quote (rate: 0.91)
+    LP2->>Requester: Quote (rate: 0.92)
+    LP3->>Requester: Quote (rate: 0.90)
+    
+    Note over Requester: Select best quote (LP2)
+    
+    Requester->>LP2: Authorize (accept quote)
+    LP2->>Requester: Authorize (settlement details)
+    
+    Requester->>Blockchain: Send assets
+    Requester->>LP2: Settle
+    
+    LP2->>Blockchain: Send assets
+    LP2->>Requester: Settle
+    
+    Note over Requester,LP2: Exchange complete
+```
+
+Key aspects of the escrow flow:
+- **Uses `pthid`**: Escrow messages reference the Quote via parent thread ID
+- **Standard [TAIP-17] flow**: Follows established escrow patterns
+- **Flexible initiation**: Either party can request escrow
+- **Atomic execution**: With dual escrow, both complete or both fail
+- **Optional**: Parties negotiate escrow post-quote acceptance
 
 ## Composability
 
@@ -421,6 +636,11 @@ TAIP-18 can be embedded as a subflow in:
 * Quote expiry timestamps prevent stale pricing abuse
 * Settlement verification via txHash
 * Swap routed through identity-bound agents
+* When using escrow:
+  - Escrow agent must be trusted by both parties
+  - Atomic execution prevents partial settlement
+  - Expiry times on escrows prevent indefinite fund locks
+  - Both parties must verify escrow funding before releasing
 
 ## Privacy Considerations
 
