@@ -47,7 +47,7 @@ TAIP-18 defines two new message types for quote negotiation (`Exchange` and `Quo
 
 An **Exchange** is a [DIDComm] message (per [TAIP-2]) sent by the party initiating an exchange request. Like all TAP messages, it follows the DIDComm v2 message structure with the TAP-specific body format.
 
-The exchange request identifies the parties involved in the potential transaction and the agents acting on their behalf. The `requester` party represents the entity seeking the exchange, while the `provider` party represents the liquidity provider being engaged. The `agents` array lists all software agents involved in processing this exchange request, including their roles and the parties they represent.
+The exchange request identifies the parties involved in the potential transaction and the agents acting on their behalf. The `requester` party represents the entity seeking the exchange. The optional `provider` party represents a specific liquidity provider being engaged; when omitted, the Exchange message can be broadcast through a centralized service or sent to multiple providers who can each choose to respond with a Quote. The `agents` array lists all software agents involved in processing this exchange request, including their roles and the parties they represent.
 
 The DIDComm message envelope contains:
 
@@ -67,7 +67,7 @@ The message `body` contains:
 - **`toAsset`** – REQUIRED [CAIP-19], DTI, or [ISO-4217] currency code for the target asset
 - **`amount`** – REQUIRED Amount to convert (string decimal)
 - **`requester`** – REQUIRED The party requesting the exchange (Party object per [TAIP-6])
-- **`provider`** – REQUIRED The liquidity provider party (Party object per [TAIP-6])
+- **`provider`** – OPTIONAL The preferred liquidity provider party (Party object per [TAIP-6]). When omitted, the Exchange message can be broadcast to multiple providers
 - **`agents`** – REQUIRED Array of agents involved in the exchange request per [TAIP-5]
 - **`policies`** – OPTIONAL Compliance or presentation requirements per [TAIP-7]
 
@@ -289,6 +289,37 @@ Response:
     "fee": "2.00",
     "provider": "did:web:onramp.provider",
     "expiresAt": "2025-07-21T00:00:00Z"
+  }
+}
+```
+
+### Example: Broadcast Exchange Request
+
+This example shows an Exchange request broadcast to multiple providers without specifying a particular provider:
+
+```json
+{
+  "id": "broadcast-exchange-456",
+  "type": "https://tap.rsvp/schema/1.0#Exchange",
+  "from": "did:web:wallet.example",
+  "to": ["did:web:exchange.platform", "did:web:lp1.example", "did:web:lp2.example"],
+  "created_time": 1719228000,
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#Exchange",
+    "fromAsset": "eip155:1/erc20:0xA0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+    "toAsset": "eip155:137/erc20:0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174",
+    "amount": "5000.00",
+    "requester": {
+      "@id": "did:web:business.example"
+    },
+    "agents": [
+      {
+        "@id": "did:web:wallet.example",
+        "for": "did:web:business.example",
+        "role": "requester"
+      }
+    ]
   }
 }
 ```
