@@ -1,113 +1,95 @@
-# **TAIP-18: Quote & Swap**
+---
+taip: 18
+title: Quote & Swap
+status: Draft
+type: Standard
+author: Tarek Mohammad <tarek.mohammad@notabene.id>, Pelle Braendgaard <pelle@notabene.id>
+created: 2025-07-20
+updated: 2025-08-23
+description: Defines QuoteRequest, QuoteResponse, QuoteAccept, and SwapSettle message types for requesting and executing token swaps and price quotations. Enables cross-asset quotes, swap route approval, and settlement with minimal trust assumptions while maintaining composability with existing TAP messages.
+requires: 2, 3, 4, 6, 7, 8, 9, 14, 17
+---
 
- Type: Standard
- Created: 2025-07-20
- Updated: 2025-07-20
- Requires: 2, 3, 4, 6, 7, 8, 9, 14, 16
+# TAIP-18: Quote & Swap
 
-## **Simple Summary**
+## Simple Summary
 
 A standard for requesting and executing token swaps and price quotations for blockchain-based payment settlement. Enables wallets and orchestrators to request cross-asset quotes, approve swap routes, and settle in compatible assets with minimal trust assumptions.
 
-## **Abstract**
+## Abstract
 
-TAIP-18 introduces a QuoteRequest message format for initiating cross-asset quotes (e.g., from USDC to EURC, or across chains) and defines optional settlement support for accepted quotes. It is designed for composability with existing TAP messages like Payment (TAIP-14), Transfer (TAIP-3), and Invoices (TAIP-16). TAIP-18 formalizes the message exchange required to:
+TAIP-18 introduces a QuoteRequest message format for initiating cross-asset quotes (e.g., from USDC to EURC, or across chains) and defines optional settlement support for accepted quotes. It is designed for composability with existing TAP messages like Payment ([TAIP-14]), Transfer ([TAIP-3]), and Invoices ([TAIP-16]). TAIP-18 formalizes the message exchange required to:
 
 * Quote and approve stablecoin swaps
-
 * Discover on-/off-ramp pricing
-
 * Execute FX transactions
-
 * Bridge assets or stablecoins across chains
 
 It enables wallets, liquidity providers (LPs), and orchestrators to collaborate on a unified quoting and swap interface.
 
-## **Motivation**
+## Motivation
 
 Stablecoin-based payments often require conversion between tokens, chains, or currencies. For example:
 
 * A business receives an invoice in EURC but only holds USDC
-
 * A wallet provider wants to settle in native stablecoins across chains
-
-* A PSP requires a cross-currency quote (e.g. USD to GBP)
+* A PSP requires a cross-currency quote (e.g., USD to GBP)
 
 Today, such flows are fragmented across centralized off-ramps, AMMs, and FX providers, with no standard message structure to request, negotiate, and execute swaps.
 
 TAIP-18 solves this by creating a compliant, composable quote & swap framework that plugs into existing TAP flows. It abstracts complexity and adds identity-layered trust for regulatory-grade financial activity.
 
-## **Specification**
+## Specification
 
 TAIP-18 defines the following primary message types:
 
-### **1\. `QuoteRequest`**
+### 1. `QuoteRequest`
 
 Sent by the party initiating a quote. Includes:
 
 * `@type`: `QuoteRequest`
-
-* `fromAsset`: CAIP-19 or DTI
-
-* `toAsset`: CAIP-19 or DTI
-
+* `fromAsset`: [CAIP-19] or DTI
+* `toAsset`: [CAIP-19] or DTI
 * `amount`: amount of `fromAsset` to convert
-
 * `expiry`: optional, how long the quote is valid for
-
 * `policies`: optional; compliance or presentation requirements
-
 * `preferredProvider`: optional, LP to prioritize
 
-### **2\. `QuoteResponse`**
+### 2. `QuoteResponse`
 
 Sent by the liquidity provider or orchestrator in response to a QuoteRequest.
 
 * `@type`: `QuoteResponse`
-
 * `fromAsset`, `toAsset`, `amount`: copied from request
-
-* `rate`: exchange rate (e.g., 1 USDC \= 0.91 EURC)
-
+* `rate`: exchange rate (e.g., 1 USDC = 0.91 EURC)
 * `fee`: quoted fee
-
 * `path`: route of assets and chains
-
 * `provider`: identifier of quoting entity
-
 * `expiresAt`: timestamp
-
 * `quoteId`: reference for settlement
 
-### **3\. `QuoteAccept`**
+### 3. `QuoteAccept`
 
 Used to accept a quote and proceed with execution. Optional depending on flow type.
 
 * `@type`: `QuoteAccept`
-
 * `quoteId`: reference to accepted quote
-
 * `payer`: optional address
-
 * `receiver`: optional address
 
-### **4\. `SwapSettle`**
+### 4. `SwapSettle`
 
 Describes how the swap was executed, post-trade. May trigger downstream TAP-3 Transfer.
 
 * `@type`: `SwapSettle`
-
 * `quoteId`
-
 * `txHash`
-
 * `settledAmount`
-
 * `settledAsset`
 
-## **Example Messages**
+## Example Messages
 
-### **QuoteRequest (Signed)**
+### QuoteRequest (Signed)
 
 ```json
 {
@@ -120,7 +102,7 @@ Describes how the swap was executed, post-trade. May trigger downstream TAP-3 Tr
 }
 ```
 
-### **QuoteResponse**
+### QuoteResponse
 
 ```json
 {
@@ -137,7 +119,7 @@ Describes how the swap was executed, post-trade. May trigger downstream TAP-3 Tr
 }
 ```
 
-### **QuoteAccept**
+### QuoteAccept
 
 ```json
 {
@@ -148,7 +130,7 @@ Describes how the swap was executed, post-trade. May trigger downstream TAP-3 Tr
 }
 ```
 
-### **SwapSettle**
+### SwapSettle
 
 ```json
 {
@@ -160,54 +142,55 @@ Describes how the swap was executed, post-trade. May trigger downstream TAP-3 Tr
 }
 ```
 
-## **Flow**
+## Flow
 
 1. Wallet or orchestrator sends `QuoteRequest` for USDC → EURC
-
 2. LP or route engine replies with `QuoteResponse`
-
 3. Wallet sends `QuoteAccept`
-
 4. LP executes swap, sends `SwapSettle`
+5. Settlement triggers [TAIP-3] Transfer
 
-5. Settlement triggers TAP-3 Transfer
+## Composability
 
-## **Composability**
+TAIP-18 can be embedded as a subflow in:
 
-TAIP-18 is typically embedded as a subflow in:
+* `Payment` workflows ([TAIP-14]) for invoice settlement
 
-* `Payment` workflows (TAIP-14) for invoice settlement
-
-* `Receivables` APIs via TAIP-16 (e.g., EURC invoice settled in USDC)
-
-* Off-chain FX coordination between wallets and LPs
-
-## **Security Considerations**
+## Security Considerations
 
 * Quote expiry timestamps prevent stale pricing abuse
-
 * Settlement verification via txHash
-
 * Swap routed through identity-bound agents
 
-## **Privacy Considerations**
+## Privacy Considerations
 
 * Quotes do not reveal identity unless policies require
+* Presentation of verifiable credentials is optional via RequirePresentation ([TAIP-8])
 
-* Presentation of verifiable credentials is optional via RequirePresentation (TAIP-8)
+## References
 
-## **References**
+* [TAIP-2] TAP Messaging
+* [TAIP-3] Asset Transfer
+* [TAIP-4] Transaction Authorization Protocol
+* [TAIP-6] Transaction Parties
+* [TAIP-7] Agent Policies
+* [TAIP-8] Selective Disclosure
+* [TAIP-9] DIDComm Integration
+* [TAIP-14] Payment Request
+* [CAIP-19] Asset Type and Asset ID Specification
+* [DTI] Digital Token Identifier
 
-* TAIP-2 Messaging
+[TAIP-2]: ./taip-2
+[TAIP-3]: ./taip-3
+[TAIP-4]: ./taip-4
+[TAIP-6]: ./taip-6
+[TAIP-7]: ./taip-7
+[TAIP-8]: ./taip-8
+[TAIP-9]: ./taip-9
+[TAIP-14]: ./taip-14
+[CAIP-19]: https://chainagnostic.org/CAIPs/caip-19
+[DTI]: https://www.dtif.org/
 
-* TAIP-3 Transfer
+## Copyright
 
-* TAIP-14 Payments
-
-* TAIP-16 Invoices
-
-* CAIP-19 Asset IDs
-
-* DTI Stablecoin Identifiers
-
-* TAP Schema Definitions
+Copyright and related rights waived via [CC0](../LICENSE).
