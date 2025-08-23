@@ -1,24 +1,24 @@
 ---
 taip: 18
-title: Quote & Swap
+title: Asset Exchange
 status: Draft
 type: Standard
 author: Tarek Mohammad <tarek.mohammad@notabene.id>, Pelle Braendgaard <pelle@notabene.id>
 created: 2025-07-20
 updated: 2025-08-23
-description: Defines QuoteRequest, QuoteResponse, QuoteAccept, and SwapSettle message types for requesting and executing token swaps and price quotations. Enables cross-asset quotes, swap route approval, and settlement with minimal trust assumptions while maintaining composability with existing TAP messages.
+description: Defines Exchange and Quote message types for requesting and executing token swaps and price quotations. Enables cross-asset quotes, swap route approval, and settlement with minimal trust assumptions while maintaining composability with existing TAP messages.
 requires: 2, 3, 4, 5, 6, 7, 8, 9, 14, 17
 ---
 
-# TAIP-18: Quote & Swap
+# TAIP-18: Asset Exchange
 
 ## Simple Summary
 
-A standard for requesting and executing token swaps and price quotations for blockchain-based payment settlement. Enables wallets and orchestrators to request cross-asset quotes, approve swap routes, and settle in compatible assets with minimal trust assumptions.
+A standard for requesting and executing asset exchanges and price quotations for blockchain-based payment settlement. Enables wallets and orchestrators to request cross-asset quotes, approve swap routes, and settle in compatible assets with minimal trust assumptions.
 
 ## Abstract
 
-TAIP-18 introduces a QuoteRequest message format for initiating cross-asset quotes (e.g., from USDC to EURC, USD to USDC, or across chains) and defines optional settlement support for accepted quotes. It is designed for composability with existing TAP messages like Payment ([TAIP-14]) and Transfer ([TAIP-3]). TAIP-18 formalizes the message exchange required to:
+TAIP-18 introduces an Exchange message format for initiating cross-asset quotes (e.g., from USDC to EURC, USD to USDC, or across chains) and defines optional settlement support for accepted quotes. It is designed for composability with existing TAP messages like Payment ([TAIP-14]) and Transfer ([TAIP-3]). TAIP-18 formalizes the message exchange required to:
 
 * Quote and approve stablecoin swaps
 * Discover on-/off-ramp pricing
@@ -41,19 +41,19 @@ TAIP-18 solves this by creating a compliant, composable quote & swap framework t
 
 ## Specification
 
-TAIP-18 defines two new message types for quote negotiation (`QuoteRequest` and `QuoteResponse`) and reuses existing [TAIP-4] messages (`Authorize` and `Settle`) for quote acceptance and swap settlement:
+TAIP-18 defines two new message types for quote negotiation (`Exchange` and `Quote`) and reuses existing [TAIP-4] messages (`Authorize` and `Settle`) for quote acceptance and swap settlement:
 
-### 1. `QuoteRequest`
+### 1. `Exchange`
 
-A **QuoteRequest** is a [DIDComm] message (per [TAIP-2]) sent by the party initiating a quote. Like all TAP messages, it follows the DIDComm v2 message structure with the TAP-specific body format.
+An **Exchange** is a [DIDComm] message (per [TAIP-2]) sent by the party initiating an exchange request. Like all TAP messages, it follows the DIDComm v2 message structure with the TAP-specific body format.
 
-The quote request identifies the parties involved in the potential transaction and the agents acting on their behalf. The `requester` party represents the entity seeking the quote, while the `provider` party represents the liquidity provider being engaged. The `agents` array lists all software agents involved in processing this quote request, including their roles and the parties they represent.
+The exchange request identifies the parties involved in the potential transaction and the agents acting on their behalf. The `requester` party represents the entity seeking the exchange, while the `provider` party represents the liquidity provider being engaged. The `agents` array lists all software agents involved in processing this exchange request, including their roles and the parties they represent.
 
 The DIDComm message envelope contains:
 
 - **`from`** – REQUIRED [DID] of the initiating agent
 - **`to`** – REQUIRED Array containing [DID] of the liquidity providers or orchestrators
-- **`type`** – REQUIRED Message type: `"https://tap.rsvp/schema/1.0#QuoteRequest"`
+- **`type`** – REQUIRED Message type: `"https://tap.rsvp/schema/1.0#Exchange"`
 - **`id`** – REQUIRED Unique message identifier
 - **`thid`** – OPTIONAL Thread identifier for related messages (e.g., a Payment from [TAIP-14])
 - **`created_time`** – REQUIRED Message creation timestamp
@@ -62,32 +62,32 @@ The DIDComm message envelope contains:
 The message `body` contains:
 
 - **`@context`** – REQUIRED JSON-LD context: `"https://tap.rsvp/schema/1.0"`
-- **`@type`** – REQUIRED Type identifier: `"https://tap.rsvp/schema/1.0#QuoteRequest"`
+- **`@type`** – REQUIRED Type identifier: `"https://tap.rsvp/schema/1.0#Exchange"`
 - **`fromAsset`** – REQUIRED [CAIP-19], DTI, or [ISO-4217] currency code for the source asset
 - **`toAsset`** – REQUIRED [CAIP-19], DTI, or [ISO-4217] currency code for the target asset
 - **`amount`** – REQUIRED Amount to convert (string decimal)
-- **`requester`** – REQUIRED The party requesting the quote (Party object per [TAIP-6])
+- **`requester`** – REQUIRED The party requesting the exchange (Party object per [TAIP-6])
 - **`provider`** – REQUIRED The liquidity provider party (Party object per [TAIP-6])
-- **`agents`** – REQUIRED Array of agents involved in the quote request per [TAIP-5]
+- **`agents`** – REQUIRED Array of agents involved in the exchange request per [TAIP-5]
 - **`policies`** – OPTIONAL Compliance or presentation requirements per [TAIP-7]
 
-### 2. `QuoteResponse`
+### 2. `Quote`
 
-A **QuoteResponse** is a [DIDComm] message sent by the liquidity provider or orchestrator in response to a QuoteRequest.
+A **Quote** is a [DIDComm] message sent by the liquidity provider or orchestrator in response to an Exchange request.
 
 The DIDComm message envelope contains:
 
 - **`from`** – REQUIRED [DID] of the liquidity provider or orchestrator
 - **`to`** – REQUIRED Array containing [DID] of the original requester
-- **`type`** – REQUIRED Message type: `"https://tap.rsvp/schema/1.0#QuoteResponse"`
+- **`type`** – REQUIRED Message type: `"https://tap.rsvp/schema/1.0#Quote"`
 - **`id`** – REQUIRED Unique message identifier
-- **`thid`** – REQUIRED Thread identifier linking to the original QuoteRequest
+- **`thid`** – REQUIRED Thread identifier linking to the original Exchange request
 - **`created_time`** – REQUIRED Message creation timestamp
 
 The message `body` contains:
 
 - **`@context`** – REQUIRED JSON-LD context: `"https://tap.rsvp/schema/1.0"`
-- **`@type`** – REQUIRED Type identifier: `"https://tap.rsvp/schema/1.0#QuoteResponse"`
+- **`@type`** – REQUIRED Type identifier: `"https://tap.rsvp/schema/1.0#Quote"`
 - **`fromAsset`** – REQUIRED Source asset (copied from request)
 - **`toAsset`** – REQUIRED Target asset (copied from request)
 - **`amount`** – REQUIRED Amount to convert (copied from request)
@@ -105,7 +105,7 @@ TAIP-18 reuses the existing `Authorize` and `Settle` messages from [TAIP-4] for 
 
 When accepting a quote, agents send an `Authorize` message (per [TAIP-4]) with the following considerations:
 
-- **`thid`** links to the QuoteResponse message ID
+- **`thid`** links to the Quote message ID
 - **`settlementAddress`** specifies where to receive the swapped assets
 - **`settlementAsset`** confirms the asset being received (from `toAsset` in the quote)
 - **`amount`** confirms the expected amount to receive based on the quote
@@ -121,21 +121,21 @@ When the swap is executed, the liquidity provider sends a `Settle` message (per 
 
 ## Example Messages
 
-### QuoteRequest Example
+### Exchange Example
 
-This example shows a complete DIDComm message requesting a quote from USDC to EURC:
+This example shows a complete DIDComm message requesting an exchange from USDC to EURC:
 
 ```json
 {
-  "id": "quote-request-123",
-  "type": "https://tap.rsvp/schema/1.0#QuoteRequest",
+  "id": "exchange-request-123",
+  "type": "https://tap.rsvp/schema/1.0#Exchange",
   "from": "did:web:wallet.example",
   "to": ["did:web:lp.example", "did:web:lp2.example"],
   "created_time": 1719226800,
   "expires_time": 1719313200,
   "body": {
     "@context": "https://tap.rsvp/schema/1.0",
-    "@type": "https://tap.rsvp/schema/1.0#QuoteRequest",
+    "@type": "https://tap.rsvp/schema/1.0#Exchange",
     "fromAsset": "eip155:1/erc20:0xA0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
     "toAsset": "eip155:1/erc20:0xB00b00b00b00b00b00b00b00b00b00b00b00b00b",
     "amount": "1000.00",
@@ -161,19 +161,19 @@ This example shows a complete DIDComm message requesting a quote from USDC to EU
 }
 ```
 
-### QuoteResponse Example
+### Quote Example
 
 ```json
 {
-  "id": "quote-response-456",
-  "type": "https://tap.rsvp/schema/1.0#QuoteResponse",
+  "id": "quote-456",
+  "type": "https://tap.rsvp/schema/1.0#Quote",
   "from": "did:web:lp.example",
   "to": ["did:web:wallet.example"],
-  "thid": "quote-request-123",
+  "thid": "exchange-request-123",
   "created_time": 1719226850,
   "body": {
     "@context": "https://tap.rsvp/schema/1.0",
-    "@type": "https://tap.rsvp/schema/1.0#QuoteResponse",
+    "@type": "https://tap.rsvp/schema/1.0#Quote",
     "fromAsset": "eip155:1/erc20:0xA0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
     "toAsset": "eip155:1/erc20:0xB00b00b00b00b00b00b00b00b00b00b00b00b00b",
     "amount": "1000.00",
@@ -196,7 +196,7 @@ This example shows accepting a quote using the standard `Authorize` message from
   "type": "https://tap.rsvp/schema/1.0#Authorize",
   "from": "did:web:wallet.example",
   "to": ["did:web:lp.example"],
-  "thid": "quote-response-456",
+  "thid": "quote-456",
   "created_time": 1719226900,
   "body": {
     "@context": "https://tap.rsvp/schema/1.0",
@@ -232,18 +232,18 @@ This example shows swap settlement using the standard `Settle` message from [TAI
 
 ### Example: Fiat to Crypto Quote
 
-This example shows a quote request from USD fiat to USDC stablecoin:
+This example shows an exchange request from USD fiat to USDC stablecoin:
 
 ```json
 {
-  "id": "fiat-quote-request-111",
-  "type": "https://tap.rsvp/schema/1.0#QuoteRequest",
+  "id": "fiat-exchange-request-111",
+  "type": "https://tap.rsvp/schema/1.0#Exchange",
   "from": "did:web:user.wallet",
   "to": ["did:web:onramp.provider"],
   "created_time": 1719230000,
   "body": {
     "@context": "https://tap.rsvp/schema/1.0",
-    "@type": "https://tap.rsvp/schema/1.0#QuoteRequest",
+    "@type": "https://tap.rsvp/schema/1.0#Exchange",
     "fromAsset": "USD",
     "toAsset": "eip155:1/erc20:0xA0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
     "amount": "1000.00",
@@ -273,15 +273,15 @@ Response:
 
 ```json
 {
-  "id": "fiat-quote-response-222",
-  "type": "https://tap.rsvp/schema/1.0#QuoteResponse",
+  "id": "fiat-quote-222",
+  "type": "https://tap.rsvp/schema/1.0#Quote",
   "from": "did:web:onramp.provider",
   "to": ["did:web:user.wallet"],
-  "thid": "fiat-quote-request-111",
+  "thid": "fiat-exchange-request-111",
   "created_time": 1719230050,
   "body": {
     "@context": "https://tap.rsvp/schema/1.0",
-    "@type": "https://tap.rsvp/schema/1.0#QuoteResponse",
+    "@type": "https://tap.rsvp/schema/1.0#Quote",
     "fromAsset": "USD",
     "toAsset": "eip155:1/erc20:0xA0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
     "amount": "1000.00",
@@ -295,18 +295,18 @@ Response:
 
 ### Example: Cross-Currency FX Quote
 
-This example shows a pure FX quote between fiat currencies:
+This example shows a pure FX exchange request between fiat currencies:
 
 ```json
 {
-  "id": "fx-quote-request-333",
-  "type": "https://tap.rsvp/schema/1.0#QuoteRequest",
+  "id": "fx-exchange-request-333",
+  "type": "https://tap.rsvp/schema/1.0#Exchange",
   "from": "did:web:bank.example",
   "to": ["did:web:fx.provider"],
   "created_time": 1719231000,
   "body": {
     "@context": "https://tap.rsvp/schema/1.0",
-    "@type": "https://tap.rsvp/schema/1.0#QuoteRequest",
+    "@type": "https://tap.rsvp/schema/1.0#Exchange",
     "fromAsset": "USD",
     "toAsset": "EUR",
     "amount": "1000.00",
@@ -334,8 +334,8 @@ This example shows a pure FX quote between fiat currencies:
 
 ## Flow
 
-1. Wallet or orchestrator sends `QuoteRequest` for USDC → EURC
-2. LP or route engine replies with `QuoteResponse`
+1. Wallet or orchestrator sends `Exchange` request for USDC → EURC
+2. LP or route engine replies with `Quote`
 3. Wallet sends `Authorize` (per [TAIP-4]) to accept the quote
 4. LP executes swap and sends `Settle` (per [TAIP-4]) with transaction details
 5. Settlement may trigger downstream [TAIP-3] Transfer for fund distribution
