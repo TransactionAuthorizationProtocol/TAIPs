@@ -2,58 +2,105 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://taips.tap.rsvp/schemas/data-structures/transaction-constraints.json",
   "title": "TransactionConstraints",
-  "description": "Constraints on a virtual asset transaction",
+  "description": "Transaction constraints for TAIP-15 Agent Connection Protocol that define the boundaries and permissions for transactions performed through an established connection",
   "type": "object",
   "properties": {
-    "maxAmount": {
-      "$ref": "../common/base-types.json#/$defs/amount",
-      "description": "Maximum transaction amount"
-    },
-    "minAmount": {
-      "$ref": "../common/base-types.json#/$defs/amount",
-      "description": "Minimum transaction amount"
-    },
-    "currency": {
-      "$ref": "../common/base-types.json#/$defs/iso4217CurrencyCode",
-      "description": "Currency for amount constraints"
-    },
-    "validFrom": {
-      "$ref": "../common/base-types.json#/$defs/iso8601DateTime",
-      "description": "Start of validity period"
-    },
-    "validUntil": {
-      "$ref": "../common/base-types.json#/$defs/iso8601DateTime",
-      "description": "End of validity period"
-    },
-    "allowedPurposes": {
+    "purposes": {
       "type": "array",
       "items": {
-        "type": "string"
+        "type": "string",
+        "description": "ISO 20022 External Purpose Code"
       },
-      "description": "Allowed transaction purpose codes"
+      "description": "Array of TAIP-13 purpose codes that are allowed for transactions"
+    },
+    "categoryPurposes": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "description": "ISO 20022 External Category Purpose Code"
+      },
+      "description": "Array of TAIP-13 category purpose codes that are allowed for transactions"
+    },
+    "limits": {
+      "type": "object",
+      "properties": {
+        "per_transaction": {
+          "$ref": "../common/base-types.json#/$defs/amount",
+          "description": "Maximum amount per single transaction"
+        },
+        "per_day": {
+          "$ref": "../common/base-types.json#/$defs/amount",
+          "description": "Maximum cumulative amount per day"
+        },
+        "per_week": {
+          "$ref": "../common/base-types.json#/$defs/amount",
+          "description": "Maximum cumulative amount per week"
+        },
+        "per_month": {
+          "$ref": "../common/base-types.json#/$defs/amount",
+          "description": "Maximum cumulative amount per month"
+        },
+        "per_year": {
+          "$ref": "../common/base-types.json#/$defs/amount",
+          "description": "Maximum cumulative amount per year"
+        },
+        "currency": {
+          "$ref": "../common/base-types.json#/$defs/iso4217CurrencyCode",
+          "description": "ISO 4217 currency code for all limits"
+        }
+      },
+      "required": ["currency"],
+      "additionalProperties": false,
+      "description": "Financial limits for transactions with time-based constraints"
+    },
+    "allowedBeneficiaries": {
+      "type": "array",
+      "items": {
+        "$ref": "party.json",
+        "description": "TAIP-6 Party object representing an approved payment recipient"
+      },
+      "description": "Array of TAIP-6 Party objects representing parties that can receive payments through this connection"
+    },
+    "allowedSettlementAddresses": {
+      "type": "array",
+      "items": {
+        "$ref": "../common/caip-types.json#/$defs/caip10",
+        "description": "CAIP-10 blockchain address"
+      },
+      "description": "Array of CAIP-10 addresses that are permitted for settlement through this connection"
     },
     "allowedAssets": {
       "type": "array",
       "items": {
-        "$ref": "../common/caip-types.json#/$defs/caip19"
+        "$ref": "../common/caip-types.json#/$defs/caip19",
+        "description": "CAIP-19 asset identifier"
       },
-      "description": "Allowed asset types"
-    },
-    "blockedCountries": {
-      "type": "array",
-      "items": {
-        "type": "string",
-        "pattern": "^[A-Z]{2}$"
-      },
-      "description": "ISO 3166-1 alpha-2 country codes to block"
-    },
-    "allowedCountries": {
-      "type": "array",
-      "items": {
-        "type": "string",
-        "pattern": "^[A-Z]{2}$"
-      },
-      "description": "ISO 3166-1 alpha-2 country codes to allow"
+      "description": "Array of CAIP-19 asset identifiers that can be transacted through this connection"
     }
-  }
+  },
+  "additionalProperties": false,
+  "examples": [
+    {
+      "purposes": ["BEXP", "SUPP"],
+      "categoryPurposes": ["CASH", "CCRD"],
+      "limits": {
+        "per_transaction": "10000.00",
+        "per_day": "50000.00",
+        "currency": "USD"
+      },
+      "allowedBeneficiaries": [
+        {
+          "@id": "did:example:vendor-1",
+          "name": "Approved Vendor 1"
+        }
+      ],
+      "allowedSettlementAddresses": [
+        "eip155:1:0x742d35Cc6e4dfE2eDFaD2C0b91A8b0780EDAEb58"
+      ],
+      "allowedAssets": [
+        "eip155:1/slip44:60",
+        "eip155:1/erc20:0xA0b86a33E6441b7178bb7094b2c4b6e5066d68B7"
+      ]
+    }
+  ]
 }

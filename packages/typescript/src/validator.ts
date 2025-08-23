@@ -208,12 +208,32 @@ export const AuthorizeSchema = TapMessageObjectSchema.merge(z.object({
   conditions: z.array(z.record(z.string(), z.unknown())).optional()
 }));
 
+/** Transaction Constraints validator */
+export const TransactionConstraintsSchema = z.object({
+  purposes: z.array(PurposeCodeSchema).optional(),
+  categoryPurposes: z.array(CategoryPurposeCodeSchema).optional(),
+  limits: z.object({
+    per_transaction: AmountSchema.optional(),
+    per_day: AmountSchema.optional(),
+    per_week: AmountSchema.optional(),
+    per_month: AmountSchema.optional(),
+    per_year: AmountSchema.optional(),
+    currency: CurrencyCodeSchema
+  }).optional(),
+  allowedBeneficiaries: z.array(PartySchema).optional(),
+  allowedSettlementAddresses: z.array(CAIP10Schema).optional(),
+  allowedAssets: z.array(CAIP19Schema).optional()
+});
+
 /** Connect message body validator */
 export const ConnectSchema = TapMessageObjectSchema.merge(z.object({
   "@type": z.literal("Connect"),
-  agent: AgentSchema,
-  capabilities: z.array(z.string()).optional(),
-  protocols: z.array(z.string()).optional()
+  requester: PartySchema,
+  principal: PartySchema,
+  agents: z.array(AgentSchema),
+  constraints: TransactionConstraintsSchema,
+  expiry: ISO8601DateTimeSchema.optional(),
+  agreement: z.string().url().optional()
 }));
 
 /** Settle message body validator */
@@ -374,3 +394,6 @@ export const validateCancelMessage = (message: unknown) => CancelMessageSchema.s
 
 /** Validates Revert messages */
 export const validateRevertMessage = (message: unknown) => RevertMessageSchema.safeParse(message);
+
+/** Validates Transaction Constraints */
+export const validateTransactionConstraints = (constraints: unknown) => TransactionConstraintsSchema.safeParse(constraints);

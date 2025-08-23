@@ -1055,7 +1055,25 @@ The body object must contain:
         "per_transaction": "10000.00",
         "per_day": "50000.00",
         "currency": "USD"
-      }
+      },
+      "allowedBeneficiaries": [
+        {
+          "@id": "did:example:vendor-1",
+          "name": "Approved Vendor 1"
+        },
+        {
+          "@id": "did:example:vendor-2", 
+          "name": "Approved Vendor 2"
+        }
+      ],
+      "allowedSettlementAddresses": [
+        "eip155:1:0x742d35Cc6e4dfE2eDFaD2C0b91A8b0780EDAEb58",
+        "eip155:1:0x89abcdefabcdefabcdefabcdefabcdefabcdef12"
+      ],
+      "allowedAssets": [
+        "eip155:1/slip44:60",
+        "eip155:1/erc20:0xA0b86a33E6441b7178bb7094b2c4b6e5066d68B7"
+      ]
     }
   }
 }
@@ -1094,7 +1112,11 @@ The body object must contain:
         "per_transaction": "5000.00",
         "per_day": "25000.00",
         "currency": "USD"
-      }
+      },
+      "allowedAssets": [
+        "eip155:1/erc20:0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+        "eip155:1/erc20:0x6B175474E89094C44Da98b954EedeAC495271d0F"
+      ]
     }
   }
 }
@@ -1192,11 +1214,31 @@ Requests a connection between agents with specified constraints.
 |-----------|------|----------|---------|-------------|
 | @context | string | Yes | Draft ([TAIP-15]) | JSON-LD context "https://tap.rsvp/schema/1.0" |
 | @type | string | Yes | Draft ([TAIP-15]) | JSON-LD type "https://tap.rsvp/schema/1.0#Connect" |
-| agent | object | No | Draft ([TAIP-15]) | Details of the requesting agent |
-| principal | [Party](#party) | Yes | Draft ([TAIP-15]) | Party object representing the principal the agent acts on behalf of |
-| constraints | object | Yes | Draft ([TAIP-15]) | Transaction constraints for the connection |
+| requester | [Party](#party) | Yes | Draft ([TAIP-15]) | Party object representing the party requesting the connection |
+| principal | [Party](#party) | Yes | Draft ([TAIP-15]) | Party object representing the party the requesting agent acts on behalf of |
+| agents | array | Yes | Draft ([TAIP-15]) | Array of agent objects involved in the connection process |
+| constraints | object | Yes | Draft ([TAIP-15]) | Transaction constraints for the connection (see [constraints table](#transaction-constraints)) |
 | expiry | string | No | Draft ([TAIP-15]) | ISO 8601 datetime indicating when the connection request expires |
 | agreement | string | No | Draft ([TAIP-15]) | URL or identifier of terms agreed to by the principal |
+
+#### Transaction Constraints
+
+The `constraints` object defines the boundaries and permissions for transactions performed through an established connection:
+
+| Attribute | Type | Required | Status | Description |
+|-----------|------|----------|---------|-------------|
+| purposes | array | No | Draft ([TAIP-15]) | Array of [TAIP-13] purpose codes that are allowed |
+| categoryPurposes | array | No | Draft ([TAIP-15]) | Array of [TAIP-13] category purpose codes that are allowed |
+| limits | object | No | Draft ([TAIP-15]) | Financial limits for transactions |
+| limits.per_transaction | string | No | Draft ([TAIP-15]) | Maximum amount per transaction |
+| limits.per_day | string | No | Draft ([TAIP-15]) | Maximum daily total |
+| limits.per_week | string | No | Draft ([TAIP-15]) | Maximum weekly total |
+| limits.per_month | string | No | Draft ([TAIP-15]) | Maximum monthly total |
+| limits.per_year | string | No | Draft ([TAIP-15]) | Maximum yearly total |
+| limits.currency | string | Yes* | Draft ([TAIP-15]) | ISO 4217 currency code (*required if limits are specified) |
+| allowedBeneficiaries | array | No | Draft ([TAIP-15]) | Array of [TAIP-6] Party objects representing approved payment recipients |
+| allowedSettlementAddresses | array | No | Draft ([TAIP-15]) | Array of [CAIP-10] addresses permitted for settlement |
+| allowedAssets | array | No | Draft ([TAIP-15]) | Array of [CAIP-19] asset identifiers that can be transacted |
 
 #### Example Connect Message
 ```json
@@ -1233,7 +1275,25 @@ Requests a connection between agents with specified constraints.
         "per_transaction": "10000.00",
         "per_day": "50000.00",
         "currency": "USD"
-      }
+      },
+      "allowedBeneficiaries": [
+        {
+          "@id": "did:example:vendor-1",
+          "name": "Approved Vendor 1"
+        },
+        {
+          "@id": "did:example:vendor-2", 
+          "name": "Approved Vendor 2"
+        }
+      ],
+      "allowedSettlementAddresses": [
+        "eip155:1:0x742d35Cc6e4dfE2eDFaD2C0b91A8b0780EDAEb58",
+        "eip155:1:0x89abcdefabcdefabcdefabcdefabcdefabcdef12"
+      ],
+      "allowedAssets": [
+        "eip155:1/slip44:60",
+        "eip155:1/erc20:0xA0b86a33E6441b7178bb7094b2c4b6e5066d68B7"
+      ]
     },
     "agreement": "https://example.com/terms/v2.1"
   }
@@ -1315,7 +1375,20 @@ This flow demonstrates establishing a connection between a B2B service and a VAS
         "per_transaction": "10000.00",
         "per_day": "50000.00",
         "currency": "USD"
-      }
+      },
+      "allowedBeneficiaries": [
+        {
+          "@id": "did:example:vendor-1",
+          "name": "Approved Vendor 1"
+        }
+      ],
+      "allowedSettlementAddresses": [
+        "eip155:1:0x742d35Cc6e4dfE2eDFaD2C0b91A8b0780EDAEb58"
+      ],
+      "allowedAssets": [
+        "eip155:1/slip44:60",
+        "eip155:1/erc20:0xA0b86a33E6441b7178bb7094b2c4b6e5066d68B7"
+      ]
     }
   }
 }
@@ -1426,7 +1499,12 @@ In self-onboarding scenarios, the agent and principal can be the same entity (e.
         "per_transaction": "50000.00",
         "per_day": "250000.00",
         "currency": "USD"
-      }
+      },
+      "allowedAssets": [
+        "eip155:1/slip44:60",
+        "eip155:1/erc20:0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+        "eip155:1/erc20:0x6B175474E89094C44Da98b954EedeAC495271d0F"
+      ]
     },
     "agreement": "https://wallet-service.com/terms-of-service/v3.0"
   }
