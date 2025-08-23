@@ -18,7 +18,7 @@ A standard for requesting and executing token swaps and price quotations for blo
 
 ## Abstract
 
-TAIP-18 introduces a QuoteRequest message format for initiating cross-asset quotes (e.g., from USDC to EURC, or across chains) and defines optional settlement support for accepted quotes. It is designed for composability with existing TAP messages like Payment ([TAIP-14]), Transfer ([TAIP-3]), and Invoices ([TAIP-16]). TAIP-18 formalizes the message exchange required to:
+TAIP-18 introduces a QuoteRequest message format for initiating cross-asset quotes (e.g., from USDC to EURC, USD to USDC, or across chains) and defines optional settlement support for accepted quotes. It is designed for composability with existing TAP messages like Payment ([TAIP-14]) and Transfer ([TAIP-3]). TAIP-18 formalizes the message exchange required to:
 
 * Quote and approve stablecoin swaps
 * Discover on-/off-ramp pricing
@@ -48,9 +48,9 @@ TAIP-18 defines the following primary message types:
 Sent by the party initiating a quote. Includes:
 
 * `@type`: `QuoteRequest`
-* `fromAsset`: [CAIP-19] or DTI
-* `toAsset`: [CAIP-19] or DTI
-* `amount`: amount of `fromAsset` to convert
+* `fromAsset`: [CAIP-19], DTI, or [ISO-4217] currency code (e.g., "USD", "EUR") for the source asset
+* `toAsset`: [CAIP-19], DTI, or [ISO-4217] currency code for the target asset
+* `amount`: amount to convert (string decimal)
 * `expiry`: optional, how long the quote is valid for
 * `policies`: optional; compliance or presentation requirements
 * `preferredProvider`: optional, LP to prioritize
@@ -85,7 +85,7 @@ Describes how the swap was executed, post-trade. May trigger downstream TAP-3 Tr
 * `quoteId`
 * `txHash`
 * `settledAmount`
-* `settledAsset`
+* `settledAsset`: [CAIP-19], DTI, or [ISO-4217] currency code for the settled asset
 
 ## Example Messages
 
@@ -96,7 +96,7 @@ Describes how the swap was executed, post-trade. May trigger downstream TAP-3 Tr
   "@type": "QuoteRequest",
   "fromAsset": "eip155:1/erc20:0xA0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
   "toAsset": "eip155:1/erc20:0xB00b00b00b00b00b00b00b00b00b00b00b00b00b",
-  "amount": "1000",
+  "amount": "1000.00",
   "expiry": "2025-07-21T00:00:00Z",
   "preferredProvider": "did:example:lp-xyz"
 }
@@ -110,7 +110,7 @@ Describes how the swap was executed, post-trade. May trigger downstream TAP-3 Tr
   "quoteId": "quote-abc-123",
   "fromAsset": "eip155:1/erc20:0xA0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
   "toAsset": "eip155:1/erc20:0xB00b00b00b00b00b00b00b00b00b00b00b00b00b",
-  "amount": "1000",
+  "amount": "1000.00",
   "rate": "0.91",
   "fee": "1.50",
   "path": ["USDC", "ETH", "EURC"],
@@ -142,6 +142,49 @@ Describes how the swap was executed, post-trade. May trigger downstream TAP-3 Tr
 }
 ```
 
+### Example: Fiat to Crypto Quote
+
+This example shows a quote request from USD fiat to USDC stablecoin:
+
+```json
+{
+  "@type": "QuoteRequest",
+  "fromAsset": "USD",
+  "toAsset": "eip155:1/erc20:0xA0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+  "amount": "1000.00",
+  "expiry": "2025-07-21T00:00:00Z"
+}
+```
+
+Response:
+
+```json
+{
+  "@type": "QuoteResponse",
+  "quoteId": "fiat-quote-456",
+  "fromAsset": "USD",
+  "toAsset": "eip155:1/erc20:0xA0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+  "amount": "1000.00",
+  "rate": "0.998",
+  "fee": "2.00",
+  "provider": "did:web:onramp.provider",
+  "expiresAt": "2025-07-21T00:00:00Z"
+}
+```
+
+### Example: Cross-Currency FX Quote
+
+This example shows a pure FX quote between fiat currencies:
+
+```json
+{
+  "@type": "QuoteRequest",
+  "fromAsset": "USD",
+  "toAsset": "EUR",
+  "amount": "1000.00"
+}
+```
+
 ## Flow
 
 1. Wallet or orchestrator sends `QuoteRequest` for USDC → EURC
@@ -155,6 +198,10 @@ Describes how the swap was executed, post-trade. May trigger downstream TAP-3 Tr
 TAIP-18 can be embedded as a subflow in:
 
 * `Payment` workflows ([TAIP-14]) for invoice settlement
+* `Escrow` workflows ([TAIP-17]) for guaranteed payment with FX conversion
+* On-ramp/off-ramp flows between fiat and crypto assets
+* Cross-border remittance with currency conversion
+* Multi-asset portfolio rebalancing
 
 ## Security Considerations
 
@@ -177,8 +224,10 @@ TAIP-18 can be embedded as a subflow in:
 * [TAIP-8] Selective Disclosure
 * [TAIP-9] DIDComm Integration
 * [TAIP-14] Payment Request
+* [TAIP-17] Composable Escrow
 * [CAIP-19] Asset Type and Asset ID Specification
 * [DTI] Digital Token Identifier
+* [ISO-4217] ISO 4217 Currency Codes
 
 [TAIP-2]: ./taip-2
 [TAIP-3]: ./taip-3
@@ -188,8 +237,10 @@ TAIP-18 can be embedded as a subflow in:
 [TAIP-8]: ./taip-8
 [TAIP-9]: ./taip-9
 [TAIP-14]: ./taip-14
+[TAIP-17]: ./taip-17
 [CAIP-19]: https://chainagnostic.org/CAIPs/caip-19
 [DTI]: https://www.dtif.org/
+[ISO-4217]: https://www.iso.org/iso-4217-currency-codes.html
 
 ## Copyright
 
