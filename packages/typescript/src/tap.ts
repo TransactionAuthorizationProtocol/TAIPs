@@ -1666,6 +1666,27 @@ export interface TransactionConstraints {
      */
     currency: IsoCurrency;
   };
+
+  /**
+   * Allowed beneficiaries for transactions
+   * Array of TAIP-6 Party objects representing parties that can receive payments through this connection
+   * Used to restrict transactions to specific approved recipients
+   */
+  allowedBeneficiaries?: Party[];
+
+  /**
+   * Allowed settlement addresses
+   * Array of CAIP-10 addresses that are permitted for settlement through this connection
+   * Used to restrict settlements to specific approved blockchain addresses
+   */
+  allowedSettlementAddresses?: CAIP10[];
+
+  /**
+   * Allowed assets for transactions
+   * Array of CAIP-19 asset identifiers that can be transacted through this connection
+   * Used to restrict transactions to specific approved tokens or assets
+   */
+  allowedAssets?: CAIP19[];
 }
 
 /**
