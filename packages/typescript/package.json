@@ -1,6 +1,6 @@
 {
   "name": "@taprsvp/types",
-  "version": "1.9.0",
+  "version": "1.10.0",
   "description": "TypeScript types and interfaces for the Transaction Authorization Protocol (TAP)",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -48,7 +48,6 @@
     "access": "public"
   },
   "dependencies": {
-    "@taprsvp/iso20022_external_codes": "^1.0.0",
     "ivms101": "^1.1.1",
     "zod": "^4.0.17"
   }
