@@ -49,6 +49,8 @@ An **Exchange** is a [DIDComm] message (per [TAIP-2]) sent by the party initiati
 
 The exchange request identifies the parties involved in the potential transaction and the agents acting on their behalf. The `requester` party represents the entity seeking the exchange. The optional `provider` party represents a specific liquidity provider being engaged; when omitted, the Exchange message can be broadcast through a centralized service or sent to multiple providers who can each choose to respond with a Quote. The `agents` array lists all software agents involved in processing this exchange request, including their roles and the parties they represent.
 
+The Exchange message supports multiple assets in both `fromAssets` and `toAssets` arrays, enabling complex exchange scenarios. For example, when responding to a Payment request ([TAIP-14]) that lists multiple EUR stablecoins as supportedAssets, but the customer only has USD stablecoins available, they can list their available USD tokens in `fromAssets` and the merchant's supported EUR tokens in `toAssets`, allowing providers to quote cross-currency exchanges.
+
 The DIDComm message envelope contains:
 
 - **`from`** – REQUIRED [DID] of the initiating agent
@@ -63,9 +65,10 @@ The message `body` contains:
 
 - **`@context`** – REQUIRED JSON-LD context: `"https://tap.rsvp/schema/1.0"`
 - **`@type`** – REQUIRED Type identifier: `"https://tap.rsvp/schema/1.0#Exchange"`
-- **`fromAsset`** – REQUIRED [CAIP-19], DTI, or [ISO-4217] currency code for the source asset
-- **`toAsset`** – REQUIRED [CAIP-19], DTI, or [ISO-4217] currency code for the target asset
-- **`amount`** – REQUIRED Amount to convert (string decimal)
+- **`fromAssets`** – REQUIRED Array of [CAIP-19], DTI, or [ISO-4217] currency codes for available source assets
+- **`toAssets`** – REQUIRED Array of [CAIP-19], DTI, or [ISO-4217] currency codes for desired target assets
+- **`fromAmount`** – CONDITIONAL Amount of source asset to exchange (string decimal). Either `fromAmount` or `toAmount` must be provided
+- **`toAmount`** – CONDITIONAL Amount of target asset desired (string decimal). Either `fromAmount` or `toAmount` must be provided
 - **`requester`** – REQUIRED The party requesting the exchange (Party object per [TAIP-6])
 - **`provider`** – OPTIONAL The preferred liquidity provider party (Party object per [TAIP-6]). When omitted, the Exchange message can be broadcast to multiple providers
 - **`agents`** – REQUIRED Array of agents involved in the exchange request per [TAIP-5]
@@ -74,6 +77,8 @@ The message `body` contains:
 ### 2. `Quote`
 
 A **Quote** is a [DIDComm] message sent by the liquidity provider or orchestrator in response to an Exchange request.
+
+The quote response includes the `provider` party information and an updated `agents` array. The agents array must contain all agents from the original Exchange request plus any additional agents representing the provider. This ensures full traceability of all parties and agents involved in the potential transaction.
 
 The DIDComm message envelope contains:
 
@@ -90,11 +95,10 @@ The message `body` contains:
 - **`@type`** – REQUIRED Type identifier: `"https://tap.rsvp/schema/1.0#Quote"`
 - **`fromAsset`** – REQUIRED Source asset (copied from request)
 - **`toAsset`** – REQUIRED Target asset (copied from request)
-- **`amount`** – REQUIRED Amount to convert (copied from request)
-- **`rate`** – REQUIRED Exchange rate (e.g., "0.91" meaning 1 fromAsset = 0.91 toAsset)
-- **`fee`** – REQUIRED Fee amount (string decimal)
-- **`path`** – OPTIONAL Array of assets/chains in the routing path
-- **`provider`** – REQUIRED [DID] of the quoting entity
+- **`fromAmount`** – REQUIRED Amount of source asset to be exchanged (string decimal)
+- **`toAmount`** – REQUIRED Amount of target asset to be received (string decimal)
+- **`provider`** – REQUIRED The liquidity provider party (Party object per [TAIP-6])
+- **`agents`** – REQUIRED Array of agents involved in the quote per [TAIP-5]. Must include all agents from the original Exchange request plus any provider agents
 - **`expiresAt`** – REQUIRED ISO 8601 timestamp when quote expires
 
 ### 3. Authorization and Settlement
@@ -136,9 +140,9 @@ This example shows a complete DIDComm message requesting an exchange from USDC t
   "body": {
     "@context": "https://tap.rsvp/schema/1.0",
     "@type": "https://tap.rsvp/schema/1.0#Exchange",
-    "fromAsset": "eip155:1/erc20:0xA0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
-    "toAsset": "eip155:1/erc20:0xB00b00b00b00b00b00b00b00b00b00b00b00b00b",
-    "amount": "1000.00",
+    "fromAssets": ["eip155:1/erc20:0xA0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"],
+    "toAssets": ["eip155:1/erc20:0xB00b00b00b00b00b00b00b00b00b00b00b00b00b"],
+    "fromAmount": "1000.00",
     "requester": {
       "@id": "did:web:business.example"
     },
@@ -176,11 +180,23 @@ This example shows a complete DIDComm message requesting an exchange from USDC t
     "@type": "https://tap.rsvp/schema/1.0#Quote",
     "fromAsset": "eip155:1/erc20:0xA0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
     "toAsset": "eip155:1/erc20:0xB00b00b00b00b00b00b00b00b00b00b00b00b00b",
-    "amount": "1000.00",
-    "rate": "0.91",
-    "fee": "1.50",
-    "path": ["USDC", "ETH", "EURC"],
-    "provider": "did:web:lp.example",
+    "fromAmount": "1000.00",
+    "toAmount": "908.50",
+    "provider": {
+      "@id": "did:web:liquidity.provider"
+    },
+    "agents": [
+      {
+        "@id": "did:web:wallet.example",
+        "for": "did:web:business.example",
+        "role": "requester"
+      },
+      {
+        "@id": "did:web:lp.example",
+        "for": "did:web:liquidity.provider",
+        "role": "provider"
+      }
+    ],
     "expiresAt": "2025-07-21T00:00:00Z"
   }
 }
@@ -203,7 +219,7 @@ This example shows accepting a quote using the standard `Authorize` message from
     "@type": "https://tap.rsvp/schema/1.0#Authorize",
     "settlementAddress": "eip155:1:0xabcdef0123456789abcdef0123456789abcdef01",
     "settlementAsset": "eip155:1/erc20:0xB00b00b00b00b00b00b00b00b00b00b00b00b00b",
-    "amount": "909.50"
+    "amount": "908.50"
   }
 }
 ```
@@ -225,7 +241,7 @@ This example shows swap settlement using the standard `Settle` message from [TAI
     "@type": "https://tap.rsvp/schema/1.0#Settle",
     "settlementAddress": "eip155:1:0xabcdef0123456789abcdef0123456789abcdef01",
     "settlementId": "eip155:1:tx/0xdeadbeef1234567890abcdef1234567890abcdef1234567890abcdef123456",
-    "amount": "909.50"
+    "amount": "908.50"
   }
 }
 ```
@@ -244,9 +260,9 @@ This example shows an exchange request from USD fiat to USDC stablecoin:
   "body": {
     "@context": "https://tap.rsvp/schema/1.0",
     "@type": "https://tap.rsvp/schema/1.0#Exchange",
-    "fromAsset": "USD",
-    "toAsset": "eip155:1/erc20:0xA0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
-    "amount": "1000.00",
+    "fromAssets": ["USD"],
+    "toAssets": ["eip155:1/erc20:0xA0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"],
+    "fromAmount": "1000.00",
     "requester": {
       "@id": "did:web:user.entity"
     },
@@ -284,10 +300,23 @@ Response:
     "@type": "https://tap.rsvp/schema/1.0#Quote",
     "fromAsset": "USD",
     "toAsset": "eip155:1/erc20:0xA0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
-    "amount": "1000.00",
-    "rate": "0.998",
-    "fee": "2.00",
-    "provider": "did:web:onramp.provider",
+    "fromAmount": "1000.00",
+    "toAmount": "996.00",
+    "provider": {
+      "@id": "did:web:onramp.company"
+    },
+    "agents": [
+      {
+        "@id": "did:web:user.wallet",
+        "for": "did:web:user.entity",
+        "role": "requester"
+      },
+      {
+        "@id": "did:web:onramp.provider",
+        "for": "did:web:onramp.company",
+        "role": "provider"
+      }
+    ],
     "expiresAt": "2025-07-21T00:00:00Z"
   }
 }
@@ -295,7 +324,7 @@ Response:
 
 ### Example: Broadcast Exchange Request
 
-This example shows an Exchange request broadcast to multiple providers without specifying a particular provider:
+This example shows an Exchange request broadcast to multiple providers without specifying a particular provider. The requester has USDC and USDT on Ethereum mainnet available and wants to exchange for either USDC or USDT on Polygon:
 
 ```json
 {
@@ -307,9 +336,15 @@ This example shows an Exchange request broadcast to multiple providers without s
   "body": {
     "@context": "https://tap.rsvp/schema/1.0",
     "@type": "https://tap.rsvp/schema/1.0#Exchange",
-    "fromAsset": "eip155:1/erc20:0xA0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
-    "toAsset": "eip155:137/erc20:0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174",
-    "amount": "5000.00",
+    "fromAssets": [
+      "eip155:1/erc20:0xA0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+      "eip155:1/erc20:0xdAC17F958D2ee523a2206206994597C13D831ec7"
+    ],
+    "toAssets": [
+      "eip155:137/erc20:0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174",
+      "eip155:137/erc20:0xc2132D05D31c914a87C6611C10748AEb04B58e8F"
+    ],
+    "toAmount": "5000.00",
     "requester": {
       "@id": "did:web:business.example"
     },
@@ -338,9 +373,9 @@ This example shows a pure FX exchange request between fiat currencies:
   "body": {
     "@context": "https://tap.rsvp/schema/1.0",
     "@type": "https://tap.rsvp/schema/1.0#Exchange",
-    "fromAsset": "USD",
-    "toAsset": "EUR",
-    "amount": "1000.00",
+    "fromAssets": ["USD"],
+    "toAssets": ["EUR"],
+    "fromAmount": "1000.00",
     "requester": {
       "@id": "did:web:bank.entity"
     },
