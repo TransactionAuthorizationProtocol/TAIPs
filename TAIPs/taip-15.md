@@ -5,7 +5,7 @@ status: Review
 type: Standard
 author: Pelle Braendgaard <pelle@notabene.id>
 created: 2024-03-21
-updated: 2025-08-21
+updated: 2025-08-23
 description: Establishes a protocol for creating secure, authorized connections between TAP agents with predefined transaction constraints and OAuth-style authorization flows. Enables persistent B2B integrations with transaction limits, purpose restrictions, and user control mechanisms for ongoing business relationships while maintaining robust risk management.
 requires: [2, 4, 6, 9, 13]
 ---
@@ -57,6 +57,50 @@ The Agent Connection Protocol involves two distinct parties and their respective
 
 This separation allows for complex B2B relationships where a service provider (requester) wants to act on behalf of their customer (principal) while maintaining clear accountability and authorization chains.
 
+### Transaction Constraints
+
+Transaction constraints are a fundamental security mechanism in the Agent Connection Protocol that define the boundaries and permissions for transactions performed through an established connection. These constraints serve multiple critical purposes:
+
+**Security and Risk Management**: Constraints act as guardrails that prevent unauthorized or excessive transactions, protecting both parties from potential fraud, errors, or misuse of the connection. They establish clear limits on transaction amounts, frequencies, and purposes.
+
+**Compliance and Governance**: Many organizations require specific controls over automated transactions to meet regulatory requirements, internal policies, or audit standards. Constraints provide a standardized way to encode these requirements into the connection itself.
+
+**User Control and Transparency**: By clearly defining what actions can be performed through a connection, constraints give users visibility and control over how their funds or assets may be used by authorized agents.
+
+**Automated Decision Making**: Constraints enable receiving agents to automatically approve transactions that fall within established parameters while flagging or rejecting those that exceed the agreed-upon limits.
+
+#### Constraint Enforcement
+
+Agents MUST enforce all specified constraints when processing transactions through an established connection. Failure to respect constraints constitutes a violation of the connection agreement and may result in:
+- Transaction rejection
+- Connection termination
+- Loss of trust between parties
+- Potential legal or regulatory consequences
+
+#### Types of Constraints
+
+The Agent Connection Protocol supports several categories of transaction constraints:
+
+**Purpose Constraints**: Define what types of transactions are permitted through the connection.
+- `purposes` - Specific [TAIP-13] purpose codes that are allowed
+- `categoryPurposes` - Broader [TAIP-13] category purpose codes that encompass multiple specific purposes
+
+**Financial Limits**: Set monetary boundaries on transaction amounts and frequencies.
+- `per_transaction` - Maximum amount for any single transaction
+- `per_day`, `per_week`, `per_month`, `per_year` - Cumulative limits over time periods
+- `currency` - The currency in which all limits are expressed
+
+**Party Restrictions**: Control which entities can participate in transactions.
+- `allowedBeneficiaries` - Specific [TAIP-6] parties that can receive payments through this connection
+- This enables scenarios like approved vendor lists or restricted recipient sets
+
+**Technical Restrictions**: Define technical parameters for transaction execution.
+- `allowedSettlementAddresses` - Specific [CAIP-10] blockchain addresses permitted for settlement
+- `allowedAssets` - Specific [CAIP-19] assets that can be transacted through this connection
+- These constraints enable precise control over which tokens and addresses can be used
+
+Constraints work together to create a comprehensive authorization framework. For example, a connection might allow monthly subscription payments (`purposes: ["SUBS"]`) up to $100 per month (`limits: {"per_month": "100.00", "currency": "USD"}`) only to a specific merchant (`allowedBeneficiaries: [{"@id": "did:web:saas-provider.example"}]`) using only USDC tokens (`allowedAssets: ["eip155:1/erc20:0xA0b86a33E6441b7178bb7094b2c4b6e5066d68B7"]`).
+
 ### Connect Message
 
 A message sent by an agent requesting connection to another agent:
@@ -80,6 +124,9 @@ A message sent by an agent requesting connection to another agent:
     - `per_month` - OPTIONAL string decimal amount
     - `per_year` - OPTIONAL string decimal amount
     - `currency` - REQUIRED string ISO 4217 currency code if limits are specified
+  - `allowedBeneficiaries` - OPTIONAL array of [TAIP-6] Party objects representing parties that can receive payments through this connection
+  - `allowedSettlementAddresses` - OPTIONAL array of [CAIP-10] addresses that are permitted for settlement through this connection
+  - `allowedAssets` - OPTIONAL array of [CAIP-19] asset identifiers that can be transacted through this connection
 - `agreement` - OPTIONAL string URL pointing to terms of service or agreement between the principal and requesting agent
 - `expiry` - OPTIONAL timestamp in ISO 8601 format indicating when the connection request expires. After this time, if no authorization has occurred, the connection request should be considered invalid. This is distinct from the technical message expiry handled by the DIDComm `expires_time` header.
 - `attachments` - OPTIONAL array of [TAIP-2] message attachments containing transaction messages (such as [TAIP-3] Transfer or [TAIP-14] Payment messages) that should be authorized in the same context as the Connect request. When attachments are present, authorization of the Connect request also authorizes the attached transaction messages. This enables use cases like establishing recurring billing connections with an immediate first payment, or setting up trading permissions with an initial transaction. All attached transaction messages MUST respect the connection's defined constraints.
@@ -404,7 +451,25 @@ The following are example plaintext messages. See [TAIP-2] for how to sign the m
         "per_transaction": "10000.00",
         "per_day": "50000.00",
         "currency": "USD"
-      }
+      },
+      "allowedBeneficiaries": [
+        {
+          "@id": "did:example:vendor-1",
+          "name": "Approved Vendor 1"
+        },
+        {
+          "@id": "did:example:vendor-2", 
+          "name": "Approved Vendor 2"
+        }
+      ],
+      "allowedSettlementAddresses": [
+        "eip155:1:0x742d35Cc6e4dfE2eDFaD2C0b91A8b0780EDAEb58",
+        "eip155:1:0x89abcdefabcdefabcdefabcdefabcdefabcdef12"
+      ],
+      "allowedAssets": [
+        "eip155:1/slip44:60",
+        "eip155:1/erc20:0xA0b86a33E6441b7178bb7094b2c4b6e5066d68B7"
+      ]
     },
     "agreement": "https://b2b-service.com/terms/api-agreement",
     "expiry": "2024-03-22T15:00:00Z"
@@ -589,6 +654,9 @@ The receiving agent MUST:
    - Verify the amount is within the per-transaction and daily limits
    - Confirm the originator's `@id` matches the connection's `principal.@id` value
    - Verify the agent has permission to act for the specified principal
+   - If `allowedBeneficiaries` is specified, confirm the beneficiary is in the approved list
+   - If `allowedSettlementAddresses` is specified, confirm the settlement address is in the approved list
+   - If `allowedAssets` is specified, confirm the transaction asset is in the approved list
 3. Process the transaction according to [TAIP-4] if all checks pass
 
 ### Example Connect with Attached Payment for Recurring Billing
@@ -681,12 +749,16 @@ In this example:
 * [TAIP-6] Transaction Parties
 * [TAIP-9] Proof of Relationship
 * [TAIP-13] Purpose Codes
+* [CAIP-10] Account ID Specification
+* [CAIP-19] Asset Type and Asset ID Specification
 
 [TAIP-2]: ./taip-2 "TAP Messaging"
 [TAIP-4]: ./taip-4 "Transaction Authorization Protocol"
 [TAIP-6]: ./taip-6 "Transaction Parties"
 [TAIP-9]: ./taip-9 "Proof of Relationship"
 [TAIP-13]: ./taip-13 "Purpose Codes"
+[CAIP-10]: https://chainagnostic.org/CAIPs/caip-10 "Account ID Specification"
+[CAIP-19]: https://chainagnostic.org/CAIPs/caip-19 "Asset Type and Asset ID Specification"
 
 ## Copyright
 

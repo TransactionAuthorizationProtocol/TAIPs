@@ -14,6 +14,19 @@ This changelog focuses on:
 - Protocol structural changes
 - Breaking changes
 
+## [2025-08-23]
+
+### Enhanced
+- **TAIP-15 Agent Connection Protocol**: Enhanced transaction constraints for improved security and control
+  - Added three new optional constraint fields to Connect messages:
+    - `allowedBeneficiaries` - array of TAIP-6 Party objects for approved payment recipients
+    - `allowedSettlementAddresses` - array of CAIP-10 addresses for approved settlement addresses
+    - `allowedAssets` - array of CAIP-19 asset identifiers for approved transaction assets
+  - Added comprehensive "Transaction Constraints" section explaining constraint purposes, enforcement requirements, and types
+  - Updated transaction validation requirements to include new constraint checks
+  - Enhanced test examples to demonstrate new constraint usage
+  - Added CAIP-10 and CAIP-19 references for address and asset identifier standards
+
 ## [2025-08-21]
 
 ### Added
