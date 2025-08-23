@@ -45,100 +45,181 @@ TAIP-18 defines the following primary message types:
 
 ### 1. `QuoteRequest`
 
-Sent by the party initiating a quote. Includes:
+A **QuoteRequest** is a [DIDComm] message (per [TAIP-2]) sent by the party initiating a quote. Like all TAP messages, it follows the DIDComm v2 message structure with the TAP-specific body format.
 
-* `@type`: `QuoteRequest`
-* `fromAsset`: [CAIP-19], DTI, or [ISO-4217] currency code (e.g., "USD", "EUR") for the source asset
-* `toAsset`: [CAIP-19], DTI, or [ISO-4217] currency code for the target asset
-* `amount`: amount to convert (string decimal)
-* `expiry`: optional, how long the quote is valid for
-* `policies`: optional; compliance or presentation requirements
-* `preferredProvider`: optional, LP to prioritize
+The DIDComm message envelope contains:
+
+- **`from`** – REQUIRED [DID] of the initiating agent
+- **`to`** – REQUIRED Array containing [DID] of the liquidity providers or orchestrators
+- **`type`** – REQUIRED Message type: `"https://tap.rsvp/schema/1.0#QuoteRequest"`
+- **`id`** – REQUIRED Unique message identifier
+- **`thid`** – OPTIONAL Thread identifier for related messages (e.g., a Payment from [TAIP-14])
+- **`created_time`** – REQUIRED Message creation timestamp
+- **`expires_time`** – OPTIONAL Message expiration timestamp
+
+The message `body` contains:
+
+- **`@context`** – REQUIRED JSON-LD context: `"https://tap.rsvp/schema/1.0"`
+- **`@type`** – REQUIRED Type identifier: `"https://tap.rsvp/schema/1.0#QuoteRequest"`
+- **`fromAsset`** – REQUIRED [CAIP-19], DTI, or [ISO-4217] currency code for the source asset
+- **`toAsset`** – REQUIRED [CAIP-19], DTI, or [ISO-4217] currency code for the target asset
+- **`amount`** – REQUIRED Amount to convert (string decimal)
+- **`policies`** – OPTIONAL Compliance or presentation requirements per [TAIP-7]
+- **`preferredProvider`** – OPTIONAL [DID] of preferred liquidity provider
 
 ### 2. `QuoteResponse`
 
-Sent by the liquidity provider or orchestrator in response to a QuoteRequest.
+A **QuoteResponse** is a [DIDComm] message sent by the liquidity provider or orchestrator in response to a QuoteRequest.
 
-* `@type`: `QuoteResponse`
-* `fromAsset`, `toAsset`, `amount`: copied from request
-* `rate`: exchange rate (e.g., 1 USDC = 0.91 EURC)
-* `fee`: quoted fee
-* `path`: route of assets and chains
-* `provider`: identifier of quoting entity
-* `expiresAt`: timestamp
-* `quoteId`: reference for settlement
+The DIDComm message envelope contains:
+
+- **`from`** – REQUIRED [DID] of the liquidity provider or orchestrator
+- **`to`** – REQUIRED Array containing [DID] of the original requester
+- **`type`** – REQUIRED Message type: `"https://tap.rsvp/schema/1.0#QuoteResponse"`
+- **`id`** – REQUIRED Unique message identifier
+- **`thid`** – REQUIRED Thread identifier linking to the original QuoteRequest
+- **`created_time`** – REQUIRED Message creation timestamp
+
+The message `body` contains:
+
+- **`@context`** – REQUIRED JSON-LD context: `"https://tap.rsvp/schema/1.0"`
+- **`@type`** – REQUIRED Type identifier: `"https://tap.rsvp/schema/1.0#QuoteResponse"`
+- **`fromAsset`** – REQUIRED Source asset (copied from request)
+- **`toAsset`** – REQUIRED Target asset (copied from request)
+- **`amount`** – REQUIRED Amount to convert (copied from request)
+- **`rate`** – REQUIRED Exchange rate (e.g., "0.91" meaning 1 fromAsset = 0.91 toAsset)
+- **`fee`** – REQUIRED Fee amount (string decimal)
+- **`path`** – OPTIONAL Array of assets/chains in the routing path
+- **`provider`** – REQUIRED [DID] of the quoting entity
+- **`expiresAt`** – REQUIRED ISO 8601 timestamp when quote expires
 
 ### 3. `QuoteAccept`
 
-Used to accept a quote and proceed with execution. Optional depending on flow type.
+A **QuoteAccept** is a [DIDComm] message used to accept a quote and proceed with execution. This message is optional depending on the flow type.
 
-* `@type`: `QuoteAccept`
-* `quoteId`: reference to accepted quote
-* `payer`: optional address
-* `receiver`: optional address
+The DIDComm message envelope contains:
+
+- **`from`** – REQUIRED [DID] of the accepting agent
+- **`to`** – REQUIRED Array containing [DID] of the liquidity provider
+- **`type`** – REQUIRED Message type: `"https://tap.rsvp/schema/1.0#QuoteAccept"`
+- **`id`** – REQUIRED Unique message identifier
+- **`thid`** – REQUIRED Thread identifier linking to the QuoteResponse
+- **`created_time`** – REQUIRED Message creation timestamp
+
+The message `body` contains:
+
+- **`@context`** – REQUIRED JSON-LD context: `"https://tap.rsvp/schema/1.0"`
+- **`@type`** – REQUIRED Type identifier: `"https://tap.rsvp/schema/1.0#QuoteAccept"`
+- **`payer`** – OPTIONAL [CAIP-10] address of the payer
+- **`receiver`** – OPTIONAL [CAIP-10] address of the receiver
 
 ### 4. `SwapSettle`
 
-Describes how the swap was executed, post-trade. May trigger downstream TAP-3 Transfer.
+A **SwapSettle** is a [DIDComm] message that describes how the swap was executed, post-trade. It may trigger a downstream [TAIP-3] Transfer.
 
-* `@type`: `SwapSettle`
-* `quoteId`
-* `txHash`
-* `settledAmount`
-* `settledAsset`: [CAIP-19], DTI, or [ISO-4217] currency code for the settled asset
+The DIDComm message envelope contains:
+
+- **`from`** – REQUIRED [DID] of the liquidity provider or settlement agent
+- **`to`** – REQUIRED Array containing [DID] of involved parties
+- **`type`** – REQUIRED Message type: `"https://tap.rsvp/schema/1.0#SwapSettle"`
+- **`id`** – REQUIRED Unique message identifier
+- **`thid`** – REQUIRED Thread identifier linking to the QuoteAccept or QuoteResponse
+- **`created_time`** – REQUIRED Message creation timestamp
+
+The message `body` contains:
+
+- **`@context`** – REQUIRED JSON-LD context: `"https://tap.rsvp/schema/1.0"`
+- **`@type`** – REQUIRED Type identifier: `"https://tap.rsvp/schema/1.0#SwapSettle"`
+- **`txHash`** – REQUIRED Transaction hash on the blockchain
+- **`settledAmount`** – REQUIRED Amount that was settled (string decimal)
+- **`settledAsset`** – REQUIRED [CAIP-19], DTI, or [ISO-4217] currency code for the settled asset
 
 ## Example Messages
 
-### QuoteRequest (Signed)
+### QuoteRequest Example
+
+This example shows a complete DIDComm message requesting a quote from USDC to EURC:
 
 ```json
 {
-  "@type": "QuoteRequest",
-  "fromAsset": "eip155:1/erc20:0xA0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
-  "toAsset": "eip155:1/erc20:0xB00b00b00b00b00b00b00b00b00b00b00b00b00b",
-  "amount": "1000.00",
-  "expiry": "2025-07-21T00:00:00Z",
-  "preferredProvider": "did:example:lp-xyz"
+  "id": "quote-request-123",
+  "type": "https://tap.rsvp/schema/1.0#QuoteRequest",
+  "from": "did:web:wallet.example",
+  "to": ["did:web:lp.example", "did:web:lp2.example"],
+  "created_time": 1719226800,
+  "expires_time": 1719313200,
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#QuoteRequest",
+    "fromAsset": "eip155:1/erc20:0xA0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+    "toAsset": "eip155:1/erc20:0xB00b00b00b00b00b00b00b00b00b00b00b00b00b",
+    "amount": "1000.00",
+    "preferredProvider": "did:web:lp.example"
+  }
 }
 ```
 
-### QuoteResponse
+### QuoteResponse Example
 
 ```json
 {
-  "@type": "QuoteResponse",
-  "quoteId": "quote-abc-123",
-  "fromAsset": "eip155:1/erc20:0xA0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
-  "toAsset": "eip155:1/erc20:0xB00b00b00b00b00b00b00b00b00b00b00b00b00b",
-  "amount": "1000.00",
-  "rate": "0.91",
-  "fee": "1.50",
-  "path": ["USDC", "ETH", "EURC"],
-  "provider": "did:example:lp-xyz",
-  "expiresAt": "2025-07-21T00:00:00Z"
+  "id": "quote-response-456",
+  "type": "https://tap.rsvp/schema/1.0#QuoteResponse",
+  "from": "did:web:lp.example",
+  "to": ["did:web:wallet.example"],
+  "thid": "quote-request-123",
+  "created_time": 1719226850,
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#QuoteResponse",
+    "fromAsset": "eip155:1/erc20:0xA0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+    "toAsset": "eip155:1/erc20:0xB00b00b00b00b00b00b00b00b00b00b00b00b00b",
+    "amount": "1000.00",
+    "rate": "0.91",
+    "fee": "1.50",
+    "path": ["USDC", "ETH", "EURC"],
+    "provider": "did:web:lp.example",
+    "expiresAt": "2025-07-21T00:00:00Z"
+  }
 }
 ```
 
-### QuoteAccept
+### QuoteAccept Example
 
 ```json
 {
-  "@type": "QuoteAccept",
-  "quoteId": "quote-abc-123",
-  "payer": "0x1234567890abcdef...",
-  "receiver": "0xabcdef0123456789..."
+  "id": "quote-accept-789",
+  "type": "https://tap.rsvp/schema/1.0#QuoteAccept",
+  "from": "did:web:wallet.example",
+  "to": ["did:web:lp.example"],
+  "thid": "quote-response-456",
+  "created_time": 1719226900,
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#QuoteAccept",
+    "payer": "eip155:1:0x1234567890abcdef1234567890abcdef12345678",
+    "receiver": "eip155:1:0xabcdef0123456789abcdef0123456789abcdef01"
+  }
 }
 ```
 
-### SwapSettle
+### SwapSettle Example
 
 ```json
 {
-  "@type": "SwapSettle",
-  "quoteId": "quote-abc-123",
-  "txHash": "0xdeadbeef123...",
-  "settledAmount": "909.50",
-  "settledAsset": "eip155:1/erc20:0xB00b00b00b00b00b00b00b00b00b00b00b00b00b"
+  "id": "swap-settle-999",
+  "type": "https://tap.rsvp/schema/1.0#SwapSettle",
+  "from": "did:web:lp.example",
+  "to": ["did:web:wallet.example"],
+  "thid": "quote-accept-789",
+  "created_time": 1719227000,
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#SwapSettle",
+    "txHash": "0xdeadbeef1234567890abcdef1234567890abcdef1234567890abcdef123456",
+    "settledAmount": "909.50",
+    "settledAsset": "eip155:1/erc20:0xB00b00b00b00b00b00b00b00b00b00b00b00b00b"
+  }
 }
 ```
 
@@ -148,11 +229,18 @@ This example shows a quote request from USD fiat to USDC stablecoin:
 
 ```json
 {
-  "@type": "QuoteRequest",
-  "fromAsset": "USD",
-  "toAsset": "eip155:1/erc20:0xA0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
-  "amount": "1000.00",
-  "expiry": "2025-07-21T00:00:00Z"
+  "id": "fiat-quote-request-111",
+  "type": "https://tap.rsvp/schema/1.0#QuoteRequest",
+  "from": "did:web:user.wallet",
+  "to": ["did:web:onramp.provider"],
+  "created_time": 1719230000,
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#QuoteRequest",
+    "fromAsset": "USD",
+    "toAsset": "eip155:1/erc20:0xA0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+    "amount": "1000.00"
+  }
 }
 ```
 
@@ -160,15 +248,23 @@ Response:
 
 ```json
 {
-  "@type": "QuoteResponse",
-  "quoteId": "fiat-quote-456",
-  "fromAsset": "USD",
-  "toAsset": "eip155:1/erc20:0xA0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
-  "amount": "1000.00",
-  "rate": "0.998",
-  "fee": "2.00",
-  "provider": "did:web:onramp.provider",
-  "expiresAt": "2025-07-21T00:00:00Z"
+  "id": "fiat-quote-response-222",
+  "type": "https://tap.rsvp/schema/1.0#QuoteResponse",
+  "from": "did:web:onramp.provider",
+  "to": ["did:web:user.wallet"],
+  "thid": "fiat-quote-request-111",
+  "created_time": 1719230050,
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#QuoteResponse",
+    "fromAsset": "USD",
+    "toAsset": "eip155:1/erc20:0xA0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+    "amount": "1000.00",
+    "rate": "0.998",
+    "fee": "2.00",
+    "provider": "did:web:onramp.provider",
+    "expiresAt": "2025-07-21T00:00:00Z"
+  }
 }
 ```
 
@@ -178,10 +274,18 @@ This example shows a pure FX quote between fiat currencies:
 
 ```json
 {
-  "@type": "QuoteRequest",
-  "fromAsset": "USD",
-  "toAsset": "EUR",
-  "amount": "1000.00"
+  "id": "fx-quote-request-333",
+  "type": "https://tap.rsvp/schema/1.0#QuoteRequest",
+  "from": "did:web:bank.example",
+  "to": ["did:web:fx.provider"],
+  "created_time": 1719231000,
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#QuoteRequest",
+    "fromAsset": "USD",
+    "toAsset": "EUR",
+    "amount": "1000.00"
+  }
 }
 ```
 
@@ -225,9 +329,12 @@ TAIP-18 can be embedded as a subflow in:
 * [TAIP-9] DIDComm Integration
 * [TAIP-14] Payment Request
 * [TAIP-17] Composable Escrow
+* [CAIP-10] Account ID Specification
 * [CAIP-19] Asset Type and Asset ID Specification
 * [DTI] Digital Token Identifier
 * [ISO-4217] ISO 4217 Currency Codes
+* [DID] Decentralized Identifiers
+* [DIDComm] DIDComm Messaging
 
 [TAIP-2]: ./taip-2
 [TAIP-3]: ./taip-3
@@ -238,9 +345,12 @@ TAIP-18 can be embedded as a subflow in:
 [TAIP-9]: ./taip-9
 [TAIP-14]: ./taip-14
 [TAIP-17]: ./taip-17
+[CAIP-10]: https://chainagnostic.org/CAIPs/caip-10
 [CAIP-19]: https://chainagnostic.org/CAIPs/caip-19
 [DTI]: https://www.dtif.org/
 [ISO-4217]: https://www.iso.org/iso-4217-currency-codes.html
+[DID]: https://www.w3.org/TR/did-core/
+[DIDComm]: https://identity.foundation/didcomm-messaging/spec/
 
 ## Copyright
 
