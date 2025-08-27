@@ -510,7 +510,7 @@ The only potential PII that could be shared and leaked through this flow are pub
 [CAIP-10]: <https://chainagnostic.org/CAIPs/caip-10>
 [CAIP-19]: <https://chainagnostic.org/CAIPs/caip-19>
 [RFC 8905]: <https://datatracker.ietf.org/doc/rfc8905/>
-[TAIP Whitepaper]: <https://docs.google.com/document/d/1z16nPRjiCFGsnMqr7GiBRMCMMPBG6laaS337s4oJrEw/edit#heading=h.ujq0dkl3njwc>
+[TAIP Whitepaper]: <https://hubs.ly/Q03BPp1k0>
 
 ## Copyright
 

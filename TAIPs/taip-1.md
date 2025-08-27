@@ -167,7 +167,7 @@ This document was derived heavily from [CAIP-1] written by Ligi, which was deriv
 
 ### References
 
-[TAP Whitepaper]: https://docs.google.com/document/d/1z16nPRjiCFGsnMqr7GiBRMCMMPBG6laaS337s4oJrEw/edit#heading=h.ujq0dkl3njwc
+[TAP Whitepaper]: https://hubs.ly/Q03BPp1k0
 [CAIP-1]: https://chainagnostic.org/CAIPs/caip-1
 [markdown]: https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet
 [Bitcoin's BIP-0001]: https://github.com/bitcoin/bips
