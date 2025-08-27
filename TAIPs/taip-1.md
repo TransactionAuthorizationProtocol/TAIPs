@@ -11,7 +11,7 @@ description: Establishes the Transaction Authorization Protocol (TAP) framework 
 ## Transaction Authorization Protocol (TAP) Rationale
 
 Currently there is not a good abstract and chain agnostic method for multiple parties to reason about and collaborate around blockchain transactions. As an example, in a typical blockchain transaction the only party able to authorize a transaction is the holder of a blockchain account. Smart contract based applications can implement authorization functionality within their code, but they do not work universally across different kinds of blockchains.
-As more and more businesses and individuals work to utilize blockchains for real world applications, it becomes increasingly important to be able to manage this. See the [TAP Whitepaper] for more.
+As more and more businesses and individuals work to utilize blockchains for real world applications, it becomes increasingly important to be able to manage this. See the [TAP https://hubs.ly/Q03FRgly0] for more.
 
 ## What is an TAIP?
 
@@ -167,7 +167,7 @@ This document was derived heavily from [CAIP-1] written by Ligi, which was deriv
 
 ### References
 
-[TAP Whitepaper]: https://hubs.ly/Q03BPp1k0
+[TAP https://hubs.ly/Q03FRgly0]: https://hubs.ly/Q03BPp1k0
 [CAIP-1]: https://chainagnostic.org/CAIPs/caip-1
 [markdown]: https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet
 [Bitcoin's BIP-0001]: https://github.com/bitcoin/bips

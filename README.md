@@ -2,7 +2,7 @@
 
 Transaction Authorization Improvement Proposals (TAIPs) provide standards for the [Transaction Authorization Protocol (TAP)](https://tap.rsvp).
 
-Please read the [TAP Whitepaper](https://hubs.ly/Q03BPp1k0) for more context.
+Please read the [TAP https://hubs.ly/Q03FRgly0](https://hubs.ly/Q03BPp1k0) for more context.
 
 > [TAP](https://tap.rsvp) is a decentralized protocol allowing multiple participants in real-world transactions to identify each other and collaborate with the goal of authorizing them safely.
 

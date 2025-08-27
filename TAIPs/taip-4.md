@@ -489,7 +489,7 @@ The only potential PII that could be shared and leaked through this flow are pub
 ## References
 <!--Links to external resources that help understanding the TAIP better. This can e.g. be links to existing implementations. See CONTRIBUTING.md#style-guide . -->
 
-- [TAIP Whitepaper] The Transaction Authorization Whitepaper
+- [TAIP https://hubs.ly/Q03FRgly0] The Transaction Authorization https://hubs.ly/Q03FRgly0
 - [TAIP-2] Defines the TAP Message structure
 - [TAIP-3] Asset Transfer Message
 - [TAIP-5] Transaction Agents
@@ -510,7 +510,7 @@ The only potential PII that could be shared and leaked through this flow are pub
 [CAIP-10]: <https://chainagnostic.org/CAIPs/caip-10>
 [CAIP-19]: <https://chainagnostic.org/CAIPs/caip-19>
 [RFC 8905]: <https://datatracker.ietf.org/doc/rfc8905/>
-[TAIP Whitepaper]: <https://hubs.ly/Q03BPp1k0>
+[TAIP https://hubs.ly/Q03FRgly0]: <https://hubs.ly/Q03BPp1k0>
 
 ## Copyright
 
