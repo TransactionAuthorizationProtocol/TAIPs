@@ -35,6 +35,10 @@ import {
   // Message validators
   TransferSchema,
   PaymentSchema,
+  ExchangeSchema,
+  QuoteSchema,
+  EscrowSchema,
+  CaptureSchema,
   AuthorizeSchema,
   ConnectSchema,
   SettleSchema,
@@ -45,6 +49,10 @@ import {
   // DIDComm wrapped validators
   TransferMessageSchema,
   PaymentMessageSchema,
+  ExchangeMessageSchema,
+  QuoteMessageSchema,
+  EscrowMessageSchema,
+  CaptureMessageSchema,
   AuthorizeMessageSchema,
   ConnectMessageSchema,
   SettleMessageSchema,
@@ -59,6 +67,10 @@ import {
   isTAPMessage,
   validateTransferMessage,
   validatePaymentMessage,
+  validateExchangeMessage,
+  validateQuoteMessage,
+  validateEscrowMessage,
+  validateCaptureMessage,
   validateAuthorizeMessage,
   validateConnectMessage,
   validateSettleMessage,
@@ -385,6 +397,183 @@ describe('TAP Message Validators', () => {
     });
   });
 
+  describe('ExchangeSchema', () => {
+    it('should validate exchange with fromAmount', () => {
+      const exchange = {
+        "@context": "https://tap.rsvp/schema/1.0",
+        "@type": "Exchange",
+        fromAssets: ["USD"],
+        toAssets: ["eip155:1/erc20:0xA0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"],
+        fromAmount: "1000.00",
+        requester: validPerson,
+        agents: [validAgent]
+      };
+      expect(ExchangeSchema.safeParse(exchange).success).toBe(true);
+    });
+
+    it('should validate exchange with toAmount', () => {
+      const exchange = {
+        "@context": "https://tap.rsvp/schema/1.0",
+        "@type": "Exchange",
+        fromAssets: ["USD"],
+        toAssets: ["EUR"],
+        toAmount: "900.00",
+        requester: validPerson,
+        provider: validPerson,
+        agents: [validAgent]
+      };
+      expect(ExchangeSchema.safeParse(exchange).success).toBe(true);
+    });
+
+    it('should validate exchange with multiple assets', () => {
+      const exchange = {
+        "@context": "https://tap.rsvp/schema/1.0",
+        "@type": "Exchange",
+        fromAssets: ["USD", "EUR"],
+        toAssets: ["eip155:1/erc20:0xA0b86991c6218b36c1d19d4a2e9eb0ce3606eb48", "eip155:1/erc20:0x6b175474e89094c44da98b954eedeac495271d0f"],
+        fromAmount: "1000.00",
+        requester: validPerson,
+        agents: [validAgent]
+      };
+      expect(ExchangeSchema.safeParse(exchange).success).toBe(true);
+    });
+
+    it('should require either fromAmount or toAmount', () => {
+      const exchange = {
+        "@context": "https://tap.rsvp/schema/1.0",
+        "@type": "Exchange",
+        fromAssets: ["USD"],
+        toAssets: ["EUR"],
+        requester: validPerson,
+        agents: [validAgent]
+      };
+      expect(ExchangeSchema.safeParse(exchange).success).toBe(false);
+    });
+
+    it('should require at least one fromAsset and toAsset', () => {
+      const exchange = {
+        "@context": "https://tap.rsvp/schema/1.0",
+        "@type": "Exchange",
+        fromAssets: [],
+        toAssets: ["EUR"],
+        fromAmount: "1000.00",
+        requester: validPerson,
+        agents: [validAgent]
+      };
+      expect(ExchangeSchema.safeParse(exchange).success).toBe(false);
+    });
+  });
+
+  describe('QuoteSchema', () => {
+    it('should validate valid quote messages', () => {
+      const quote = {
+        "@context": "https://tap.rsvp/schema/1.0",
+        "@type": "Quote",
+        fromAsset: "USD",
+        toAsset: "eip155:1/erc20:0xA0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        fromAmount: "1000.00",
+        toAmount: "996.00",
+        provider: validPerson,
+        agents: [validAgent],
+        expiresAt: "2025-07-21T00:00:00Z"
+      };
+      expect(QuoteSchema.safeParse(quote).success).toBe(true);
+    });
+
+    it('should require all required fields', () => {
+      const quote = {
+        "@context": "https://tap.rsvp/schema/1.0",
+        "@type": "Quote",
+        fromAsset: "USD",
+        toAsset: "EUR"
+      };
+      expect(QuoteSchema.safeParse(quote).success).toBe(false);
+    });
+  });
+
+  describe('EscrowSchema', () => {
+    it('should validate escrow with asset', () => {
+      const escrow = {
+        "@context": "https://tap.rsvp/schema/1.0",
+        "@type": "Escrow",
+        asset: "eip155:1/erc20:0xA0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        amount: "1000.00",
+        originator: validPerson,
+        beneficiary: validPerson,
+        expiry: "2025-07-21T01:00:00Z",
+        agents: [validAgent]
+      };
+      expect(EscrowSchema.safeParse(escrow).success).toBe(true);
+    });
+
+    it('should validate escrow with currency', () => {
+      const escrow = {
+        "@context": "https://tap.rsvp/schema/1.0",
+        "@type": "Escrow",
+        currency: "USD",
+        amount: "1000.00",
+        originator: validPerson,
+        beneficiary: validPerson,
+        expiry: "2025-07-21T01:00:00Z",
+        agreement: "https://example.com/escrow-terms",
+        agents: [validAgent]
+      };
+      expect(EscrowSchema.safeParse(escrow).success).toBe(true);
+    });
+
+    it('should require either asset or currency', () => {
+      const escrow = {
+        "@context": "https://tap.rsvp/schema/1.0",
+        "@type": "Escrow",
+        amount: "1000.00",
+        originator: validPerson,
+        beneficiary: validPerson,
+        expiry: "2025-07-21T01:00:00Z",
+        agents: [validAgent]
+      };
+      expect(EscrowSchema.safeParse(escrow).success).toBe(false);
+    });
+
+    it('should require all required fields', () => {
+      const escrow = {
+        "@context": "https://tap.rsvp/schema/1.0",
+        "@type": "Escrow",
+        asset: "eip155:1/erc20:0xA0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
+      };
+      expect(EscrowSchema.safeParse(escrow).success).toBe(false);
+    });
+  });
+
+  describe('CaptureSchema', () => {
+    it('should validate capture with all optional fields', () => {
+      const capture = {
+        "@context": "https://tap.rsvp/schema/1.0",
+        "@type": "Capture",
+        amount: "500.00",
+        settlementAddress: "eip155:1:0xabcdef0123456789abcdef0123456789abcdef01"
+      };
+      expect(CaptureSchema.safeParse(capture).success).toBe(true);
+    });
+
+    it('should validate capture with no optional fields', () => {
+      const capture = {
+        "@context": "https://tap.rsvp/schema/1.0",
+        "@type": "Capture"
+      };
+      expect(CaptureSchema.safeParse(capture).success).toBe(true);
+    });
+
+    it('should validate capture with PayTo URI settlement address', () => {
+      const capture = {
+        "@context": "https://tap.rsvp/schema/1.0",
+        "@type": "Capture",
+        amount: "500.00",
+        settlementAddress: "payto://iban/DE75512108001245126199"
+      };
+      expect(CaptureSchema.safeParse(capture).success).toBe(true);
+    });
+  });
+
   describe('AuthorizeSchema', () => {
     it('should validate valid authorization', () => {
       const authorize = {
@@ -446,6 +635,46 @@ describe('DIDComm Message Validators', () => {
     agents: [{ "@id": "did:example:agent", for: "did:example:alice", name: "Agent" }]
   };
 
+  const validExchangeBody = {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "Exchange",
+    fromAssets: ["USD"],
+    toAssets: ["EUR"],
+    fromAmount: "1000.00",
+    requester: { "@id": "did:example:alice", name: "Alice" },
+    agents: [{ "@id": "did:example:agent", for: "did:example:alice", name: "Agent" }]
+  };
+
+  const validQuoteBody = {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "Quote",
+    fromAsset: "USD",
+    toAsset: "EUR",
+    fromAmount: "1000.00",
+    toAmount: "900.00",
+    provider: { "@id": "did:example:provider", name: "Provider" },
+    agents: [{ "@id": "did:example:agent", for: "did:example:provider", name: "Agent" }],
+    expiresAt: "2025-07-21T00:00:00Z"
+  };
+
+  const validEscrowBody = {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "Escrow",
+    asset: "eip155:1/erc20:0xA0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+    amount: "1000.00",
+    originator: { "@id": "did:example:alice", name: "Alice" },
+    beneficiary: { "@id": "did:example:bob", name: "Bob" },
+    expiry: "2025-07-21T01:00:00Z",
+    agents: [{ "@id": "did:example:agent", for: "did:example:alice", name: "Agent" }]
+  };
+
+  const validCaptureBody = {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "Capture",
+    amount: "500.00",
+    settlementAddress: "eip155:1:0xabcdef0123456789abcdef0123456789abcdef01"
+  };
+
   describe('TransferMessageSchema', () => {
     it('should validate valid transfer messages', () => {
       const message = {
@@ -469,6 +698,112 @@ describe('DIDComm Message Validators', () => {
         body: validTransferBody
       };
       expect(TransferMessageSchema.safeParse(message).success).toBe(false);
+    });
+  });
+
+  describe('ExchangeMessageSchema', () => {
+    it('should validate valid exchange messages', () => {
+      const message = {
+        id: "01234567-89ab-4def-a123-456789abcdef",
+        type: "https://tap.rsvp/schema/1.0#Exchange",
+        from: "did:example:sender",
+        to: ["did:example:receiver"],
+        created_time: Date.now(),
+        body: validExchangeBody
+      };
+      expect(ExchangeMessageSchema.safeParse(message).success).toBe(true);
+    });
+
+    it('should reject wrong message type', () => {
+      const message = {
+        id: "01234567-89ab-4def-a123-456789abcdef",
+        type: "https://tap.rsvp/schema/1.0#Transfer",
+        from: "did:example:sender",
+        to: ["did:example:receiver"],
+        created_time: Date.now(),
+        body: validExchangeBody
+      };
+      expect(ExchangeMessageSchema.safeParse(message).success).toBe(false);
+    });
+  });
+
+  describe('QuoteMessageSchema', () => {
+    it('should validate quote replies with thid', () => {
+      const message = {
+        id: "01234567-89ab-4def-a123-456789abcdef",
+        type: "https://tap.rsvp/schema/1.0#Quote",
+        from: "did:example:provider",
+        to: ["did:example:requester"],
+        thid: "12345678-9abc-4def-a123-456789abcdef",
+        created_time: Date.now(),
+        body: validQuoteBody
+      };
+      expect(QuoteMessageSchema.safeParse(message).success).toBe(true);
+    });
+
+    it('should require thid for quote reply messages', () => {
+      const message = {
+        id: "01234567-89ab-4def-a123-456789abcdef",
+        type: "https://tap.rsvp/schema/1.0#Quote",
+        from: "did:example:provider",
+        to: ["did:example:requester"],
+        created_time: Date.now(),
+        body: validQuoteBody
+      };
+      expect(QuoteMessageSchema.safeParse(message).success).toBe(false);
+    });
+  });
+
+  describe('EscrowMessageSchema', () => {
+    it('should validate valid escrow messages', () => {
+      const message = {
+        id: "01234567-89ab-4def-a123-456789abcdef",
+        type: "https://tap.rsvp/schema/1.0#Escrow",
+        from: "did:example:sender",
+        to: ["did:example:receiver"],
+        created_time: Date.now(),
+        body: validEscrowBody
+      };
+      expect(EscrowMessageSchema.safeParse(message).success).toBe(true);
+    });
+
+    it('should reject wrong message type', () => {
+      const message = {
+        id: "01234567-89ab-4def-a123-456789abcdef",
+        type: "https://tap.rsvp/schema/1.0#Transfer",
+        from: "did:example:sender",
+        to: ["did:example:receiver"],
+        created_time: Date.now(),
+        body: validEscrowBody
+      };
+      expect(EscrowMessageSchema.safeParse(message).success).toBe(false);
+    });
+  });
+
+  describe('CaptureMessageSchema', () => {
+    it('should validate capture replies with thid', () => {
+      const message = {
+        id: "01234567-89ab-4def-a123-456789abcdef",
+        type: "https://tap.rsvp/schema/1.0#Capture",
+        from: "did:example:releaser",
+        to: ["did:example:originator"],
+        thid: "12345678-9abc-4def-a123-456789abcdef",
+        created_time: Date.now(),
+        body: validCaptureBody
+      };
+      expect(CaptureMessageSchema.safeParse(message).success).toBe(true);
+    });
+
+    it('should require thid for capture reply messages', () => {
+      const message = {
+        id: "01234567-89ab-4def-a123-456789abcdef",
+        type: "https://tap.rsvp/schema/1.0#Capture",
+        from: "did:example:releaser",
+        to: ["did:example:originator"],
+        created_time: Date.now(),
+        body: validCaptureBody
+      };
+      expect(CaptureMessageSchema.safeParse(message).success).toBe(false);
     });
   });
 
@@ -527,8 +862,43 @@ describe('TAPMessageSchema (Discriminated Union)', () => {
       }
     };
 
-    const authorizeMessage = {
+    const exchangeMessage = {
       id: "12345678-9abc-4def-a123-456789abcdef",
+      type: "https://tap.rsvp/schema/1.0#Exchange",
+      from: "did:example:requester",
+      to: ["did:example:provider"],
+      created_time: Date.now(),
+      body: {
+        "@context": "https://tap.rsvp/schema/1.0",
+        "@type": "Exchange",
+        fromAssets: ["USD"],
+        toAssets: ["EUR"],
+        fromAmount: "1000.00",
+        requester: { "@id": "did:example:alice", name: "Alice" },
+        agents: [{ "@id": "did:example:agent", for: "did:example:alice", name: "Agent" }]
+      }
+    };
+
+    const escrowMessage = {
+      id: "23456789-abcd-4ef0-a123-456789abcdef",
+      type: "https://tap.rsvp/schema/1.0#Escrow",
+      from: "did:example:originator",
+      to: ["did:example:beneficiary"],
+      created_time: Date.now(),
+      body: {
+        "@context": "https://tap.rsvp/schema/1.0",
+        "@type": "Escrow",
+        asset: "eip155:1/erc20:0xA0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        amount: "1000.00",
+        originator: { "@id": "did:example:alice", name: "Alice" },
+        beneficiary: { "@id": "did:example:bob", name: "Bob" },
+        expiry: "2025-07-21T01:00:00Z",
+        agents: [{ "@id": "did:example:agent", for: "did:example:alice", name: "Agent" }]
+      }
+    };
+
+    const authorizeMessage = {
+      id: "34567890-bcde-4f01-a123-456789abcdef",
       type: "https://tap.rsvp/schema/1.0#Authorize",
       from: "did:example:authorizer",
       to: ["did:example:sender"],
@@ -542,7 +912,49 @@ describe('TAPMessageSchema (Discriminated Union)', () => {
     };
 
     expect(TAPMessageSchema.safeParse(transferMessage).success).toBe(true);
+    expect(TAPMessageSchema.safeParse(exchangeMessage).success).toBe(true);
+    expect(TAPMessageSchema.safeParse(escrowMessage).success).toBe(true);
     expect(TAPMessageSchema.safeParse(authorizeMessage).success).toBe(true);
+  });
+
+  it('should validate quote and capture reply messages', () => {
+    const quoteMessage = {
+      id: "45678901-cdef-4012-a123-456789abcdef",
+      type: "https://tap.rsvp/schema/1.0#Quote",
+      from: "did:example:provider",
+      to: ["did:example:requester"],
+      thid: "12345678-9abc-4def-a123-456789abcdef",
+      created_time: Date.now(),
+      body: {
+        "@context": "https://tap.rsvp/schema/1.0",
+        "@type": "Quote",
+        fromAsset: "USD",
+        toAsset: "EUR",
+        fromAmount: "1000.00",
+        toAmount: "900.00",
+        provider: { "@id": "did:example:provider", name: "Provider" },
+        agents: [{ "@id": "did:example:agent", for: "did:example:provider", name: "Agent" }],
+        expiresAt: "2025-07-21T00:00:00Z"
+      }
+    };
+
+    const captureMessage = {
+      id: "56789012-def0-4123-a123-456789abcdef",
+      type: "https://tap.rsvp/schema/1.0#Capture",
+      from: "did:example:releaser",
+      to: ["did:example:originator"],
+      thid: "23456789-abcd-4ef0-a123-456789abcdef",
+      created_time: Date.now(),
+      body: {
+        "@context": "https://tap.rsvp/schema/1.0",
+        "@type": "Capture",
+        amount: "500.00",
+        settlementAddress: "eip155:1:0xabcdef0123456789abcdef0123456789abcdef01"
+      }
+    };
+
+    expect(TAPMessageSchema.safeParse(quoteMessage).success).toBe(true);
+    expect(TAPMessageSchema.safeParse(captureMessage).success).toBe(true);
   });
 });
 
@@ -606,14 +1018,124 @@ describe('Validation Functions', () => {
   });
 
   describe('Message-specific validators', () => {
+    const validExchangeMessage = {
+      id: "12345678-9abc-4def-a123-456789abcdef",
+      type: "https://tap.rsvp/schema/1.0#Exchange",
+      from: "did:example:requester",
+      to: ["did:example:provider"],
+      created_time: Date.now(),
+      body: {
+        "@context": "https://tap.rsvp/schema/1.0",
+        "@type": "Exchange",
+        fromAssets: ["USD"],
+        toAssets: ["EUR"],
+        fromAmount: "1000.00",
+        requester: { "@id": "did:example:alice", name: "Alice" },
+        agents: [{ "@id": "did:example:agent", for: "did:example:alice", name: "Agent" }]
+      }
+    };
+
+    const validQuoteMessage = {
+      id: "23456789-abcd-4ef0-a123-456789abcdef",
+      type: "https://tap.rsvp/schema/1.0#Quote",
+      from: "did:example:provider",
+      to: ["did:example:requester"],
+      thid: "12345678-9abc-4def-a123-456789abcdef",
+      created_time: Date.now(),
+      body: {
+        "@context": "https://tap.rsvp/schema/1.0",
+        "@type": "Quote",
+        fromAsset: "USD",
+        toAsset: "EUR",
+        fromAmount: "1000.00",
+        toAmount: "900.00",
+        provider: { "@id": "did:example:provider", name: "Provider" },
+        agents: [{ "@id": "did:example:agent", for: "did:example:provider", name: "Agent" }],
+        expiresAt: "2025-07-21T00:00:00Z"
+      }
+    };
+
+    const validEscrowMessage = {
+      id: "34567890-bcde-4f01-a123-456789abcdef",
+      type: "https://tap.rsvp/schema/1.0#Escrow",
+      from: "did:example:originator",
+      to: ["did:example:beneficiary"],
+      created_time: Date.now(),
+      body: {
+        "@context": "https://tap.rsvp/schema/1.0",
+        "@type": "Escrow",
+        asset: "eip155:1/erc20:0xA0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        amount: "1000.00",
+        originator: { "@id": "did:example:alice", name: "Alice" },
+        beneficiary: { "@id": "did:example:bob", name: "Bob" },
+        expiry: "2025-07-21T01:00:00Z",
+        agents: [{ "@id": "did:example:agent", for: "did:example:alice", name: "Agent" }]
+      }
+    };
+
+    const validCaptureMessage = {
+      id: "45678901-cdef-4012-a123-456789abcdef",
+      type: "https://tap.rsvp/schema/1.0#Capture",
+      from: "did:example:releaser",
+      to: ["did:example:originator"],
+      thid: "34567890-bcde-4f01-a123-456789abcdef",
+      created_time: Date.now(),
+      body: {
+        "@context": "https://tap.rsvp/schema/1.0",
+        "@type": "Capture",
+        amount: "500.00",
+        settlementAddress: "eip155:1:0xabcdef0123456789abcdef0123456789abcdef01"
+      }
+    };
+
     it('should validate transfer messages', () => {
       const result = validateTransferMessage(validMessage);
+      expect(result.success).toBe(true);
+    });
+
+    it('should validate exchange messages', () => {
+      const result = validateExchangeMessage(validExchangeMessage);
+      expect(result.success).toBe(true);
+    });
+
+    it('should validate quote messages', () => {
+      const result = validateQuoteMessage(validQuoteMessage);
+      expect(result.success).toBe(true);
+    });
+
+    it('should validate escrow messages', () => {
+      const result = validateEscrowMessage(validEscrowMessage);
+      expect(result.success).toBe(true);
+    });
+
+    it('should validate capture messages', () => {
+      const result = validateCaptureMessage(validCaptureMessage);
       expect(result.success).toBe(true);
     });
 
     it('should reject non-transfer messages for transfer validator', () => {
       const authMessage = { ...validMessage, type: "https://tap.rsvp/schema/1.0#Authorize" };
       const result = validateTransferMessage(authMessage);
+      expect(result.success).toBe(false);
+    });
+
+    it('should reject non-exchange messages for exchange validator', () => {
+      const result = validateExchangeMessage(validMessage);
+      expect(result.success).toBe(false);
+    });
+
+    it('should reject non-quote messages for quote validator', () => {
+      const result = validateQuoteMessage(validMessage);
+      expect(result.success).toBe(false);
+    });
+
+    it('should reject non-escrow messages for escrow validator', () => {
+      const result = validateEscrowMessage(validMessage);
+      expect(result.success).toBe(false);
+    });
+
+    it('should reject non-capture messages for capture validator', () => {
+      const result = validateCaptureMessage(validMessage);
       expect(result.success).toBe(false);
     });
   });

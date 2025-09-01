@@ -2,6 +2,19 @@
 
 All notable changes to the TypeScript package are documented in this file.
 
+## [1.12.0] - 2025-09-01
+
+### Added
+- **TAIP-18 Asset Exchange**: Added Exchange and Quote message types for cross-asset transactions
+  - Added `Exchange` interface supporting multi-asset arrays for source and target assets
+  - Added `Quote` interface for liquidity provider responses with pricing and expiration
+  - Support for CAIP-19, DTI, and ISO-4217 currency codes in asset arrays
+  - Added `ExchangeMessage` and `QuoteMessage` DIDComm wrappers
+  - Updated `Transactions` union type to include `Exchange`
+  - Updated `TAPMessage` union type to include `ExchangeMessage` and `QuoteMessage`
+  - Enhanced TAIP specification cross-reference documentation
+  - Enables cross-asset quotes (USDC to EURC), FX transactions, on/off-ramp services, and cross-chain bridging
+
 ## [1.11.0] - 2025-08-23
 
 ### Enhanced

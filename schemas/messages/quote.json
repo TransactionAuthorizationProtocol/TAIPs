@@ -1,0 +1,89 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://taips.tap.rsvp/schemas/messages/quote.json",
+  "title": "Quote Message",
+  "description": "Asset exchange quote response message per TAIP-18",
+  "type": "object",
+  "allOf": [
+    {
+      "$ref": "../common/didcomm-base.json#/$defs/didcommReplyHeader"
+    }
+  ],
+  "properties": {
+    "type": {
+      "const": "https://tap.rsvp/schema/1.0#Quote"
+    },
+    "body": {
+      "type": "object",
+      "required": ["@context", "@type", "fromAsset", "toAsset", "fromAmount", "toAmount", "provider", "agents", "expiresAt"],
+      "properties": {
+        "@context": {
+          "const": "https://tap.rsvp/schema/1.0"
+        },
+        "@type": {
+          "const": "https://tap.rsvp/schema/1.0#Quote"
+        },
+        "fromAsset": {
+          "oneOf": [
+            {
+              "$ref": "../common/caip-types.json#/$defs/caip19",
+              "description": "CAIP-19 blockchain asset identifier"
+            },
+            {
+              "type": "string",
+              "description": "DTI (Digital Token Identifier) for traditional finance assets"
+            },
+            {
+              "$ref": "../common/base-types.json#/$defs/iso4217CurrencyCode",
+              "description": "ISO 4217 currency code"
+            }
+          ],
+          "description": "Source asset for the exchange"
+        },
+        "toAsset": {
+          "oneOf": [
+            {
+              "$ref": "../common/caip-types.json#/$defs/caip19",
+              "description": "CAIP-19 blockchain asset identifier"
+            },
+            {
+              "type": "string",
+              "description": "DTI (Digital Token Identifier) for traditional finance assets"
+            },
+            {
+              "$ref": "../common/base-types.json#/$defs/iso4217CurrencyCode",
+              "description": "ISO 4217 currency code"
+            }
+          ],
+          "description": "Target asset for the exchange"
+        },
+        "fromAmount": {
+          "$ref": "../common/base-types.json#/$defs/amount",
+          "description": "Amount of source asset to be exchanged"
+        },
+        "toAmount": {
+          "$ref": "../common/base-types.json#/$defs/amount",
+          "description": "Amount of target asset to be received"
+        },
+        "provider": {
+          "$ref": "../data-structures/party.json",
+          "description": "Liquidity provider party information"
+        },
+        "agents": {
+          "type": "array",
+          "items": {
+            "$ref": "../data-structures/agent.json"
+          },
+          "minItems": 1,
+          "description": "Agents involved in the quote (must include all from original Exchange plus provider agents)"
+        },
+        "expiresAt": {
+          "$ref": "../common/base-types.json#/$defs/iso8601DateTime",
+          "description": "Quote expiration timestamp"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "required": ["type", "body", "thid"]
+}

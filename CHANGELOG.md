@@ -14,6 +14,21 @@ This changelog focuses on:
 - Protocol structural changes
 - Breaking changes
 
+## [2025-09-01]
+
+### Added
+- **TAIP-18 Asset Exchange**: Added Exchange and Quote message types for cross-asset transactions
+  - New Exchange message type for requesting asset conversion quotes (USDC to EURC, USD to crypto, cross-chain)
+  - New Quote message type for liquidity provider responses with pricing and expiration timestamps
+  - Support for multi-asset arrays enabling flexible routing and provider selection
+  - Compatible with existing TAIP-4 Authorize/Settle flows for quote acceptance and settlement
+  - Integration with TAIP-17 Escrow for counterparty risk management in exchanges
+  - Enables use cases: cross-asset payments, FX transactions, on/off-ramp services, cross-chain bridging
+  - **Updated JSON Schemas**: Added exchange.json and quote.json message schemas
+  - **Updated TypeScript Package v1.12.0**: Added Exchange and Quote interfaces and message wrappers
+    - See [packages/typescript/CHANGELOG.md](packages/typescript/CHANGELOG.md) for complete details
+  - **Updated Documentation**: Enhanced messages.md and transactions.md with Exchange and Quote documentation
+
 ## [2025-08-23]
 
 ### Enhanced

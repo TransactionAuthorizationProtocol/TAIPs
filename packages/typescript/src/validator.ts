@@ -77,8 +77,11 @@ export const PurposeCodeSchema = z.enum(VALID_PURPOSE_CODES);
 /** ISO 20022 Category Purpose Code validator */
 export const CategoryPurposeCodeSchema = z.enum(VALID_CATEGORY_PURPOSE_CODES);
 
-/** Asset ID (union of CAIP-19 and ISO 4217 currency code) */
-export const AssetSchema = z.union([CAIP19Schema, CurrencyCodeSchema]);
+/** DTI (Digital Token Identifier) validator */
+export const DTISchema = z.string().min(1);
+
+/** Asset ID (union of CAIP-19, DTI, and ISO 4217 currency code) */
+export const AssetSchema = z.union([CAIP19Schema, DTISchema, CurrencyCodeSchema]);
 
 // ============================================================================
 // JSON-LD BASE VALIDATORS
@@ -267,6 +270,55 @@ export const RevertSchema = TapMessageObjectSchema.merge(z.object({
   txHash: z.string().optional()
 }));
 
+/** Exchange message body validator */
+export const ExchangeSchema = TapMessageObjectSchema.merge(z.object({
+  "@type": z.literal("Exchange"),
+  fromAssets: z.array(AssetSchema).min(1),
+  toAssets: z.array(AssetSchema).min(1),
+  fromAmount: AmountSchema.optional(),
+  toAmount: AmountSchema.optional(),
+  requester: PartySchema,
+  provider: PartySchema.optional(),
+  agents: z.array(AgentSchema).min(1),
+  policies: z.array(z.record(z.string(), z.unknown())).optional()
+})).refine(data => data.fromAmount || data.toAmount, {
+  message: "Either fromAmount or toAmount must be provided"
+});
+
+/** Quote message body validator */
+export const QuoteSchema = TapMessageObjectSchema.merge(z.object({
+  "@type": z.literal("Quote"),
+  fromAsset: AssetSchema,
+  toAsset: AssetSchema,
+  fromAmount: AmountSchema,
+  toAmount: AmountSchema,
+  provider: PartySchema,
+  agents: z.array(AgentSchema).min(1),
+  expiresAt: ISO8601DateTimeSchema
+}));
+
+/** Escrow message body validator */
+export const EscrowSchema = TapMessageObjectSchema.merge(z.object({
+  "@type": z.literal("Escrow"),
+  asset: CAIP19Schema.optional(),
+  currency: CurrencyCodeSchema.optional(),
+  amount: AmountSchema,
+  originator: PartySchema,
+  beneficiary: PartySchema,
+  expiry: ISO8601DateTimeSchema,
+  agreement: z.string().url().optional(),
+  agents: z.array(AgentSchema).min(1)
+})).refine(data => data.asset || data.currency, {
+  message: "Either asset or currency must be provided"
+});
+
+/** Capture message body validator */
+export const CaptureSchema = TapMessageObjectSchema.merge(z.object({
+  "@type": z.literal("Capture"),
+  amount: AmountSchema.optional(),
+  settlementAddress: SettlementAddressSchema.optional()
+}));
+
 // ============================================================================
 // DIDCOMM WRAPPED MESSAGE VALIDATORS
 // ============================================================================
@@ -319,6 +371,30 @@ export const RevertMessageSchema = DIDCommReplySchema.merge(z.object({
   body: RevertSchema
 }));
 
+/** Exchange DIDComm message validator */
+export const ExchangeMessageSchema = DIDCommMessageSchema.merge(z.object({
+  type: z.literal("https://tap.rsvp/schema/1.0#Exchange"),
+  body: ExchangeSchema
+}));
+
+/** Quote DIDComm reply validator */
+export const QuoteMessageSchema = DIDCommReplySchema.merge(z.object({
+  type: z.literal("https://tap.rsvp/schema/1.0#Quote"),
+  body: QuoteSchema
+}));
+
+/** Escrow DIDComm message validator */
+export const EscrowMessageSchema = DIDCommMessageSchema.merge(z.object({
+  type: z.literal("https://tap.rsvp/schema/1.0#Escrow"),
+  body: EscrowSchema
+}));
+
+/** Capture DIDComm reply validator */
+export const CaptureMessageSchema = DIDCommReplySchema.merge(z.object({
+  type: z.literal("https://tap.rsvp/schema/1.0#Capture"),
+  body: CaptureSchema
+}));
+
 // ============================================================================
 // UNION VALIDATOR FOR ALL TAP MESSAGES
 // ============================================================================
@@ -327,6 +403,10 @@ export const RevertMessageSchema = DIDCommReplySchema.merge(z.object({
 export const TAPMessageSchema = z.discriminatedUnion("type", [
   TransferMessageSchema,
   PaymentMessageSchema,
+  ExchangeMessageSchema,
+  QuoteMessageSchema,
+  EscrowMessageSchema,
+  CaptureMessageSchema,
   AuthorizeMessageSchema,
   ConnectMessageSchema,
   SettleMessageSchema,
@@ -394,6 +474,18 @@ export const validateCancelMessage = (message: unknown) => CancelMessageSchema.s
 
 /** Validates Revert messages */
 export const validateRevertMessage = (message: unknown) => RevertMessageSchema.safeParse(message);
+
+/** Validates Exchange messages */
+export const validateExchangeMessage = (message: unknown) => ExchangeMessageSchema.safeParse(message);
+
+/** Validates Quote messages */
+export const validateQuoteMessage = (message: unknown) => QuoteMessageSchema.safeParse(message);
+
+/** Validates Escrow messages */
+export const validateEscrowMessage = (message: unknown) => EscrowMessageSchema.safeParse(message);
+
+/** Validates Capture messages */
+export const validateCaptureMessage = (message: unknown) => CaptureMessageSchema.safeParse(message);
 
 /** Validates Transaction Constraints */
 export const validateTransactionConstraints = (constraints: unknown) => TransactionConstraintsSchema.safeParse(constraints);
