@@ -1,0 +1,112 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://taips.tap.rsvp/schemas/messages/exchange.json",
+  "title": "Exchange Message",
+  "description": "Asset exchange request message per TAIP-18",
+  "type": "object",
+  "allOf": [
+    {
+      "$ref": "../common/didcomm-base.json#/$defs/didcommHeader"
+    }
+  ],
+  "properties": {
+    "type": {
+      "const": "https://tap.rsvp/schema/1.0#Exchange"
+    },
+    "body": {
+      "type": "object",
+      "required": ["@context", "@type", "fromAssets", "toAssets", "requester", "agents"],
+      "oneOf": [
+        {
+          "required": ["fromAmount"]
+        },
+        {
+          "required": ["toAmount"]
+        }
+      ],
+      "properties": {
+        "@context": {
+          "const": "https://tap.rsvp/schema/1.0"
+        },
+        "@type": {
+          "const": "https://tap.rsvp/schema/1.0#Exchange"
+        },
+        "fromAssets": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "../common/caip-types.json#/$defs/caip19",
+                "description": "CAIP-19 blockchain asset identifier"
+              },
+              {
+                "type": "string",
+                "description": "DTI (Digital Token Identifier) for traditional finance assets"
+              },
+              {
+                "$ref": "../common/base-types.json#/$defs/iso4217CurrencyCode",
+                "description": "ISO 4217 currency code"
+              }
+            ]
+          },
+          "minItems": 1,
+          "description": "Available source assets for exchange"
+        },
+        "toAssets": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "../common/caip-types.json#/$defs/caip19",
+                "description": "CAIP-19 blockchain asset identifier"
+              },
+              {
+                "type": "string",
+                "description": "DTI (Digital Token Identifier) for traditional finance assets"
+              },
+              {
+                "$ref": "../common/base-types.json#/$defs/iso4217CurrencyCode",
+                "description": "ISO 4217 currency code"
+              }
+            ]
+          },
+          "minItems": 1,
+          "description": "Desired target assets for exchange"
+        },
+        "fromAmount": {
+          "$ref": "../common/base-types.json#/$defs/amount",
+          "description": "Amount of source asset to exchange (either fromAmount or toAmount required)"
+        },
+        "toAmount": {
+          "$ref": "../common/base-types.json#/$defs/amount",
+          "description": "Amount of target asset desired (either fromAmount or toAmount required)"
+        },
+        "requester": {
+          "$ref": "../data-structures/party.json",
+          "description": "Party requesting the exchange"
+        },
+        "provider": {
+          "$ref": "../data-structures/party.json",
+          "description": "Optional preferred liquidity provider party"
+        },
+        "agents": {
+          "type": "array",
+          "items": {
+            "$ref": "../data-structures/agent.json"
+          },
+          "minItems": 1,
+          "description": "Agents involved in the exchange request"
+        },
+        "policies": {
+          "type": "array",
+          "items": {
+            "$ref": "../data-structures/policy.json"
+          },
+          "description": "Optional compliance or presentation requirements"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "required": ["type", "body"]
+}

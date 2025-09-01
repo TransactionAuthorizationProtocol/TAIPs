@@ -1058,7 +1058,7 @@ export type Policies =
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-14.md | TAIP-14: Payment Request}
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-17.md | TAIP-17: Escrow}
  */
-export type Transactions = Transfer | Payment | Escrow;
+export type Transactions = Transfer | Payment | Exchange | Escrow;
 
 /**
  * Transfer Message
@@ -1256,6 +1256,160 @@ export interface Payment extends TapMessageObject<"Payment"> {
    * Must include at least one merchant agent with policies
    */
   agents: Agent[];
+}
+
+/**
+ * Exchange Message
+ * Requests a quote for exchanging assets between different types or chains.
+ * Used to request cross-asset quotes (e.g., USDC to EURC, USD to USDC).
+ *
+ * @example
+ * ```typescript
+ * const exchange: Exchange = {
+ *   "@context": "https://tap.rsvp/schema/1.0",
+ *   "@type": "Exchange",
+ *   fromAssets: ["eip155:1/erc20:0xA0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"], // USDC
+ *   toAssets: ["eip155:1/erc20:0x1aBaEA1f7C830bD89Acc67eC4af516284b1bC33c"], // EURC
+ *   fromAmount: "1000.00",
+ *   requester: {
+ *     "@id": "did:example:requester",
+ *     "@type": "https://schema.org/Organization",
+ *     name: "Example Business"
+ *   },
+ *   agents: [{
+ *     "@id": "did:example:requester-agent",
+ *     for: "did:example:requester",
+ *     role: "requester"
+ *   }]
+ * };
+ * ```
+ *
+ * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-18.md | TAIP-18: Asset Exchange}
+ */
+export interface Exchange extends TapMessageObject<"Exchange"> {
+  /**
+   * Array of available source assets
+   * Can include CAIP-19, DTI, or ISO-4217 currency codes
+   */
+  fromAssets: (CAIP19 | DTI | IsoCurrency)[];
+
+  /**
+   * Array of desired target assets
+   * Can include CAIP-19, DTI, or ISO-4217 currency codes
+   */
+  toAssets: (CAIP19 | DTI | IsoCurrency)[];
+
+  /**
+   * Optional amount of source asset to exchange
+   * String representation of the decimal amount
+   * Either fromAmount or toAmount must be provided
+   */
+  fromAmount?: Amount;
+
+  /**
+   * Optional amount of target asset desired
+   * String representation of the decimal amount
+   * Either fromAmount or toAmount must be provided
+   */
+  toAmount?: Amount;
+
+  /**
+   * Party requesting the exchange
+   * The entity seeking to exchange assets
+   */
+  requester: Party;
+
+  /**
+   * Optional preferred liquidity provider
+   * When omitted, the Exchange can be broadcast to multiple providers
+   */
+  provider?: Party;
+
+  /**
+   * List of agents involved in the exchange request
+   * Must include agent acting for the requester
+   */
+  agents: Agent[];
+
+  /**
+   * Optional compliance or presentation requirements
+   * Policies that must be satisfied for the exchange
+   */
+  policies?: Policies[];
+}
+
+/**
+ * Quote Message
+ * Response to an Exchange request providing pricing and terms.
+ * Sent by liquidity providers or orchestrators with specific rates.
+ *
+ * @example
+ * ```typescript
+ * const quote: Quote = {
+ *   "@context": "https://tap.rsvp/schema/1.0",
+ *   "@type": "Quote",
+ *   fromAsset: "eip155:1/erc20:0xA0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+ *   toAsset: "eip155:1/erc20:0x1aBaEA1f7C830bD89Acc67eC4af516284b1bC33c",
+ *   fromAmount: "1000.00",
+ *   toAmount: "908.50",
+ *   provider: {
+ *     "@id": "did:example:liquidity-provider",
+ *     "@type": "https://schema.org/Organization",
+ *     name: "LP Corp"
+ *   },
+ *   agents: [{
+ *     "@id": "did:example:lp-agent",
+ *     for: "did:example:liquidity-provider",
+ *     role: "provider"
+ *   }],
+ *   expiresAt: "2025-07-21T00:00:00Z"
+ * };
+ * ```
+ *
+ * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-18.md | TAIP-18: Asset Exchange}
+ */
+export interface Quote extends TapMessageObject<"Quote"> {
+  /**
+   * Source asset for the exchange
+   * CAIP-19, DTI, or ISO-4217 currency code
+   */
+  fromAsset: CAIP19 | DTI | IsoCurrency;
+
+  /**
+   * Target asset for the exchange
+   * CAIP-19, DTI, or ISO-4217 currency code
+   */
+  toAsset: CAIP19 | DTI | IsoCurrency;
+
+  /**
+   * Amount of source asset to be exchanged
+   * String representation of the decimal amount
+   */
+  fromAmount: Amount;
+
+  /**
+   * Amount of target asset to be received
+   * String representation of the decimal amount
+   */
+  toAmount: Amount;
+
+  /**
+   * Liquidity provider party information
+   * The entity providing the quote
+   */
+  provider: Party;
+
+  /**
+   * List of agents involved in the quote
+   * Must include all agents from the original Exchange request plus provider agents
+   */
+  agents: Agent[];
+
+  /**
+   * Quote expiration timestamp
+   * ISO 8601 timestamp when the quote becomes invalid
+   */
+  expiresAt: ISO8601DateTime;
 }
 
 // ============================================================================
@@ -1829,6 +1983,28 @@ export interface PaymentMessage extends DIDCommMessage<Payment> {
 }
 
 /**
+ * Exchange Message Wrapper
+ * DIDComm envelope for an Exchange message.
+ *
+ * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-2.md | TAIP-2: Message Format}
+ * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-18.md | TAIP-18: Asset Exchange}
+ */
+export interface ExchangeMessage extends DIDCommMessage<Exchange> {
+  type: "https://tap.rsvp/schema/1.0#Exchange";
+}
+
+/**
+ * Quote Message Wrapper
+ * DIDComm envelope for a Quote message.
+ *
+ * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-2.md | TAIP-2: Message Format}
+ * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-18.md | TAIP-18: Asset Exchange}
+ */
+export interface QuoteMessage extends DIDCommReply<Quote> {
+  type: "https://tap.rsvp/schema/1.0#Quote";
+}
+
+/**
  * Authorization Message Wrapper
  * DIDComm envelope for an Authorization message.
  *
@@ -2177,6 +2353,8 @@ export interface PresentationMessage extends DIDCommReply<Record<string, never>>
 export type TAPMessage =
   | TransferMessage
   | PaymentMessage
+  | ExchangeMessage
+  | QuoteMessage
   | AuthorizeMessage
   | SettleMessage
   | RejectMessage
@@ -2212,6 +2390,7 @@ export type TAPMessage =
  * - TAIP-4: Authorization Flow → {@link Authorize}, {@link Settle}, {@link Reject}, {@link Cancel}, {@link Revert}, {@link AuthorizationRequired}
  * - TAIP-14: Payment Request → {@link Payment}, {@link PaymentMessage}
  * - TAIP-17: Composable Escrow → {@link Escrow}, {@link Capture}, {@link EscrowMessage}, {@link CaptureMessage}
+ * - TAIP-18: Asset Exchange → {@link Exchange}, {@link Quote}, {@link ExchangeMessage}, {@link QuoteMessage}
  *
  * **Participant Management:**
  * - TAIP-5: Agents → {@link Agent}, {@link UpdateAgent}, {@link AddAgents}, {@link ReplaceAgent}, {@link RemoveAgent}
