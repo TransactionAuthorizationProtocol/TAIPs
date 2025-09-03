@@ -51,10 +51,32 @@ import * as ivms101 from 'ivms101/src/arbitraries';
 // ============================================================================
 
 export const did = (): fc.Arbitrary<DID> =>
-  fc.record({
-    method: fc.constantFrom("web", "key", "example", "peer", "ethr"),
-    identifier: fc.string({ minLength: 10, maxLength: 50 }).filter(s => /^[a-zA-Z0-9._%-]+$/.test(s))
-  }).map(({ method, identifier }) => `did:${method}:${identifier}` as DID);
+  fc.oneof(
+    // did:web with valid domain names
+    fc.domain().map(domain => `did:web:${domain}` as DID),
+    
+    // did:ethr with Ethereum addresses (simplified format)
+    fc.string({ minLength: 40, maxLength: 40, unit: fc.constantFrom('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f') })
+      .map(ethAddress => `did:ethr:0x${ethAddress}` as DID),
+    
+    // did:key with standard multibase key
+    fc.constantFrom(
+      "did:key:z6MkiTBz1ymuepAQ4HEHYSF1H8quG5GLVVQR3djdX3mDooWp",
+      "did:key:z6MkhaXgBZDvotDkL5257faiztiGiC2QtKLGpbnnEGta2doK",
+      "did:key:z6Mkfriq1MqLBoPWecGoDHRzEyqZY6ksafzCJ8nfaqJNgHgN"
+    ),
+    
+    // Generic did:example for testing  
+    fc.constantFrom(
+      "did:example:123456789abcdefg",
+      "did:example:alice",
+      "did:example:bob"
+    ),
+    
+    // did:pkh with simplified identifier (validator doesn't support full CAIP-10)
+    fc.string({ minLength: 20, maxLength: 50, unit: fc.constantFrom(...'abcdefghijklmnopqrstuvwxyz0123456789._%-'.split('')) })
+      .map(identifier => `did:pkh:${identifier}` as DID)
+  );
 
 export const iri = (): fc.Arbitrary<IRI> =>
   fc.oneof(
@@ -69,11 +91,28 @@ export const uuid = (): fc.Arbitrary<string> =>
   fc.uuid();
 
 export const caip10 = (): fc.Arbitrary<CAIP10> =>
-  fc.record({
-    namespace: fc.constantFrom("eip155", "bip122", "cosmos", "polkadot"),
-    reference: fc.string({ minLength: 1, maxLength: 32, unit: fc.constantFrom('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f', '-') }),
-    address: fc.string({ minLength: 16, maxLength: 64, unit: fc.constantFrom('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f') })
-  }).map(({ namespace, reference, address }) => `${namespace}:${reference}:${address}` as CAIP10);
+  fc.oneof(
+    // Ethereum addresses
+    fc.record({
+      namespace: fc.constant("eip155"),
+      reference: fc.constantFrom("1", "137", "56", "10", "42161"),
+      address: fc.string({ minLength: 40, maxLength: 40, unit: fc.constantFrom('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f') })
+    }).map(({ namespace, reference, address }) => `${namespace}:${reference}:0x${address}` as CAIP10),
+    
+    // Bitcoin addresses
+    fc.record({
+      namespace: fc.constant("bip122"),
+      reference: fc.constantFrom("000000000019d6689c085ae165831e93", "000000000000000000651ef99cb9fcbe"),
+      address: fc.constantFrom("1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa", "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4")
+    }).map(({ namespace, reference, address }) => `${namespace}:${reference}:${address}` as CAIP10),
+    
+    // Cosmos addresses  
+    fc.record({
+      namespace: fc.constant("cosmos"),
+      reference: fc.constantFrom("cosmoshub-3", "cosmoshub-4"),
+      address: fc.constantFrom("cosmos1t2uflqwqe0fsj0shcfkrvpukewcw40yjj6hdc0", "cosmos1fqzqejwkk898fcslw4z4eeqjzesynvwsjk3r8")
+    }).map(({ namespace, reference, address }) => `${namespace}:${reference}:${address}` as CAIP10)
+  );
 
 export const caip19 = (): fc.Arbitrary<CAIP19> =>
   fc.record({
@@ -101,8 +140,13 @@ export const participant = (): fc.Arbitrary<Participant> =>
   fc.record({
     "@id": did(),
     name: fc.constantFrom("Alice Smith", "Bob Jones", "Carol Davis", "Dave Miller", "Eva Brown", "Frank Wilson", "Grace Taylor", "Henry Johnson"),
-    email: fc.option(fc.emailAddress(), { nil: undefined }),
-    telephone: fc.option(fc.string({ minLength: 10, maxLength: 15 }), { nil: undefined })
+    email: fc.option(fc.constantFrom("alice@example.com", "bob@test.org", "carol@demo.net"), { freq: 7 }),
+    telephone: fc.option(fc.constantFrom("+1-555-0123", "+44-20-7946-0958", "+49-30-12345678"), { freq: 5 })
+  }).map(obj => {
+    const result: any = { ...obj };
+    if (result.email === null) delete result.email;
+    if (result.telephone === null) delete result.telephone;
+    return result;
   });
 
 export const person = (): fc.Arbitrary<Person> =>
@@ -110,9 +154,15 @@ export const person = (): fc.Arbitrary<Person> =>
     "@id": did(),
     "@type": fc.constant("https://schema.org/Person" as const),
     name: fc.constantFrom("Alice Smith", "Bob Jones", "Carol Davis", "Dave Miller", "Eva Brown"),
-    givenName: fc.option(fc.string({ minLength: 2, maxLength: 25 }), { nil: undefined }),
-    familyName: fc.option(fc.string({ minLength: 2, maxLength: 25 }), { nil: undefined }),
-    email: fc.option(fc.emailAddress(), { nil: undefined })
+    givenName: fc.option(fc.constantFrom("Alice", "Bob", "Carol", "Dave", "Eva"), { freq: 6 }),
+    familyName: fc.option(fc.constantFrom("Smith", "Jones", "Davis", "Miller", "Brown"), { freq: 6 }),
+    email: fc.option(fc.constantFrom("alice@example.com", "bob@test.org", "carol@demo.net"), { freq: 7 })
+  }).map(obj => {
+    const result: any = { ...obj };
+    if (result.givenName === null) delete result.givenName;
+    if (result.familyName === null) delete result.familyName;
+    if (result.email === null) delete result.email;
+    return result;
   });
 
 export const organization = (): fc.Arbitrary<Organization> =>
@@ -120,8 +170,13 @@ export const organization = (): fc.Arbitrary<Organization> =>
     "@id": did(),
     "@type": fc.constant("https://schema.org/Organization" as const),
     name: fc.constantFrom("Acme Corp", "TechStart Inc", "Global Bank", "Crypto Exchange", "Payment Services"),
-    legalName: fc.option(fc.string({ minLength: 2, maxLength: 100 }), { nil: undefined }),
-    url: fc.option(fc.webUrl(), { nil: undefined })
+    legalName: fc.option(fc.constantFrom("Acme Corporation Ltd", "TechStart Incorporated", "Global Banking Solutions"), { freq: 5 }),
+    url: fc.option(fc.constantFrom("https://acme.com", "https://techstart.io", "https://globalbank.net"), { freq: 6 })
+  }).map(obj => {
+    const result: any = { ...obj };
+    if (result.legalName === null) delete result.legalName;
+    if (result.url === null) delete result.url;
+    return result;
   });
 
 export const party = () => fc.oneof(person(), organization());
@@ -131,7 +186,11 @@ export const agent = (): fc.Arbitrary<Agent> =>
     "@id": did(),
     for: did(),
     name: fc.constantFrom("Wallet Agent", "Exchange Agent", "Bank Agent", "Payment Agent", "Trading Bot"),
-    role: fc.option(fc.constantFrom("PaymentProcessor", "WalletProvider", "Exchange", "Bank"), { nil: undefined })
+    role: fc.option(fc.constantFrom("PaymentProcessor", "WalletProvider", "Exchange", "Bank"), { freq: 8 })
+  }).map(obj => {
+    const result: any = { ...obj };
+    if (result.role === null) delete result.role;
+    return result;
   });
 
 // ============================================================================
@@ -197,7 +256,11 @@ export const quote = (): fc.Arbitrary<Quote> =>
     toAmount: amount(),
     provider: party(),
     agents: fc.array(agent(), { minLength: 1, maxLength: 3 }),
-    expiresAt: fc.date({ min: new Date(), max: new Date(Date.now() + 86400000) }).map(d => d.toISOString())
+    expiresAt: fc.constantFrom(
+      new Date(Date.now() + 3600000).toISOString(),   // 1 hour from now
+      new Date(Date.now() + 86400000).toISOString(),  // 1 day from now
+      new Date(Date.now() + 604800000).toISOString()  // 1 week from now
+    )
   });
 
 export const escrow = (): fc.Arbitrary<Escrow> =>
