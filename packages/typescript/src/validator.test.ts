@@ -3,9 +3,12 @@
  * 
  * These tests verify that the Zod validation schemas correctly validate and reject
  * TAP messages according to the protocol specifications.
+ * Now includes property-based tests using fast-check for comprehensive validation.
  */
 
 import { describe, it, expect } from 'vitest';
+import fc from 'fast-check';
+import { arbitraries } from './arbitraries';
 import {
   // Fundamental validators
   DIDSchema,
@@ -87,6 +90,14 @@ describe('Fundamental Validators', () => {
       expect(DIDSchema.safeParse('did:example:123456789abcdefg').success).toBe(true);
     });
 
+    it('should validate generated DIDs', () => {
+      fc.assert(
+        fc.property(arbitraries.fundamental.did(), (did) => {
+          expect(DIDSchema.safeParse(did).success).toBe(true);
+        })
+      );
+    });
+
     it('should reject invalid DIDs', () => {
       expect(DIDSchema.safeParse('not-a-did').success).toBe(false);
       expect(DIDSchema.safeParse('did:').success).toBe(false);
@@ -102,6 +113,14 @@ describe('Fundamental Validators', () => {
       expect(IRISchema.safeParse('urn:example:resource').success).toBe(true);
     });
 
+    it('should validate generated IRIs', () => {
+      fc.assert(
+        fc.property(arbitraries.fundamental.iri(), (iri) => {
+          expect(IRISchema.safeParse(iri).success).toBe(true);
+        })
+      );
+    });
+
     it('should reject invalid IRIs', () => {
       expect(IRISchema.safeParse('not-an-iri').success).toBe(false);
       expect(IRISchema.safeParse('').success).toBe(false);
@@ -113,6 +132,14 @@ describe('Fundamental Validators', () => {
     it('should validate valid UUIDs', () => {
       expect(UUIDSchema.safeParse('123e4567-e89b-42d3-a456-426614174000').success).toBe(true);
       expect(UUIDSchema.safeParse('01234567-89ab-4def-a123-456789abcdef').success).toBe(true);
+    });
+
+    it('should validate generated UUIDs', () => {
+      fc.assert(
+        fc.property(arbitraries.fundamental.uuid(), (uuid) => {
+          expect(UUIDSchema.safeParse(uuid).success).toBe(true);
+        })
+      );
     });
 
     it('should reject invalid UUIDs', () => {
@@ -129,6 +156,14 @@ describe('Fundamental Validators', () => {
       expect(CAIP10Schema.safeParse('cosmos:cosmoshub-3:cosmos1t2uflqwqe0fsj0shcfkrvpukewcw40yjj6hdc0').success).toBe(true);
     });
 
+    it('should validate generated CAIP-10 addresses', () => {
+      fc.assert(
+        fc.property(arbitraries.fundamental.caip10(), (address) => {
+          expect(CAIP10Schema.safeParse(address).success).toBe(true);
+        })
+      );
+    });
+
     it('should reject invalid CAIP-10 addresses', () => {
       expect(CAIP10Schema.safeParse('eip155:1').success).toBe(false);
       expect(CAIP10Schema.safeParse('invalid-address').success).toBe(false);
@@ -140,6 +175,14 @@ describe('Fundamental Validators', () => {
     it('should validate valid CAIP-19 asset IDs', () => {
       expect(CAIP19Schema.safeParse('eip155:1/erc20:0x6b175474e89094c44da98b954eedeac495271d0f').success).toBe(true);
       expect(CAIP19Schema.safeParse('bip122:000000000019d6689c085ae165831e93/slip44:0').success).toBe(true);
+    });
+
+    it('should validate generated CAIP-19 asset IDs', () => {
+      fc.assert(
+        fc.property(arbitraries.fundamental.caip19(), (assetId) => {
+          expect(CAIP19Schema.safeParse(assetId).success).toBe(true);
+        })
+      );
     });
 
     it('should reject invalid CAIP-19 asset IDs', () => {
@@ -169,6 +212,14 @@ describe('Fundamental Validators', () => {
       expect(AmountSchema.safeParse('100.50').success).toBe(true);
       expect(AmountSchema.safeParse('0.01').success).toBe(true);
       expect(AmountSchema.safeParse('1000000').success).toBe(true);
+    });
+
+    it('should validate generated amounts', () => {
+      fc.assert(
+        fc.property(arbitraries.fundamental.amount(), (amount) => {
+          expect(AmountSchema.safeParse(amount).success).toBe(true);
+        })
+      );
     });
 
     it('should reject invalid amounts', () => {
@@ -242,6 +293,14 @@ describe('Participant Validators', () => {
       expect(ParticipantSchema.safeParse(participant).success).toBe(true);
     });
 
+    it('should validate generated participants', () => {
+      fc.assert(
+        fc.property(arbitraries.participants.participant(), (participant) => {
+          expect(ParticipantSchema.safeParse(participant).success).toBe(true);
+        })
+      );
+    });
+
     it('should require @id and name', () => {
       expect(ParticipantSchema.safeParse({ name: "Alice" }).success).toBe(false);
       expect(ParticipantSchema.safeParse({ "@id": "did:example:alice" }).success).toBe(false);
@@ -259,6 +318,14 @@ describe('Participant Validators', () => {
       };
       expect(PersonSchema.safeParse(person).success).toBe(true);
     });
+
+    it('should validate generated persons', () => {
+      fc.assert(
+        fc.property(arbitraries.participants.person(), (person) => {
+          expect(PersonSchema.safeParse(person).success).toBe(true);
+        })
+      );
+    });
   });
 
   describe('OrganizationSchema', () => {
@@ -272,6 +339,14 @@ describe('Participant Validators', () => {
       };
       expect(OrganizationSchema.safeParse(organization).success).toBe(true);
     });
+
+    it('should validate generated organizations', () => {
+      fc.assert(
+        fc.property(arbitraries.participants.organization(), (organization) => {
+          expect(OrganizationSchema.safeParse(organization).success).toBe(true);
+        })
+      );
+    });
   });
 
   describe('AgentSchema', () => {
@@ -283,6 +358,14 @@ describe('Participant Validators', () => {
         role: "WalletProvider"
       };
       expect(AgentSchema.safeParse(agent).success).toBe(true);
+    });
+
+    it('should validate generated agents', () => {
+      fc.assert(
+        fc.property(arbitraries.participants.agent(), (agent) => {
+          expect(AgentSchema.safeParse(agent).success).toBe(true);
+        })
+      );
     });
 
     it('should require @id and for fields', () => {
@@ -317,6 +400,14 @@ describe('TAP Message Validators', () => {
         purposeCode: "TRAD"
       };
       expect(TransferSchema.safeParse(transfer).success).toBe(true);
+    });
+
+    it('should validate generated transfer messages', () => {
+      fc.assert(
+        fc.property(arbitraries.messageBodies.transfer(), (transfer) => {
+          expect(TransferSchema.safeParse(transfer).success).toBe(true);
+        })
+      );
     });
 
     it('should reject transfer with invalid purpose code', () => {
@@ -354,6 +445,14 @@ describe('TAP Message Validators', () => {
         agents: [validAgent]
       };
       expect(PaymentSchema.safeParse(payment).success).toBe(true);
+    });
+
+    it('should validate generated payment messages', () => {
+      fc.assert(
+        fc.property(arbitraries.messageBodies.payment(), (payment) => {
+          expect(PaymentSchema.safeParse(payment).success).toBe(true);
+        })
+      );
     });
 
     it('should validate payment with currency', () => {
@@ -409,6 +508,14 @@ describe('TAP Message Validators', () => {
         agents: [validAgent]
       };
       expect(ExchangeSchema.safeParse(exchange).success).toBe(true);
+    });
+
+    it('should validate generated exchange messages', () => {
+      fc.assert(
+        fc.property(arbitraries.messageBodies.exchange(), (exchange) => {
+          expect(ExchangeSchema.safeParse(exchange).success).toBe(true);
+        })
+      );
     });
 
     it('should validate exchange with toAmount', () => {
@@ -480,6 +587,14 @@ describe('TAP Message Validators', () => {
       expect(QuoteSchema.safeParse(quote).success).toBe(true);
     });
 
+    it('should validate generated quote messages', () => {
+      fc.assert(
+        fc.property(arbitraries.messageBodies.quote(), (quote) => {
+          expect(QuoteSchema.safeParse(quote).success).toBe(true);
+        })
+      );
+    });
+
     it('should require all required fields', () => {
       const quote = {
         "@context": "https://tap.rsvp/schema/1.0",
@@ -504,6 +619,14 @@ describe('TAP Message Validators', () => {
         agents: [validAgent]
       };
       expect(EscrowSchema.safeParse(escrow).success).toBe(true);
+    });
+
+    it('should validate generated escrow messages', () => {
+      fc.assert(
+        fc.property(arbitraries.messageBodies.escrow(), (escrow) => {
+          expect(EscrowSchema.safeParse(escrow).success).toBe(true);
+        })
+      );
     });
 
     it('should validate escrow with currency', () => {
@@ -688,6 +811,14 @@ describe('DIDComm Message Validators', () => {
       expect(TransferMessageSchema.safeParse(message).success).toBe(true);
     });
 
+    it('should validate generated transfer messages', () => {
+      fc.assert(
+        fc.property(arbitraries.messages.transferMessage(), (message) => {
+          expect(TransferMessageSchema.safeParse(message).success).toBe(true);
+        })
+      );
+    });
+
     it('should reject wrong message type', () => {
       const message = {
         id: "01234567-89ab-4def-a123-456789abcdef",
@@ -712,6 +843,14 @@ describe('DIDComm Message Validators', () => {
         body: validExchangeBody
       };
       expect(ExchangeMessageSchema.safeParse(message).success).toBe(true);
+    });
+
+    it('should validate generated exchange messages', () => {
+      fc.assert(
+        fc.property(arbitraries.messages.exchangeMessage(), (message) => {
+          expect(ExchangeMessageSchema.safeParse(message).success).toBe(true);
+        })
+      );
     });
 
     it('should reject wrong message type', () => {
@@ -844,6 +983,14 @@ describe('DIDComm Message Validators', () => {
 });
 
 describe('TAPMessageSchema (Discriminated Union)', () => {
+  it('should validate generated TAPMessage union types', () => {
+    fc.assert(
+      fc.property(arbitraries.messages.tapMessage(), (message) => {
+        expect(TAPMessageSchema.safeParse(message).success).toBe(true);
+      })
+    );
+  });
+
   it('should validate different message types', () => {
     const transferMessage = {
       id: "01234567-89ab-4def-a123-456789abcdef",
