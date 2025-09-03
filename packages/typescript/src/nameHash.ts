@@ -72,7 +72,10 @@ function extractNaturalPersonName(naturalPerson: IVMS101_2020.NaturalPerson | IV
   }
 
   // Prefer legal name (LEGL) if available
-  const legalName = naturalPerson.name.find(n => n.nameIdentifierType === 'LEGL');
+  const legalName = naturalPerson.name.find(n => 
+    ('nameIdentifierType' in n && n.nameIdentifierType === 'LEGL') ||
+    ('naturalPersonNameIdentifierType' in n && n.naturalPersonNameIdentifierType === 'LEGL')
+  );
   const nameEntry = legalName || naturalPerson.name[0];
 
   const parts: string[] = [];
