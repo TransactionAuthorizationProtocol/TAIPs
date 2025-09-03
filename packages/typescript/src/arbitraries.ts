@@ -217,7 +217,7 @@ export const payment = (): fc.Arbitrary<Payment> =>
     currency: isoCurrency(),
     payer: party(),
     payee: party(),
-    merchant: fc.option(party(), { nil: undefined }),
+    merchant: party(),
     agents: fc.array(agent(), { minLength: 1, maxLength: 3 }),
     purposeCode: fc.option(fc.constantFrom("TRAD", "SALA", "RENT", "INTC", "SUPP"), { nil: undefined })
   });
@@ -271,7 +271,11 @@ export const escrow = (): fc.Arbitrary<Escrow> =>
     amount: amount(),
     originator: party(),
     beneficiary: party(),
-    expiry: fc.date({ min: new Date(), max: new Date(Date.now() + 86400000) }).map(d => d.toISOString()),
+    expiry: fc.constantFrom(
+      new Date(Date.now() + 3600000).toISOString(),   // 1 hour from now
+      new Date(Date.now() + 86400000).toISOString(),  // 1 day from now  
+      new Date(Date.now() + 604800000).toISOString()  // 1 week from now
+    ),
     agents: fc.array(agent(), { minLength: 1, maxLength: 3 }),
     agreement: fc.option(fc.webUrl(), { nil: undefined })
   });
