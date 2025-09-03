@@ -18,6 +18,19 @@ All notable changes to the TypeScript package are documented in this file.
   - Enables developers to write property-based tests for TAP protocol implementations
   - Automatically discovers edge cases and validates protocol compliance across wide input ranges
 
+### Enhanced
+- **TAIP-12 Name Hashing with IVMS101 Integration**: Extended nameHash module for travel rule compliance
+  - Enhanced `generateNameHash()` function now supports IVMS101 originator/beneficiary structures
+  - Seamless integration with both IVMS101 2020 and 2023 data formats
+  - Intelligent name extraction from complex IVMS101 structures (natural/legal persons)
+  - Multi-person handling with automatic name combination and legal name prioritization
+  - Cross-format consistency ensuring identical hashes for equivalent names
+  - Comprehensive property-based testing with 21 new tests using ivms101 arbitraries
+  - Maintained backward compatibility with existing string-based name hashing
+  - Enhanced API supports: strings, IVMS101 originators, and IVMS101 beneficiaries
+  - Performance optimized for large structures (100+ persons) with Unicode support
+  - Enables unified privacy-preserving name matching across TAP and IVMS101 systems
+
 ## [1.12.0] - 2025-09-01
 
 ### Added
