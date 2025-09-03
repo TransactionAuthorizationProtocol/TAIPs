@@ -2,6 +2,22 @@
 
 All notable changes to the TypeScript package are documented in this file.
 
+## [1.12.1] - 2025-09-03
+
+### Added
+- **Property-Based Testing Support**: Added comprehensive fast-check arbitraries for enhanced testing
+  - New `arbitraries.ts` module with generators for all TAP message types and components
+  - Fast-check v4 arbitraries for fundamental types (DID, CAIP-10, CAIP-19, UUID, ISO currencies)
+  - Participant arbitraries (Person, Organization, Party, Agent) with realistic data generation
+  - Message body arbitraries for all TAP transactions (Transfer, Payment, Exchange, Quote, etc.)
+  - Complete DIDComm message wrappers with proper threading and metadata
+  - Integration with ivms101 library arbitraries for compliance data structures
+  - Organized arbitrary exports by category for easy discovery and usage
+  - Property-based tests integrated into existing test suite for robust validation
+  - Comprehensive documentation in README.md with usage examples and testing patterns
+  - Enables developers to write property-based tests for TAP protocol implementations
+  - Automatically discovers edge cases and validates protocol compliance across wide input ranges
+
 ## [1.12.0] - 2025-09-01
 
 ### Added
@@ -20,7 +36,7 @@ All notable changes to the TypeScript package are documented in this file.
 ### Enhanced
 - **TAIP-15 Transaction Constraints**: Enhanced TransactionConstraints interface for improved connection security
   - Added `allowedBeneficiaries` field: Array of TAIP-6 Party objects for approved payment recipients
-  - Added `allowedSettlementAddresses` field: Array of CAIP-10 addresses for approved settlement addresses  
+  - Added `allowedSettlementAddresses` field: Array of CAIP-10 addresses for approved settlement addresses
   - Added `allowedAssets` field: Array of CAIP-19 asset identifiers for approved transaction assets
   - Enhanced Zod validator schemas to validate new constraint fields
   - Added `validateTransactionConstraints()` function for standalone constraint validation
@@ -31,7 +47,7 @@ All notable changes to the TypeScript package are documented in this file.
 
 ### Added
 - **Enhanced Zod v4 Validation**: Comprehensive runtime validation for TAP messages
-  - New `validator` module available at `@taprsvp/types/validator` 
+  - New `validator` module available at `@taprsvp/types/validator`
   - Zod v4 schemas for all TAP message types (Transfer, Payment, Authorize, etc.)
   - **Strict ISO Standards Validation**: Proper validation using actual ISO code sets
     - ISO 4217 currency code validation (156 valid codes: USD, EUR, GBP, etc.)

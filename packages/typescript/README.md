@@ -22,6 +22,7 @@ This package provides comprehensive TypeScript type definitions for the Transact
 - **📋 Compliance Ready**: IVMS101 integration for travel rule compliance
 - **🏦 Traditional Banking**: RFC 8905 PayTo URI support for IBAN, SEPA, and other systems
 - **✅ Runtime Validation**: Zod v4 schemas for message validation and parsing
+- **🧪 Property-Based Testing**: Fast-check arbitraries for comprehensive test coverage
 
 ## Installation
 
@@ -113,6 +114,261 @@ if (transferResult.success) {
 
 // Direct schema usage
 const isValidTransfer = TransferMessageSchema.safeParse(data).success;
+```
+
+## Property-Based Testing
+
+This package includes comprehensive [fast-check](https://fast-check.dev/) arbitraries for generating realistic TAP message data for property-based testing. These arbitraries are perfect for testing your TAP implementations with diverse, edge-case-rich data.
+
+### Installation
+
+The arbitraries are included with the package. You'll also need fast-check as a dev dependency:
+
+```bash
+npm install --save-dev fast-check
+```
+
+### Basic Usage
+
+```typescript
+import * as fc from 'fast-check';
+import { arbitraries } from '@taprsvp/types/arbitraries';
+import { TransferSchema } from '@taprsvp/types/validator';
+
+// Test that all generated transfers pass validation
+fc.assert(
+  fc.property(arbitraries.messageBodies.transfer(), (transfer) => {
+    expect(TransferSchema.safeParse(transfer).success).toBe(true);
+  })
+);
+
+// Generate sample data for manual inspection
+const sampleTransfers = fc.sample(arbitraries.messageBodies.transfer(), 5);
+console.log('Sample transfers:', sampleTransfers);
+```
+
+### Available Arbitraries
+
+The arbitraries are organized into logical groups:
+
+#### Fundamental Types
+```typescript
+import { arbitraries } from '@taprsvp/types/arbitraries';
+
+// Generate DIDs, addresses, amounts, etc.
+const did = arbitraries.fundamental.did();           // "did:web:example.com"
+const address = arbitraries.fundamental.caip10();    // "eip155:1:0x742d35..."
+const amount = arbitraries.fundamental.amount();     // "123.45"
+const currency = arbitraries.fundamental.isoCurrency(); // "USD"
+```
+
+#### Participants
+```typescript
+// Generate realistic participants
+const person = arbitraries.participants.person();
+const organization = arbitraries.participants.organization();
+const agent = arbitraries.participants.agent();
+
+// Example generated person:
+// {
+//   "@id": "did:web:alice.example.com",
+//   "@type": "https://schema.org/Person", 
+//   "name": "Alice Smith",
+//   "email": "alice@example.com"
+// }
+```
+
+#### Message Bodies
+```typescript
+// Generate complete TAP message bodies
+const transfer = arbitraries.messageBodies.transfer();
+const payment = arbitraries.messageBodies.payment();
+const exchange = arbitraries.messageBodies.exchange();
+const quote = arbitraries.messageBodies.quote();
+const escrow = arbitraries.messageBodies.escrow();
+
+// All message types available:
+// transfer, payment, exchange, quote, escrow, capture,
+// authorize, connect, settle, reject, cancel, revert
+```
+
+#### DIDComm Message Wrappers  
+```typescript
+// Generate complete DIDComm-wrapped messages
+const transferMessage = arbitraries.messages.transferMessage();
+const paymentMessage = arbitraries.messages.paymentMessage();
+const tapMessage = arbitraries.messages.tapMessage(); // Union of all types
+
+// Example generated message:
+// {
+//   "id": "550e8400-e29b-41d4-a716-446655440000",
+//   "type": "https://tap.rsvp/schema/1.0#Transfer",
+//   "from": "did:web:sender.example.com",
+//   "to": ["did:web:receiver.example.com"],
+//   "created_time": 1640995200000,
+//   "body": { /* Transfer message body */ }
+// }
+```
+
+### Testing Patterns
+
+#### Round-Trip Testing
+```typescript
+import { validateTAPMessage, parseTAPMessage } from '@taprsvp/types/validator';
+
+// Test that generated messages survive serialization/parsing
+fc.assert(
+  fc.property(arbitraries.messages.tapMessage(), (originalMessage) => {
+    // Serialize to JSON and back
+    const json = JSON.stringify(originalMessage);
+    const parsed = JSON.parse(json);
+    
+    // Should still validate
+    const result = validateTAPMessage(parsed);
+    expect(result.success).toBe(true);
+    
+    if (result.success) {
+      // Critical fields should match
+      expect(result.data.id).toBe(originalMessage.id);
+      expect(result.data.type).toBe(originalMessage.type);
+    }
+  })
+);
+```
+
+#### Business Logic Testing
+```typescript
+// Test your business logic with diverse inputs
+function calculateTransactionFee(transfer: Transfer): number {
+  // Your fee calculation logic
+  const amount = parseFloat(transfer.amount);
+  return amount > 1000 ? amount * 0.001 : 0.5; // 0.1% or flat fee
+}
+
+fc.assert(
+  fc.property(arbitraries.messageBodies.transfer(), (transfer) => {
+    const fee = calculateTransactionFee(transfer);
+    
+    // Fee should always be non-negative
+    expect(fee).toBeGreaterThanOrEqual(0);
+    
+    // Fee should be reasonable (less than 10% of transfer)
+    const transferAmount = parseFloat(transfer.amount);
+    expect(fee).toBeLessThan(transferAmount * 0.1);
+  })
+);
+```
+
+#### Edge Case Discovery
+```typescript
+// Property-based testing excels at finding edge cases
+function validateTransactionLimits(transfer: Transfer): boolean {
+  const amount = parseFloat(transfer.amount);
+  const isHighValue = amount >= 10000;
+  
+  // High-value transfers must have additional compliance data
+  if (isHighValue) {
+    return transfer.originator?.nationalIdentifier != null;
+  }
+  return true;
+}
+
+fc.assert(
+  fc.property(arbitraries.messageBodies.transfer(), (transfer) => {
+    // This test will find transfers that violate your compliance rules
+    const isValid = validateTransactionLimits(transfer);
+    
+    if (!isValid) {
+      console.log('Found non-compliant transfer:', {
+        amount: transfer.amount,
+        hasNationalId: !!transfer.originator?.nationalIdentifier
+      });
+    }
+    
+    expect(isValid).toBe(true);
+  })
+);
+```
+
+#### Integration Testing
+```typescript
+// Test your API endpoints with generated data
+async function testTransferAPI() {
+  await fc.assert(
+    fc.asyncProperty(
+      arbitraries.messages.transferMessage(),
+      async (transferMessage) => {
+        // Post to your API
+        const response = await fetch('/api/transfers', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(transferMessage)
+        });
+        
+        // Should accept valid messages
+        if (validateTAPMessage(transferMessage).success) {
+          expect(response.status).toBe(200);
+        }
+      }
+    )
+  );
+}
+```
+
+### Custom Arbitraries
+
+You can create custom arbitraries for your specific use cases:
+
+```typescript
+import * as fc from 'fast-check';
+import { arbitraries } from '@taprsvp/types/arbitraries';
+
+// Custom arbitrary for high-value transfers
+const highValueTransfer = () => 
+  arbitraries.messageBodies.transfer()
+    .filter(transfer => parseFloat(transfer.amount) >= 10000)
+    .map(transfer => ({
+      ...transfer,
+      // Ensure high-value transfers have required compliance data
+      originator: {
+        ...transfer.originator,
+        nationalIdentifier: {
+          nationalIdentifier: "123456789",
+          nationalIdentifierType: "PASS",
+          countryOfIssue: "US"
+        }
+      }
+    }));
+
+// Use your custom arbitrary
+fc.assert(
+  fc.property(highValueTransfer(), (transfer) => {
+    expect(parseFloat(transfer.amount)).toBeGreaterThanOrEqual(10000);
+    expect(transfer.originator?.nationalIdentifier).toBeDefined();
+  })
+);
+```
+
+### Performance Testing
+
+```typescript
+// Generate large datasets for performance testing
+const performanceTest = async () => {
+  const messages = fc.sample(arbitraries.messages.tapMessage(), 10000);
+  
+  const start = Date.now();
+  let validCount = 0;
+  
+  for (const message of messages) {
+    if (validateTAPMessage(message).success) {
+      validCount++;
+    }
+  }
+  
+  const duration = Date.now() - start;
+  console.log(`Validated ${validCount}/${messages.length} messages in ${duration}ms`);
+  console.log(`Average: ${duration / messages.length}ms per message`);
+};
 ```
 
 ### Available Validators
