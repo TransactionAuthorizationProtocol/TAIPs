@@ -126,16 +126,33 @@ const transfer: Transfer = {
 ```
 
 #### Payment
-Requests payment with optional invoice details.
+Requests payment with optional invoice details and flexible asset pricing support.
 
 ```typescript
-import { Payment } from '@taprsvp/types';
+import { Payment, SupportedAssetPricing } from '@taprsvp/types';
 
 const payment: Payment = {
   "@context": "https://tap.rsvp/schema/1.0",
   "@type": "Payment",
   amount: "99.99",
   currency: "USD",
+  // Enhanced supportedAssets with pricing objects for non-1:1 rates
+  supportedAssets: [
+    "eip155:1/erc20:0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48", // USDC 1:1
+    {
+      asset: "EUR", // ISO-4217 currency code
+      amount: "92.50", // Specific exchange rate
+      expires: "2025-09-05T15:30:00Z" // Rate expiration
+    },
+    {
+      asset: "eip155:1/erc20:0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599", // WBTC
+      amount: "0.0025", // Volatile asset pricing
+      expires: "2025-09-05T15:15:00Z"
+    }
+  ],
+  fallbackSettlementAddresses: [
+    "payto://iban/DE75512108001245126199" // Traditional banking
+  ],
   merchant: { "@type": "Party", name: "Example Store" },
   agents: [/* agent details */]
 };
@@ -237,6 +254,75 @@ const purposePolicy: RequirePurpose = {
   required: ["purpose", "categoryPurpose"]
 };
 ```
+
+### Enhanced Payment Asset Pricing
+
+The `supportedAssets` field in Payment messages supports both simple asset identifiers and pricing objects for complex scenarios:
+
+```typescript
+import { Payment, SupportedAssetPricing } from '@taprsvp/types';
+
+// Simple asset support (backward compatible)
+const basicPayment: Payment = {
+  "@context": "https://tap.rsvp/schema/1.0",
+  "@type": "Payment",
+  currency: "USD",
+  amount: "100.00",
+  supportedAssets: [
+    "eip155:1/erc20:0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" // USDC 1:1
+  ],
+  merchant: { /* merchant details */ },
+  agents: [/* agent details */]
+};
+
+// Enhanced pricing with specific rates and expiration
+const enhancedPayment: Payment = {
+  "@context": "https://tap.rsvp/schema/1.0", 
+  "@type": "Payment",
+  currency: "USD",
+  amount: "100.00",
+  supportedAssets: [
+    // Simple 1:1 asset
+    "eip155:1/erc20:0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+    // Cross-currency pricing with IBAN settlement
+    {
+      asset: "EUR", // ISO-4217 currency code
+      amount: "92.50", // Specific USD to EUR rate
+      expires: "2025-09-05T15:30:00Z" // Rate expires in 30 minutes
+    },
+    // Volatile crypto asset pricing
+    {
+      asset: "eip155:1/erc20:0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599", // WBTC
+      amount: "0.00234", // Current BTC equivalent 
+      expires: "2025-09-05T15:05:00Z" // Short expiration for volatile assets
+    },
+    // DTI identifier with specific pricing
+    {
+      asset: "dti:1:0x123...abc", // DTI token
+      amount: "850.75",
+      expires: "2025-09-05T16:00:00Z"
+    }
+  ],
+  fallbackSettlementAddresses: [
+    "payto://iban/DE75512108001245126199" // Traditional banking fallback
+  ],
+  merchant: { /* merchant details */ },
+  agents: [/* agent details */]
+};
+
+// The SupportedAssetPricing interface
+interface SupportedAssetPricing {
+  asset: string; // CAIP-19, DTI, or ISO-4217 currency code
+  amount: string; // Decimal string representing required amount
+  expires?: string; // Optional ISO 8601 expiration timestamp
+}
+```
+
+This enhanced format enables:
+- **Cross-currency payments**: USD invoice accepting EUR at specific rates
+- **Volatile asset pricing**: Real-time crypto exchange rates with expiration
+- **Traditional banking integration**: Fiat settlements via IBAN/SEPA
+- **Backward compatibility**: Simple string format still supported
 
 ## Testing and Validation
 
