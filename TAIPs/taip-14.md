@@ -57,6 +57,7 @@ A **Payment** is a [DIDComm] message (per [TAIP-2]) initiated by the merchant's 
 Once a Payment is sent by the merchant's agent, the transaction can progress through various states as messages are exchanged and the on-chain payment is executed. Payments operate within the **Transaction Authorization Protocol** defined in [TAIP-4]. In particular, the Payment message serves as the initial transaction request to which subsequent authorization messages (Authorize, Settle, Reject, Cancel, Revert) will refer via the `thid` (thread ID).
 
 Any agent that is part of the transaction (customer's or merchant's) can send [TAIP-4] authorization messages in response to the Payment:
+- **AuthorizationRequired:** Requests that an end user opens an authorization URL to approve the transaction [TAIP-4]. This is particularly useful when a customer is on a merchant website and needs to perform authorization on their wallet agent app. The merchant's agent can send this message with a URL that redirects the customer to their wallet app or web interface for payment approval.
 - **Authorize:** Signals approval or readiness. (In a simple two-party payment, this may be optional. The merchant's agent might send an Authorize after receiving required info, or the customer's agent might implicitly consider the request authorized by the user's acceptance.)
 - **Settle:** Indicates an agent is sending the transaction to the blockchain for settlement [TAIP-4]. In practice, the customer's wallet will perform the actual settlement (broadcast the payment). It may send a `Settle` message to inform the merchant that it is doing so or has done so.
 - **Reject:** Indicates an agent rejects the transaction (e.g. due to policy or error) [TAIP-4]. For instance, if the merchant's compliance checks fail after seeing the customer's info, the merchant's agent could reject the payment request, refusing to accept funds.
@@ -71,9 +72,13 @@ See **Figure 1** for a potential statemachine
 stateDiagram-v2
     direction lr
     [*] --> Request : Payment
+    Request --> AuthorizationRequired : AuthorizationRequired
     Request --> Authorized : Authorize
     Request --> Rejected : Reject
     Request --> Cancelled : Cancel
+    AuthorizationRequired --> Authorized : Authorize
+    AuthorizationRequired --> Rejected : Reject
+    AuthorizationRequired --> Cancelled : Cancel
     Authorized --> Settled : Settle
     Settled --> ReversalRequested: Revert
     ReversalRequested --> Reversed: Settle
@@ -81,7 +86,7 @@ stateDiagram-v2
     Settled --> [*]
 ```
 
-The following diagrams illustrate the payment flows. **Figure 2** is a high-level overview of a successful Payment flow between a merchant and customer. **Figure 3** shows a more detailed sequence with the involvement of each party's wallet and an example where the merchant requires additional customer information (per TAIP-8) before payment. **Figure 4** shows an example failure scenario where the customer cancels the Payment. (Other failure scenarios, such as merchant cancellation or rejection for policy reasons, follow a similar message pattern, with the merchant's agent sending a Cancel or Reject.)
+The following diagrams illustrate the payment flows. **Figure 2** is a high-level overview of a successful Payment flow between a merchant and customer. **Figure 3** shows a more detailed sequence with the involvement of each party's wallet and an example where the merchant requires additional customer information (per TAIP-8) before payment. **Figure 4** shows an example failure scenario where the customer cancels the Payment. **Figure 5** demonstrates the use of AuthorizationRequired for web-to-wallet authorization flows. (Other failure scenarios, such as merchant cancellation or rejection for policy reasons, follow a similar message pattern, with the merchant's agent sending a Cancel or Reject.)
 
 #### Figure 2: High-Level Payment Flow (Success Scenario)
 
@@ -162,6 +167,52 @@ sequenceDiagram
 ```
 
 *Description:* In this failure scenario, the merchant's wallet sends a Payment, but the customer decides not to proceed (for any reason – maybe they canceled the checkout or disagreed with the terms). The **Customer's wallet** then sends a **Cancel** message to the **Merchant's wallet**, notifying that the request is aborted. Both sides consider the payment request closed. The merchant's wallet may notify the merchant system to void the invoice or record the cancellation. Similarly, if the merchant needed to cancel (e.g. the order was out-of-stock or expired), the merchant's wallet would send a Cancel to the customer's wallet, which would inform the user. In either case, the Cancel message definitively ends that Payment thread. This differs from a **Reject** in that it isn't necessarily due to rule violations; it's a voluntary termination (any outstanding authorization or info exchange stops here). After a Cancel, the customer is not expected to send payment, and the merchant should not accept a payment if one somehow arrives late (they might refund it or handle it out of band).
+
+#### Figure 5: Payment Flow with AuthorizationRequired (Web-to-Wallet Authorization)
+
+```mermaid
+sequenceDiagram
+    participant Customer
+    participant MerchantWebsite
+    participant PSP
+    participant CustomerWallet
+    participant Blockchain
+
+    Customer->>MerchantWebsite: Browse and select items
+    MerchantWebsite->>Customer: Present Payment request (QR code or deep link)
+    Customer->>CustomerWallet: Scan QR or click deep link
+    CustomerWallet->>PSP: Receive Payment message
+    
+    CustomerWallet->>Customer: Display payment details
+    Customer->>CustomerWallet: Initiate payment authorization
+    
+    Note over PSP: PSP requires user authorization on merchant website
+    PSP->>CustomerWallet: AuthorizationRequired (with authorizationUrl)
+    CustomerWallet->>Customer: Prompt to authorize on merchant website
+    
+    Customer->>MerchantWebsite: Open authorization URL
+    MerchantWebsite->>Customer: Display authorization form
+    Customer->>MerchantWebsite: Confirm payment authorization
+    MerchantWebsite->>PSP: User authorized payment
+    
+    PSP->>CustomerWallet: Authorize (with settlement address)
+    CustomerWallet->>Customer: Show final confirmation
+    Customer->>CustomerWallet: Confirm payment
+    
+    CustomerWallet->>Blockchain: Submit transaction
+    CustomerWallet->>PSP: Settle (with transaction hash)
+    PSP->>MerchantWebsite: Payment confirmed
+    MerchantWebsite->>Customer: Order confirmation and fulfillment
+```
+
+*Description:* This flow demonstrates how **AuthorizationRequired** enables seamless integration between merchant websites and customer wallet applications. When a **Customer** initiates payment through a **MerchantWebsite** (via QR code or deep link), the payment request is received by the **CustomerWallet**. The **PSP** (merchant's payment service provider) can send an **AuthorizationRequired** message containing an authorization URL that redirects the customer back to the merchant website for additional verification, terms acceptance, or compliance requirements. After the customer completes authorization on the merchant website, the PSP sends an **Authorize** message to proceed with payment. This pattern is particularly useful for:
+
+- **Compliance requirements**: When merchants need explicit user consent recorded on their systems
+- **Terms and conditions**: Requiring customers to accept updated terms before payment
+- **Additional verification**: Two-factor authentication or identity verification steps
+- **Complex payment flows**: Multi-step processes involving shipping preferences, tax calculations, or promotional code validation
+
+The **AuthorizationRequired** message includes an `authorizationUrl` field pointing to the merchant's website, an `expires` timestamp for URL validity, and an optional `from` field indicating which party (typically "customer") must complete the authorization.
 
 ### Composability
 
