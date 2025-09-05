@@ -99,7 +99,7 @@ The message `body` contains:
 - **`toAmount`** – REQUIRED Amount of target asset to be received (string decimal)
 - **`provider`** – REQUIRED The liquidity provider party (Party object per [TAIP-6])
 - **`agents`** – REQUIRED Array of agents involved in the quote per [TAIP-5]. Must include all agents from the original Exchange request plus any provider agents
-- **`expiresAt`** – REQUIRED ISO 8601 timestamp when quote expires
+- **`expires`** – REQUIRED ISO 8601 timestamp when quote expires
 
 ### 3. Authorization and Settlement
 
@@ -485,13 +485,13 @@ sequenceDiagram
     Note over Requester: User reviews quote
     Requester->>Provider: Authorize (accept quote)
     Provider->>Requester: Authorize (settlement address)
-    
+
     Requester->>Blockchain: Send USDC
     Requester->>Provider: Settle (tx hash)
-    
+
     Provider->>Blockchain: Send EURC
     Provider->>Requester: Settle (tx hash)
-    
+
     Note over Requester,Provider: Exchange complete
 ```
 
@@ -510,28 +510,28 @@ sequenceDiagram
     Provider->>Requester: Quote (rates & amounts)
     Note over Requester: User reviews quote
     Requester->>Provider: Authorize (accept quote)
-    
+
     Note over Provider: Provider wants escrow protection
     Provider->>Requester: Escrow (pthid: quote-456)
     Provider->>Escrow: Escrow (pthid: quote-456)
-    
+
     Escrow->>Requester: Authorize (accept escrow role)
     Escrow->>Provider: Authorize (settlement address)
-    
+
     Requester->>Blockchain: Send USDC to escrow
     Requester->>Escrow: Settle (funded escrow)
-    
+
     Note over Escrow: Escrow now active
-    
+
     Provider->>Blockchain: Send EURC to requester
     Provider->>Requester: Settle (tx hash)
-    
+
     Note over Requester: Verify EURC received
-    
+
     Provider->>Escrow: Capture (release funds)
     Escrow->>Blockchain: Send USDC to provider
     Escrow->>Provider: Settle (released funds)
-    
+
     Note over Requester,Provider: Exchange complete
 ```
 
@@ -550,7 +550,7 @@ sequenceDiagram
     Requester->>Provider: Exchange (USDC → EURC)
     Provider->>Requester: Quote (rates & amounts)
     Requester->>Provider: Authorize (accept quote)
-    
+
     par Requester Escrow Setup
         Provider->>Requester: Escrow A (requester's funds)
         Provider->>EscrowA: Escrow A (pthid: quote-456)
@@ -564,9 +564,9 @@ sequenceDiagram
         Provider->>Blockchain: Fund Escrow B
         Provider->>EscrowB: Settle
     end
-    
+
     Note over EscrowA,EscrowB: Both escrows active
-    
+
     par Simultaneous Release
         Provider->>EscrowA: Capture
         EscrowA->>Blockchain: Release USDC
@@ -576,7 +576,7 @@ sequenceDiagram
         EscrowB->>Blockchain: Release EURC
         EscrowB->>Requester: Settle
     end
-    
+
     Note over Requester,Provider: Atomic exchange complete
 ```
 
@@ -595,22 +595,22 @@ sequenceDiagram
     Requester->>LP1: Exchange (multiple assets)
     Requester->>LP2: Exchange (multiple assets)
     Requester->>LP3: Exchange (multiple assets)
-    
+
     LP1->>Requester: Quote (rate: 0.91)
     LP2->>Requester: Quote (rate: 0.92)
     LP3->>Requester: Quote (rate: 0.90)
-    
+
     Note over Requester: Select best quote (LP2)
-    
+
     Requester->>LP2: Authorize (accept quote)
     LP2->>Requester: Authorize (settlement details)
-    
+
     Requester->>Blockchain: Send assets
     Requester->>LP2: Settle
-    
+
     LP2->>Blockchain: Send assets
     LP2->>Requester: Settle
-    
+
     Note over Requester,LP2: Exchange complete
 ```
 

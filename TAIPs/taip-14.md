@@ -37,8 +37,12 @@ A **Payment** is a [DIDComm] message (per [TAIP-2]) initiated by the merchant's 
 - **`@type`** – Type identifier of the message, e.g. `"Payment"` (in context of TAIP message types).
 - **`asset`** – *Optional*, **string** ([CAIP-19] or [DTI] identifier) for the specific cryptocurrency being requested. Must be a blockchain asset identifier. Either `asset` OR `currency` is required (one must be present); if both are given, they should be consistent, with `asset` having precedence (the wallet should send in the asset specified, not based on currency).
 - **`currency`** – *Optional*, **string** (ISO 4217 currency code, e.g. "USD" or "EUR") for fiat-denominated payments. Either `asset` OR `currency` is required (one must be present). If `currency` is present, a wallet might not know which crypto asset the merchant prefers to settle this fiat amount; this is addressed by the `supportedAssets` field.
-- **`supportedAssets`** – *Optional*, **array of strings** ([CAIP-19] or [DTI] asset identifiers). If `currency` is given (fiat-denominated request), this field can list which crypto assets are acceptable to settle that currency amount. Each entry is an asset the merchant will accept as payment for the given fiat amount. For example, a Payment might specify `"currency": "EUR", "amount": "50.00", "supportedAssets": ["eip155:1/erc20:0xA0b86991..."]` to indicate €50.00 can be paid in USDC on Ethereum (asset listed) or potentially other listed stablecoins. If `supportedAssets` is omitted for a fiat request, it implies the customer's wallet may choose any asset to settle that amount, subject to the merchant and wallet's out-of-band agreement or policy.
-- `fallbackSettlementAddresses` - OPTIONAL array of strings representing alternative settlement addresses in either [CAIP-10] or [RFC 8905] format. These addresses provide fallback mechanisms for fiat payments or simple crypto transfers. Each address MUST match the asset specified in the `asset` field or one of the assets in `supportedAssets`. If `currency` is specified, the fallback addresses should support settlement of that currency amount. This field enables redundancy for payment settlement and supports scenarios where the primary settlement method may fail or be unavailable.
+- **`supportedAssets`** – *Optional*, **array of strings or objects** ([CAIP-19] or [DTI] asset identifiers, or pricing objects). If `currency` is given (fiat-denominated request), this field can list which crypto assets are acceptable to settle that currency amount. Each entry can be either:
+  - **String format**: A simple asset identifier (e.g., `"eip155:1/erc20:0xA0b86991..."`) for assets with ~1:1 exchange rates like stablecoins. Additional price negotiation may be needed offline or via Exchange/Quote messages from [TAIP-18].
+  - **Object format**: A pricing object with `asset` (required [CAIP-19], [DTI] identifier, or [ISO-4217] currency code), `amount` (required string decimal representing how much of this asset or currency is needed), and optional `expires` (ISO 8601 timestamp when this exchange rate expires). For example: `{"asset": "eip155:1:0x...", "amount": "0.0004", "expires": "2025-07-30T15:00:00Z"}` indicates 0.0004 of the specified crypto asset is needed, or `{"asset": "EUR", "amount": "230.50", "expires": "2025-07-30T15:00:00Z"}` indicates €230.50 is needed to settle a USD invoice, with this rate valid until the expiration time.
+  
+  If `supportedAssets` is omitted for a fiat request, it implies the customer's wallet may choose any asset to settle that amount, subject to the merchant and wallet's out-of-band agreement or policy. When using object format, if `expires` is omitted, the rate follows the Payment's overall `expiry` timestamp.
+- `fallbackSettlementAddresses` - OPTIONAL array of strings representing alternative settlement addresses in either [CAIP-10] or [RFC 8905] format. These addresses provide fallback mechanisms for fiat payments or simple crypto transfers. Each address MUST match the asset specified in the `asset` field or one of the assets in `supportedAssets` (including both crypto assets and fiat currencies specified in object format). If `currency` is specified, the fallback addresses should support settlement of that currency amount or any of the alternative currencies/assets listed. This field enables redundancy for payment settlement and supports scenarios where the primary settlement method may fail or be unavailable.
 - **`expiry`** – *Optional*, **timestamp** indicating an expiration time for the request. After this time the merchant may no longer honor the payment (e.g. if exchange rates or inventory changed). The customer's wallet SHOULD treat an expired Payment as invalid and not allow payment. If omitted, the request is considered valid until canceled or fulfilled. This field SHOULD align with the DIDComm `expires_time` header (as specified in [TAIP-2]) to ensure consistency. In hotel reservation scenarios, for example, a merchant might set an expiry to the checkout date, indicating that if the payment is not authorized by then, the reservation will be lost.
 - **`amount`** – **Required**, **string** containing a decimal representation of the payment amount. The amount must be a valid positive number expressed as a string. Leading zeroes may be omitted (e.g. "0.5" or ".5" for half a unit). Trailing zeroes may be present (e.g. "10.00" for exactly ten units). The amount is denominated in the `asset` token units or the `currency` fiat units as appropriate.
 - **`invoice`** – *Optional*, **Invoice** per [TAIP-16] or **URI** providing additional details about the payment being requested (e.g. a link to an external invoice). This can provide further context for the customer, though the basic payment details should always be present directly in the Payment message itself.
@@ -256,11 +260,25 @@ Here's an example Payment message that includes fallback settlement addresses su
   "body": {
     "@context": "https://tap.rsvp/schema/1.0",
     "@type": "https://tap.rsvp/schema/1.0#Payment",
-    "currency": "EUR",
-    "amount": "250.00",
+    "currency": "USD",
+    "amount": "270.00",
     "supportedAssets": [
       "eip155:1/erc20:0xA0b86991c53D94fa4C0bCBf0C1C4DF2F15F1b7A8",
-      "eip155:137/erc20:0x2791Bca1f2de4661ED88A30C2A8A6b5E7C54fD3A"
+      "eip155:137/erc20:0x2791Bca1f2de4661ED88A30C2A8A6b5E7C54fD3A",
+      {
+        "asset": "eip155:1:0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+        "amount": "0.0625",
+        "expires": "2025-07-30T15:00:00Z"
+      },
+      {
+        "asset": "eip155:1:0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
+        "amount": "0.0035"
+      },
+      {
+        "asset": "EUR",
+        "amount": "250.00",
+        "expires": "2025-07-30T14:30:00Z"
+      }
     ],
     "fallbackSettlementAddresses": [
       "eip155:137:0x8B5e7A2C3f4D1E6F9A0b3C5e7D9f1A2B4C6E8F0A",
@@ -303,9 +321,11 @@ Here's an example Payment message that includes fallback settlement addresses su
 }
 ```
 
-In this example, the merchant accepts EUR 250.00 payment through various settlement methods:
-- Primary: USDC on Ethereum mainnet
-- Fallback options: USDC on Polygon, SEPA bank transfer, or IBAN bank transfer
+In this example, the merchant accepts USD 270.00 payment through various settlement methods:
+- **String format stablecoins**: USDC on Ethereum mainnet and Polygon (assuming ~1:1 USD rate)
+- **Object format with crypto pricing**: 0.0625 WETH (with rate expiring at 15:00 UTC) or 0.0035 WBTC (using Payment expiry)
+- **Object format with fiat pricing**: €250.00 (cross-currency rate expiring at 14:30 UTC)
+- **Fallback options**: USDC on Polygon address, SEPA bank transfer, or IBAN bank transfer
 
 The merchant object includes both schema.org properties (name, url, email) and IVMS101 identity data (leiCode, geographicAddress, nationalIdentifier) to support compliance requirements. For natural person merchants, consider using selective disclosure ([TAIP-8]) to protect sensitive information.
 
