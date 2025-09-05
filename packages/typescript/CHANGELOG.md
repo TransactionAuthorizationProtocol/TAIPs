@@ -2,6 +2,19 @@
 
 All notable changes to the TypeScript package are documented in this file.
 
+## [1.13.0] - 2025-09-05
+
+### Enhanced
+- **TAIP-14 Payment supportedAssets**: Enhanced supportedAssets field with flexible pricing support
+  - Added new `SupportedAssetPricing` interface for assets with specific pricing and expiration
+  - Enhanced `supportedAssets` array to support both simple strings and pricing objects
+  - Added support for CAIP-19, DTI, and ISO-4217 currency codes in pricing objects
+  - Enables cross-currency payments (e.g., USD invoice accepting EUR at specific rate)
+  - Supports volatile asset pricing (e.g., ETH, BTC) with precise amounts and rate expiration
+  - Updated Payment interface examples to demonstrate mixed asset types
+  - Maintains backward compatibility with existing string-only supportedAssets arrays
+  - Enables merchant specification of exact exchange rates with optional expiration timestamps
+
 ## [1.12.1] - 2025-09-03
 
 ### Added

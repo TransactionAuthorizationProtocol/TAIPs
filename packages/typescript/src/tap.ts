@@ -259,6 +259,49 @@ export type SettlementAddress = CAIP10 | PayToURI;
 export type Amount = `${number}.${number}` | `${number}`;
 
 /**
+ * Supported Asset Pricing
+ * Pricing object for assets that don't have 1:1 relationship with the fiat amount.
+ * Used in supportedAssets arrays to specify exact exchange rates and expiration times.
+ *
+ * @example
+ * ```typescript
+ * // WETH with specific rate and expiration
+ * const wethPricing: SupportedAssetPricing = {
+ *   asset: "eip155:1:0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+ *   amount: "0.0625",
+ *   expires: "2025-07-30T15:00:00Z"
+ * };
+ *
+ * // Cross-currency EUR pricing for USD invoice
+ * const eurPricing: SupportedAssetPricing = {
+ *   asset: "EUR",
+ *   amount: "250.00",
+ *   expires: "2025-07-30T14:30:00Z"
+ * };
+ * ```
+ */
+export interface SupportedAssetPricing {
+  /**
+   * Asset identifier
+   * Can be CAIP-19, DTI, or ISO-4217 currency code
+   */
+  asset: CAIP19 | DTI | IsoCurrency;
+
+  /**
+   * Amount of this asset needed to settle the fiat amount
+   * String representation of the decimal amount
+   */
+  amount: Amount;
+
+  /**
+   * Optional expiration timestamp for this exchange rate
+   * ISO 8601 timestamp when this rate becomes invalid
+   * If omitted, the rate follows the Payment's overall expiry timestamp
+   */
+  expires?: ISO8601DateTime;
+}
+
+/**
  * Chain Agnostic Transaction Identifier (CAIP-220)
  * Represents a transaction on a specific blockchain in a chain-agnostic way.
  *
@@ -1164,10 +1207,19 @@ export interface Transfer extends TapMessageObject<"Transfer"> {
  *   "@context": "https://tap.rsvp/schema/1.0",
  *   "@type": "Payment",
  *   currency: "USD",
- *   amount: "49.99",
+ *   amount: "270.00",
  *   supportedAssets: [
- *     "eip155:1/erc20:0x6b175474e89094c44da98b954eedeac495271d0f", // DAI
- *     "eip155:1/erc20:0xa0b86a33e6e0a7c0d4e19e40dce0000000000000"  // USDC
+ *     "eip155:1/erc20:0x6b175474e89094c44da98b954eedeac495271d0f", // DAI (simple string)
+ *     "eip155:1/erc20:0xa0b86a33e6e0a7c0d4e19e40dce0000000000000", // USDC (simple string)
+ *     { // WETH with pricing object
+ *       asset: "eip155:1:0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+ *       amount: "0.0625",
+ *       expires: "2025-07-30T15:00:00Z"
+ *     },
+ *     { // Cross-currency EUR
+ *       asset: "EUR",
+ *       amount: "250.00"
+ *     }
  *   ],
  *   merchant: {
  *     "@id": "did:example:merchant",
@@ -1212,10 +1264,10 @@ export interface Payment extends TapMessageObject<"Payment"> {
 
   /**
    * Optional list of acceptable assets
-   * CAIP-19 identifiers for assets the merchant will accept
+   * Can be either simple CAIP-19 identifiers or pricing objects with specific rates
    * Used when currency is specified to indicate which crypto assets can be used
    */
-  supportedAssets?: CAIP19[];
+  supportedAssets?: (CAIP19 | DTI | SupportedAssetPricing)[];
 
   /**
    * Optional fallback settlement addresses
@@ -2278,7 +2330,7 @@ export interface CaptureMessage extends DIDCommReply<Capture> {
  * Presentation Message
  * DIDComm message for presenting verifiable credentials in response to RequirePresentation policies.
  * Implements TAIP-8 selective disclosure for privacy-preserving identity verification.
- * 
+ *
  * The body is intentionally empty as all verifiable presentations are included as attachments.
  * This follows the WACI Present Proof protocol specification.
  *
@@ -2321,7 +2373,8 @@ export interface CaptureMessage extends DIDCommReply<Capture> {
  * @see {@link https://identity.foundation/waci-didcomm/#step-4-present-proof | WACI Present Proof}
  * @see {@link https://identity.foundation/presentation-exchange/ | Presentation Exchange}
  */
-export interface PresentationMessage extends DIDCommReply<Record<string, never>> {
+export interface PresentationMessage
+  extends DIDCommReply<Record<string, never>> {
   /**
    * Message type for verifiable presentations
    * Uses DIDComm present-proof protocol v3.0

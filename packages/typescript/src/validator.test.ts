@@ -440,8 +440,7 @@ describe('TAP Message Validators', () => {
         "@type": "Payment",
         amount: "50.00",
         asset: "USD",
-        payer: validPerson,
-        payee: validPerson,
+        merchant: validPerson,
         agents: [validAgent]
       };
       expect(PaymentSchema.safeParse(payment).success).toBe(true);
@@ -461,8 +460,7 @@ describe('TAP Message Validators', () => {
         "@type": "Payment",
         amount: "50.00",
         currency: "USD",
-        payer: validPerson,
-        payee: validPerson,
+        merchant: validPerson,
         agents: [validAgent],
         purposeCode: "SALA"
       };

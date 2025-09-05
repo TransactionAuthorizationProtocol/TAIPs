@@ -480,6 +480,63 @@ const agent: Agent = {
 
 ## Advanced Usage
 
+### Enhanced Payment Requests
+
+The latest version includes enhanced support for Payment messages with flexible asset pricing:
+
+```typescript
+import { Payment, PaymentMessage, SupportedAssetPricing } from '@taprsvp/types';
+
+// Payment with mixed simple and pricing object assets
+const payment: Payment = {
+  "@context": "https://tap.rsvp/schema/1.0",
+  "@type": "Payment",
+  currency: "USD",
+  amount: "100.00",
+  supportedAssets: [
+    // Simple 1:1 asset (backward compatible)
+    "eip155:1/erc20:0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48", // USDC
+    // Cross-currency pricing with rate and expiration
+    {
+      asset: "EUR", // ISO-4217 currency
+      amount: "92.50", // Specific USD to EUR exchange rate
+      expires: "2025-09-05T15:30:00Z" // Rate expires in 30 minutes
+    },
+    // Volatile crypto pricing with shorter expiration
+    {
+      asset: "eip155:1/erc20:0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599", // WBTC
+      amount: "0.00234", // Current BTC equivalent amount
+      expires: "2025-09-05T15:05:00Z" // 5 minute expiration for volatility
+    }
+  ],
+  fallbackSettlementAddresses: [
+    "payto://iban/DE75512108001245126199" // Traditional banking fallback
+  ],
+  merchant: {
+    "@id": "did:web:merchant.example.com",
+    "@type": "https://schema.org/Organization",
+    name: "Global Marketplace"
+  },
+  agents: [
+    {
+      "@id": "did:web:merchant.example.com",
+      for: "did:web:merchant.example.com",
+      role: "PaymentProcessor"
+    }
+  ]
+};
+
+// Wrap in DIDComm message
+const paymentMessage: PaymentMessage = {
+  id: "01234567-89ab-cdef-0123-456789abcdef",
+  type: "https://tap.rsvp/schema/1.0#Payment",
+  from: "did:web:merchant.example.com",
+  to: ["did:web:customer.example.com"],
+  created_time: Date.now(),
+  body: payment
+};
+```
+
 ### Selective Disclosure Policies
 
 ```typescript
@@ -720,6 +777,7 @@ const presentationMessage: PresentationMessage = {
 - **`PayToURI`** - RFC 8905 payment URI (`payto://method/address`)
 - **`SettlementAddress`** - Union of `CAIP10 | PayToURI`
 - **`Amount`** - Decimal string representation of monetary amounts
+- **`SupportedAssetPricing`** - Pricing object for non-1:1 asset exchange rates with optional expiration
 
 ### Participant Interfaces
 

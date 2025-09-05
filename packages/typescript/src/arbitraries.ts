@@ -132,6 +132,20 @@ export const amount = (): fc.Arbitrary<Amount> =>
 export const isoCurrency = (): fc.Arbitrary<IsoCurrency> =>
   fc.constantFrom("USD", "EUR", "GBP", "JPY", "CHF", "CAD", "AUD");
 
+export const supportedAssetPricing = (): fc.Arbitrary<any> =>
+  fc.record({
+    asset: fc.oneof(caip19(), isoCurrency()),
+    amount: amount(),
+    expires: fc.option(
+      fc.constantFrom(
+        new Date(Date.now() + 3600000).toISOString(),   // 1 hour from now
+        new Date(Date.now() + 86400000).toISOString(),  // 1 day from now
+        new Date(Date.now() + 1800000).toISOString()    // 30 minutes from now
+      ), 
+      { nil: undefined }
+    )
+  });
+
 // ============================================================================
 // PARTICIPANT ARBITRARIES
 // ============================================================================
@@ -215,10 +229,37 @@ export const payment = (): fc.Arbitrary<Payment> =>
     "@type": fc.constant("Payment" as const),
     amount: amount(),
     currency: isoCurrency(),
-    payer: party(),
-    payee: party(),
+    supportedAssets: fc.option(
+      fc.array(
+        fc.oneof(
+          fc.oneof(caip19(), isoCurrency()), // Simple asset strings
+          supportedAssetPricing() // Pricing objects
+        ), 
+        { minLength: 1, maxLength: 5 }
+      ), 
+      { nil: undefined }
+    ),
+    fallbackSettlementAddresses: fc.option(
+      fc.array(fc.oneof(
+        caip10(),
+        fc.constantFrom(
+          "payto://iban/DE75512108001245126199" as any,
+          "payto://iban/GB29NWBK60161331926819" as any
+        )
+      ), { minLength: 1, maxLength: 3 }),
+      { nil: undefined }
+    ),
     merchant: party(),
+    customer: fc.option(party(), { nil: undefined }),
     agents: fc.array(agent(), { minLength: 1, maxLength: 3 }),
+    expiry: fc.option(
+      fc.constantFrom(
+        new Date(Date.now() + 3600000).toISOString(),   // 1 hour from now
+        new Date(Date.now() + 86400000).toISOString(),  // 1 day from now
+        new Date(Date.now() + 1800000).toISOString()    // 30 minutes from now
+      ),
+      { nil: undefined }
+    ),
     purposeCode: fc.option(fc.constantFrom("TRAD", "SALA", "RENT", "INTC", "SUPP"), { nil: undefined })
   });
 
@@ -527,6 +568,7 @@ export const arbitraries = {
     caip19: () => caip19(),
     amount: () => amount(),
     isoCurrency: () => isoCurrency(),
+    supportedAssetPricing: () => supportedAssetPricing(),
   },
   
   // Participants
