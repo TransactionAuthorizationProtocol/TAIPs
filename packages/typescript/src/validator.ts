@@ -83,6 +83,13 @@ export const DTISchema = z.string().min(1);
 /** Asset ID (union of CAIP-19, DTI, and ISO 4217 currency code) */
 export const AssetSchema = z.union([CAIP19Schema, DTISchema, CurrencyCodeSchema]);
 
+/** Supported Asset Pricing object for Payment messages */
+export const SupportedAssetPricingSchema = z.object({
+  asset: AssetSchema,
+  amount: AmountSchema,
+  expires: ISO8601DateTimeSchema.optional()
+});
+
 // ============================================================================
 // JSON-LD BASE VALIDATORS
 // ============================================================================
@@ -192,10 +199,12 @@ export const PaymentSchema = TapMessageObjectSchema.merge(z.object({
   amount: AmountSchema,
   asset: AssetSchema.optional(),
   currency: CurrencyCodeSchema.optional(),
-  payer: PartySchema,
-  payee: PartySchema,
+  supportedAssets: z.array(z.union([AssetSchema, SupportedAssetPricingSchema])).optional(),
+  fallbackSettlementAddresses: z.array(SettlementAddressSchema).optional(),
+  merchant: PartySchema,
+  customer: PartySchema.optional(),
   agents: z.array(AgentSchema),
-  settlementAddress: SettlementAddressSchema.optional(),
+  expiry: ISO8601DateTimeSchema.optional(),
   purposeCode: PurposeCodeSchema.optional(),
   reference: z.string().optional(),
   invoiceId: z.string().optional()
