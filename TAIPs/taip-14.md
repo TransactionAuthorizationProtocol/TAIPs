@@ -5,9 +5,9 @@ status: Review
 type: Standard
 author: Pelle Braendgaard <pelle@notabene.id>
 created: 2024-03-21
-updated: 2025-08-21
+updated: 2025-09-05
 description: Defines a merchant-initiated Payment message standard for requesting blockchain payments with specified amounts in either crypto assets or fiat currencies. Enables selective disclosure of customer information for compliance and business purposes while facilitating standard e-commerce and invoice payment flows with privacy protection.
-requires: 2, 3, 4, 6, 7, 8, 9, 16
+requires: 2, 3, 4, 6, 7, 8, 9, 16, 18
 ---
 
 ## Simple Summary
@@ -161,7 +161,7 @@ sequenceDiagram
 
 ### Composability
 
-Most simple payments involving a single blockchain and a single token transfer can be implemented using the `Payment` -> `Authorize` -> `Authorize` -> `Settle` flow. More complex payments may include a Forex swap between different stablecoins or bridging between blockchain networks. For full transparency these can be implemented using multiple `Transfer` messages refering to the parent Payment through the `pthid` field (see [TAIP-2]).
+Most simple payments involving a single blockchain and a single token transfer can be implemented using the `Payment` -> `Authorize` -> `Authorize` -> `Settle` flow. More complex payments may require asset conversion between different stablecoins or currencies. These scenarios can be handled using `Exchange` and `Quote` messages from [TAIP-18], with the Exchange referring to the parent Payment through the `pthid` field (see [TAIP-2]).
 
 ```mermaid
 sequenceDiagram
@@ -170,17 +170,20 @@ sequenceDiagram
     participant PSP
     participant Blockchain
 
-    PSP->>CustomerWallet: Payment (USDT)
-    CustomerWallet-->>PSP: AddAgent (LiquidityProvider)
-
-    CustomerWallet->>LiquidityProvider: Transfer (EURC)
+    PSP->>CustomerWallet: Payment (USDT, 1000.00)
+    Note over CustomerWallet: Customer only has EURC
+    
+    CustomerWallet->>LiquidityProvider: Exchange (EURC → USDT, pthid: payment-id)
+    LiquidityProvider-->>CustomerWallet: Quote (908.50 EURC → 1000.00 USDT)
+    
+    CustomerWallet-->>LiquidityProvider: Authorize (accept quote)
     LiquidityProvider-->>CustomerWallet: Authorize (with EURC settlementAddress)
-    CustomerWallet-->>PSP: Authorize
+    CustomerWallet-->>PSP: Authorize (payment approved)
     PSP-->>LiquidityProvider: Authorize (with USDT settlementAddress)
 
-    CustomerWallet-)Blockchain: Submit EURC transaction
+    CustomerWallet->>Blockchain: Submit EURC transaction
     CustomerWallet-->>LiquidityProvider: Settle (EURC)
-    LiquidityProvider-)Blockchain: Submit USDT
+    LiquidityProvider->>Blockchain: Submit USDT
     LiquidityProvider-->>PSP: Settle (USDT)
 ```
 
@@ -342,6 +345,7 @@ By incorporating selective disclosure and unique payment addresses, the Payment 
 * [TAIP-8] Selective Disclosure
 * [TAIP-9] Proof of Relationship
 * [TAIP-16] Invoices
+* [TAIP-18] Asset Exchange
 * [CAIP-19] Asset Type and Asset ID Specification
 * [BIP-70] Payment Protocol
 * [BIP-75] Out of Band Address Exchange using Payment Protocol Encryption
@@ -358,6 +362,7 @@ By incorporating selective disclosure and unique payment addresses, the Payment 
 [TAIP-8]: ./taip-8 "Selective Disclosure"
 [TAIP-9]: ./taip-9 "Proof of Relationship"
 [TAIP-16]: ./taip-16 "Invoices"
+[TAIP-18]: ./taip-18 "Asset Exchange"
 [CAIP-19]: https://chainagnostic.org/CAIPs/caip-19 "Asset Type and Asset ID Specification"
 [BIP-70]: https://github.com/bitcoin/bips/blob/master/bip-0070.mediawiki "Payment Protocol"
 [BIP-75]: https://github.com/bitcoin/bips/blob/master/bip-0075.mediawiki "Out of Band Address Exchange using Payment Protocol Encryption"
