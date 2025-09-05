@@ -184,7 +184,7 @@ Initiates a payment request from a merchant to a customer.
 | asset | string | No | Review ([TAIP-14]) | CAIP-19 identifier of the asset to be paid. Either asset OR currency is required. |
 | currency | string | No | Review ([TAIP-14]) | ISO 4217 currency code for fiat amount. Either asset OR currency is required. |
 | amount | string | Yes | Review ([TAIP-14]) | Amount requested in the specified asset or currency |
-| supportedAssets | array | No | Review ([TAIP-14]) | Array of CAIP-19 asset identifiers that can be used to settle a fiat currency amount. Used when currency is specified to indicate which crypto assets can be used. |
+| supportedAssets | array | No | Review ([TAIP-14]) | Array of CAIP-19 asset identifiers, DTI identifiers, or pricing objects that can be used to settle a fiat currency amount. Supports both simple strings and pricing objects with amount and optional expiration for non-1:1 exchange rates. |
 | fallbackSettlementAddresses | array | No | Review ([TAIP-14]) | Array of alternative settlement addresses in either CAIP-10 or RFC 8905 format for redundancy |
 | invoice | object or string | No | Review ([TAIP-14], [TAIP-16]) | Invoice object as defined in TAIP-16 or URI to an invoice document |
 | expiry | string | No | Review ([TAIP-14]) | ISO 8601 timestamp when the request expires |
@@ -322,6 +322,49 @@ Initiates a payment request from a merchant to a customer.
       },
       {
         "@id": "did:web:merchant-psp",
+        "for": "did:web:merchant.vasp"
+      }
+    ]
+  }
+}
+```
+
+##### Cross-currency payment with pricing objects
+```json
+{
+  "id": "01234567-89ab-cdef-0123-456789abcdef",
+  "type": "https://tap.rsvp/schema/1.0#Payment",
+  "from": "did:web:merchant.vasp",
+  "to": ["did:web:customer.vasp"],
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#Payment",
+    "currency": "USD",
+    "amount": "100.00",
+    "supportedAssets": [
+      "eip155:1/erc20:0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+      {
+        "asset": "EUR", 
+        "amount": "92.50",
+        "expires": "2025-09-05T15:30:00Z"
+      },
+      {
+        "asset": "eip155:1/erc20:0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
+        "amount": "0.0025",
+        "expires": "2025-09-05T15:15:00Z"
+      }
+    ],
+    "fallbackSettlementAddresses": [
+      "payto://iban/DE75512108001245126199"
+    ],
+    "merchant": {
+      "@id": "did:web:merchant.vasp",
+      "name": "Global Marketplace"
+    },
+    "expiry": "2025-09-05T16:00:00Z",
+    "agents": [
+      {
+        "@id": "did:web:merchant.vasp",
         "for": "did:web:merchant.vasp"
       }
     ]
