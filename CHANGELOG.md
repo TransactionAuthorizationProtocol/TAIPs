@@ -14,6 +14,21 @@ This changelog focuses on:
 - Protocol structural changes
 - Breaking changes
 
+## [2025-09-05]
+
+### Enhanced
+- **TAIP-14 Payment Requests**: Enhanced supportedAssets field and composability integration
+  - **Enhanced supportedAssets field**: Now supports both string and object formats for flexible pricing
+    - String format: Simple asset identifiers for ~1:1 assets like stablecoins  
+    - Object format: Pricing objects with `asset` (CAIP-19, DTI, or ISO-4217), `amount`, and optional `expires`
+    - Enables cross-currency payments (e.g., USD invoice accepting EUR at specific rate with IBAN settlement)
+    - Supports volatile asset pricing (e.g., ETH, BTC) with precise amounts and rate expiration
+  - **Updated composability section**: Replaced Transfer-based examples with Exchange/Quote pattern from TAIP-18
+    - Shows proper use of Exchange requests for currency conversion in payment flows
+    - Demonstrates parent-child relationship using `pthid` to link Exchange to Payment
+    - Added TAIP-18 to requirements and references
+  - Enhanced example demonstrates mixed payment methods: stablecoins, crypto with pricing, cross-currency fiat
+
 ## [2025-09-01]
 
 ### Added
