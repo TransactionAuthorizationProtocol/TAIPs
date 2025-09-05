@@ -116,6 +116,34 @@ body {
   background-color: var(--color-primary);
 }
 
+/* Sidebar CTA */
+.sidebar-cta {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.whitepaper-cta {
+  display: block;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background-color: var(--color-primary);
+  color: white;
+  text-decoration: none;
+  border-radius: 0.375rem;
+  font-family: var(--font-heading);
+  font-weight: 500;
+  font-size: 0.9rem;
+  text-align: center;
+  transition: background-color 0.2s, transform 0.2s;
+  box-sizing: border-box;
+}
+
+.whitepaper-cta:hover {
+  background-color: var(--color-primary-light);
+  color: white;
+  transform: translateY(-2px);
+}
+
 /* Typography */
 h1, h2, h3, h4, h5, h6 {
   margin-top: 2rem;
