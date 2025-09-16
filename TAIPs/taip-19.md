@@ -2,7 +2,7 @@
 taip: TAIP-19
 title: Fee Allocation
 author: Onuwa Nnachi Isaac <isaac.onuwa@notabene.id>
-discussions-to: https://github.com/TransactionAuthorizationProtocol/TAIPs/discussions/19
+discussions-to: https://github.com/TransactionAuthorizationProtocol/TAIPs/discussions/49
 status: Draft
 type: Standard
 created: 2025-09-14
