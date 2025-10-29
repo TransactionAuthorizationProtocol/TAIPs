@@ -104,6 +104,11 @@
           "$ref": "#/$defs/base64"
         }
       }
+    },
+    "settlementTag": {
+      "type": "string",
+      "description": "Optional routing identifier for blockchains that require destination tags/memos (e.g., XRP destination tag, Stellar memo, Cosmos memo). Format and requirements are chain-specific.",
+      "examples": ["12345", "invoice-abc-123"]
     }
   }
 }

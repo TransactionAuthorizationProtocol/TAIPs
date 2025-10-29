@@ -27,6 +27,9 @@
           "$ref": "../common/settlement-address.json",
           "description": "Settlement address in either CAIP-10 or RFC 8905 format"
         },
+        "settlementTag": {
+          "$ref": "../common/base-types.json#/$defs/settlementTag"
+        },
         "settlementAsset": {
           "$ref": "../common/caip-types.json#/$defs/caip19",
           "description": "Asset for settlement in CAIP-19 format"

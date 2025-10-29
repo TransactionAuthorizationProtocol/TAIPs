@@ -35,6 +35,9 @@
         "settlementAddress": {
           "$ref": "../common/settlement-address.json",
           "description": "Settlement address in either CAIP-10 or RFC 8905 format. If omitted, uses address from earlier Authorize"
+        },
+        "settlementTag": {
+          "$ref": "../common/base-types.json#/$defs/settlementTag"
         }
       },
       "required": ["@context", "@type"]

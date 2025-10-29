@@ -27,6 +27,9 @@
           "$ref": "../common/settlement-address.json",
           "description": "Settlement address to return funds to in either CAIP-10 or RFC 8905 format"
         },
+        "settlementTag": {
+          "$ref": "../common/base-types.json#/$defs/settlementTag"
+        },
         "reason": {
           "type": "string",
           "description": "Human readable message describing why the transaction reversal is being requested"

@@ -27,6 +27,9 @@
           "$ref": "../common/settlement-address.json",
           "description": "Destination address of the transaction in either CAIP-10 or RFC 8905 format"
         },
+        "settlementTag": {
+          "$ref": "../common/base-types.json#/$defs/settlementTag"
+        },
         "settlementId": {
           "type": "string",
           "pattern": "^[-a-z0-9]{3,8}:[-_a-zA-Z0-9]{1,32}:(tx|txn)/[-%a-zA-Z0-9]{1,128}$",

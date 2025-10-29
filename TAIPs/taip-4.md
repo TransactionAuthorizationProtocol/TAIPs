@@ -117,6 +117,7 @@ Any agent can authorize the transaction by replying as a thread to the initial m
 - `@context` - REQUIRED the JSON-LD context `https://tap.rsvp/schema/1.0`
 - `@type` - REQUIRED the JSON-LD type `https://tap.rsvp/schema/1.0#Authorize`
 - `settlementAddress` - OPTIONAL string representing the intended destination address of the transaction specified in either [CAIP-10] or [RFC 8905] format. [CAIP-10] format is used for blockchain addresses, while [RFC 8905] payto URIs are used for traditional payment systems such as bank transfers (e.g., `payto://iban/DE75512108001245126199`). If sent by an Agent representing the beneficiary this is REQUIRED unless the original request contains an agent with the `settlementAddress` role. For all others it is OPTIONAL.
+- `settlementTag` - OPTIONAL string for blockchains that require destination tags or memos (e.g., XRP destination tag, Stellar memo, Cosmos memo). Format and requirements are chain-specific. Used in conjunction with `settlementAddress` to specify routing information.
 - `settlementAsset` - OPTIONAL string representing an asset for settlement in [CAIP-19] format. If multiple `supportedAssets` are presentented in the Transaction message (eg. `Payment` from [TAIP-14]) then an agent representing the sending side of the transaction is REQUIRED to specify the `settlementAsset` as part of their authorization, so the receiving side can specify the correct `settlementAddress`
 - `amount` - OPTIONAL string with the full amount as a decimal representation of the `settlementAsset` in case it is different than the original `Payment` or `Transfer` message.
 - `expiry` - OPTIONAL timestamp in ISO 8601 format indicating when the authorization expires. After this time, if settlement has not occurred, the authorization should be considered invalid and settlement should not proceed. In merchant payment flows, the customer's wallet may either repeat the merchant's specified expiration time or override it with a different time.
@@ -167,6 +168,7 @@ An originating agent notifies the other agents in the same thread that they are 
 - `@context` - REQUIRED the JSON-LD context `https://tap.rsvp/schema/1.0`
 - `@type` - REQUIRED the JSON-LD type `https://tap.rsvp/schema/1.0#Settle`
 - `settlementAddress` - REQUIRED string representing the destination address of the transaction specified in either [CAIP-10] or [RFC 8905] format. [CAIP-10] format is used for blockchain addresses, while [RFC 8905] payto URIs are used for traditional payment systems such as bank transfers.
+- `settlementTag` - OPTIONAL string for blockchains that require destination tags or memos (e.g., XRP destination tag, Stellar memo, Cosmos memo). Format and requirements are chain-specific. Used in conjunction with `settlementAddress` to specify routing information.
 - `settlementId` - OPTIONAL a [CAIP-220](https://github.com/ChainAgnostic/CAIPs/pull/221/files) identifier of the underlying settlement transaction on a blockchain. REQUIRED by at least one agent representing the originator.
 - `amount` - OPTIONAL string containing a decimal representation of the settled amount. If specified, this MUST be less than or equal to the amount in the original transaction message. If a `Authorize` message was received with an amount specified, then the amount in the `Settle` message MUST match that value. If omitted, the full amount from the original transaction message is implied.
 
@@ -293,6 +295,7 @@ A `Revert` message could be `Settled`, `Authorized` or `Rejected` or simply igno
 - `@context` - REQUIRED the JSON-LD context `https://tap.rsvp/schema/1.0`
 - `@type` - REQUIRED the JSON-LD type `https://tap.rsvp/schema/1.0#Revert`
 - `settlementAddress` - REQUIRED the proposed settlement address in either [CAIP-10] or [RFC 8905] format to return the funds to
+- `settlementTag` - OPTIONAL string for blockchains that require destination tags or memos (e.g., XRP destination tag, Stellar memo, Cosmos memo). Format and requirements are chain-specific. Used in conjunction with `settlementAddress` to specify routing information.
 - `reason` - REQUIRED Human readable message describing why the transaction reversal is being requested
 
 The following shows a simple Reversal request of a Transfer by the Originating Agent.
@@ -405,6 +408,24 @@ The following are example plaintext messages. See [TAIP-2] for how to sign the m
     "@context": "https://tap.rsvp/schema/1.0",
     "@type": "https://tap.rsvp/schema/1.0#Authorize",
     "settlementAddress": "eip155:1:0x1234a96D359eC26a11e2C2b3d8f8B8942d5Bfcdb",
+    "expiry": "2024-01-01T12:00:00Z"
+  }
+}
+```
+
+Example with XRP destination tag:
+
+```json
+{
+  "from": "did:web:beneficiary.vasp",
+  "type": "https://tap.rsvp/schema/1.0#Authorize",
+  "thid": "ID of transfer request",
+  "to": ["did:web:originator.vasp"],
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#Authorize",
+    "settlementAddress": "xrpl:0:rN7n7otQDd6FczFgLdlqtyMVrn3HMfGt9d",
+    "settlementTag": "123456789",
     "expiry": "2024-01-01T12:00:00Z"
   }
 }

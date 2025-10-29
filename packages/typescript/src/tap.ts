@@ -1484,6 +1484,12 @@ export interface Authorize extends TapMessageObject<"Authorize"> {
   settlementAddress?: SettlementAddress;
 
   /**
+   * Optional routing identifier for blockchains that require destination tags/memos
+   * Format and requirements are chain-specific (e.g., XRP destination tag, Stellar memo, Cosmos memo)
+   */
+  settlementTag?: string;
+
+  /**
    * Optional settlement asset
    * CAIP-19 identifier specifying the asset for settlement
    * REQUIRED when multiple supportedAssets are present in transaction message
@@ -1562,6 +1568,12 @@ export interface Settle extends TapMessageObject<"Settle"> {
   settlementAddress: SettlementAddress;
 
   /**
+   * Optional routing identifier for blockchains that require destination tags/memos
+   * Format and requirements are chain-specific (e.g., XRP destination tag, Stellar memo, Cosmos memo)
+   */
+  settlementTag?: string;
+
+  /**
    * Optional settlement transaction identifier
    * CAIP-220 identifier for the on-chain settlement transaction
    * REQUIRED by at least one agent representing the originator
@@ -1624,6 +1636,12 @@ export interface Revert extends TapMessageObject<"Revert"> {
    * Either a blockchain address (CAIP-10) or traditional payment target (RFC 8905 PayTo URI)
    */
   settlementAddress: SettlementAddress;
+
+  /**
+   * Optional routing identifier for blockchains that require destination tags/memos
+   * Format and requirements are chain-specific (e.g., XRP destination tag, Stellar memo, Cosmos memo)
+   */
+  settlementTag?: string;
 
   /**
    * Reason for the revert request
@@ -2302,6 +2320,12 @@ export interface Capture extends TapMessageObject<"Capture"> {
    * If omitted, uses address from earlier Authorize
    */
   settlementAddress?: SettlementAddress;
+
+  /**
+   * Optional routing identifier for blockchains that require destination tags/memos
+   * Format and requirements are chain-specific (e.g., XRP destination tag, Stellar memo, Cosmos memo)
+   */
+  settlementTag?: string;
 }
 
 /**
