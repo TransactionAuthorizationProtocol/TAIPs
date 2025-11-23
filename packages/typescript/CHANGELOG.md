@@ -2,7 +2,7 @@
 
 All notable changes to the TypeScript package are documented in this file.
 
-## [Unreleased]
+## [1.14.0] - 2025-11-23
 
 ### Changed
 - **IVMS101 2023 Only**: Updated to use only IVMS101 2023 version per specification, removed legacy 2020 support
