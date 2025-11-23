@@ -49,7 +49,7 @@
     "access": "public"
   },
   "dependencies": {
-    "ivms101": "^1.2.1",
+    "ivms101": "file:../../../ivms101",
     "zod": "^4.0.17"
   }
 }

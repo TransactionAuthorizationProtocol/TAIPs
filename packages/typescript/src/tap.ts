@@ -51,7 +51,15 @@
 import { IsoCurrency } from "./currencies";
 import { Invoice } from "./invoice";
 import { PurposeCode, CategoryPurposeCode } from "./purpose_codes";
-import { IVMS101_2020, IVMS101_2023 } from "ivms101/dist/";
+import type {
+  NaturalPersonNameId,
+  LegalPersonNameId,
+  Address,
+  NationalIdentification,
+  NaturalPersonNationalIdentifierTypeCode,
+  LegalEntityNationalIdentifierTypeCode,
+  CountryCode
+} from "ivms101";
 
 // ============================================================================
 // FUNDAMENTAL TYPES
@@ -677,7 +685,7 @@ export interface Person extends Participant {
    * @example "Alice Johnson" // Simple string
    * @example [{ primaryIdentifier: "Alice", secondaryIdentifier: "Johnson", nameIdentifierType: "LEGL" }] // IVMS101
    */
-  name?: string | IVMS101_2023.NaturalPersonNameId[];
+  name?: string | NaturalPersonNameId[];
 
   /**
    * Geographic addresses associated with the person
@@ -685,7 +693,7 @@ export interface Person extends Participant {
    * Supports multiple address types (HOME, BIZZ, etc.)
    * @example [{ addressType: "HOME", streetName: "123 Main St", townName: "City", country: "US" }]
    */
-  geographicAddress?: IVMS101_2023.Address[];
+  geographicAddress?: Address[];
 
   /**
    * National identification documents
@@ -693,7 +701,7 @@ export interface Person extends Participant {
    * **Privacy**: Consider selective disclosure for sensitive ID information
    * @example { nationalIdentifier: "123-45-6789", nationalIdentifierType: "ARNU", countryOfIssue: "US" }
    */
-  nationalIdentifier?: IVMS101_2020.NationalIdentification<IVMS101_2020.NaturalPersonNationalIdentifierTypeCode>;
+  nationalIdentifier?: NationalIdentification<NaturalPersonNationalIdentifierTypeCode>;
 
   /**
    * Date and place of birth information
@@ -714,7 +722,7 @@ export interface Person extends Participant {
    * @example "CA"
    * @example "GB"
    */
-  countryOfResidence?: IVMS101_2023.CountryCode;
+  countryOfResidence?: CountryCode;
 }
 
 /**
@@ -803,7 +811,7 @@ export interface Organization extends Participant {
    * @example "Example Corporation Inc." // Simple string
    * @example [{ legalPersonName: "Example Corp", legalPersonNameIdentifierType: "LEGL" }] // IVMS101
    */
-  name?: string | IVMS101_2023.LegalPersonNameId[];
+  name?: string | LegalPersonNameId[];
 
   /**
    * Customer identification string
@@ -817,7 +825,7 @@ export interface Organization extends Participant {
    * Government-issued identifiers like tax ID, business registration number
    * @example { nationalIdentifier: "12-3456789", nationalIdentifierType: "TXID", countryOfIssue: "US" }
    */
-  nationalIdentifier?: IVMS101_2020.NationalIdentification<IVMS101_2020.LegalEntityNationalIdentifierTypeCode>;
+  nationalIdentifier?: NationalIdentification<LegalEntityNationalIdentifierTypeCode>;
 
   /**
    * Merchant Category Code (ISO 18245)
@@ -863,7 +871,7 @@ export interface Organization extends Participant {
    * Supports multiple address types (BIZZ for business, etc.)
    * @example [{ addressType: "BIZZ", streetName: "456 Business Ave", townName: "Finance City", country: "US" }]
    */
-  geographicAddress?: IVMS101_2023.Address[];
+  geographicAddress?: Address[];
 
   /**
    * Country of registration/incorporation
@@ -873,7 +881,7 @@ export interface Organization extends Participant {
    * @example "SG" // Singapore
    * @example "CH" // Switzerland
    */
-  countryOfRegistration?: IVMS101_2023.CountryCode;
+  countryOfRegistration?: CountryCode;
 }
 
 export type Party = Person | Organization;
@@ -901,12 +909,12 @@ type AgentRoles =
  *   url: "https://vasp.example.com",
  *   email: "compliance@vasp.example.com",
  *   geographicAddress: [{
- *     addressType: IVMS101_2023.AddressType.HOME,
+ *     addressType: "HOME",
  *     streetName: "123 Main St",
  *     buildingNumber: "123",
  *     postCode: "12345",
  *     townName: "Example City",
- *     country: IVMS101_2023.CountryCode.US
+ *     country: "US"
  *   }],
  *   policies: [{
  *     "@type": "RequireAuthorization",

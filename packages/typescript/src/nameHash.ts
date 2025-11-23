@@ -13,7 +13,7 @@
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-12.md | TAIP-12: Privacy-Preserving Name Matching}
  */
 
-import type { IVMS101_2020, IVMS101_2023 } from 'ivms101';
+import type { NaturalPerson, LegalPerson, Originator, Beneficiary } from 'ivms101';
 
 // Type declaration for Node.js crypto module to avoid dependency on @types/node
 declare function require(name: string): any;
@@ -66,17 +66,16 @@ export function normalizeForHashing(name: string): string {
  * extractNaturalPersonName(person); // Returns "John Smith"
  * ```
  */
-function extractNaturalPersonName(naturalPerson: IVMS101_2020.NaturalPerson | IVMS101_2023.NaturalPerson): string {
-  if (!naturalPerson.name || naturalPerson.name.length === 0) {
+function extractNaturalPersonName(naturalPerson: NaturalPerson): string {
+  if (!naturalPerson.name?.nameIdentifier || naturalPerson.name.nameIdentifier.length === 0) {
     return '';
   }
 
   // Prefer legal name (LEGL) if available
-  const legalName = naturalPerson.name.find(n => 
-    ('nameIdentifierType' in n && n.nameIdentifierType === 'LEGL') ||
-    ('naturalPersonNameIdentifierType' in n && n.naturalPersonNameIdentifierType === 'LEGL')
+  const legalName = naturalPerson.name.nameIdentifier.find(n =>
+    n.naturalPersonNameIdentifierType === 'LEGL'
   );
-  const nameEntry = legalName || naturalPerson.name[0];
+  const nameEntry = legalName || naturalPerson.name.nameIdentifier[0];
 
   const parts: string[] = [];
   if (nameEntry.secondaryIdentifier) {
@@ -110,14 +109,14 @@ function extractNaturalPersonName(naturalPerson: IVMS101_2020.NaturalPerson | IV
  * extractLegalPersonName(entity); // Returns "Acme Corporation Ltd"
  * ```
  */
-function extractLegalPersonName(legalPerson: IVMS101_2020.LegalPerson | IVMS101_2023.LegalPerson): string {
-  if (!legalPerson.name || legalPerson.name.length === 0) {
+function extractLegalPersonName(legalPerson: LegalPerson): string {
+  if (!legalPerson.name?.nameIdentifier || legalPerson.name.nameIdentifier.length === 0) {
     return '';
   }
 
   // Prefer legal name (LEGL) if available
-  const legalName = legalPerson.name.find(n => n.legalPersonNameIdentifierType === 'LEGL');
-  const nameEntry = legalName || legalPerson.name[0];
+  const legalName = legalPerson.name.nameIdentifier.find(n => n.legalPersonNameIdentifierType === 'LEGL');
+  const nameEntry = legalName || legalPerson.name.nameIdentifier[0];
 
   return nameEntry.legalPersonName;
 }
@@ -143,9 +142,9 @@ function extractLegalPersonName(legalPerson: IVMS101_2020.LegalPerson | IVMS101_
  * extractOriginatorNames(originator); // Returns ["John Smith"]
  * ```
  */
-function extractOriginatorNames(originator: IVMS101_2020.Originator | IVMS101_2023.Originator): string[] {
-  const persons = 'originatorPersons' in originator ? originator.originatorPersons : originator.originatorPerson;
-  
+function extractOriginatorNames(originator: Originator): string[] {
+  const persons = originator.originatorPerson;
+
   return persons.map(person => {
     if (person.naturalPerson) {
       return extractNaturalPersonName(person.naturalPerson);
@@ -177,9 +176,9 @@ function extractOriginatorNames(originator: IVMS101_2020.Originator | IVMS101_20
  * extractBeneficiaryNames(beneficiary); // Returns ["Acme Corp"]
  * ```
  */
-function extractBeneficiaryNames(beneficiary: IVMS101_2020.Beneficiary | IVMS101_2023.Beneficiary): string[] {
-  const persons = 'beneficiaryPersons' in beneficiary ? beneficiary.beneficiaryPersons : beneficiary.beneficiaryPerson;
-  
+function extractBeneficiaryNames(beneficiary: Beneficiary): string[] {
+  const persons = beneficiary.beneficiaryPerson;
+
   return persons.map(person => {
     if (person.naturalPerson) {
       return extractNaturalPersonName(person.naturalPerson);
@@ -241,18 +240,18 @@ function extractBeneficiaryNames(beneficiary: IVMS101_2020.Beneficiary | IVMS101
  * ```
  */
 export async function generateNameHash(
-  input: string | IVMS101_2020.Originator | IVMS101_2023.Originator | IVMS101_2020.Beneficiary | IVMS101_2023.Beneficiary
+  input: string | Originator | Beneficiary
 ): Promise<string> {
   let nameToHash: string;
 
   if (typeof input === 'string') {
     nameToHash = input;
-  } else if ('originatorPersons' in input || 'originatorPerson' in input) {
+  } else if ('originatorPerson' in input) {
     // IVMS101 Originator structure
     const names = extractOriginatorNames(input);
     nameToHash = names.join(' ');
-  } else if ('beneficiaryPersons' in input || 'beneficiaryPerson' in input) {
-    // IVMS101 Beneficiary structure  
+  } else if ('beneficiaryPerson' in input) {
+    // IVMS101 Beneficiary structure
     const names = extractBeneficiaryNames(input);
     nameToHash = names.join(' ');
   } else {
