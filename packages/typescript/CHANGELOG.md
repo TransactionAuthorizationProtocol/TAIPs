@@ -2,6 +2,15 @@
 
 All notable changes to the TypeScript package are documented in this file.
 
+## [Unreleased]
+
+### Changed
+- **IVMS101 2023 Only**: Updated to use only IVMS101 2023 version per specification, removed legacy 2020 support
+  - Updated all IVMS101 imports to use cleaned-up ivms101 v2.0 exports
+  - Updated Person and Organization interfaces to use 2023 types exclusively
+  - Updated nameHash module to handle 2023 structure (name as object with nameIdentifier array)
+  - All 144 tests pass with full type safety
+
 ## [1.13.0] - 2025-09-05
 
 ### Enhanced

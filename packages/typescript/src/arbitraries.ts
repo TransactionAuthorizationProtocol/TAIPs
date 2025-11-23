@@ -44,7 +44,7 @@ import type {
   TransactionConstraints,
 } from "./tap";
 import type { IsoCurrency } from "./currencies";
-import * as ivms101 from 'ivms101/src/arbitraries';
+import { arbitraries as ivms101 } from 'ivms101';
 
 // ============================================================================
 // FUNDAMENTAL TYPE ARBITRARIES

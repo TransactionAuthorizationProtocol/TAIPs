@@ -10,9 +10,9 @@
 
 import { describe, it, expect } from 'vitest';
 import * as fc from 'fast-check';
-import * as ivms101 from 'ivms101/src/arbitraries';
+import { arbitraries as ivms101 } from 'ivms101';
 import { normalizeForHashing, generateNameHash } from './nameHash';
-import type { IVMS101_2020, IVMS101_2023 } from 'ivms101';
+import type { Originator, Beneficiary, Person, NaturalPerson, LegalPerson, NaturalPersonNameId } from 'ivms101';
 
 describe('normalizeForHashing', () => {
   it('should remove all whitespace and convert to uppercase', () => {
@@ -218,17 +218,19 @@ describe('TAIP-12 compliance', () => {
 describe('IVMS101 Integration', () => {
   describe('generateNameHash with IVMS101 2020 originators', () => {
     it('should handle natural person originators', async () => {
-      const originator: IVMS101_2020.Originator = {
-        originatorPersons: [
+      const originator: Originator = {
+        originatorPerson: [
           {
             naturalPerson: {
-              name: [
+              name: {
+                nameIdentifier: [
                 {
                   primaryIdentifier: "Lee",
                   secondaryIdentifier: "Alice", 
-                  nameIdentifierType: "LEGL"
+                  naturalPersonNameIdentifierType: "LEGL"
                 }
               ]
+              }
             }
           }
         ]
@@ -240,16 +242,18 @@ describe('IVMS101 Integration', () => {
     });
 
     it('should handle legal person originators', async () => {
-      const originator: IVMS101_2020.Originator = {
-        originatorPersons: [
+      const originator: Originator = {
+        originatorPerson: [
           {
             legalPerson: {
-              name: [
+              name: {
+                nameIdentifier: [
                 {
                   legalPersonName: "Acme Corporation",
                   legalPersonNameIdentifierType: "LEGL"
                 }
               ]
+              }
             }
           }
         ]
@@ -261,27 +265,31 @@ describe('IVMS101 Integration', () => {
     });
 
     it('should handle multiple persons in originator', async () => {
-      const originator: IVMS101_2020.Originator = {
-        originatorPersons: [
+      const originator: Originator = {
+        originatorPerson: [
           {
             naturalPerson: {
-              name: [
+              name: {
+                nameIdentifier: [
                 {
                   primaryIdentifier: "Smith",
                   secondaryIdentifier: "John",
-                  nameIdentifierType: "LEGL"
+                  naturalPersonNameIdentifierType: "LEGL"
                 }
               ]
+              }
             }
           },
           {
             legalPerson: {
-              name: [
+              name: {
+                nameIdentifier: [
                 {
                   legalPersonName: "Tech Corp",
                   legalPersonNameIdentifierType: "LEGL"
                 }
               ]
+              }
             }
           }
         ]
@@ -293,22 +301,24 @@ describe('IVMS101 Integration', () => {
     });
 
     it('should prefer legal names over other name types', async () => {
-      const originator: IVMS101_2020.Originator = {
-        originatorPersons: [
+      const originator: Originator = {
+        originatorPerson: [
           {
             naturalPerson: {
-              name: [
+              name: {
+                nameIdentifier: [
                 {
                   primaryIdentifier: "Doe",
                   secondaryIdentifier: "Johnny",
-                  nameIdentifierType: "ALIA"
+                  naturalPersonNameIdentifierType: "ALIA"
                 },
                 {
                   primaryIdentifier: "Doe",
                   secondaryIdentifier: "John",
-                  nameIdentifierType: "LEGL"
+                  naturalPersonNameIdentifierType: "LEGL"
                 }
               ]
+              }
             }
           }
         ]
@@ -322,17 +332,19 @@ describe('IVMS101 Integration', () => {
 
   describe('generateNameHash with IVMS101 2020 beneficiaries', () => {
     it('should handle natural person beneficiaries', async () => {
-      const beneficiary: IVMS101_2020.Beneficiary = {
-        beneficiaryPersons: [
+      const beneficiary: Beneficiary = {
+        beneficiaryPerson: [
           {
             naturalPerson: {
-              name: [
+              name: {
+                nameIdentifier: [
                 {
                   primaryIdentifier: "Smith",
                   secondaryIdentifier: "Bob",
-                  nameIdentifierType: "LEGL"
+                  naturalPersonNameIdentifierType: "LEGL"
                 }
               ]
+              }
             }
           }
         ]
@@ -344,16 +356,18 @@ describe('IVMS101 Integration', () => {
     });
 
     it('should handle legal person beneficiaries', async () => {
-      const beneficiary: IVMS101_2020.Beneficiary = {
-        beneficiaryPersons: [
+      const beneficiary: Beneficiary = {
+        beneficiaryPerson: [
           {
             legalPerson: {
-              name: [
+              name: {
+                nameIdentifier: [
                 {
                   legalPersonName: "Global Bank Ltd",
                   legalPersonNameIdentifierType: "LEGL"
                 }
               ]
+              }
             }
           }
         ]
@@ -367,17 +381,19 @@ describe('IVMS101 Integration', () => {
 
   describe('generateNameHash with IVMS101 2023 structures', () => {
     it('should handle 2023 originator format', async () => {
-      const originator: IVMS101_2023.Originator = {
+      const originator: Originator = {
         originatorPerson: [
           {
             naturalPerson: {
-              name: [
+              name: {
+                nameIdentifier: [
                 {
                   primaryIdentifier: "Williams",
                   secondaryIdentifier: "Sarah",
                   naturalPersonNameIdentifierType: "LEGL"
                 }
               ]
+              }
             }
           }
         ]
@@ -389,16 +405,18 @@ describe('IVMS101 Integration', () => {
     });
 
     it('should handle 2023 beneficiary format', async () => {
-      const beneficiary: IVMS101_2023.Beneficiary = {
+      const beneficiary: Beneficiary = {
         beneficiaryPerson: [
           {
             legalPerson: {
-              name: [
+              name: {
+                nameIdentifier: [
                 {
                   legalPersonName: "Future Finance Inc",
                   legalPersonNameIdentifierType: "LEGL"
                 }
               ]
+              }
             }
           }
         ]
@@ -412,11 +430,13 @@ describe('IVMS101 Integration', () => {
 
   describe('edge cases', () => {
     it('should handle empty name arrays', async () => {
-      const originator: IVMS101_2020.Originator = {
-        originatorPersons: [
+      const originator: Originator = {
+        originatorPerson: [
           {
             naturalPerson: {
-              name: []
+              name: {
+                nameIdentifier: []
+              }
             }
           }
         ]
@@ -428,16 +448,18 @@ describe('IVMS101 Integration', () => {
     });
 
     it('should handle missing name identifiers', async () => {
-      const beneficiary: IVMS101_2020.Beneficiary = {
-        beneficiaryPersons: [
+      const beneficiary: Beneficiary = {
+        beneficiaryPerson: [
           {
             naturalPerson: {
-              name: [
+              name: {
+                nameIdentifier: [
                 {
                   primaryIdentifier: "OnlyPrimary",
-                  nameIdentifierType: "LEGL"
+                  naturalPersonNameIdentifierType: "LEGL"
                 }
               ]
+              }
             }
           }
         ]
@@ -459,7 +481,7 @@ describe('IVMS101 Integration', () => {
 describe('Property-Based Testing with IVMS101', () => {
   it('should always produce 64-character hex strings for generated originators', () => {
     fc.assert(
-      fc.asyncProperty(ivms101.originator(), async (originator) => {
+      fc.asyncProperty(ivms101.originator2023(), async (originator) => {
         const hash = await generateNameHash(originator);
         expect(hash).toMatch(/^[0-9a-f]{64}$/);
         expect(hash.length).toBe(64);
@@ -469,7 +491,7 @@ describe('Property-Based Testing with IVMS101', () => {
 
   it('should always produce 64-character hex strings for generated beneficiaries', () => {
     fc.assert(
-      fc.asyncProperty(ivms101.beneficiary(), async (beneficiary) => {
+      fc.asyncProperty(ivms101.beneficiary2023(), async (beneficiary) => {
         const hash = await generateNameHash(beneficiary);
         expect(hash).toMatch(/^[0-9a-f]{64}$/);
         expect(hash.length).toBe(64);
@@ -499,7 +521,7 @@ describe('Property-Based Testing with IVMS101', () => {
 
   it('should produce consistent hashes for equivalent name strings', () => {
     fc.assert(
-      fc.asyncProperty(ivms101.naturalPersonNameId(), async (nameId) => {
+      fc.asyncProperty(ivms101.naturalPersonNameId2023(), async (nameId) => {
         // Build name string manually
         const parts: string[] = [];
         if (nameId.secondaryIdentifier) {
@@ -509,11 +531,13 @@ describe('Property-Based Testing with IVMS101', () => {
         const nameString = parts.join(' ');
 
         // Create IVMS101 structure with same name
-        const originator: IVMS101_2020.Originator = {
-          originatorPersons: [
+        const originator: Originator = {
+          originatorPerson: [
             {
               naturalPerson: {
-                name: [nameId]
+                name: {
+                  nameIdentifier: [nameId]
+                }
               }
             }
           ]
@@ -529,9 +553,9 @@ describe('Property-Based Testing with IVMS101', () => {
 
   it('should handle all natural person name types correctly', () => {
     fc.assert(
-      fc.asyncProperty(ivms101.naturalPerson(), async (naturalPerson) => {
-        const originator: IVMS101_2020.Originator = {
-          originatorPersons: [{ naturalPerson }]
+      fc.asyncProperty(ivms101.naturalPerson2023(), async (naturalPerson) => {
+        const originator: Originator = {
+          originatorPerson: [{ naturalPerson }]
         };
 
         const hash = await generateNameHash(originator);
@@ -549,9 +573,9 @@ describe('Property-Based Testing with IVMS101', () => {
 
   it('should handle all legal person name types correctly', () => {
     fc.assert(
-      fc.asyncProperty(ivms101.legalPerson(), async (legalPerson) => {
-        const beneficiary: IVMS101_2020.Beneficiary = {
-          beneficiaryPersons: [{ legalPerson }]
+      fc.asyncProperty(ivms101.legalPerson2023(), async (legalPerson) => {
+        const beneficiary: Beneficiary = {
+          beneficiaryPerson: [{ legalPerson }]
         };
 
         const hash = await generateNameHash(beneficiary);
@@ -573,16 +597,18 @@ describe('Property-Based Testing with IVMS101', () => {
         fc.string({ minLength: 1, maxLength: 50 }).filter(s => s.trim().length > 0),
         async (nameString) => {
           // Create an IVMS101 structure with the same name
-          const originator: IVMS101_2020.Originator = {
-            originatorPersons: [
+          const originator: Originator = {
+            originatorPerson: [
               {
                 naturalPerson: {
-                  name: [
-                    {
-                      primaryIdentifier: nameString,
-                      nameIdentifierType: "LEGL"
-                    }
-                  ]
+                  name: {
+                    nameIdentifier: [
+                      {
+                        primaryIdentifier: nameString,
+                        naturalPersonNameIdentifierType: "LEGL"
+                      }
+                    ]
+                  }
                 }
               }
             ]
@@ -601,19 +627,21 @@ describe('Property-Based Testing with IVMS101', () => {
 describe('Performance and Edge Cases', () => {
   it('should handle large numbers of persons efficiently', async () => {
     // Create an originator with many persons
-    const manyPersons: IVMS101_2020.Person[] = Array.from({ length: 100 }, (_, i) => ({
+    const manyPersons: Person[] = Array.from({ length: 100 }, (_, i) => ({
       naturalPerson: {
-        name: [
-          {
-            primaryIdentifier: `Person${i}`,
-            nameIdentifierType: "LEGL"
-          }
-        ]
+        name: {
+          nameIdentifier: [
+            {
+              primaryIdentifier: `Person${i}`,
+              naturalPersonNameIdentifierType: "LEGL"
+            }
+          ]
+        }
       }
     }));
 
-    const originator: IVMS101_2020.Originator = {
-      originatorPersons: manyPersons
+    const originator: Originator = {
+      originatorPerson: manyPersons
     };
 
     const start = Date.now();
@@ -634,16 +662,18 @@ describe('Performance and Edge Cases', () => {
     ];
 
     for (const name of unicodeNames) {
-      const originator: IVMS101_2020.Originator = {
-        originatorPersons: [
+      const originator: Originator = {
+        originatorPerson: [
           {
             naturalPerson: {
-              name: [
+              name: {
+                nameIdentifier: [
                 {
                   primaryIdentifier: name,
-                  nameIdentifierType: "LEGL"
+                  naturalPersonNameIdentifierType: "LEGL"
                 }
               ]
+              }
             }
           }
         ]
