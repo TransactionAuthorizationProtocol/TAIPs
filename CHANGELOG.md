@@ -14,6 +14,20 @@ This changelog focuses on:
 - Protocol structural changes
 - Breaking changes
 
+## [2025-11-25]
+
+### Added
+- **TAIP-19 ISO 20022 Message Mapping**: New specification for bidirectional mapping between ISO 20022 and TAP messages
+  - Maps PAIN messages (payment initiation) to TAIP-14 Payment and TAIP-15 Connect
+  - Maps PACS messages (clearing/settlement) to TAIP-3 Transfer
+  - Maps CAMT messages (cash management) to TAIP-4 Cancel/Revert flows
+  - Defines party/agent mappings (Debtor/Creditor → originator/beneficiary, BIC → did:web:, LEI support)
+  - Uses RFC 8905 payto:// URIs for traditional account identifiers (IBAN, BBAN, ACH)
+  - Includes status code mappings (ACCP/ACTC → Authorize, ACSC → Settle, RJCT → Reject)
+  - Provides detailed field mappings for pacs.008, pain.001, pain.009
+  - Documents flow diagrams for credit transfers, direct debit mandates, and payment recalls
+  - Enables interoperability with SWIFT, SEPA, FedNow, and other ISO 20022 payment systems
+
 ## [2025-09-05]
 
 ### Enhanced
