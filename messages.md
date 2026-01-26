@@ -623,7 +623,7 @@ An agent can require that an end user opens up an authorization URL in a web bro
 ### Authorize
 [TAIP-4] - Review
 
-Approves a transaction after completing compliance checks.
+Approves a transaction after completing compliance checks. Can also approve connection requests (TAIP-20).
 
 | Attribute | Type | Required | Status | Description |
 |-----------|------|----------|---------|-------------|
@@ -633,8 +633,11 @@ Approves a transaction after completing compliance checks.
 | settlementAsset | string | No | Review ([TAIP-4]) | Optional CAIP-19 identifier for the settlement asset |
 | amount | string | No | Review ([TAIP-4]) | Optional decimal amount authorized of the settlementAsset |
 | expiry | string | No | Review ([TAIP-4]) | ISO 8601 datetime indicating when the authorization expires |
+| approvedTypes | array | No | Draft ([TAIP-20]) | Array of approved connection types (for Connect responses only) |
+| ddqDocument | object | No | Draft ([TAIP-20]) | DDQ document reference object (for Connect responses only) |
+| trustLevel | string | No | Draft ([TAIP-20]) | Trust status indicator (for Connect responses only) |
 
-> **Note:** The message refers to the original Transfer message via the DIDComm `thid` (thread ID) in the message envelope.
+> **Note:** The message refers to the original Transfer or Payment message via the DIDComm `thid` (thread ID) in the message envelope. When used for connections, it refers to the original Connect message.
 
 #### Examples
 
