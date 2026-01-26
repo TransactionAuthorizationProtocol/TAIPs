@@ -17,10 +17,17 @@ This changelog focuses on:
 ## [Unreleased]
 ## [2026-01-26]
    
-   ### Added
+### Added
    - TAIP-20: Trusted Connections using Connect and TAIP-4 messages
    - Connect message for establishing/updating trusted relationships
    - Support for DDQ exchange, mutual trust, and whitelisting workflows
+
+### Changed
+- **TAIP-4**: Extended Authorize message with optional connection-specific fields
+  - Added `approvedTypes` field for indicating approved connection types
+  - Added `ddqDocument` field for DDQ document references
+  - Added `trustLevel` field for trust status indicators
+  - These fields are only used when responding to Connect messages (TAIP-20)
 
 ## [Released]
 ## [2025-11-25]
