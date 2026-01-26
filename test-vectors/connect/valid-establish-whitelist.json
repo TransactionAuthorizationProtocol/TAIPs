@@ -1,0 +1,15 @@
+{
+  "id": "conn-234e5678-e89b-12d3-a456-426614174001",
+  "type": "https://tap.rsvp/schema/1.0#Connect",
+  "from": "did:web:vasp-a.example",
+  "to": ["did:web:vasp-b.example"],
+  "created_time": 1706227200,
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#Connect",
+    "action": "establish",
+    "connectionTypes": ["mutual-trust", "whitelist"],
+    "purpose": "Establish mutual trust and enable straight-through processing",
+    "expiry": "2027-01-26T00:00:00Z"
+  }
+}
