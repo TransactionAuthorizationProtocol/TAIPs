@@ -1,0 +1,13 @@
+{
+  "id": "reject-789",
+  "type": "https://tap.rsvp/schema/1.0#Reject",
+  "from": "did:web:vasp-b.example",
+  "to": ["did:web:vasp-a.example"],
+  "thid": "conn-123e4567-e89b-12d3-a456-426614174000",
+  "created_time": 1706227260,
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#Reject",
+    "reason": "Insufficient compliance documentation provided"
+  }
+}
