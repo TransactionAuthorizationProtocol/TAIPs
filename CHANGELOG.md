@@ -14,6 +14,15 @@ This changelog focuses on:
 - Protocol structural changes
 - Breaking changes
 
+## [Unreleased]
+## [2026-01-26]
+   
+   ### Added
+   - TAIP-20: Trusted Connections using Connect and TAIP-4 messages
+   - Connect message for establishing/updating trusted relationships
+   - Support for DDQ exchange, mutual trust, and whitelisting workflows
+
+## [Released]
 ## [2025-11-25]
 
 ### Added
