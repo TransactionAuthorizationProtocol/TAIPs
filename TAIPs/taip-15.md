@@ -79,7 +79,18 @@ Used when `connectionTypes` includes trust-related types (`ddq-access`, `mutual-
 
 **Note**: Trust connections SHOULD NOT include `requester`, `principal`, `agents`, or `constraints` fields. These are peer-to-peer institutional relationships.
 
-**Attachment Usage**: Trust connections can use attachments to provide documents inline (e.g., DDQ PDFs, compliance certificates). The `ddqDocument` field in Authorize responses provides URLs for later retrieval, while attachments provide immediate document access during connection establishment.
+Attachment Usage: Trust connections can use attachments to provide documents inline (e.g., DDQ PDFs, compliance certificates). The ddqDocument field in Authorize responses provides URLs for later retrieval, while attachments provide immediate document access during connection establishment.
+DDQ Document Formats: Implementations MAY use any of the following formats based on their requirements:
+
+- application/pdf: Human-readable signed PDF documents for regulatory compliance archives
+- application/json: Structured DDQ objects for automated processing and machine-readable workflows
+- application/didcomm-signed+json: Cryptographically signed structured data providing both machine-readability and verifiable authenticity
+
+The choice of format depends on use case:
+
+- Use PDF for regulatory submissions requiring human-readable signed documents
+- Use JSON for automated processing, field-by-field validation, and API integrations
+- Use signed JSON when cryptographic verification and non-repudiation are required
 
 ## Trust Connection Types
 
@@ -212,31 +223,14 @@ Authorize body includes additional optional fields:
   - `checksum` - OPTIONAL string SHA-256 hash
   - `expiresAt` - OPTIONAL ISO 8601 timestamp when access expires
 - `trustLevel` - OPTIONAL string: `whitelisted`, `trusted`, `standard`, `reviewing`, `suspended`
+- `attachments` - OPTIONAL array of TAIP-2 message attachments. Can include DDQ documents or supporting materials (certificates, licenses) provided inline in the approval response
 
-**Example Trust Connection Approval:**
+**DDQ Document Delivery Options:**
 
-```json
-{
-  "id": "auth-456",
-  "type": "https://tap.rsvp/schema/1.0#Authorize",
-  "from": "did:web:vasp-b.example",
-  "to": ["did:web:vasp-a.example"],
-  "thid": "conn-123",
-  "created_time": 1706227260,
-  "body": {
-    "@context": "https://tap.rsvp/schema/1.0",
-    "@type": "https://tap.rsvp/schema/1.0#Authorize",
-    "approvedTypes": ["ddq-access", "mutual-trust"],
-    "ddqDocument": {
-      "documentId": "ddq-uuid-789",
-      "version": "2024-Q4",
-      "accessUrl": "https://vasp-b.example/api/ddq/ddq-uuid-789",
-      "expiresAt": "2026-12-31T23:59:59Z"
-    },
-    "trustLevel": "trusted"
-  }
-}
-```
+**URL-based:** Use ddqDocument.accessUrl for later retrieval (requires separate fetch)
+**Inline:** Use attachments for immediate delivery (included in Authorize response)
+**Both:** Can provide both URL for archival access and inline attachment for immediate use
+
 
 #### Reject Message
 
@@ -401,6 +395,25 @@ VASP A                                 VASP B
     |   ddqDocument: {...})                |
     |                                      |
 ```
+
+
+#### Trust Connection Flow (Mutual DDQ Exchange)
+```
+VASP A                                 VASP B
+    |                                      |
+    |--Connect---------------------------->|
+    |  (connectionTypes: [ddq-access],     |
+    |   attachments: [VASP A's DDQ])       |
+    |                                      |
+    |<--Authorize--------------------------|
+    |  (approvedTypes: [ddq-access],       |
+    |   attachments: [VASP B's DDQ])       |
+    |                                      |
+```
+Benefits of Mutual Exchange:
+- Single round-trip for both parties to exchange DDQs
+- Simultaneous verification
+- Reduced latency in establishing trust relationship
 
 #### Trust Connection Update Flow
 
@@ -745,6 +758,49 @@ The following are example plaintext messages. See [TAIP-2] for how to sign the m
 ```
 
 ### Authorize Connection
+Example Trust Connection Approval with Inline DDQ:
+```json
+{
+  "id": "auth-789",
+  "type": "https://tap.rsvp/schema/1.0#Authorize",
+  "from": "did:web:vasp-b.example",
+  "to": ["did:web:vasp-a.example"],
+  "thid": "conn-456",
+  "created_time": 1706227260,
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#Authorize",
+    "approvedTypes": ["ddq-access", "mutual-trust"],
+    "trustLevel": "trusted"
+  },
+  "attachments": [
+    {
+      "id": "ddq-response",
+      "description": "VASP B Due Diligence Questionnaire 2024-Q4",
+      "media_type": "application/json",
+      "data": {
+        "json": {
+          "version": "2024-Q4",
+          "lastUpdated": "2024-10-15T00:00:00Z",
+          "legalName": "VASP B Example Corp.",
+          "jurisdiction": "UK",
+          "ownershipType": "Public",
+          "conductsKyc": true,
+          "regulatoryLicenses": [
+            {
+              "jurisdiction": "UK-FCA",
+              "licenseType": "Cryptoasset Registration",
+              "licenseNumber": "FCA-98765"
+            }
+          ],
+          "supportedAssets": ["BTC", "ETH", "USDC", "GBP"]
+        }
+      }
+    }
+  ]
+}
+```
+Example Trust Connection Approval with URL:
 ```json
 {
   "id": "auth-456",
