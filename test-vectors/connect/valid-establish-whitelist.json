@@ -7,6 +7,7 @@
   "body": {
     "@context": "https://tap.rsvp/schema/1.0",
     "@type": "https://tap.rsvp/schema/1.0#Connect",
+    "connectionTypes": ["whitelist"],
     "action": "establish",
     "connectionTypes": ["mutual-trust", "whitelist"],
     "purpose": "Establish mutual trust and enable straight-through processing",
