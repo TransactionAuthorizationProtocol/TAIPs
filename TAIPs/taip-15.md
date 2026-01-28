@@ -231,6 +231,21 @@ Authorize body includes additional optional fields:
 **Inline:** Use attachments for immediate delivery (included in Authorize response)
 **Both:** Can provide both URL for archival access and inline attachment for immediate use
 
+**Use Cases for Attachments in Authorize Response**
+**Scenario 1:** Immediate DDQ Exchange
+VASP A → Connect (request ddq-access)
+VASP B → Authorize (approve + attach their DDQ immediately)
+Benefit: One round-trip instead of two
+
+**Scenario 2:** Mutual DDQ Exchange
+VASP A → Connect (request ddq-access + attach their DDQ)
+VASP B → Authorize (approve + attach their DDQ in response)
+Benefit: Simultaneous mutual exchange
+
+**Scenario 3:** Supporting Documents
+VASP A → Connect (request whitelist)
+VASP B → Authorize (approve + attach license certificates, compliance docs)
+Benefit: All verification materials provided immediately
 
 #### Reject Message
 
