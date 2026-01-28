@@ -443,6 +443,61 @@ Either Party                           Other Party
     |                                      |
 ```
 
+###DDQ Update Broadcast
+
+When a VASP updates their DDQ, they broadcast to all ddq-access approved parties:
+```json
+{
+  "id": "conn-update-ddq-202",
+  "type": "https://tap.rsvp/schema/1.0#Connect",
+  "from": "did:web:vasp-a.example",
+  "to": ["did:web:vasp-b.example"],
+  "created_time": 1706227400,
+  "expires_time": 1706313800,
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#Connect",
+    "connectionTypes": ["ddq-access"],
+    "action": "update",
+    "purpose": "Updated DDQ - Q1 2025 version with new license information"
+  },
+  "attachments": [
+    {
+      "id": "ddq-document-updated",
+      "description": "VASP A Due Diligence Questionnaire 2025-Q1 (Updated)",
+      "media_type": "application/json",
+      "data": {
+        "json": {
+          "version": "2025-Q1",
+          "lastUpdated": "2025-01-15T00:00:00Z",
+          "legalName": "VASP A Example Inc.",
+          "jurisdiction": "US",
+          "ownershipType": "Private",
+          "conductsKyc": true,
+          "kycProvider": "InternalTeam",
+          "amlCompliance": true,
+          "regulatoryLicenses": [
+            {
+              "jurisdiction": "US-NY",
+              "licenseType": "BitLicense",
+              "licenseNumber": "BL-12345"
+            },
+            {
+              "jurisdiction": "US-CA",
+              "licenseType": "Money Transmission License",
+              "licenseNumber": "MTL-67890"
+            }
+          ],
+          "supportedAssets": ["BTC", "ETH", "USDC", "USDT"],
+          "transactionMonitoring": true,
+          "sanctionsScreening": true,
+          "changeLog": "Added California MTL, expanded supported assets to include USDT"
+        }
+      }
+    }
+  ]
+}
+```
 
 ### Extended Connection Flow Diagrams for Transactional connections
 
