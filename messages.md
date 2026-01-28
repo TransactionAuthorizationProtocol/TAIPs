@@ -674,6 +674,30 @@ Approves a transaction after completing compliance checks. Can also approve conn
 }
 ```
 
+##### Example Trust Connection Authorization
+```json
+{
+  "id": "auth-456",
+  "type": "https://tap.rsvp/schema/1.0#Authorize",
+  "from": "did:web:vasp-b.example",
+  "to": ["did:web:vasp-a.example"],
+  "thid": "conn-123",
+  "created_time": 1706227260,
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#Authorize",
+    "approvedTypes": ["ddq-access", "mutual-trust"],
+    "ddqDocument": {
+      "documentId": "ddq-uuid-789",
+      "version": "2024-Q4",
+      "accessUrl": "https://vasp-b.example/api/ddq/ddq-uuid-789",
+      "expiresAt": "2026-12-31T23:59:59Z"
+    },
+    "trustLevel": "trusted"
+  }
+}
+```
+
 ### Settle
 [TAIP-4] - Review
 
@@ -1366,20 +1390,51 @@ Updates policies for a transaction.
 ## Connection Messages
 
 ### Connect
-[TAIP-15] - Draft
+[TAIP-15] - Review
 
-Requests a connection between agents with specified constraints.
+Requests a connection between agents. Supports both transactional connections (with constraints) and trust connections (DDQ, whitelisting).
+
+#### All Connections (Required)
 
 | Attribute | Type | Required | Status | Description |
 |-----------|------|----------|---------|-------------|
-| @context | string | Yes | Draft ([TAIP-15]) | JSON-LD context "https://tap.rsvp/schema/1.0" |
-| @type | string | Yes | Draft ([TAIP-15]) | JSON-LD type "https://tap.rsvp/schema/1.0#Connect" |
-| requester | [Party](#party) | Yes | Draft ([TAIP-15]) | Party object representing the party requesting the connection |
-| principal | [Party](#party) | Yes | Draft ([TAIP-15]) | Party object representing the party the requesting agent acts on behalf of |
-| agents | array | Yes | Draft ([TAIP-15]) | Array of agent objects involved in the connection process |
-| constraints | object | Yes | Draft ([TAIP-15]) | Transaction constraints for the connection (see [constraints table](#transaction-constraints)) |
-| expiry | string | No | Draft ([TAIP-15]) | ISO 8601 datetime indicating when the connection request expires |
-| agreement | string | No | Draft ([TAIP-15]) | URL or identifier of terms agreed to by the principal |
+| @context | string | Yes | Review ([TAIP-15]) | JSON-LD context "https://tap.rsvp/schema/1.0" |
+| @type | string | Yes | Review ([TAIP-15]) | JSON-LD type "https://tap.rsvp/schema/1.0#Connect" |
+| connectionTypes | array | Yes | Review ([TAIP-15]) | Array of connection types: "transaction", "ddq-access", "mutual-trust", "whitelist" |
+| purpose | string | No | Review ([TAIP-15]) | Human-readable purpose for the connection |
+| expiry | string | No | Review ([TAIP-15]) | ISO 8601 datetime when connection request expires |
+| agreement | string | No | Review ([TAIP-15]) | URL pointing to terms of service |
+
+#### Transactional Connection Fields
+*(Required when connectionTypes includes "transaction")*
+
+| Attribute | Type | Required | Status | Description |
+|-----------|------|----------|---------|-------------|
+| requester | [Party](#party) | Yes* | Review ([TAIP-15]) | Party requesting the connection (*required for transaction type) |
+| principal | [Party](#party) | Yes* | Review ([TAIP-15]) | Party on whose behalf transactions will be performed (*required for transaction type) |
+| agents | array | Yes* | Review ([TAIP-15]) | Array of agent objects involved (*required for transaction type) |
+| constraints | object | Yes* | Review ([TAIP-15]) | Transaction constraints (*required for transaction type, see [constraints table](#transaction-constraints)) |
+| attachments | array | No | Review ([TAIP-15]) | Transaction messages for immediate authorization |
+
+#### Trust Connection Fields
+*(Used when connectionTypes includes trust types)*
+
+| Attribute | Type | Required | Status | Description |
+|-----------|------|----------|---------|-------------|
+| action | string | No | Review ([TAIP-15]) | Connection action: "establish" (default) or "update" |
+| attachments | array | No | Review ([TAIP-15]) | DIDComm message attachments (e.g., DDQ documents, certificates) |
+
+**Note:** Connection behavior is determined by `connectionTypes`. Transactional connections (`["transaction"]`) require `requester`, `principal`, `agents`, and `constraints`. Trust connections should omit these fields but MAY include attachments for inline document delivery.
+
+#### Connection Types
+
+| Value | Description | Required Fields |
+|-------|-------------|-----------------|
+| transaction | Transactional connections for B2B integrations, recurring billing | requester, principal, agents, constraints |
+| ddq-access | DDQ document exchange between institutions | None (peer-to-peer) |
+| mutual-trust | Bilateral trust relationship establishment | None (peer-to-peer) |
+| whitelist | Pre-approved straight-through processing | None (peer-to-peer) |
+
 
 #### Transaction Constraints
 
@@ -1400,7 +1455,10 @@ The `constraints` object defines the boundaries and permissions for transactions
 | allowedSettlementAddresses | array | No | Draft ([TAIP-15]) | Array of [CAIP-10] addresses permitted for settlement |
 | allowedAssets | array | No | Draft ([TAIP-15]) | Array of [CAIP-19] asset identifiers that can be transacted |
 
-#### Example Connect Message
+#### Example Connect Messages
+
+##### Transactional Connection (B2B Payment Service)
+
 ```json
 {
   "id": "123e4567-e89b-12d3-a456-426614174000",
@@ -1412,9 +1470,10 @@ The `constraints` object defines the boundaries and permissions for transactions
   "body": {
     "@context": "https://tap.rsvp/schema/1.0",
     "@type": "https://tap.rsvp/schema/1.0#Connect",
+    "connectionTypes": ["transaction"],
     "requester": {
-      "@id": "did:example:business-customer",
-      "name": "Business Customer"
+      "@id": "did:example:b2b-service",
+      "name": "B2B Payment Service"
     },
     "principal": {
       "@id": "did:example:business-customer",
@@ -1425,7 +1484,7 @@ The `constraints` object defines the boundaries and permissions for transactions
         "@id": "did:example:b2b-service",
         "name": "B2B Payment Service",
         "serviceUrl": "https://b2b-service/did-comm",
-        "for": "did:example:business-customer"
+        "for": "did:example:b2b-service"
       }
     ],
     "constraints": {
@@ -1456,6 +1515,97 @@ The `constraints` object defines the boundaries and permissions for transactions
       ]
     },
     "agreement": "https://example.com/terms/v2.1"
+  }
+}
+```
+
+##### Trust Connection (DDQ Access Request)
+
+```json
+{
+  "id": "conn-ddq-123",
+  "type": "https://tap.rsvp/schema/1.0#Connect",
+  "from": "did:web:vasp-a.example",
+  "to": ["did:web:vasp-b.example"],
+  "created_time": 1706227200,
+  "expires_time": 1706313600,
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#Connect",
+    "connectionTypes": ["ddq-access"],
+    "purpose": "Request DDQ access for compliance verification",
+    "expiry": "2026-12-31T23:59:59Z"
+  }
+}
+```
+
+##### Trust Connection (Mutual Trust with Whitelist)
+
+```json
+{
+  "id": "conn-trust-456",
+  "type": "https://tap.rsvp/schema/1.0#Connect",
+  "from": "did:web:vasp-a.example",
+  "to": ["did:web:vasp-b.example"],
+  "created_time": 1706227200,
+  "expires_time": 1706313600,
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#Connect",
+    "connectionTypes": ["mutual-trust", "whitelist"],
+    "purpose": "Establish mutual trust and enable straight-through processing",
+    "expiry": "2027-01-26T00:00:00Z"
+  }
+}
+```
+
+##### Trust Connection (DDQ Exchange with Inline Document)
+
+```json
+{
+  "id": "conn-ddq-789",
+  "type": "https://tap.rsvp/schema/1.0#Connect",
+  "from": "did:web:vasp-a.example",
+  "to": ["did:web:vasp-b.example"],
+  "created_time": 1706227200,
+  "expires_time": 1706313600,
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#Connect",
+    "connectionTypes": ["ddq-access"],
+    "purpose": "Provide DDQ document for mutual verification",
+    "expiry": "2026-12-31T23:59:59Z"
+  },
+  "attachments": [
+    {
+      "id": "ddq-doc-1",
+      "description": "VASP A Due Diligence Questionnaire 2024-Q4",
+      "filename": "vasp-a-ddq-2024-q4.pdf",
+      "media_type": "application/pdf",
+      "data": {
+        "base64": "JVBERi0xLjQKJeLjz9MKMSAwIG9iago8PC9UeXBlL0NhdGFsb2..."
+      }
+    }
+  ]
+}
+```
+
+##### Trust Connection Update (Add Whitelist)
+
+```json
+{
+  "id": "conn-update-101",
+  "type": "https://tap.rsvp/schema/1.0#Connect",
+  "from": "did:web:vasp-a.example",
+  "to": ["did:web:vasp-b.example"],
+  "created_time": 1706227300,
+  "expires_time": 1706313700,
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#Connect",
+    "connectionTypes": ["whitelist"],
+    "action": "update",
+    "purpose": "Upgrade to whitelisted status for high-volume processing"
   }
 }
 ```
