@@ -636,6 +636,7 @@ Approves a transaction after completing compliance checks. Can also approve conn
 | approvedTypes | array | No | Draft ([TAIP-20]) | Array of approved connection types (for Connect responses only) |
 | ddqDocument | object | No | Draft ([TAIP-20]) | DDQ document reference object (for Connect responses only) |
 | trustLevel | string | No | Draft ([TAIP-20]) | Trust status indicator (for Connect responses only) |
+| attachments | array | No | Draft ([TAIP-15]) | DIDComm attachments for inline DDQ delivery |
 
 > **Note:** The message refers to the original Transfer or Payment message via the DIDComm `thid` (thread ID) in the message envelope. When used for connections, it refers to the original Connect message.
 
@@ -695,6 +696,52 @@ Approves a transaction after completing compliance checks. Can also approve conn
     },
     "trustLevel": "trusted"
   }
+}
+```
+##### Trust Connection Authorization with Inline DDQ
+```json
+{
+  "id": "auth-trust-123",
+  "type": "https://tap.rsvp/schema/1.0#Authorize",
+  "from": "did:web:vasp-b.example",
+  "to": ["did:web:vasp-a.example"],
+  "thid": "conn-ddq-456",
+  "created_time": 1706227260,
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#Authorize",
+    "approvedTypes": ["ddq-access", "mutual-trust"],
+    "trustLevel": "trusted"
+  },
+  "attachments": [
+    {
+      "id": "ddq-response",
+      "description": "VASP B Due Diligence Questionnaire 2024-Q4",
+      "media_type": "application/json",
+      "data": {
+        "json": {
+          "version": "2024-Q4",
+          "lastUpdated": "2024-10-15T00:00:00Z",
+          "legalName": "VASP B Example Corp.",
+          "jurisdiction": "UK",
+          "ownershipType": "Public",
+          "conductsKyc": true,
+          "kycProvider": "InternalTeam",
+          "amlCompliance": true,
+          "regulatoryLicenses": [
+            {
+              "jurisdiction": "UK-FCA",
+              "licenseType": "Cryptoasset Registration",
+              "licenseNumber": "FCA-98765"
+            }
+          ],
+          "supportedAssets": ["BTC", "ETH", "USDC", "GBP"],
+          "transactionMonitoring": true,
+          "sanctionsScreening": true
+        }
+      }
+    }
+  ]
 }
 ```
 
@@ -1202,110 +1249,6 @@ The body object must contain:
 }
 ```
 
-### Connect Message Examples
-
-#### 1. B2B Service Connection Request
-```json
-{
-  "id": "connect-123",
-  "type": "https://tap.rsvp/schema/1.0#Connect",
-  "from": "did:example:b2b-service",
-  "to": ["did:example:vasp"],
-  "created_time": 1516269022,
-  "expires_time": 1516385931,
-  "body": {
-    "@context": "https://tap.rsvp/schema/1.0",
-    "@type": "Connect",
-    "requester": {
-      "@id": "did:example:business-customer",
-      "name": "Business Customer"
-    },
-    "principal": {
-      "@id": "did:example:business-customer",
-      "name": "Business Customer"
-    },
-    "agents": [
-      {
-        "@id": "did:example:b2b-service",
-        "name": "B2B Payment Service",
-        "serviceUrl": "https://b2b-service/did-comm",
-        "for": "did:example:business-customer"
-      }
-    ],
-    "constraints": {
-      "purposes": ["BEXP", "SUPP"],
-      "categoryPurposes": ["CASH", "CCRD"],
-      "limits": {
-        "per_transaction": "10000.00",
-        "per_day": "50000.00",
-        "currency": "USD"
-      },
-      "allowedBeneficiaries": [
-        {
-          "@id": "did:example:vendor-1",
-          "name": "Approved Vendor 1"
-        },
-        {
-          "@id": "did:example:vendor-2", 
-          "name": "Approved Vendor 2"
-        }
-      ],
-      "allowedSettlementAddresses": [
-        "eip155:1:0x742d35Cc6e4dfE2eDFaD2C0b91A8b0780EDAEb58",
-        "eip155:1:0x89abcdefabcdefabcdefabcdefabcdefabcdef12"
-      ],
-      "allowedAssets": [
-        "eip155:1/slip44:60",
-        "eip155:1/erc20:0xA0b86a33E6441b7178bb7094b2c4b6e5066d68B7"
-      ]
-    }
-  }
-}
-```
-
-#### 2. Merchant Connection Request
-```json
-{
-  "id": "connect-124",
-  "type": "https://tap.rsvp/schema/1.0#Connect",
-  "from": "did:web:psp.agent",
-  "to": ["did:web:payment.provider"],
-  "created_time": 1516269022,
-  "body": {
-    "@context": "https://tap.rsvp/schema/1.0",
-    "@type": "Connect",
-    "requester": {
-      "@id": "did:web:merchant.vasp",
-      "name": "Example Store"
-    },
-    "principal": {
-      "@id": "did:web:merchant.vasp",
-      "name": "Example Store"
-    },
-    "agents": [
-      {
-        "@id": "did:web:psp.agent",
-        "name": "PSP Agent",
-        "for": "did:web:merchant.vasp"
-      }
-    ],
-    "constraints": {
-      "purposes": ["RCPT"],
-      "categoryPurposes": ["EPAY"],
-      "limits": {
-        "per_transaction": "5000.00",
-        "per_day": "25000.00",
-        "currency": "USD"
-      },
-      "allowedAssets": [
-        "eip155:1/erc20:0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
-        "eip155:1/erc20:0x6B175474E89094C44Da98b954EedeAC495271d0F"
-      ]
-    }
-  }
-}
-```
-
 ### AuthorizationRequired Message Examples
 
 #### 1. Interactive Authorization Required
@@ -1457,11 +1400,10 @@ The `constraints` object defines the boundaries and permissions for transactions
 
 #### Example Connect Messages
 
-##### Transactional Connection (B2B Payment Service)
-
+#### B2B Service Connection Request
 ```json
 {
-  "id": "123e4567-e89b-12d3-a456-426614174000",
+  "id": "connect-123",
   "type": "https://tap.rsvp/schema/1.0#Connect",
   "from": "did:example:b2b-service",
   "to": ["did:example:vasp"],
@@ -1469,11 +1411,11 @@ The `constraints` object defines the boundaries and permissions for transactions
   "expires_time": 1516385931,
   "body": {
     "@context": "https://tap.rsvp/schema/1.0",
-    "@type": "https://tap.rsvp/schema/1.0#Connect",
+    "@type": "Connect",
     "connectionTypes": ["transaction"],
     "requester": {
-      "@id": "did:example:b2b-service",
-      "name": "B2B Payment Service"
+      "@id": "did:example:business-customer",
+      "name": "Business Customer"
     },
     "principal": {
       "@id": "did:example:business-customer",
@@ -1484,7 +1426,7 @@ The `constraints` object defines the boundaries and permissions for transactions
         "@id": "did:example:b2b-service",
         "name": "B2B Payment Service",
         "serviceUrl": "https://b2b-service/did-comm",
-        "for": "did:example:b2b-service"
+        "for": "did:example:business-customer"
       }
     ],
     "constraints": {
@@ -1513,14 +1455,56 @@ The `constraints` object defines the boundaries and permissions for transactions
         "eip155:1/slip44:60",
         "eip155:1/erc20:0xA0b86a33E6441b7178bb7094b2c4b6e5066d68B7"
       ]
+    }
+  }
+}
+```
+
+#### Merchant Connection Request
+```json
+{
+  "id": "connect-124",
+  "type": "https://tap.rsvp/schema/1.0#Connect",
+  "from": "did:web:psp.agent",
+  "to": ["did:web:payment.provider"],
+  "created_time": 1516269022,
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "Connect",
+    "connectionTypes": ["transaction"],
+    "requester": {
+      "@id": "did:web:merchant.vasp",
+      "name": "Example Store"
     },
-    "agreement": "https://example.com/terms/v2.1"
+    "principal": {
+      "@id": "did:web:merchant.vasp",
+      "name": "Example Store"
+    },
+    "agents": [
+      {
+        "@id": "did:web:psp.agent",
+        "name": "PSP Agent",
+        "for": "did:web:merchant.vasp"
+      }
+    ],
+    "constraints": {
+      "purposes": ["RCPT"],
+      "categoryPurposes": ["EPAY"],
+      "limits": {
+        "per_transaction": "5000.00",
+        "per_day": "25000.00",
+        "currency": "USD"
+      },
+      "allowedAssets": [
+        "eip155:1/erc20:0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+        "eip155:1/erc20:0x6B175474E89094C44Da98b954EedeAC495271d0F"
+      ]
+    }
   }
 }
 ```
 
 ##### Trust Connection (DDQ Access Request)
-
 ```json
 {
   "id": "conn-ddq-123",
@@ -1533,6 +1517,7 @@ The `constraints` object defines the boundaries and permissions for transactions
     "@context": "https://tap.rsvp/schema/1.0",
     "@type": "https://tap.rsvp/schema/1.0#Connect",
     "connectionTypes": ["ddq-access"],
+    "action": "establish",
     "purpose": "Request DDQ access for compliance verification",
     "expiry": "2026-12-31T23:59:59Z"
   }
@@ -1540,7 +1525,6 @@ The `constraints` object defines the boundaries and permissions for transactions
 ```
 
 ##### Trust Connection (Mutual Trust with Whitelist)
-
 ```json
 {
   "id": "conn-trust-456",
@@ -1553,14 +1537,14 @@ The `constraints` object defines the boundaries and permissions for transactions
     "@context": "https://tap.rsvp/schema/1.0",
     "@type": "https://tap.rsvp/schema/1.0#Connect",
     "connectionTypes": ["mutual-trust", "whitelist"],
+    "action": "establish",
     "purpose": "Establish mutual trust and enable straight-through processing",
     "expiry": "2027-01-26T00:00:00Z"
   }
 }
 ```
 
-##### Trust Connection (DDQ Exchange with Inline Document)
-
+##### Trust Connection (DDQ Exchange with Inline Document - JSON Format)
 ```json
 {
   "id": "conn-ddq-789",
@@ -1573,17 +1557,36 @@ The `constraints` object defines the boundaries and permissions for transactions
     "@context": "https://tap.rsvp/schema/1.0",
     "@type": "https://tap.rsvp/schema/1.0#Connect",
     "connectionTypes": ["ddq-access"],
-    "purpose": "Provide DDQ document for mutual verification",
+    "action": "establish",
+    "purpose": "Provide structured DDQ data for automated processing",
     "expiry": "2026-12-31T23:59:59Z"
   },
   "attachments": [
     {
-      "id": "ddq-doc-1",
+      "id": "ddq-document",
       "description": "VASP A Due Diligence Questionnaire 2024-Q4",
-      "filename": "vasp-a-ddq-2024-q4.pdf",
-      "media_type": "application/pdf",
+      "media_type": "application/json",
       "data": {
-        "base64": "JVBERi0xLjQKJeLjz9MKMSAwIG9iago8PC9UeXBlL0NhdGFsb2..."
+        "json": {
+          "version": "2024-Q4",
+          "lastUpdated": "2024-10-15T00:00:00Z",
+          "legalName": "VASP A Example Inc.",
+          "jurisdiction": "US",
+          "ownershipType": "Private",
+          "conductsKyc": true,
+          "kycProvider": "InternalTeam",
+          "amlCompliance": true,
+          "regulatoryLicenses": [
+            {
+              "jurisdiction": "US-NY",
+              "licenseType": "BitLicense",
+              "licenseNumber": "BL-12345"
+            }
+          ],
+          "supportedAssets": ["BTC", "ETH", "USDC"],
+          "transactionMonitoring": true,
+          "sanctionsScreening": true
+        }
       }
     }
   ]
@@ -1591,7 +1594,6 @@ The `constraints` object defines the boundaries and permissions for transactions
 ```
 
 ##### Trust Connection Update (Add Whitelist)
-
 ```json
 {
   "id": "conn-update-101",
@@ -1607,6 +1609,62 @@ The `constraints` object defines the boundaries and permissions for transactions
     "action": "update",
     "purpose": "Upgrade to whitelisted status for high-volume processing"
   }
+}
+```
+
+##### DDQ Update Broadcast
+
+When a VASP updates their DDQ, they broadcast to all approved parties:
+```json
+{
+  "id": "conn-update-ddq-202",
+  "type": "https://tap.rsvp/schema/1.0#Connect",
+  "from": "did:web:vasp-a.example",
+  "to": ["did:web:vasp-b.example"],
+  "created_time": 1706227400,
+  "expires_time": 1706313800,
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#Connect",
+    "connectionTypes": ["ddq-access"],
+    "action": "update",
+    "purpose": "Updated DDQ - Q1 2025 version with new license information"
+  },
+  "attachments": [
+    {
+      "id": "ddq-document-updated",
+      "description": "VASP A Due Diligence Questionnaire 2025-Q1 (Updated)",
+      "media_type": "application/json",
+      "data": {
+        "json": {
+          "version": "2025-Q1",
+          "lastUpdated": "2025-01-15T00:00:00Z",
+          "legalName": "VASP A Example Inc.",
+          "jurisdiction": "US",
+          "ownershipType": "Private",
+          "conductsKyc": true,
+          "kycProvider": "InternalTeam",
+          "amlCompliance": true,
+          "regulatoryLicenses": [
+            {
+              "jurisdiction": "US-NY",
+              "licenseType": "BitLicense",
+              "licenseNumber": "BL-12345"
+            },
+            {
+              "jurisdiction": "US-CA",
+              "licenseType": "Money Transmission License",
+              "licenseNumber": "MTL-67890"
+            }
+          ],
+          "supportedAssets": ["BTC", "ETH", "USDC", "USDT"],
+          "transactionMonitoring": true,
+          "sanctionsScreening": true,
+          "changeLog": "Added California MTL, expanded supported assets to include USDT"
+        }
+      }
+    }
+  ]
 }
 ```
 
