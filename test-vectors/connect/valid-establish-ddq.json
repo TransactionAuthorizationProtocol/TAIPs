@@ -7,8 +7,8 @@
   "body": {
     "@context": "https://tap.rsvp/schema/1.0",
     "@type": "https://tap.rsvp/schema/1.0#Connect",
-    "action": "establish",
     "connectionTypes": ["ddq-access"],
+    "action": "establish",
     "purpose": "Request DDQ access for compliance verification",
     "expiry": "2026-12-31T23:59:59Z"
   }
