@@ -43,7 +43,7 @@ The purpose of TAIPs is to provide the community with a means to propose enhance
 | 15   | [Agent Connection Protocol](./TAIPs/taip-15.md)                         |
 | 16   | [Invoices](./TAIPs/taip-16.md)                                         |
 | 17   | [Composable Escrow](./TAIPs/taip-17.md)                                |
-| 20   | [Trusted Connections](./TAIPs/taip-20.md)                              |
+
 
 ## Implementation Resources
 
