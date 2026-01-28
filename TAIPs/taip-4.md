@@ -121,9 +121,9 @@ Any agent can authorize the transaction by replying as a thread to the initial m
 - `amount` - OPTIONAL string with the full amount as a decimal representation of the `settlementAsset` in case it is different than the original `Payment` or `Transfer` message.
 - `expiry` - OPTIONAL timestamp in ISO 8601 format indicating when the authorization expires. After this time, if settlement has not occurred, the authorization should be considered invalid and settlement should not proceed. In merchant payment flows, the customer's wallet may either repeat the merchant's specified expiration time or override it with a different time.
 
-#### Connection-Specific Fields (TAIP-20)
+#### Connection-Specific Fields (TAIP-15)
 
-When responding to `Connect` messages (see [TAIP-20]), the `Authorize` message MAY include these additional optional fields to indicate connection approval:
+When responding to `Connect` messages (see [TAIP-15]), the `Authorize` message MAY include these additional optional fields to indicate connection approval:
 
 - `approvedTypes` - OPTIONAL array of strings indicating which connection types were approved from the original request (e.g., `["ddq-access", "mutual-trust"]`). This field SHOULD only be present when responding to `Connect` messages.
 - `ddqDocument` - OPTIONAL object containing Due Diligence Questionnaire document reference. This field SHOULD only be present when responding to `Connect` messages and granting DDQ access. Object structure:
@@ -133,6 +133,7 @@ When responding to `Connect` messages (see [TAIP-20]), the `Authorize` message M
   - `checksum` - OPTIONAL string SHA-256 hash for integrity verification
   - `expiresAt` - OPTIONAL ISO 8601 timestamp when document access expires
 - `trustLevel` - OPTIONAL string indicating trust status between parties: `whitelisted`, `trusted`, `standard`, `reviewing`, or `suspended`. This field SHOULD only be present when responding to `Connect` messages.
+- `attachments` - OPTIONAL DIDComm message attachments (e.g., DDQ documents, certificates) |
 
 These connection-specific fields SHOULD be omitted when authorizing transactions (`Transfer`, `Payment`, etc.).
 
