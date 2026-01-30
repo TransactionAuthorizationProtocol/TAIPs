@@ -74,10 +74,24 @@ A message sent to establish or update a connection between agents.
 
 Used when `connectionTypes` includes trust-related types (`ddq-access`, `mutual-trust`, `whitelist`):
 
-- `action` - OPTIONAL string indicating connection lifecycle action: `establish` (default) or `update`
+- `action` - OPTIONAL string indicating connection lifecycle action. Defaults to `establish` if not specified. Valid values:
+  - `establish` - Create a new connection relationship (default)
+  - `update` - Modify an existing connection or broadcast document updates
 - `attachments` - OPTIONAL array of [TAIP-2] message attachments. Can include DDQ documents or other supporting materials. When present, these documents are provided inline for review during connection establishment.
 
 **Note**: Trust connections SHOULD NOT include `requester`, `principal`, `agents`, or `constraints` fields. These are peer-to-peer institutional relationships.
+
+#### Trust Connection Action Semantics
+
+The `action` field determines the purpose of the Connect message:
+
+- **`action="establish"`** (default): Requests to create a new trust relationship. Used for initial DDQ access requests, mutual trust establishment, or whitelist requests.
+
+- **`action="update"`**: Used in two scenarios:
+  1. **Request connection upgrade**: Requesting additional connection types (e.g., adding `whitelist` to existing `mutual-trust`)
+  2. **Broadcast document refresh**: Notifying connected parties of updated DDQ documents or supporting materials via attachments
+
+When `action="update"` is used with attachments containing updated documents, recipients might acknowledge receipt but are not required to send Authorize responses unless the update requests new connection types.
 
 Attachment Usage: Trust connections can use attachments to provide documents inline (e.g., DDQ PDFs, compliance certificates). The ddqDocument field in Authorize responses provides URLs for later retrieval, while attachments provide immediate document access during connection establishment.
 DDQ Document Formats: Implementations MAY use any of the following formats based on their requirements:
