@@ -1364,7 +1364,7 @@ Requests a connection between agents. Supports both transactional connections (w
 
 | Attribute | Type | Required | Status | Description |
 |-----------|------|----------|---------|-------------|
-| action | string | No | Review ([TAIP-15]) | Connection action: "establish" (default) or "update" |
+| action | string | No | Review ([TAIP-15]) | Connection lifecycle action. Defaults to "establish" if not specified. Values: "establish" (create new connection), "update" (modify existing or broadcast document updates) |
 | attachments | array | No | Review ([TAIP-15]) | DIDComm message attachments (e.g., DDQ documents, certificates) |
 
 **Note:** Connection behavior is determined by `connectionTypes`. Transactional connections (`["transaction"]`) require `requester`, `principal`, `agents`, and `constraints`. Trust connections should omit these fields but MAY include attachments for inline document delivery.
