@@ -137,6 +137,32 @@ When responding to `Connect` messages (see [TAIP-15]), the `Authorize` message M
 
 These connection-specific fields SHOULD be omitted when authorizing transactions (`Transfer`, `Payment`, etc.).
 
+##### Attachment Integrity Verification
+
+When including sensitive documents or data as attachments (such as DDQ documents Authorize responses), implementations SHOULD include integrity verification:
+
+- `checksum` - OPTIONAL string field within the attachment object (as a sibling to `data`) containing a SHA-256 hash for integrity verification
+- Format: `sha256:<hex-encoded-hash>` where the hash is calculated on:
+  - **For JSON data** (`media_type: "application/json"`): The canonical JSON string representation of the `data.json` content
+  - **For base64 data** (`media_type: "application/pdf"`, etc.): The raw decoded bytes of the `data.base64` content
+- The checksum field MUST be placed outside the `data` object to avoid circular dependency
+
+```json
+{
+  "id": "ddq-doc-1",
+  "description": "VASP A DDQ 2024-Q4",
+  "media_type": "application/json",
+  "checksum": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "data": {
+    "json": {
+      "version": "2024-Q4",
+      "legalName": "VASP A Example Inc.",
+      ...
+    }
+  }
+}
+```
+Recipients SHOULD verify the checksum before processing attachment content. Checksum mismatches SHOULD be treated as potential data corruption or tampering.
 
 By not providing a `settlementAddress` until after `Authorization`, beneficiary agents can reject incoming blockchain transactions for the first time.
 
