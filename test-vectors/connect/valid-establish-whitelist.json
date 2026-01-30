@@ -9,7 +9,6 @@
     "@type": "https://tap.rsvp/schema/1.0#Connect",
     "connectionTypes": ["whitelist"],
     "action": "establish",
-    "connectionTypes": ["mutual-trust", "whitelist"],
     "purpose": "Establish mutual trust and enable straight-through processing",
     "expiry": "2027-01-26T00:00:00Z"
   }
