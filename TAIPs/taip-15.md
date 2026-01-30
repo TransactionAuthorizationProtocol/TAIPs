@@ -81,7 +81,7 @@ Used when `connectionTypes` includes trust-related types (`ddq-access`, `mutual-
 
 **Note**: Trust connections SHOULD NOT include `requester`, `principal`, `agents`, or `constraints` fields. These are peer-to-peer institutional relationships.
 
-#### Trust Connection Action Semantics
+##### Trust Connection Action Semantics
 
 The `action` field determines the purpose of the Connect message:
 
@@ -93,6 +93,7 @@ The `action` field determines the purpose of the Connect message:
 
 When `action="update"` is used with attachments containing updated documents, recipients might acknowledge receipt but are not required to send Authorize responses unless the update requests new connection types.
 
+##### Attachment usage
 Attachment Usage: Trust connections can use attachments to provide documents inline (e.g., DDQ PDFs, compliance certificates). The ddqDocument field in Authorize responses provides URLs for later retrieval, while attachments provide immediate document access during connection establishment.
 DDQ Document Formats: Implementations MAY use any of the following formats based on their requirements:
 
@@ -105,6 +106,33 @@ The choice of format depends on use case:
 - Use PDF for regulatory submissions requiring human-readable signed documents
 - Use JSON for automated processing, field-by-field validation, and API integrations
 - Use signed JSON when cryptographic verification and non-repudiation are required
+
+##### Attachment Integrity Verification
+When including sensitive documents or data as attachments, implementations SHOULD include integrity verification:
+
+- `checksum` - OPTIONAL string field within the attachment object (as a sibling to `data`) containing a SHA-256 hash for integrity verification
+- Format: `sha256:<hex-encoded-hash>` where the hash is calculated on:
+  - **For JSON data** (`media_type: "application/json"`): The canonical JSON string representation of the `data.json` content
+  - **For base64 data** (`media_type: "application/pdf"`, etc.): The raw decoded bytes of the `data.base64` content
+- The checksum field MUST be placed outside the `data` object to avoid circular dependency
+
+```json
+{
+  "id": "ddq-doc-1",
+  "description": "VASP A DDQ 2024-Q4",
+  "media_type": "application/json",
+  "checksum": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "data": {
+    "json": {
+      "version": "2024-Q4",
+      "legalName": "VASP A Example Inc.",
+      ...
+    }
+  }
+}
+```
+
+Recipients SHOULD verify the checksum before processing attachment content. Checksum mismatches SHOULD be treated as potential data corruption or tampering.
 
 ## Trust Connection Types
 
