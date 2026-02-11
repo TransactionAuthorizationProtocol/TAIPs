@@ -55,6 +55,9 @@ As specified in [TAIP-2] the message body is [JSON-LD]. The following attributes
 * `agents` - REQUIRED an array of identity objects representing the agents who help execute the transaction. At minimum, there MUST be one agent whose `@id` matches the `from` field of the DIDComm message and has a `for` attribute set to the originator or beneficiary DID to indicate which party they represent. See [TAIP-5](TAIP-5) for more.
 * `memo` - OPTIONAL a human readable UTF-8 string to be provided as-is by the originator to the beneficiary about the transfer
 * `expiry` - OPTIONAL a timestamp in ISO 8601 format indicating when the transfer request expires. After this time, if no authorization has occurred, the transfer should be considered invalid and funds will not be sent. Recipients' agents SHOULD communicate this expiration deadline to their users when presenting the transfer for review.
+* `transactionValue` - OPTIONAL an object representing the fiat equivalent value of the transfer. This is useful for compliance purposes such as Travel Rule threshold determination, particularly when the virtual asset is not widely traded and its fiat value cannot be easily resolved by receiving agents. Contains:
+  * `amount` - REQUIRED the decimal string representation of the fiat amount
+  * `currency` - REQUIRED the [ISO 4217](https://www.iso.org/iso-4217-currency-codes.html) 3-letter currency code (e.g., `"USD"`, `"EUR"`)
 
 Many of the attributes are optional and through the process of authorization can be expanded and modified collaboratively by the agents of a transaction.
 
@@ -251,6 +254,43 @@ The following is a request for a third-party transfer of 1.23 ETH from a crypto 
       {
         "@id":"did:web:beneficiary.vasp",
         "for":"sms:+15105550101"
+      }
+    ]
+  }
+}
+```
+
+The following is a third-party transfer of a custom token with a provided fiat equivalent value. The `transactionValue` allows receiving agents to determine the fiat value for Travel Rule threshold evaluation when the asset is not widely traded:
+
+```json
+{
+  "from":"did:web:originator.vasp",
+  "type": "https://tap.rsvp/schema/1.0#Transfer",
+  "id": "...",
+  "to": ["did:web:beneficiary.vasp"],
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#Transfer",
+    "asset": "eip155:1/erc20:0x1234567890abcdef1234567890abcdef12345678",
+    "originator":{
+      "@id":"did:eg:bob"
+    },
+    "beneficiary":{
+      "@id":"did:eg:alice"
+    },
+    "amount": "500",
+    "transactionValue": {
+      "amount": "1250.00",
+      "currency": "EUR"
+    },
+    "agents":[
+      {
+        "@id":"did:web:originator.vasp",
+        "for":"did:eg:bob"
+      },
+      {
+        "@id":"did:web:beneficiary.vasp",
+        "for":"did:eg:alice"
       }
     ]
   }
