@@ -1202,6 +1202,19 @@ export interface Transfer extends TapMessageObject<"Transfer"> {
    * Additional information about the transfer
    */
   memo?: string;
+
+  /**
+   * Optional fiat equivalent value of the transfer
+   * Used for compliance purposes such as Travel Rule threshold determination,
+   * particularly when the virtual asset is not widely traded and its fiat value
+   * cannot be easily resolved by receiving agents
+   */
+  transactionValue?: {
+    /** Fiat amount as decimal string */
+    amount: Amount;
+    /** ISO 4217 currency code (e.g., "USD", "EUR") */
+    currency: IsoCurrency;
+  };
 }
 
 /**

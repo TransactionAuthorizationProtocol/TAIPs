@@ -75,6 +75,21 @@
               "$ref": "../common/base-types.json#/$defs/iso4217CurrencyCode"
             }
           }
+        },
+        "transactionValue": {
+          "type": "object",
+          "description": "Fiat equivalent value of the transfer for compliance purposes such as Travel Rule threshold determination",
+          "required": ["amount", "currency"],
+          "properties": {
+            "amount": {
+              "$ref": "../common/base-types.json#/$defs/amount",
+              "description": "Fiat amount as decimal string"
+            },
+            "currency": {
+              "$ref": "../common/base-types.json#/$defs/iso4217CurrencyCode",
+              "description": "ISO 4217 currency code"
+            }
+          }
         }
       }
     }
