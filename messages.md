@@ -623,7 +623,7 @@ An agent can require that an end user opens up an authorization URL in a web bro
 ### Authorize
 [TAIP-4] - Review
 
-Approves a transaction after completing compliance checks.
+Approves a transaction after completing compliance checks. Can also approve connection requests (TAIP-20).
 
 | Attribute | Type | Required | Status | Description |
 |-----------|------|----------|---------|-------------|
@@ -633,8 +633,12 @@ Approves a transaction after completing compliance checks.
 | settlementAsset | string | No | Review ([TAIP-4]) | Optional CAIP-19 identifier for the settlement asset |
 | amount | string | No | Review ([TAIP-4]) | Optional decimal amount authorized of the settlementAsset |
 | expiry | string | No | Review ([TAIP-4]) | ISO 8601 datetime indicating when the authorization expires |
+| approvedTypes | array | No | Draft ([TAIP-20]) | Array of approved connection types (for Connect responses only) |
+| ddqDocument | object | No | Draft ([TAIP-20]) | DDQ document reference object (for Connect responses only) |
+| trustLevel | string | No | Draft ([TAIP-20]) | Trust status indicator (for Connect responses only) |
+| attachments | array | No | Draft ([TAIP-15]) | DIDComm attachments for inline DDQ delivery |
 
-> **Note:** The message refers to the original Transfer message via the DIDComm `thid` (thread ID) in the message envelope.
+> **Note:** The message refers to the original Transfer or Payment message via the DIDComm `thid` (thread ID) in the message envelope. When used for connections, it refers to the original Connect message.
 
 #### Examples
 
@@ -668,6 +672,76 @@ Approves a transaction after completing compliance checks.
     "settlementAddress": "payto://iban/DE75512108001245126199",
     "expiry": "2024-01-01T12:00:00Z"
   }
+}
+```
+
+##### Example Trust Connection Authorization
+```json
+{
+  "id": "auth-456",
+  "type": "https://tap.rsvp/schema/1.0#Authorize",
+  "from": "did:web:vasp-b.example",
+  "to": ["did:web:vasp-a.example"],
+  "thid": "conn-123",
+  "created_time": 1706227260,
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#Authorize",
+    "approvedTypes": ["ddq-access", "mutual-trust"],
+    "ddqDocument": {
+      "documentId": "ddq-uuid-789",
+      "version": "2024-Q4",
+      "accessUrl": "https://vasp-b.example/api/ddq/ddq-uuid-789",
+      "expiresAt": "2026-12-31T23:59:59Z"
+    },
+    "trustLevel": "trusted"
+  }
+}
+```
+##### Trust Connection Authorization with Inline DDQ
+```json
+{
+  "id": "auth-trust-123",
+  "type": "https://tap.rsvp/schema/1.0#Authorize",
+  "from": "did:web:vasp-b.example",
+  "to": ["did:web:vasp-a.example"],
+  "thid": "conn-ddq-456",
+  "created_time": 1706227260,
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#Authorize",
+    "approvedTypes": ["ddq-access", "mutual-trust"],
+    "trustLevel": "trusted"
+  },
+  "attachments": [
+    {
+      "id": "ddq-response",
+      "description": "VASP B Due Diligence Questionnaire 2024-Q4",
+      "media_type": "application/json",
+      "data": {
+        "json": {
+          "version": "2024-Q4",
+          "lastUpdated": "2024-10-15T00:00:00Z",
+          "legalName": "VASP B Example Corp.",
+          "jurisdiction": "UK",
+          "ownershipType": "Public",
+          "conductsKyc": true,
+          "kycProvider": "InternalTeam",
+          "amlCompliance": true,
+          "regulatoryLicenses": [
+            {
+              "jurisdiction": "UK-FCA",
+              "licenseType": "Cryptoasset Registration",
+              "licenseNumber": "FCA-98765"
+            }
+          ],
+          "supportedAssets": ["BTC", "ETH", "USDC", "GBP"],
+          "transactionMonitoring": true,
+          "sanctionsScreening": true
+        }
+      }
+    }
+  ]
 }
 ```
 
@@ -1175,110 +1249,6 @@ The body object must contain:
 }
 ```
 
-### Connect Message Examples
-
-#### 1. B2B Service Connection Request
-```json
-{
-  "id": "connect-123",
-  "type": "https://tap.rsvp/schema/1.0#Connect",
-  "from": "did:example:b2b-service",
-  "to": ["did:example:vasp"],
-  "created_time": 1516269022,
-  "expires_time": 1516385931,
-  "body": {
-    "@context": "https://tap.rsvp/schema/1.0",
-    "@type": "Connect",
-    "requester": {
-      "@id": "did:example:business-customer",
-      "name": "Business Customer"
-    },
-    "principal": {
-      "@id": "did:example:business-customer",
-      "name": "Business Customer"
-    },
-    "agents": [
-      {
-        "@id": "did:example:b2b-service",
-        "name": "B2B Payment Service",
-        "serviceUrl": "https://b2b-service/did-comm",
-        "for": "did:example:business-customer"
-      }
-    ],
-    "constraints": {
-      "purposes": ["BEXP", "SUPP"],
-      "categoryPurposes": ["CASH", "CCRD"],
-      "limits": {
-        "per_transaction": "10000.00",
-        "per_day": "50000.00",
-        "currency": "USD"
-      },
-      "allowedBeneficiaries": [
-        {
-          "@id": "did:example:vendor-1",
-          "name": "Approved Vendor 1"
-        },
-        {
-          "@id": "did:example:vendor-2", 
-          "name": "Approved Vendor 2"
-        }
-      ],
-      "allowedSettlementAddresses": [
-        "eip155:1:0x742d35Cc6e4dfE2eDFaD2C0b91A8b0780EDAEb58",
-        "eip155:1:0x89abcdefabcdefabcdefabcdefabcdefabcdef12"
-      ],
-      "allowedAssets": [
-        "eip155:1/slip44:60",
-        "eip155:1/erc20:0xA0b86a33E6441b7178bb7094b2c4b6e5066d68B7"
-      ]
-    }
-  }
-}
-```
-
-#### 2. Merchant Connection Request
-```json
-{
-  "id": "connect-124",
-  "type": "https://tap.rsvp/schema/1.0#Connect",
-  "from": "did:web:psp.agent",
-  "to": ["did:web:payment.provider"],
-  "created_time": 1516269022,
-  "body": {
-    "@context": "https://tap.rsvp/schema/1.0",
-    "@type": "Connect",
-    "requester": {
-      "@id": "did:web:merchant.vasp",
-      "name": "Example Store"
-    },
-    "principal": {
-      "@id": "did:web:merchant.vasp",
-      "name": "Example Store"
-    },
-    "agents": [
-      {
-        "@id": "did:web:psp.agent",
-        "name": "PSP Agent",
-        "for": "did:web:merchant.vasp"
-      }
-    ],
-    "constraints": {
-      "purposes": ["RCPT"],
-      "categoryPurposes": ["EPAY"],
-      "limits": {
-        "per_transaction": "5000.00",
-        "per_day": "25000.00",
-        "currency": "USD"
-      },
-      "allowedAssets": [
-        "eip155:1/erc20:0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
-        "eip155:1/erc20:0x6B175474E89094C44Da98b954EedeAC495271d0F"
-      ]
-    }
-  }
-}
-```
-
 ### AuthorizationRequired Message Examples
 
 #### 1. Interactive Authorization Required
@@ -1363,20 +1333,51 @@ Updates policies for a transaction.
 ## Connection Messages
 
 ### Connect
-[TAIP-15] - Draft
+[TAIP-15] - Review
 
-Requests a connection between agents with specified constraints.
+Requests a connection between agents. Supports both transactional connections (with constraints) and trust connections (DDQ, whitelisting).
+
+#### All Connections (Required)
 
 | Attribute | Type | Required | Status | Description |
 |-----------|------|----------|---------|-------------|
-| @context | string | Yes | Draft ([TAIP-15]) | JSON-LD context "https://tap.rsvp/schema/1.0" |
-| @type | string | Yes | Draft ([TAIP-15]) | JSON-LD type "https://tap.rsvp/schema/1.0#Connect" |
-| requester | [Party](#party) | Yes | Draft ([TAIP-15]) | Party object representing the party requesting the connection |
-| principal | [Party](#party) | Yes | Draft ([TAIP-15]) | Party object representing the party the requesting agent acts on behalf of |
-| agents | array | Yes | Draft ([TAIP-15]) | Array of agent objects involved in the connection process |
-| constraints | object | Yes | Draft ([TAIP-15]) | Transaction constraints for the connection (see [constraints table](#transaction-constraints)) |
-| expiry | string | No | Draft ([TAIP-15]) | ISO 8601 datetime indicating when the connection request expires |
-| agreement | string | No | Draft ([TAIP-15]) | URL or identifier of terms agreed to by the principal |
+| @context | string | Yes | Review ([TAIP-15]) | JSON-LD context "https://tap.rsvp/schema/1.0" |
+| @type | string | Yes | Review ([TAIP-15]) | JSON-LD type "https://tap.rsvp/schema/1.0#Connect" |
+| connectionTypes | array | Yes | Review ([TAIP-15]) | Array of connection types: "transaction", "ddq-access", "mutual-trust", "whitelist" |
+| purpose | string | No | Review ([TAIP-15]) | Human-readable purpose for the connection |
+| expiry | string | No | Review ([TAIP-15]) | ISO 8601 datetime when connection request expires |
+| agreement | string | No | Review ([TAIP-15]) | URL pointing to terms of service |
+
+#### Transactional Connection Fields
+*(Required when connectionTypes includes "transaction")*
+
+| Attribute | Type | Required | Status | Description |
+|-----------|------|----------|---------|-------------|
+| requester | [Party](#party) | Yes* | Review ([TAIP-15]) | Party requesting the connection (*required for transaction type) |
+| principal | [Party](#party) | Yes* | Review ([TAIP-15]) | Party on whose behalf transactions will be performed (*required for transaction type) |
+| agents | array | Yes* | Review ([TAIP-15]) | Array of agent objects involved (*required for transaction type) |
+| constraints | object | Yes* | Review ([TAIP-15]) | Transaction constraints (*required for transaction type, see [constraints table](#transaction-constraints)) |
+| attachments | array | No | Review ([TAIP-15]) | Transaction messages for immediate authorization |
+
+#### Trust Connection Fields
+*(Used when connectionTypes includes trust types)*
+
+| Attribute | Type | Required | Status | Description |
+|-----------|------|----------|---------|-------------|
+| action | string | No | Review ([TAIP-15]) | Connection lifecycle action. Defaults to "establish" if not specified. Values: "establish" (create new connection), "update" (modify existing or broadcast document updates) |
+| attachments | array | No | Review ([TAIP-15]) | DIDComm message attachments (e.g., DDQ documents, certificates) |
+
+**Note:** Connection behavior is determined by `connectionTypes`. Transactional connections (`["transaction"]`) require `requester`, `principal`, `agents`, and `constraints`. Trust connections should omit these fields but MAY include attachments for inline document delivery.
+
+#### Connection Types
+
+| Value | Description | Required Fields |
+|-------|-------------|-----------------|
+| transaction | Transactional connections for B2B integrations, recurring billing | requester, principal, agents, constraints |
+| ddq-access | DDQ document exchange between institutions | None (peer-to-peer) |
+| mutual-trust | Bilateral trust relationship establishment | None (peer-to-peer) |
+| whitelist | Pre-approved straight-through processing | None (peer-to-peer) |
+
 
 #### Transaction Constraints
 
@@ -1397,10 +1398,12 @@ The `constraints` object defines the boundaries and permissions for transactions
 | allowedSettlementAddresses | array | No | Draft ([TAIP-15]) | Array of [CAIP-10] addresses permitted for settlement |
 | allowedAssets | array | No | Draft ([TAIP-15]) | Array of [CAIP-19] asset identifiers that can be transacted |
 
-#### Example Connect Message
+#### Example Connect Messages
+
+#### B2B Service Connection Request
 ```json
 {
-  "id": "123e4567-e89b-12d3-a456-426614174000",
+  "id": "connect-123",
   "type": "https://tap.rsvp/schema/1.0#Connect",
   "from": "did:example:b2b-service",
   "to": ["did:example:vasp"],
@@ -1408,7 +1411,8 @@ The `constraints` object defines the boundaries and permissions for transactions
   "expires_time": 1516385931,
   "body": {
     "@context": "https://tap.rsvp/schema/1.0",
-    "@type": "https://tap.rsvp/schema/1.0#Connect",
+    "@type": "Connect",
+    "connectionTypes": ["transaction"],
     "requester": {
       "@id": "did:example:business-customer",
       "name": "Business Customer"
@@ -1451,9 +1455,216 @@ The `constraints` object defines the boundaries and permissions for transactions
         "eip155:1/slip44:60",
         "eip155:1/erc20:0xA0b86a33E6441b7178bb7094b2c4b6e5066d68B7"
       ]
-    },
-    "agreement": "https://example.com/terms/v2.1"
+    }
   }
+}
+```
+
+#### Merchant Connection Request
+```json
+{
+  "id": "connect-124",
+  "type": "https://tap.rsvp/schema/1.0#Connect",
+  "from": "did:web:psp.agent",
+  "to": ["did:web:payment.provider"],
+  "created_time": 1516269022,
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "Connect",
+    "connectionTypes": ["transaction"],
+    "requester": {
+      "@id": "did:web:merchant.vasp",
+      "name": "Example Store"
+    },
+    "principal": {
+      "@id": "did:web:merchant.vasp",
+      "name": "Example Store"
+    },
+    "agents": [
+      {
+        "@id": "did:web:psp.agent",
+        "name": "PSP Agent",
+        "for": "did:web:merchant.vasp"
+      }
+    ],
+    "constraints": {
+      "purposes": ["RCPT"],
+      "categoryPurposes": ["EPAY"],
+      "limits": {
+        "per_transaction": "5000.00",
+        "per_day": "25000.00",
+        "currency": "USD"
+      },
+      "allowedAssets": [
+        "eip155:1/erc20:0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+        "eip155:1/erc20:0x6B175474E89094C44Da98b954EedeAC495271d0F"
+      ]
+    }
+  }
+}
+```
+
+##### Trust Connection (DDQ Access Request)
+```json
+{
+  "id": "conn-ddq-123",
+  "type": "https://tap.rsvp/schema/1.0#Connect",
+  "from": "did:web:vasp-a.example",
+  "to": ["did:web:vasp-b.example"],
+  "created_time": 1706227200,
+  "expires_time": 1706313600,
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#Connect",
+    "connectionTypes": ["ddq-access"],
+    "action": "establish",
+    "purpose": "Request DDQ access for compliance verification",
+    "expiry": "2026-12-31T23:59:59Z"
+  }
+}
+```
+
+##### Trust Connection (Mutual Trust with Whitelist)
+```json
+{
+  "id": "conn-trust-456",
+  "type": "https://tap.rsvp/schema/1.0#Connect",
+  "from": "did:web:vasp-a.example",
+  "to": ["did:web:vasp-b.example"],
+  "created_time": 1706227200,
+  "expires_time": 1706313600,
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#Connect",
+    "connectionTypes": ["mutual-trust", "whitelist"],
+    "action": "establish",
+    "purpose": "Establish mutual trust and enable straight-through processing",
+    "expiry": "2027-01-26T00:00:00Z"
+  }
+}
+```
+
+##### Trust Connection (DDQ Exchange with Inline Document - JSON Format)
+```json
+{
+  "id": "conn-ddq-789",
+  "type": "https://tap.rsvp/schema/1.0#Connect",
+  "from": "did:web:vasp-a.example",
+  "to": ["did:web:vasp-b.example"],
+  "created_time": 1706227200,
+  "expires_time": 1706313600,
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#Connect",
+    "connectionTypes": ["ddq-access"],
+    "action": "establish",
+    "purpose": "Provide structured DDQ data for automated processing",
+    "expiry": "2026-12-31T23:59:59Z"
+  },
+  "attachments": [
+    {
+      "id": "ddq-document",
+      "description": "VASP A Due Diligence Questionnaire 2024-Q4",
+      "media_type": "application/json",
+      "data": {
+        "json": {
+          "version": "2024-Q4",
+          "lastUpdated": "2024-10-15T00:00:00Z",
+          "legalName": "VASP A Example Inc.",
+          "jurisdiction": "US",
+          "ownershipType": "Private",
+          "conductsKyc": true,
+          "kycProvider": "InternalTeam",
+          "amlCompliance": true,
+          "regulatoryLicenses": [
+            {
+              "jurisdiction": "US-NY",
+              "licenseType": "BitLicense",
+              "licenseNumber": "BL-12345"
+            }
+          ],
+          "supportedAssets": ["BTC", "ETH", "USDC"],
+          "transactionMonitoring": true,
+          "sanctionsScreening": true
+        }
+      }
+    }
+  ]
+}
+```
+
+##### Trust Connection Update (Add Whitelist)
+```json
+{
+  "id": "conn-update-101",
+  "type": "https://tap.rsvp/schema/1.0#Connect",
+  "from": "did:web:vasp-a.example",
+  "to": ["did:web:vasp-b.example"],
+  "created_time": 1706227300,
+  "expires_time": 1706313700,
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#Connect",
+    "connectionTypes": ["whitelist"],
+    "action": "update",
+    "purpose": "Upgrade to whitelisted status for high-volume processing"
+  }
+}
+```
+
+##### DDQ Update Broadcast
+
+When a VASP updates their DDQ, they broadcast to all approved parties:
+```json
+{
+  "id": "conn-update-ddq-202",
+  "type": "https://tap.rsvp/schema/1.0#Connect",
+  "from": "did:web:vasp-a.example",
+  "to": ["did:web:vasp-b.example"],
+  "created_time": 1706227400,
+  "expires_time": 1706313800,
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#Connect",
+    "connectionTypes": ["ddq-access"],
+    "action": "update",
+    "purpose": "Updated DDQ - Q1 2025 version with new license information"
+  },
+  "attachments": [
+    {
+      "id": "ddq-document-updated",
+      "description": "VASP A Due Diligence Questionnaire 2025-Q1 (Updated)",
+      "media_type": "application/json",
+      "data": {
+        "json": {
+          "version": "2025-Q1",
+          "lastUpdated": "2025-01-15T00:00:00Z",
+          "legalName": "VASP A Example Inc.",
+          "jurisdiction": "US",
+          "ownershipType": "Private",
+          "conductsKyc": true,
+          "kycProvider": "InternalTeam",
+          "amlCompliance": true,
+          "regulatoryLicenses": [
+            {
+              "jurisdiction": "US-NY",
+              "licenseType": "BitLicense",
+              "licenseNumber": "BL-12345"
+            },
+            {
+              "jurisdiction": "US-CA",
+              "licenseType": "Money Transmission License",
+              "licenseNumber": "MTL-67890"
+            }
+          ],
+          "supportedAssets": ["BTC", "ETH", "USDC", "USDT"],
+          "transactionMonitoring": true,
+          "sanctionsScreening": true,
+          "changeLog": "Added California MTL, expanded supported assets to include USDT"
+        }
+      }
+    }
+  ]
 }
 ```
 

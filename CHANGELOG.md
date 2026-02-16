@@ -14,6 +14,28 @@ This changelog focuses on:
 - Protocol structural changes
 - Breaking changes
 
+## [Unreleased]
+## [2026-01-28]
+
+### Changed
+- **BREAKING: TAIP-15 Agent Connection Protocol**: Added explicit connectionTypes field
+  - **NEW REQUIRED FIELD**: `connectionTypes` array now REQUIRED for all Connect messages
+  - Transactional connections must specify `connectionTypes: ["transaction"]`
+  - Added trust connection types: `ddq-access`, `mutual-trust`, `whitelist`
+  - Trust connections enable DDQ exchange, mutual trust establishment, and whitelisting between VASPs
+  - Field requirements now determined by `connectionTypes` value:
+    - `["transaction"]` requires: requester, principal, agents, constraints
+    - Trust types require: none (peer-to-peer relationships)
+  - **Migration**: Existing transactional Connect messages must add `connectionTypes: ["transaction"]`
+  - **Rationale**: Explicit type declaration follows industry standards (JSON-LD, OpenAPI, GraphQL)
+  
+- **TAIP-4**: Extended Authorize message with optional connection-specific fields
+  - Added `approvedTypes` field for indicating approved connection types
+  - Added `ddqDocument` field for DDQ document references
+  - Added `trustLevel` field for trust status indicators
+  - These fields are only used when responding to trust-based Connect messages (TAIP-15)
+ 
+## [Released]
 ## [2025-11-25]
 
 ### Added

@@ -44,6 +44,7 @@ The purpose of TAIPs is to provide the community with a means to propose enhance
 | 16   | [Invoices](./TAIPs/taip-16.md)                                         |
 | 17   | [Composable Escrow](./TAIPs/taip-17.md)                                |
 
+
 ## Implementation Resources
 
 ### JSON Schemas

@@ -121,6 +121,49 @@ Any agent can authorize the transaction by replying as a thread to the initial m
 - `amount` - OPTIONAL string with the full amount as a decimal representation of the `settlementAsset` in case it is different than the original `Payment` or `Transfer` message.
 - `expiry` - OPTIONAL timestamp in ISO 8601 format indicating when the authorization expires. After this time, if settlement has not occurred, the authorization should be considered invalid and settlement should not proceed. In merchant payment flows, the customer's wallet may either repeat the merchant's specified expiration time or override it with a different time.
 
+#### Connection-Specific Fields (TAIP-15)
+
+When responding to `Connect` messages (see [TAIP-15]), the `Authorize` message MAY include these additional optional fields to indicate connection approval:
+
+- `approvedTypes` - OPTIONAL array of strings indicating which connection types were approved from the original request (e.g., `["ddq-access", "mutual-trust"]`). This field SHOULD only be present when responding to `Connect` messages.
+- `ddqDocument` - OPTIONAL object containing Due Diligence Questionnaire document reference. This field SHOULD only be present when responding to `Connect` messages and granting DDQ access. Object structure:
+  - `documentId` - REQUIRED string unique identifier for the document
+  - `version` - OPTIONAL string document version
+  - `accessUrl` - OPTIONAL string HTTPS URL for document retrieval
+  - `checksum` - OPTIONAL string SHA-256 hash for integrity verification
+  - `expiresAt` - OPTIONAL ISO 8601 timestamp when document access expires
+- `trustLevel` - OPTIONAL string indicating trust status between parties: `whitelisted`, `trusted`, `standard`, `reviewing`, or `suspended`. This field SHOULD only be present when responding to `Connect` messages.
+- `attachments` - OPTIONAL DIDComm message attachments (e.g., DDQ documents, certificates) |
+
+These connection-specific fields SHOULD be omitted when authorizing transactions (`Transfer`, `Payment`, etc.).
+
+##### Attachment Integrity Verification
+
+When including sensitive documents or data as attachments (such as DDQ documents Authorize responses), implementations SHOULD include integrity verification:
+
+- `checksum` - OPTIONAL string field within the attachment object (as a sibling to `data`) containing a SHA-256 hash for integrity verification
+- Format: `sha256:<hex-encoded-hash>` where the hash is calculated on:
+  - **For JSON data** (`media_type: "application/json"`): The canonical JSON string representation of the `data.json` content
+  - **For base64 data** (`media_type: "application/pdf"`, etc.): The raw decoded bytes of the `data.base64` content
+- The checksum field MUST be placed outside the `data` object to avoid circular dependency
+
+```json
+{
+  "id": "ddq-doc-1",
+  "description": "VASP A DDQ 2024-Q4",
+  "media_type": "application/json",
+  "checksum": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "data": {
+    "json": {
+      "version": "2024-Q4",
+      "legalName": "VASP A Example Inc.",
+      ...
+    }
+  }
+}
+```
+Recipients SHOULD verify the checksum before processing attachment content. Checksum mismatches SHOULD be treated as potential data corruption or tampering.
+
 By not providing a `settlementAddress` until after `Authorization`, beneficiary agents can reject incoming blockchain transactions for the first time.
 
 An example Authorization flow using two agents where the `settlementAddress` was included in the original `Transfer` message:
