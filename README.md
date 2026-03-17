@@ -43,6 +43,9 @@ The purpose of TAIPs is to provide the community with a means to propose enhance
 | 15   | [Agent Connection Protocol](./TAIPs/taip-15.md)                         |
 | 16   | [Invoices](./TAIPs/taip-16.md)                                         |
 | 17   | [Composable Escrow](./TAIPs/taip-17.md)                                |
+| 18   | [Asset Exchange](./TAIPs/taip-18.md)                                   |
+| 19   | [ISO 20022 Message Mapping](./TAIPs/taip-19.md)                        |
+| 20   | [On-Chain Transfer Correlation via Memo Hash](./TAIPs/taip-20.md)      |
 
 ## Implementation Resources
 

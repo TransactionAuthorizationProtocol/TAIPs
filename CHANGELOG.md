@@ -14,6 +14,16 @@ This changelog focuses on:
 - Protocol structural changes
 - Breaking changes
 
+## [2026-03-17]
+
+### Added
+- **TAIP-20 On-Chain Transfer Correlation via Memo Hash**: New draft standard for deterministic TAP ↔ on-chain reconciliation
+  - Defines canonical derivation `SHA-256(UTF8(tap_transfer_id))`
+  - Standardizes text memo profile as `tap:1:<64-hex>`
+  - Defines binary/hash memo profile for chains with native hash memo support
+  - Documents verification workflow for counterparties and compliance systems
+  - Provides adaptation guidance for text memo, binary memo, and numeric-tag ecosystems
+
 ## [2025-11-25]
 
 ### Added
