@@ -104,14 +104,7 @@ For chains that support fixed-length binary/hash memo fields, implementations SH
 
 If chain tooling requires hex/base64 wrappers, those wrappers MUST decode losslessly to the same 32-byte value.
 
-### 4. Settlement Message Disclosure
-
-When sending TAP settlement confirmations (e.g., `Settle`), implementations SHOULD include:
-
-- `settlementId` (chain tx identifier), and
-- `memo` (or implementation-defined extension field) containing either the text profile value or an unambiguous representation of the binary profile value.
-
-### 5. Verification Procedure
+### 4. Verification Procedure
 
 A verifier with TAP message history and blockchain tx data performs:
 
@@ -121,7 +114,7 @@ A verifier with TAP message history and blockchain tx data performs:
 4. Compare values.
 5. If equal, treat tx as cryptographically correlated to that TAP transfer.
 
-### 6. Chain-Specific Adaptation Guidance
+### 5. Chain-Specific Adaptation Guidance
 
 - **Text memo chains:** use Profile A unchanged.
 - **Hash memo chains:** use Profile B.
