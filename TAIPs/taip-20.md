@@ -3,7 +3,7 @@ taip: 20
 title: On-Chain Transfer Correlation via Memo Hash
 status: Draft
 type: Standard
-author: TAP Contributors
+author: Pelle Braendgaard <pelle@notabene.id>
 created: 2026-03-17
 updated: 2026-03-17
 description: Defines a chain-agnostic method to tag settlement transactions with a SHA-256 digest of the TAP transfer identifier using memo/reference fields, enabling deterministic reconciliation between TAP and on-chain records.
@@ -21,6 +21,11 @@ When a TAP transfer settles on-chain, the payer should include a deterministic m
 Payment-focused blockchains commonly expose a transaction-level reference field (for example, `memo`, `reference`, `comment`, or protocol-specific tag fields) that institutions use for reconciliation. Existing behavior is fragmented across ecosystems: some chains support UTF-8 text memos, some support binary/hash memos, and others expose numeric destination tags.
 
 This TAIP defines a single canonical correlation primitive for TAP: compute `sha256(transfer_id_utf8)` and place the resulting 32-byte digest (or its hex representation) into an on-chain memo/reference field. This creates a non-PII, deterministic linkage between TAP and settlement layers while preserving compatibility with heterogeneous chain memo semantics.
+
+## Overview
+
+TAIP-20 standardizes a deterministic cross-layer correlation value for TAP settlements: `SHA-256(UTF8(tap_transfer_id))`. The hash is then carried in chain-specific memo/reference fields using either a text profile (`tap:1:<64-hex>`) or a binary profile (raw 32-byte hash). This gives counterparties and compliance systems a consistent verification method across heterogeneous payment blockchains.
+
 
 ## Motivation
 
