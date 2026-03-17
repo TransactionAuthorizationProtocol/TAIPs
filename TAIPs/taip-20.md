@@ -7,14 +7,14 @@ author: Pelle Braendgaard <pelle@notabene.id>
 created: 2026-03-17
 updated: 2026-03-17
 description: Defines a chain-agnostic method to tag settlement transactions with a SHA-256 digest of the TAP transfer identifier using memo/reference fields, enabling deterministic reconciliation between TAP and on-chain records.
-requires: 3, 4
+requires: 3, 4, 14
 ---
 
 # TAIP-20: On-Chain Transfer Correlation via Memo Hash
 
 ## Simple Summary
 
-When a TAP transfer settles on-chain, the payer should include a deterministic memo/reference value derived from the TAP transfer ID so anyone with TAP context can cryptographically link the TAP transfer and blockchain transaction.
+When a TAP transfer or payment settles on-chain, the payer should include a deterministic memo/reference value derived from the TAP transfer ID so anyone with TAP context can cryptographically link the TAP transfer and blockchain transaction.
 
 ## Abstract
 
@@ -31,7 +31,7 @@ TAIP-20 standardizes a deterministic cross-layer correlation value for TAP settl
 
 TAP already provides message IDs and thread IDs for protocol-level traceability, but settlement often occurs on independent networks where counterparties, PSPs, and compliance teams need a robust way to match:
 
-- TAP transfer intent (`Transfer` / settlement flow metadata), and
+- TAP transfer or payment intent (`Transfer` / `Payment` / settlement flow metadata), and
 - final on-chain movement of value.
 
 A standardized memo-hash method improves:
@@ -58,10 +58,11 @@ This TAIP builds on that shared pattern by standardizing the reference value for
 
 ### 1. Correlation Input
 
-For a TAP transfer flow, define `tap_transfer_id` as:
+For a TAP transfer or payment flow, define `tap_transfer_id` as:
 
-1. `Transfer.id` when correlating directly to TAIP-3 Transfer, or
-2. the active settlement thread identifier (`thid`) if the implementation's canonical business identifier is thread-based.
+1. `Transfer.id` when correlating directly to a [TAIP-3] Transfer,
+2. `Payment.id` when correlating to a [TAIP-14] Payment, or
+3. the active settlement thread identifier (`thid`) if the implementation's canonical business identifier is thread-based.
 
 Implementations MUST use a stable identifier agreed by both counterparties for that transfer lifecycle.
 
@@ -165,12 +166,13 @@ A counterparty recomputing from TAP messages can verify that the settlement tran
 
 ## Backwards Compatibility
 
-This TAIP is additive. Existing TAP messages remain valid. Integrations can adopt TAIP-20 correlation without changing core TAIP-3/TAIP-4 semantics.
+This TAIP is additive. Existing TAP messages remain valid. Integrations can adopt TAIP-20 correlation without changing core TAIP-3/TAIP-4/TAIP-14 semantics.
 
 ## References
 
 - [TAIP-3: Virtual Asset Transfer][TAIP-3]
 - [TAIP-4: Transaction Authorization Protocol][TAIP-4]
+- [TAIP-14: Payment][TAIP-14]
 - [FIPS 180-4 Secure Hash Standard (SHA-2)][FIPS-180-4]
 - [CAIP-220 Blockchain Transaction Identifier][CAIP-220]
 - [Tempo TIP-20 Transfer Memos][TIP-20-Tempo]
@@ -180,6 +182,7 @@ This TAIP is additive. Existing TAP messages remain valid. Integrations can adop
 
 [TAIP-3]: https://tap.rsvp/TAIPs/taip-3
 [TAIP-4]: https://tap.rsvp/TAIPs/taip-4
+[TAIP-14]: https://tap.rsvp/TAIPs/taip-14
 [FIPS-180-4]: https://csrc.nist.gov/publications/detail/fips/180/4/final
 [CAIP-220]: https://namespaces.chainagnostic.org/caips/caip-220
 [TIP-20-Tempo]: https://docs.tempo.xyz/protocol/tip20/overview#transfer-memos
