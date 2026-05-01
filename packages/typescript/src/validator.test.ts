@@ -40,7 +40,7 @@ import {
   PaymentSchema,
   RFQSchema,
   QuoteSchema,
-  EscrowSchema,
+  LockSchema,
   CaptureSchema,
   AuthorizeSchema,
   ConnectSchema,
@@ -54,7 +54,7 @@ import {
   PaymentMessageSchema,
   RFQMessageSchema,
   QuoteMessageSchema,
-  EscrowMessageSchema,
+  LockMessageSchema,
   CaptureMessageSchema,
   AuthorizeMessageSchema,
   ConnectMessageSchema,
@@ -72,7 +72,7 @@ import {
   validatePaymentMessage,
   validateRFQMessage,
   validateQuoteMessage,
-  validateEscrowMessage,
+  validateLockMessage,
   validateCaptureMessage,
   validateAuthorizeMessage,
   validateConnectMessage,
@@ -604,11 +604,11 @@ describe('TAP Message Validators', () => {
     });
   });
 
-  describe('EscrowSchema', () => {
-    it('should validate escrow with asset', () => {
-      const escrow = {
+  describe('LockSchema', () => {
+    it('should validate lock with asset', () => {
+      const lock = {
         "@context": "https://tap.rsvp/schema/1.0",
-        "@type": "Escrow",
+        "@type": "Lock",
         asset: "eip155:1/erc20:0xA0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
         amount: "1000.00",
         originator: validPerson,
@@ -616,21 +616,21 @@ describe('TAP Message Validators', () => {
         expiry: "2025-07-21T01:00:00Z",
         agents: [validAgent]
       };
-      expect(EscrowSchema.safeParse(escrow).success).toBe(true);
+      expect(LockSchema.safeParse(lock).success).toBe(true);
     });
 
-    it('should validate generated escrow messages', () => {
+    it('should validate generated lock messages', () => {
       fc.assert(
-        fc.property(arbitraries.messageBodies.escrow(), (escrow) => {
-          expect(EscrowSchema.safeParse(escrow).success).toBe(true);
+        fc.property(arbitraries.messageBodies.lock(), (lock) => {
+          expect(LockSchema.safeParse(lock).success).toBe(true);
         })
       );
     });
 
-    it('should validate escrow with currency', () => {
-      const escrow = {
+    it('should validate lock with currency', () => {
+      const lock = {
         "@context": "https://tap.rsvp/schema/1.0",
-        "@type": "Escrow",
+        "@type": "Lock",
         currency: "USD",
         amount: "1000.00",
         originator: validPerson,
@@ -639,29 +639,29 @@ describe('TAP Message Validators', () => {
         agreement: "https://example.com/escrow-terms",
         agents: [validAgent]
       };
-      expect(EscrowSchema.safeParse(escrow).success).toBe(true);
+      expect(LockSchema.safeParse(lock).success).toBe(true);
     });
 
     it('should require either asset or currency', () => {
-      const escrow = {
+      const lock = {
         "@context": "https://tap.rsvp/schema/1.0",
-        "@type": "Escrow",
+        "@type": "Lock",
         amount: "1000.00",
         originator: validPerson,
         beneficiary: validPerson,
         expiry: "2025-07-21T01:00:00Z",
         agents: [validAgent]
       };
-      expect(EscrowSchema.safeParse(escrow).success).toBe(false);
+      expect(LockSchema.safeParse(lock).success).toBe(false);
     });
 
     it('should require all required fields', () => {
-      const escrow = {
+      const lock = {
         "@context": "https://tap.rsvp/schema/1.0",
-        "@type": "Escrow",
+        "@type": "Lock",
         asset: "eip155:1/erc20:0xA0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
       };
-      expect(EscrowSchema.safeParse(escrow).success).toBe(false);
+      expect(LockSchema.safeParse(lock).success).toBe(false);
     });
   });
 
@@ -778,9 +778,9 @@ describe('DIDComm Message Validators', () => {
     expiresAt: "2025-07-21T00:00:00Z"
   };
 
-  const validEscrowBody = {
+  const validLockBody = {
     "@context": "https://tap.rsvp/schema/1.0",
-    "@type": "Escrow",
+    "@type": "Lock",
     asset: "eip155:1/erc20:0xA0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
     amount: "1000.00",
     originator: { "@id": "did:example:alice", name: "Alice" },
@@ -891,17 +891,17 @@ describe('DIDComm Message Validators', () => {
     });
   });
 
-  describe('EscrowMessageSchema', () => {
-    it('should validate valid escrow messages', () => {
+  describe('LockMessageSchema', () => {
+    it('should validate valid lock messages', () => {
       const message = {
         id: "01234567-89ab-4def-a123-456789abcdef",
-        type: "https://tap.rsvp/schema/1.0#Escrow",
+        type: "https://tap.rsvp/schema/1.0#Lock",
         from: "did:example:sender",
         to: ["did:example:receiver"],
         created_time: Date.now(),
-        body: validEscrowBody
+        body: validLockBody
       };
-      expect(EscrowMessageSchema.safeParse(message).success).toBe(true);
+      expect(LockMessageSchema.safeParse(message).success).toBe(true);
     });
 
     it('should reject wrong message type', () => {
@@ -911,9 +911,9 @@ describe('DIDComm Message Validators', () => {
         from: "did:example:sender",
         to: ["did:example:receiver"],
         created_time: Date.now(),
-        body: validEscrowBody
+        body: validLockBody
       };
-      expect(EscrowMessageSchema.safeParse(message).success).toBe(false);
+      expect(LockMessageSchema.safeParse(message).success).toBe(false);
     });
   });
 
@@ -1024,15 +1024,15 @@ describe('TAPMessageSchema (Discriminated Union)', () => {
       }
     };
 
-    const escrowMessage = {
+    const lockMessage = {
       id: "23456789-abcd-4ef0-a123-456789abcdef",
-      type: "https://tap.rsvp/schema/1.0#Escrow",
+      type: "https://tap.rsvp/schema/1.0#Lock",
       from: "did:example:originator",
       to: ["did:example:beneficiary"],
       created_time: Date.now(),
       body: {
         "@context": "https://tap.rsvp/schema/1.0",
-        "@type": "Escrow",
+        "@type": "Lock",
         asset: "eip155:1/erc20:0xA0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
         amount: "1000.00",
         originator: { "@id": "did:example:alice", name: "Alice" },
@@ -1058,7 +1058,7 @@ describe('TAPMessageSchema (Discriminated Union)', () => {
 
     expect(TAPMessageSchema.safeParse(transferMessage).success).toBe(true);
     expect(TAPMessageSchema.safeParse(rfqMessage).success).toBe(true);
-    expect(TAPMessageSchema.safeParse(escrowMessage).success).toBe(true);
+    expect(TAPMessageSchema.safeParse(lockMessage).success).toBe(true);
     expect(TAPMessageSchema.safeParse(authorizeMessage).success).toBe(true);
   });
 
@@ -1200,15 +1200,15 @@ describe('Validation Functions', () => {
       }
     };
 
-    const validEscrowMessage = {
+    const validLockMessage = {
       id: "34567890-bcde-4f01-a123-456789abcdef",
-      type: "https://tap.rsvp/schema/1.0#Escrow",
+      type: "https://tap.rsvp/schema/1.0#Lock",
       from: "did:example:originator",
       to: ["did:example:beneficiary"],
       created_time: Date.now(),
       body: {
         "@context": "https://tap.rsvp/schema/1.0",
-        "@type": "Escrow",
+        "@type": "Lock",
         asset: "eip155:1/erc20:0xA0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
         amount: "1000.00",
         originator: { "@id": "did:example:alice", name: "Alice" },
@@ -1248,8 +1248,8 @@ describe('Validation Functions', () => {
       expect(result.success).toBe(true);
     });
 
-    it('should validate escrow messages', () => {
-      const result = validateEscrowMessage(validEscrowMessage);
+    it('should validate lock messages', () => {
+      const result = validateLockMessage(validLockMessage);
       expect(result.success).toBe(true);
     });
 
@@ -1274,8 +1274,8 @@ describe('Validation Functions', () => {
       expect(result.success).toBe(false);
     });
 
-    it('should reject non-escrow messages for escrow validator', () => {
-      const result = validateEscrowMessage(validMessage);
+    it('should reject non-lock messages for lock validator', () => {
+      const result = validateLockMessage(validMessage);
       expect(result.success).toBe(false);
     });
 

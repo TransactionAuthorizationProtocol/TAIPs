@@ -12,7 +12,7 @@ permalink: /messages/
 - [Transaction Message](#transaction-message)
   - [Transfer](#transfer)
   - [Payment](#payment)
-  - [Escrow](#escrow)
+  - [Lock](#lock)
 - [Authorization Flow Messages](#authorization-flow-messages)
   - [AuthorizationRequired](#authorizationrequired)
   - [Authorize](#authorize)
@@ -486,7 +486,7 @@ Response to an RFQ providing pricing and terms. Sent by liquidity providers or o
 }
 ```
 
-### Escrow
+### Lock
 [TAIP-17] - Draft
 
 Requests an agent to hold assets in escrow on behalf of parties, enabling payment guarantees and asset swaps.
@@ -494,7 +494,7 @@ Requests an agent to hold assets in escrow on behalf of parties, enabling paymen
 | Attribute | Type | Required | Status | Description |
 |-----------|------|----------|---------|-------------|
 | @context | string | Yes | Draft ([TAIP-17]) | JSON-LD context "https://tap.rsvp/schema/1.0" |
-| @type | string | Yes | Draft ([TAIP-17]) | JSON-LD type "https://tap.rsvp/schema/1.0#Escrow" |
+| @type | string | Yes | Draft ([TAIP-17]) | JSON-LD type "https://tap.rsvp/schema/1.0#Lock" |
 | asset | string | No | Draft ([TAIP-17]) | CAIP-19 identifier for the specific cryptocurrency asset. Either asset OR currency must be present |
 | currency | string | No | Draft ([TAIP-17]) | ISO 4217 currency code for fiat-denominated escrows. Either asset OR currency must be present |
 | amount | string | Yes | Draft ([TAIP-17]) | Amount to be held in escrow (decimal string) |
@@ -506,18 +506,18 @@ Requests an agent to hold assets in escrow on behalf of parties, enabling paymen
 
 #### Examples
 
-##### Payment guarantee escrow
+##### Payment guarantee lock
 ```json
 {
   "id": "123e4567-e89b-12d3-a456-426614174000",
-  "type": "https://tap.rsvp/schema/1.0#Escrow",
+  "type": "https://tap.rsvp/schema/1.0#Lock",
   "from": "did:web:merchant.example",
   "to": ["did:web:paymentprocessor.example"],
   "created_time": 1719226800,
   "expires_time": 1719313200,
   "body": {
     "@context": "https://tap.rsvp/schema/1.0",
-    "@type": "https://tap.rsvp/schema/1.0#Escrow",
+    "@type": "https://tap.rsvp/schema/1.0#Lock",
     "asset": "eip155:1/erc20:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
     "amount": "100.00",
     "originator": {
@@ -546,16 +546,16 @@ Requests an agent to hold assets in escrow on behalf of parties, enabling paymen
 }
 ```
 
-##### Fiat currency escrow
+##### Fiat currency lock
 ```json
 {
   "id": "789e0123-e89b-12d3-a456-426614174003",
-  "type": "https://tap.rsvp/schema/1.0#Escrow",
+  "type": "https://tap.rsvp/schema/1.0#Lock",
   "from": "did:web:marketplace.example",
   "to": ["did:web:escrow.bank"],
   "body": {
     "@context": "https://tap.rsvp/schema/1.0",
-    "@type": "https://tap.rsvp/schema/1.0#Escrow",
+    "@type": "https://tap.rsvp/schema/1.0#Lock",
     "currency": "USD",
     "amount": "500.00",
     "originator": {
@@ -862,7 +862,7 @@ Authorizes the release of escrowed funds to the beneficiary. Only agents acting 
 | amount | string | No | Draft ([TAIP-17]) | Amount to capture (decimal string). If omitted, captures full escrow amount. Must be ≤ original amount |
 | settlementAddress | string | No | Draft ([TAIP-17]) | Blockchain address for settlement. If omitted, uses address from earlier Authorize |
 
-> **Note:** The message refers to the original Escrow message via the DIDComm `thid` (thread ID) in the message envelope.
+> **Note:** The message refers to the original Lock message via the DIDComm `thid` (thread ID) in the message envelope.
 
 #### Examples
 

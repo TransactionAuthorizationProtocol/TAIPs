@@ -5,18 +5,18 @@ status: Draft
 type: Standard
 author: Pelle Braendgaard <pelle@notabene.id>
 created: 2025-06-24
-updated: 2025-06-24
-description: Defines Escrow and Capture message types for holding and releasing funds on behalf of parties, enabling payment guarantees and asset swaps. Specifies the complete escrow lifecycle from acceptance through capture, with clear authorization rules for each stage while maintaining compatibility with existing TAP messages.
+updated: 2026-05-01
+description: Defines Lock and Capture message types for holding and releasing funds on behalf of parties, enabling payment guarantees and asset swaps. Specifies the complete escrow lifecycle from acceptance through capture, with clear authorization rules for each stage while maintaining compatibility with existing TAP messages.
 requires: 2, 4, 5, 6, 7
 ---
 
 ## Simple Summary
 
-Introduces **Escrow** and **Capture** message types that allow agents to hold and release assets on behalf of parties during a transaction. The escrow can be captured (released to beneficiary) or cancelled (returned to originator), enabling payment guarantee flows (like credit card authorization/capture) and secure asset swaps between parties.
+Introduces **Lock** and **Capture** message types that allow agents to hold and release assets on behalf of parties during a transaction. The escrow can be captured (released to beneficiary) or cancelled (returned to originator), enabling payment guarantee flows (like credit card authorization/capture) and secure asset swaps between parties.
 
 ## Abstract
 
-This proposal defines a composable **Escrow** workflow within the Transaction Authorization Protocol. An Escrow message allows one agent to request another agent to hold a specified amount of currency or asset from a party in escrow on behalf of another party. The specification introduces a **Capture** message for beneficiaries to authorize the release of escrowed funds, and defines the complete lifecycle including acceptance by the escrow agent, activation through settlement, and release or cancellation. The workflow reuses existing TAP messages (Authorize, Settle, Cancel) from [TAIP-4] and can optionally leverage [TAIP-3] for returning cancelled funds. This enables various use cases including payment guarantees for merchants, asset swaps between parties, and conditional payments that require multi-party authorization before settlement.
+This proposal defines a composable escrow workflow within the Transaction Authorization Protocol. A **Lock** message allows one agent to request another agent to hold a specified amount of currency or asset from a party in escrow on behalf of another party. The specification introduces a **Capture** message for beneficiaries to authorize the release of escrowed funds, and defines the complete lifecycle including acceptance by the escrow agent, activation through settlement, and release or cancellation. The workflow reuses existing TAP messages (Authorize, Settle, Cancel) from [TAIP-4] and can optionally leverage [TAIP-3] for returning cancelled funds. This enables various use cases including payment guarantees for merchants, asset swaps between parties, and conditional payments that require multi-party authorization before settlement.
 
 ## Motivation
 
@@ -27,15 +27,15 @@ Current blockchain transactions are immediate and irreversible, making it challe
 3. **Conditional Payments**: Where funds should only be released upon meeting certain conditions
 4. **Multi-party Transactions**: Where multiple parties need to approve before funds are released
 
-By introducing an Escrow message type, TAP can support these advanced workflows while maintaining its core principles of agent-based authorization and composability. The escrow agent acts as a trusted intermediary, holding assets until conditions are met for release or cancellation.
+By introducing a Lock message type, TAP can support these advanced workflows while maintaining its core principles of agent-based authorization and composability. The escrow agent acts as a trusted intermediary, holding assets until conditions are met for release or cancellation.
 
 ## Specification
 
 ### Roles and Participants
 
-The Escrow workflow involves several distinct roles:
+The escrow workflow involves several distinct roles:
 
-1. **Initiator**: The agent that creates and sends the Escrow request (identified by `from` in the DIDComm envelope)
+1. **Initiator**: The agent that creates and sends the Lock request (identified by `from` in the DIDComm envelope)
 2. **Escrow Agent**: The agent that receives the request and holds the assets in escrow (identified by the `EscrowAgent` role the `agents` array)
 3. **Originator**: The party whose assets will be placed in escrow (consistent with TAIP-3 terminology)
 4. **Beneficiary**: The party who will receive the assets if the escrow is released
@@ -47,14 +47,14 @@ The authorization model is simple: agents acting for the beneficiary (as indicat
 
 **Policies**: Agents MAY declare policies per [TAIP-7] to specify their requirements for participating in the escrow. For example, an escrow agent might require `RequirePresentation` for KYC verification or `RequireAuthorization` from specific parties before accepting the escrow role.
 
-### Escrow Message
+### Lock Message
 
-An **Escrow** is a [DIDComm] message (per [TAIP-2]) that requests an agent to hold assets in escrow. Like all TAP messages, it follows the DIDComm v2 message structure with the TAP-specific body format.
+A **Lock** is a [DIDComm] message (per [TAIP-2]) that requests an agent to hold assets in escrow. Like all TAP messages, it follows the DIDComm v2 message structure with the TAP-specific body format.
 
 The DIDComm message envelope contains:
-- **`from`** – REQUIRED [DID] of the initiator agent (the agent requesting the escrow)
+- **`from`** – REQUIRED [DID] of the initiator agent (the agent requesting the lock)
 - **`to`** – REQUIRED Array containing [DID] of the agents taking part in the escrow process
-- **`type`** – REQUIRED Message type: `"https://tap.rsvp/schema/1.0#Escrow"`
+- **`type`** – REQUIRED Message type: `"https://tap.rsvp/schema/1.0#Lock"`
 - **`id`** – REQUIRED Unique message identifier
 - **`thid`** – OPTIONAL Thread identifier for related messages. Eg. a `Payment` ([TAIP-14])
 - **`created_time`** – REQUIRED Message creation timestamp
@@ -62,7 +62,7 @@ The DIDComm message envelope contains:
 
 The message `body` contains:
 - **`@context`** – REQUIRED JSON-LD context: `"https://tap.rsvp/schema/1.0"`
-- **`@type`** – REQUIRED Type identifier: `"https://tap.rsvp/schema/1.0#Escrow"`
+- **`@type`** – REQUIRED Type identifier: `"https://tap.rsvp/schema/1.0#Lock"`
 - **`asset`** – OPTIONAL The specific cryptocurrency asset to be held in escrow ([CAIP-19] identifier). Either `asset` OR `currency` MUST be present
 - **`currency`** – OPTIONAL ISO 4217 currency code (e.g. "USD", "EUR") for fiat-denominated escrows. Either `asset` OR `currency` MUST be present
 - **`amount`** – REQUIRED The amount to be held in escrow (string decimal)
@@ -78,7 +78,7 @@ An escrow progresses through the following states:
 
 ```mermaid
 stateDiagram-v2
-    [*] --> Requested : Escrow
+    [*] --> Requested : Lock
     Requested --> Accepted : Authorize (from EscrowAgent)
     Requested --> Rejected : Reject
     Accepted --> Active : Settle (from originator's agent)
@@ -95,7 +95,7 @@ stateDiagram-v2
 
 The escrow workflow follows this sequence:
 
-1. **Escrow Request**: Initiating agent sends Escrow message to all involved agents
+1. **Lock Request**: Initiating agent sends Lock message to all involved agents
 2. **Escrow Acceptance**: The EscrowAgent responds with Authorize to accept the escrow role
    - If EscrowAgent also acts `for` the originator, funds are locked internally
    - Otherwise, Authorize MUST include a `settlementAddress` for the originator to send funds
@@ -134,7 +134,7 @@ The DIDComm message envelope contains:
 - **`to`** – REQUIRED Array containing [DID] of the EscrowAgent
 - **`type`** – REQUIRED Message type: `"https://tap.rsvp/schema/1.0#Capture"`
 - **`id`** – REQUIRED Unique message identifier
-- **`thid`** – REQUIRED Thread identifier linking to the original Escrow message
+- **`thid`** – REQUIRED Thread identifier linking to the original Lock message
 
 The message `body` contains:
 - **`@context`** – REQUIRED JSON-LD context: `"https://tap.rsvp/schema/1.0"`
@@ -149,14 +149,14 @@ This example shows a merchant requesting a payment guarantee from a customer, fo
 ```json
 {
   "id": "123e4567-e89b-12d3-a456-426614174000",
-  "type": "https://tap.rsvp/schema/1.0#Escrow",
+  "type": "https://tap.rsvp/schema/1.0#Lock",
   "from": "did:web:merchant.example",
   "to": ["did:web:paymentprocessor.example"],
   "created_time": 1719226800,
   "expires_time": 1719313200,
   "body": {
     "@context": "https://tap.rsvp/schema/1.0",
-    "@type": "https://tap.rsvp/schema/1.0#Escrow",
+    "@type": "https://tap.rsvp/schema/1.0#Lock",
     "asset": "eip155:1/erc20:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
     "amount": "100.00",
     "originator": {
@@ -198,12 +198,12 @@ This example demonstrates an atomic swap between two parties where each party cr
 ```json
 {
   "id": "swap-alice-to-bob",
-  "type": "https://tap.rsvp/schema/1.0#Escrow",
+  "type": "https://tap.rsvp/schema/1.0#Lock",
   "from": "did:web:alice.wallet",
   "to": ["did:web:swap.service"],
   "body": {
     "@context": "https://tap.rsvp/schema/1.0",
-    "@type": "https://tap.rsvp/schema/1.0#Escrow",
+    "@type": "https://tap.rsvp/schema/1.0#Lock",
     "asset": "eip155:1/erc20:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
     "amount": "100.00",
     "originator": {
@@ -246,12 +246,12 @@ This example shows an escrow denominated in fiat currency:
 ```json
 {
   "id": "789e0123-e89b-12d3-a456-426614174003",
-  "type": "https://tap.rsvp/schema/1.0#Escrow",
+  "type": "https://tap.rsvp/schema/1.0#Lock",
   "from": "did:web:marketplace.example",
   "to": ["did:web:escrow.bank"],
   "body": {
     "@context": "https://tap.rsvp/schema/1.0",
-    "@type": "https://tap.rsvp/schema/1.0#Escrow",
+    "@type": "https://tap.rsvp/schema/1.0#Lock",
     "currency": "USD",
     "amount": "500.00",
     "originator": {
@@ -292,12 +292,12 @@ This example shows the originator's wallet provider acting as the escrow agent:
 ```json
 {
   "id": "internal-escrow-123",
-  "type": "https://tap.rsvp/schema/1.0#Escrow",
+  "type": "https://tap.rsvp/schema/1.0#Lock",
   "from": "did:web:alice.wallet",
   "to": ["did:web:alice.wallet"],
   "body": {
     "@context": "https://tap.rsvp/schema/1.0",
-    "@type": "https://tap.rsvp/schema/1.0#Escrow",
+    "@type": "https://tap.rsvp/schema/1.0#Lock",
     "asset": "eip155:1/erc20:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
     "amount": "250.00",
     "originator": {
@@ -334,12 +334,12 @@ This example shows an escrow agent requiring verification before accepting the e
 ```json
 {
   "id": "policy-escrow-456",
-  "type": "https://tap.rsvp/schema/1.0#Escrow",
+  "type": "https://tap.rsvp/schema/1.0#Lock",
   "from": "did:web:marketplace.example",
   "to": ["did:web:compliant.escrow"],
   "body": {
     "@context": "https://tap.rsvp/schema/1.0",
-    "@type": "https://tap.rsvp/schema/1.0#Escrow",
+    "@type": "https://tap.rsvp/schema/1.0#Lock",
     "asset": "eip155:1/erc20:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
     "amount": "1000.00",
     "originator": {
@@ -388,7 +388,7 @@ In this example:
 
 ### Composability with Other TAP Messages
 
-The Escrow workflow is designed to be composable with other TAP messages:
+The escrow workflow is designed to be composable with other TAP messages:
 
 1. **With Transfer**: An escrow can be created as part of a Transfer flow
 2. **With Payment**: Merchants can require escrow before shipping goods
@@ -472,13 +472,13 @@ The `expiry` timestamp is required for all escrows:
 
 ## Privacy Considerations
 
-1. **Minimal Disclosure**: Escrow messages should not contain unnecessary party information
+1. **Minimal Disclosure**: Lock messages should not contain unnecessary party information
 2. **Selective Revelation**: Use [TAIP-8] for sharing additional details only when required
 3. **Transaction Linkability**: Multiple escrows may be linkable if using same agents
 
 ## Backwards Compatibility
 
-This TAIP introduces a new message type and does not modify existing messages. Agents not supporting Escrow will reject such messages as unsupported, maintaining compatibility with existing TAP implementations.
+This TAIP introduces a new message type and does not modify existing messages. Agents not supporting Lock will reject such messages as unsupported, maintaining compatibility with existing TAP implementations.
 
 ## References
 

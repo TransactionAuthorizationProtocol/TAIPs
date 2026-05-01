@@ -1,18 +1,18 @@
 {
-  "description": "Invalid escrow request missing beneficiary",
-  "purpose": "Validates that escrow messages must include a beneficiary",
+  "description": "Invalid lock request missing beneficiary",
+  "purpose": "Validates that Lock messages must include a beneficiary",
   "shouldPass": false,
   "version": "1.0.0",
   "taips": ["taip-2", "taip-17"],
   "message": {
     "id": "550e8400-e29b-41d4-a716-446655440001",
-    "type": "https://tap.rsvp/schema/1.0#Escrow",
+    "type": "https://tap.rsvp/schema/1.0#Lock",
     "from": "did:web:buyer.example",
     "to": ["did:web:escrow-service.example"],
     "created_time": 1709654400,
     "body": {
       "@context": "https://tap.rsvp/schema/1.0",
-      "@type": "https://tap.rsvp/schema/1.0#Escrow",
+      "@type": "https://tap.rsvp/schema/1.0#Lock",
       "asset": "eip155:1/erc20:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
       "amount": "1000.00",
       "originator": {
@@ -36,7 +36,7 @@
     "valid": false,
     "error": {
       "type": "ValidationError",
-      "message": "Escrow message must include a beneficiary"
+      "message": "Lock message must include a beneficiary"
     }
   }
 }

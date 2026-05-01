@@ -20,7 +20,7 @@ import type {
   Payment,
   RFQ,
   Quote,
-  Escrow,
+  Lock,
   Capture,
   Authorize,
   Connect,
@@ -32,7 +32,7 @@ import type {
   PaymentMessage,
   RFQMessage,
   QuoteMessage,
-  EscrowMessage,
+  LockMessage,
   CaptureMessage,
   AuthorizeMessage,
   ConnectMessage,
@@ -304,10 +304,10 @@ export const quote = (): fc.Arbitrary<Quote> =>
     )
   });
 
-export const escrow = (): fc.Arbitrary<Escrow> =>
+export const lock = (): fc.Arbitrary<Lock> =>
   fc.record({
     "@context": fc.constant("https://tap.rsvp/schema/1.0" as const),
-    "@type": fc.constant("Escrow" as const),
+    "@type": fc.constant("Lock" as const),
     asset: caip19(),
     amount: amount(),
     originator: party(),
@@ -450,14 +450,14 @@ export const quoteMessage = (): fc.Arbitrary<QuoteMessage> =>
     body: quote()
   });
 
-export const escrowMessage = (): fc.Arbitrary<EscrowMessage> =>
+export const lockMessage = (): fc.Arbitrary<LockMessage> =>
   fc.record({
     id: uuid(),
-    type: fc.constant("https://tap.rsvp/schema/1.0#Escrow" as const),
+    type: fc.constant("https://tap.rsvp/schema/1.0#Lock" as const),
     from: did(),
     to: fc.array(did(), { minLength: 1, maxLength: 1 }),
     created_time: fc.integer({ min: Date.now() - 86400000, max: Date.now() }),
-    body: escrow(),
+    body: lock(),
     thid: fc.option(uuid(), { nil: undefined })
   });
 
@@ -544,7 +544,7 @@ export const tapMessage = (): fc.Arbitrary<TAPMessage> =>
     paymentMessage(),
     rfqMessage(),
     quoteMessage(),
-    escrowMessage(),
+    lockMessage(),
     captureMessage(),
     authorizeMessage(),
     connectMessage(),
@@ -586,7 +586,7 @@ export const arbitraries = {
     payment: () => payment(),
     rfq: () => rfq(),
     quote: () => quote(),
-    escrow: () => escrow(),
+    lock: () => lock(),
     capture: () => capture(),
     authorize: () => authorize(),
     connect: () => connect(),
@@ -602,7 +602,7 @@ export const arbitraries = {
     paymentMessage: () => paymentMessage(),
     rfqMessage: () => rfqMessage(),
     quoteMessage: () => quoteMessage(),
-    escrowMessage: () => escrowMessage(),
+    lockMessage: () => lockMessage(),
     captureMessage: () => captureMessage(),
     authorizeMessage: () => authorizeMessage(),
     connectMessage: () => connectMessage(),

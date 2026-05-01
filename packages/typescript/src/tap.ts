@@ -14,7 +14,7 @@
  * ## Core Message Types
  * - `Transfer` - Initiate asset transfers between parties
  * - `Payment` - Request payments from customers (merchant-initiated)
- * - `Escrow` - Hold assets in escrow with conditional release
+ * - `Lock` - Hold assets in escrow with conditional release
  * - `Authorize` - Approve transactions after compliance checks
  * - `Connect` - Establish connections between agents
  * - `Settle` - Confirm on-chain settlement
@@ -1107,9 +1107,9 @@ export type Policies =
  *
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-3.md | TAIP-3: Transfer Message}
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-14.md | TAIP-14: Payment Request}
- * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-17.md | TAIP-17: Escrow}
+ * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-17.md | TAIP-17: Composable Escrow}
  */
-export type Transactions = Transfer | Payment | RFQ | Escrow;
+export type Transactions = Transfer | Payment | RFQ | Lock;
 
 /**
  * Transfer Message
@@ -2244,13 +2244,13 @@ export interface AuthorizationRequiredMessage
 }
 
 /**
- * Escrow Message
- * Requests an agent to hold assets in escrow on behalf of parties.
+ * Lock Message
+ * Requests an agent to hold (lock) assets in escrow on behalf of parties.
  * Enables payment guarantees, asset swaps, and conditional payments.
  *
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-17.md | TAIP-17: Composable Escrow}
  */
-export interface Escrow extends TapMessageObject<"Escrow"> {
+export interface Lock extends TapMessageObject<"Lock"> {
   /**
    * Asset to be held in escrow
    * CAIP-19 identifier for blockchain assets
@@ -2326,14 +2326,14 @@ export interface Capture extends TapMessageObject<"Capture"> {
 }
 
 /**
- * Escrow Message Wrapper
- * DIDComm envelope for an Escrow message.
+ * Lock Message Wrapper
+ * DIDComm envelope for a Lock message.
  *
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-2.md | TAIP-2: Message Format}
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-17.md | TAIP-17: Composable Escrow}
  */
-export interface EscrowMessage extends DIDCommMessage<Escrow> {
-  type: "https://tap.rsvp/schema/1.0#Escrow";
+export interface LockMessage extends DIDCommMessage<Lock> {
+  type: "https://tap.rsvp/schema/1.0#Lock";
 }
 
 /**
@@ -2443,7 +2443,7 @@ export type TAPMessage =
   | UpdatePoliciesMessage
   | ConnectMessage
   | AuthorizationRequiredMessage
-  | EscrowMessage
+  | LockMessage
   | CaptureMessage
   | PresentationMessage;
 
@@ -2463,7 +2463,7 @@ export type TAPMessage =
  * - TAIP-3: Transfer Message → {@link Transfer}, {@link TransferMessage}
  * - TAIP-4: Authorization Flow → {@link Authorize}, {@link Settle}, {@link Reject}, {@link Cancel}, {@link Revert}, {@link AuthorizationRequired}
  * - TAIP-14: Payment Request → {@link Payment}, {@link PaymentMessage}
- * - TAIP-17: Composable Escrow → {@link Escrow}, {@link Capture}, {@link EscrowMessage}, {@link CaptureMessage}
+ * - TAIP-17: Composable Escrow → {@link Lock}, {@link Capture}, {@link LockMessage}, {@link CaptureMessage}
  * - TAIP-18: Asset Exchange → {@link RFQ}, {@link Quote}, {@link RFQMessage}, {@link QuoteMessage}
  *
  * **Participant Management:**

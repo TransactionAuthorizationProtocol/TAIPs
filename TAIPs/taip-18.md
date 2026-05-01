@@ -365,15 +365,15 @@ After a Quote is accepted via Authorize, the provider can request escrow using [
 
 ```json
 {
-  "id": "escrow-for-exchange-123",
-  "type": "https://tap.rsvp/schema/1.0#Escrow",
+  "id": "lock-for-exchange-123",
+  "type": "https://tap.rsvp/schema/1.0#Lock",
   "from": "did:web:lp.example",
   "to": ["did:web:alice.wallet", "did:web:escrow.service"],
   "pthid": "quote-456",
   "created_time": 1719227000,
   "body": {
     "@context": "https://tap.rsvp/schema/1.0",
-    "@type": "https://tap.rsvp/schema/1.0#Escrow",
+    "@type": "https://tap.rsvp/schema/1.0#Lock",
     "asset": "eip155:1/erc20:0xA0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
     "amount": "1000.00",
     "originator": {
@@ -401,7 +401,7 @@ After a Quote is accepted via Authorize, the provider can request escrow using [
 }
 ```
 
-Note how the Escrow message:
+Note how the Lock message:
 - Uses `pthid: "quote-456"` to link to the accepted Quote
 - Sets the requester as `originator` (their funds go into escrow)
 - Sets the provider as `beneficiary` (they receive funds after exchange)
@@ -457,7 +457,7 @@ stateDiagram-v2
     [*] --> Requested : RFQ
     Requested --> Quoted : Quote received
     Quoted --> Authorized : Authorize sent
-    Authorized --> EscrowRequested : Escrow received (optional)
+    Authorized --> EscrowRequested : Lock received (optional)
     Authorized --> Settling : Direct settlement
     EscrowRequested --> EscrowActive : Escrow funded
     EscrowActive --> Settling : Capture sent
@@ -497,7 +497,7 @@ sequenceDiagram
 
 ### Exchange Flow with Escrow
 
-Either party can manage counterparty risk by requesting escrow after a Quote is accepted. This leverages [TAIP-17] Escrow messages with the `pthid` field linking to the Quote:
+Either party can manage counterparty risk by requesting escrow after a Quote is accepted. This leverages [TAIP-17] Lock messages with the `pthid` field linking to the Quote:
 
 ```mermaid
 sequenceDiagram
@@ -512,8 +512,8 @@ sequenceDiagram
     Requester->>Provider: Authorize (accept quote)
 
     Note over Provider: Provider wants escrow protection
-    Provider->>Requester: Escrow (pthid: quote-456)
-    Provider->>Escrow: Escrow (pthid: quote-456)
+    Provider->>Requester: Lock (pthid: quote-456)
+    Provider->>Escrow: Lock (pthid: quote-456)
 
     Escrow->>Requester: Authorize (accept escrow role)
     Escrow->>Provider: Authorize (settlement address)
@@ -552,14 +552,14 @@ sequenceDiagram
     Requester->>Provider: Authorize (accept quote)
 
     par Requester Escrow Setup
-        Provider->>Requester: Escrow A (requester's funds)
-        Provider->>EscrowA: Escrow A (pthid: quote-456)
+        Provider->>Requester: Lock A (requester's funds)
+        Provider->>EscrowA: Lock A (pthid: quote-456)
         EscrowA->>Requester: Authorize
         Requester->>Blockchain: Fund Escrow A
         Requester->>EscrowA: Settle
     and Provider Escrow Setup
-        Requester->>Provider: Escrow B (provider's funds)
-        Requester->>EscrowB: Escrow B (pthid: quote-456)
+        Requester->>Provider: Lock B (provider's funds)
+        Requester->>EscrowB: Lock B (pthid: quote-456)
         EscrowB->>Provider: Authorize
         Provider->>Blockchain: Fund Escrow B
         Provider->>EscrowB: Settle
@@ -615,7 +615,7 @@ sequenceDiagram
 ```
 
 Key aspects of the escrow flow:
-- **Uses `pthid`**: Escrow messages reference the Quote via parent thread ID
+- **Uses `pthid`**: Lock messages reference the Quote via parent thread ID
 - **Standard [TAIP-17] flow**: Follows established escrow patterns
 - **Flexible initiation**: Either party can request escrow
 - **Atomic execution**: With dual escrow, both complete or both fail
@@ -626,7 +626,7 @@ Key aspects of the escrow flow:
 TAIP-18 can be embedded as a subflow in:
 
 * `Payment` workflows ([TAIP-14]) for invoice settlement
-* `Escrow` workflows ([TAIP-17]) for guaranteed payment with FX conversion
+* `Lock` workflows ([TAIP-17]) for guaranteed payment with FX conversion
 * On-ramp/off-ramp flows between fiat and crypto assets
 * Cross-border remittance with currency conversion
 * Multi-asset portfolio rebalancing
