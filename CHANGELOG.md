@@ -17,6 +17,11 @@ This changelog focuses on:
 ## [2026-05-01]
 
 ### Changed
+- **TypeScript Package Extracted**: The `@taprsvp/types` TypeScript package has moved to its own repository at [TransactionAuthorizationProtocol/tap-ts](https://github.com/TransactionAuthorizationProtocol/tap-ts)
+  - Full git history preserved via `git mv`; use `git log --follow` in the new repo to trace any file back to its original commit in this repo
+  - The `packages/typescript/` directory has been removed from this repository
+  - NPM package name (`@taprsvp/types`) is unchanged — `npm install @taprsvp/types` continues to work
+  - Future TypeScript-specific changelog entries will live in the [tap-ts CHANGELOG](https://github.com/TransactionAuthorizationProtocol/tap-ts/blob/main/CHANGELOG.md)
 - **TAIP-17 Composable Escrow**: Status advanced from Draft to Review
 - **TAIP-17 Composable Escrow**: Renamed `Escrow` message type to `Lock` based on feedback from both payment and institutional users, who recognized the term as the standard name for this pattern in payments and institutional finance
   - Message type identifier `https://tap.rsvp/schema/1.0#Escrow` is now `https://tap.rsvp/schema/1.0#Lock`
@@ -86,7 +91,7 @@ This changelog focuses on:
   - Enables use cases: cross-asset payments, FX transactions, on/off-ramp services, cross-chain bridging
   - **Updated JSON Schemas**: Added exchange.json and quote.json message schemas
   - **Updated TypeScript Package v1.12.0**: Added Exchange and Quote interfaces and message wrappers
-    - See [packages/typescript/CHANGELOG.md](packages/typescript/CHANGELOG.md) for complete details
+    - See [tap-ts CHANGELOG](https://github.com/TransactionAuthorizationProtocol/tap-ts/blob/main/CHANGELOG.md) for complete details
   - **Updated Documentation**: Enhanced messages.md and transactions.md with Exchange and Quote documentation
 
 ## [2025-08-23]
@@ -103,13 +108,13 @@ This changelog focuses on:
   - Added CAIP-10 and CAIP-19 references for address and asset identifier standards
   - **Updated JSON Schemas**: Enhanced transaction-constraints.json schema to validate new constraint fields
   - **Updated TypeScript Package v1.11.0**: Enhanced TransactionConstraints interface and Zod validators
-    - See [packages/typescript/CHANGELOG.md](packages/typescript/CHANGELOG.md) for complete details
+    - See [tap-ts CHANGELOG](https://github.com/TransactionAuthorizationProtocol/tap-ts/blob/main/CHANGELOG.md) for complete details
 
 ## [2025-08-21]
 
 ### Added
 - **TypeScript Package v1.10.0**: Enhanced Zod v4 validation with strict ISO standards validation
-  - See [packages/typescript/CHANGELOG.md](packages/typescript/CHANGELOG.md) for complete details
+  - See [tap-ts CHANGELOG](https://github.com/TransactionAuthorizationProtocol/tap-ts/blob/main/CHANGELOG.md) for complete details
 
 ### Changed
 - **BREAKING: TAIP-15 Agent Connection Protocol**: Major restructure to support multi-party connections
@@ -130,16 +135,16 @@ This changelog focuses on:
   - Ensures consistency with TAIP-15 and TAIP-17 agent array requirements
 
 - **TypeScript Package v1.9.0**: Released with TAIP-15 agent restructuring support
-  - See [packages/typescript/CHANGELOG.md](packages/typescript/CHANGELOG.md) for complete details
+  - See [tap-ts CHANGELOG](https://github.com/TransactionAuthorizationProtocol/tap-ts/blob/main/CHANGELOG.md) for complete details
 
 - **TypeScript Package v1.8.0**: Released with enhanced DIDComm v2.1 support and new message types
-  - See [packages/typescript/CHANGELOG.md](packages/typescript/CHANGELOG.md) for complete details
+  - See [tap-ts CHANGELOG](https://github.com/TransactionAuthorizationProtocol/tap-ts/blob/main/CHANGELOG.md) for complete details
 
 ## [2025-08-18]
 
 ### Added
 - **TypeScript Package v1.7.0**: Released enhanced TypeScript library with comprehensive documentation and fixes
-  - See [packages/typescript/CHANGELOG.md](packages/typescript/CHANGELOG.md) for complete details
+  - See [tap-ts CHANGELOG](https://github.com/TransactionAuthorizationProtocol/tap-ts/blob/main/CHANGELOG.md) for complete details
 
 
 ## [2025-08-16]
@@ -176,7 +181,7 @@ This changelog focuses on:
   - Added privacy recommendations for selective disclosure of natural person information
   - Clarified that this capability was always supported by the JSON-LD extensibility but was not explicitly documented
 - **TypeScript Package v1.6.0**: Released enhanced TypeScript library with comprehensive documentation
-  - See [packages/typescript/CHANGELOG.md](packages/typescript/CHANGELOG.md) for complete details
+  - See [tap-ts CHANGELOG](https://github.com/TransactionAuthorizationProtocol/tap-ts/blob/main/CHANGELOG.md) for complete details
 
 ### Changed
 - **TAIP-6 (Transaction Parties)**: Enhanced documentation to explicitly describe IVMS101 data inclusion
@@ -217,7 +222,7 @@ This changelog focuses on:
 - **Purpose Code Types**: Added ISO 20022 External Purpose Code union types
   - ExternalPurposeCode: 331 standardized purpose codes  
   - ExternalCategoryPurposeCode: 48 category purpose codes
-  - See [packages/typescript/CHANGELOG.md](packages/typescript/CHANGELOG.md) for TypeScript implementation details
+  - See [tap-ts CHANGELOG](https://github.com/TransactionAuthorizationProtocol/tap-ts/blob/main/CHANGELOG.md) for TypeScript implementation details
 - **schema.org/Organization Attributes**: Added optional organization metadata fields to Agents and Parties
   - Based on schema.org/Organization standard
   - Added fields: `name`, `url`, `logo`, `description`, `email`, `telephone`
@@ -229,7 +234,7 @@ This changelog focuses on:
 
 ### Changed
 - **TypeScript Package (@taprsvp/types)**: Updated with RFC 8905 PayTo URI support, purpose code types, and schema.org attributes
-  - See [packages/typescript/CHANGELOG.md](packages/typescript/CHANGELOG.md) for complete details
+  - See [tap-ts CHANGELOG](https://github.com/TransactionAuthorizationProtocol/tap-ts/blob/main/CHANGELOG.md) for complete details
 - **JSON Schemas**:
   - Created `payto-uri.json` and `settlement-address.json` common schemas
   - Updated all message schemas to support new settlement address formats
@@ -274,7 +279,7 @@ This changelog focuses on:
   - Supports both cryptocurrency assets and fiat currency denominations
   - Enables payment guarantees and asset swap use cases
 - TypeScript Package: Added `by` field to Cancel interface
-  - See [packages/typescript/CHANGELOG.md](packages/typescript/CHANGELOG.md) for complete details
+  - See [tap-ts CHANGELOG](https://github.com/TransactionAuthorizationProtocol/tap-ts/blob/main/CHANGELOG.md) for complete details
 
 ### Removed
 - Complete message type (replaced by extended Authorize message)
