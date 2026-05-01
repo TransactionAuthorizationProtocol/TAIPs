@@ -1,0 +1,79 @@
+---
+layout: null
+permalink: /llms.txt
+sitemap: false
+---
+# TAP — Transaction Authorization Protocol
+
+> The Transaction Authorization Protocol (TAP) is an open, chain-agnostic messaging layer that adds identity, compliance, and multi-party authorization to blockchain transactions before they settle. TAP creates a separate authorization layer that operates independently from the blockchain settlement layer, allowing participants to exchange the necessary information, perform risk assessments, and implement compliance checks before funds move. TAP is donated by Notabene and is licensed CC BY-SA 4.0; the canonical source for every standard is the set of Transaction Authorization Improvement Proposals (TAIPs) listed below.
+
+Key concepts:
+
+- **Agents** — software acting on behalf of participants (VASPs, wallets, custodians, payment processors, AI agents) that exchange TAP messages.
+- **Parties** — the real-world legal or natural persons whose transaction is being authorized.
+- **Transaction message types** — Transfer (push), Payment (pull/merchant), RFQ + Quote (asset swap / FX), Lock + Capture (escrow).
+- **Authorization flow** — AuthorizationRequired, Authorize, Settle, Reject, Cancel, Revert.
+- **Identity & compliance** — IVMS101 Travel Rule data, LEI for institutions, hashed party names, ISO 20022 purpose codes, selective disclosure via W3C Verifiable Credentials.
+- **Transport** — DIDComm v2 over HTTPS, JSON-LD bodies, JWS signatures with optional JWE encryption.
+
+## Core resources
+
+- [TAP overview]({{ '/overview/' | absolute_url }}): high-level concepts, motivation, and how the authorization and settlement layers interact.
+- [TAP message reference]({{ '/messages/' | absolute_url }}): every message type, field, and a worked example.
+- [Transaction types]({{ '/transactions/' | absolute_url }}): business-level overview of Transfer, Payment, RFQ, and Lock.
+- [Authorization flow]({{ '/authorization/' | absolute_url }}): how Authorize / Settle / Reject / Cancel / Revert thread together.
+- [Parties]({{ '/parties/' | absolute_url }}) and [Agents]({{ '/agents/' | absolute_url }}): identity model used across all TAP messages.
+- [Developer resources]({{ '/developers/' | absolute_url }}): SDK pointers, JSON Schemas, test vectors.
+- [Changelog]({{ '/changelog/' | absolute_url }}): structural changes across TAIPs.
+- [JSON Schemas](https://github.com/TransactionAuthorizationProtocol/TAIPs/tree/main/schemas): JSON Schema 2020-12 definitions for every message and shared structure.
+- [Test vectors](https://github.com/TransactionAuthorizationProtocol/TAIPs/tree/main/test-vectors): valid + invalid examples for protocol implementers.
+- [TypeScript SDK (`@taprsvp/types`)](https://github.com/TransactionAuthorizationProtocol/tap-ts): published types for TAP messages.
+
+## TAIPs
+
+Every TAIP below links to the raw Markdown source on GitHub.
+
+{%- assign source_base = "https://raw.githubusercontent.com/TransactionAuthorizationProtocol/TAIPs/main/TAIPs" -%}
+{%- assign all_taips = site.pages | where_exp: "p", "p.path contains 'TAIPs/taip-'" | sort: "taip" -%}
+
+{%- assign final_taips = all_taips | where: "status", "Final" -%}
+{%- if final_taips.size > 0 %}
+### Final
+
+{% for t in final_taips -%}
+- [TAIP-{{ t.taip }}: {{ t.title }}]({{ source_base }}/taip-{{ t.taip }}.md){% if t.description %}: {{ t.description | strip_newlines }}{% endif %}
+{% endfor %}
+{%- endif %}
+
+{%- assign lastcall_taips = all_taips | where: "status", "Last Call" -%}
+{%- if lastcall_taips.size > 0 %}
+### Last Call
+
+{% for t in lastcall_taips -%}
+- [TAIP-{{ t.taip }}: {{ t.title }}]({{ source_base }}/taip-{{ t.taip }}.md){% if t.description %}: {{ t.description | strip_newlines }}{% endif %}
+{% endfor %}
+{%- endif %}
+
+{%- assign review_taips = all_taips | where: "status", "Review" -%}
+{%- if review_taips.size > 0 %}
+### Review
+
+{% for t in review_taips -%}
+- [TAIP-{{ t.taip }}: {{ t.title }}]({{ source_base }}/taip-{{ t.taip }}.md){% if t.description %}: {{ t.description | strip_newlines }}{% endif %}
+{% endfor %}
+{%- endif %}
+
+{%- assign draft_taips = all_taips | where: "status", "Draft" -%}
+{%- if draft_taips.size > 0 %}
+### Draft
+
+{% for t in draft_taips -%}
+- [TAIP-{{ t.taip }}: {{ t.title }}]({{ source_base }}/taip-{{ t.taip }}.md){% if t.description %}: {{ t.description | strip_newlines }}{% endif %}
+{% endfor %}
+{%- endif %}
+
+## Optional
+
+- [Site source on GitHub](https://github.com/TransactionAuthorizationProtocol/TAIPs): the canonical repository for all TAIPs and this site.
+- [Contributing guidelines](https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/CONTRIBUTING.md): how to propose a new TAIP or revise an existing one.
+- [TAP marketing site](https://tap.rsvp): high-level introduction and use-case explainers.

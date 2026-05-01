@@ -22,7 +22,7 @@
 title: Transaction Authorization Improvement Proposals
 description: >- # this means to ignore newlines until "baseurl:"
   Transaction Authorization Improvement Proposals (TAIPs) describe standards for off-chain authorizations of transactions between multiple parties.
-url: "" # the base hostname & protocol for your site, e.g. http://example.com
+url: "https://taips.tap.rsvp"
 github_username: TransactionAuthorizationProtocol
 repository: TransactionAuthorizationProtocol/TAIPs
 
