@@ -373,22 +373,22 @@ Initiates a payment request from a merchant to a customer.
 ```
 
 ### RFQ
-[TAIP-18] - Draft
+[TAIP-18] - Review
 
 Requests a quote for exchanging assets between different types or chains. Enables cross-asset quotes (e.g., USDC to EURC, USD to USDC).
 
 | Attribute | Type | Required | Status | Description |
 |-----------|------|----------|---------|-------------|
-| @context | string | Yes | Draft ([TAIP-18]) | JSON-LD context "https://tap.rsvp/schema/1.0" |
-| @type | string | Yes | Draft ([TAIP-18]) | JSON-LD type "https://tap.rsvp/schema/1.0#RFQ" |
-| fromAssets | array of string | Yes | Draft ([TAIP-18]) | Available source assets (CAIP-19, DTI, or ISO-4217 currency codes) |
-| toAssets | array of string | Yes | Draft ([TAIP-18]) | Desired target assets (CAIP-19, DTI, or ISO-4217 currency codes) |
-| fromAmount | string | No | Draft ([TAIP-18]) | Amount of source asset to exchange. Either fromAmount or toAmount must be provided |
-| toAmount | string | No | Draft ([TAIP-18]) | Amount of target asset desired. Either fromAmount or toAmount must be provided |
-| requester | [Party](#party) | Yes | Draft ([TAIP-18]) | Party requesting the exchange |
-| provider | [Party](#party) | No | Draft ([TAIP-18]) | Optional preferred liquidity provider. When omitted, RFQ can be broadcast to multiple providers |
-| agents | array of [Agent](#agent) | Yes | Draft ([TAIP-18]) | Array of agents involved in the RFQ |
-| policies | array of [Policy](#policy) | No | Draft ([TAIP-18]) | Optional compliance or presentation requirements |
+| @context | string | Yes | Review ([TAIP-18]) | JSON-LD context "https://tap.rsvp/schema/1.0" |
+| @type | string | Yes | Review ([TAIP-18]) | JSON-LD type "https://tap.rsvp/schema/1.0#RFQ" |
+| fromAssets | array of string | Yes | Review ([TAIP-18]) | Available source assets (CAIP-19, DTI, or ISO-4217 currency codes) |
+| toAssets | array of string | Yes | Review ([TAIP-18]) | Desired target assets (CAIP-19, DTI, or ISO-4217 currency codes) |
+| fromAmount | string | No | Review ([TAIP-18]) | Amount of source asset to exchange. Either fromAmount or toAmount must be provided |
+| toAmount | string | No | Review ([TAIP-18]) | Amount of target asset desired. Either fromAmount or toAmount must be provided |
+| requester | [Party](#party) | Yes | Review ([TAIP-18]) | Party requesting the exchange |
+| provider | [Party](#party) | No | Review ([TAIP-18]) | Optional preferred liquidity provider. When omitted, RFQ can be broadcast to multiple providers |
+| agents | array of [Agent](#agent) | Yes | Review ([TAIP-18]) | Array of agents involved in the RFQ |
+| policies | array of [Policy](#policy) | No | Review ([TAIP-18]) | Optional compliance or presentation requirements |
 
 #### Example
 ```json
@@ -432,21 +432,21 @@ Requests a quote for exchanging assets between different types or chains. Enable
 ```
 
 ### Quote
-[TAIP-18] - Draft
+[TAIP-18] - Review
 
 Response to an RFQ providing pricing and terms. Sent by liquidity providers or orchestrators with specific rates.
 
 | Attribute | Type | Required | Status | Description |
 |-----------|------|----------|---------|-------------|
-| @context | string | Yes | Draft ([TAIP-18]) | JSON-LD context "https://tap.rsvp/schema/1.0" |
-| @type | string | Yes | Draft ([TAIP-18]) | JSON-LD type "https://tap.rsvp/schema/1.0#Quote" |
-| fromAsset | string | Yes | Draft ([TAIP-18]) | Source asset for the exchange (CAIP-19, DTI, or ISO-4217 currency code) |
-| toAsset | string | Yes | Draft ([TAIP-18]) | Target asset for the exchange (CAIP-19, DTI, or ISO-4217 currency code) |
-| fromAmount | string | Yes | Draft ([TAIP-18]) | Amount of source asset to be exchanged |
-| toAmount | string | Yes | Draft ([TAIP-18]) | Amount of target asset to be received |
-| provider | [Party](#party) | Yes | Draft ([TAIP-18]) | Liquidity provider party information |
-| agents | array of [Agent](#agent) | Yes | Draft ([TAIP-18]) | Array of agents involved in the quote |
-| expiresAt | string | Yes | Draft ([TAIP-18]) | ISO 8601 timestamp when quote expires |
+| @context | string | Yes | Review ([TAIP-18]) | JSON-LD context "https://tap.rsvp/schema/1.0" |
+| @type | string | Yes | Review ([TAIP-18]) | JSON-LD type "https://tap.rsvp/schema/1.0#Quote" |
+| fromAsset | string | Yes | Review ([TAIP-18]) | Source asset for the exchange (CAIP-19, DTI, or ISO-4217 currency code) |
+| toAsset | string | Yes | Review ([TAIP-18]) | Target asset for the exchange (CAIP-19, DTI, or ISO-4217 currency code) |
+| fromAmount | string | Yes | Review ([TAIP-18]) | Amount of source asset to be exchanged |
+| toAmount | string | Yes | Review ([TAIP-18]) | Amount of target asset to be received |
+| provider | [Party](#party) | Yes | Review ([TAIP-18]) | Liquidity provider party information |
+| agents | array of [Agent](#agent) | Yes | Review ([TAIP-18]) | Array of agents involved in the quote |
+| expiresAt | string | Yes | Review ([TAIP-18]) | ISO 8601 timestamp when quote expires |
 
 #### Example
 ```json

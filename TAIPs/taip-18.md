@@ -1,7 +1,7 @@
 ---
 taip: 18
 title: Asset Exchange
-status: Draft
+status: Review
 type: Standard
 author: Tarek Mohammad <tarek.mohammad@notabene.id>, Pelle Braendgaard <pelle@notabene.id>
 created: 2025-07-20
