@@ -17,6 +17,7 @@ This changelog focuses on:
 ## [2026-05-01]
 
 ### Changed
+- **TAIP-18 Asset Exchange**: Status advanced from Draft to Review
 - **TAIP-18 Asset Exchange**: Renamed `Exchange` message type to `RFQ` (Request for Quote) based on feedback from both payment and institutional users, who recognized the term as the standard name for this pattern in payments and institutional finance
   - Message type identifier `https://tap.rsvp/schema/1.0#Exchange` is now `https://tap.rsvp/schema/1.0#RFQ`
   - JSON-LD `@type` value changed from `Exchange` to `RFQ`
