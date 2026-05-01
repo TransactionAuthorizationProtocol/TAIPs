@@ -1,7 +1,7 @@
 ---
 taip: 17
 title: Composable Escrow
-status: Draft
+status: Review
 type: Standard
 author: Pelle Braendgaard <pelle@notabene.id>
 created: 2025-06-24

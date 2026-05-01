@@ -487,22 +487,22 @@ Response to an RFQ providing pricing and terms. Sent by liquidity providers or o
 ```
 
 ### Lock
-[TAIP-17] - Draft
+[TAIP-17] - Review
 
 Requests an agent to hold assets in escrow on behalf of parties, enabling payment guarantees and asset swaps.
 
 | Attribute | Type | Required | Status | Description |
 |-----------|------|----------|---------|-------------|
-| @context | string | Yes | Draft ([TAIP-17]) | JSON-LD context "https://tap.rsvp/schema/1.0" |
-| @type | string | Yes | Draft ([TAIP-17]) | JSON-LD type "https://tap.rsvp/schema/1.0#Lock" |
-| asset | string | No | Draft ([TAIP-17]) | CAIP-19 identifier for the specific cryptocurrency asset. Either asset OR currency must be present |
-| currency | string | No | Draft ([TAIP-17]) | ISO 4217 currency code for fiat-denominated escrows. Either asset OR currency must be present |
-| amount | string | Yes | Draft ([TAIP-17]) | Amount to be held in escrow (decimal string) |
-| originator | [Party](#party) | Yes | Draft ([TAIP-17]) | Party whose assets will be placed in escrow |
-| beneficiary | [Party](#party) | Yes | Draft ([TAIP-17]) | Party who will receive the assets when released |
-| expiry | string | Yes | Draft ([TAIP-17]) | ISO 8601 timestamp after which the escrow automatically expires |
-| agreement | string | No | Draft ([TAIP-17]) | URL or URI referencing the terms and conditions of the escrow |
-| agents | array of [Agent](#agent) | Yes | Draft ([TAIP-17]) | Array of agents involved in the escrow. Exactly one agent MUST have role "EscrowAgent" |
+| @context | string | Yes | Review ([TAIP-17]) | JSON-LD context "https://tap.rsvp/schema/1.0" |
+| @type | string | Yes | Review ([TAIP-17]) | JSON-LD type "https://tap.rsvp/schema/1.0#Lock" |
+| asset | string | No | Review ([TAIP-17]) | CAIP-19 identifier for the specific cryptocurrency asset. Either asset OR currency must be present |
+| currency | string | No | Review ([TAIP-17]) | ISO 4217 currency code for fiat-denominated escrows. Either asset OR currency must be present |
+| amount | string | Yes | Review ([TAIP-17]) | Amount to be held in escrow (decimal string) |
+| originator | [Party](#party) | Yes | Review ([TAIP-17]) | Party whose assets will be placed in escrow |
+| beneficiary | [Party](#party) | Yes | Review ([TAIP-17]) | Party who will receive the assets when released |
+| expiry | string | Yes | Review ([TAIP-17]) | ISO 8601 timestamp after which the escrow automatically expires |
+| agreement | string | No | Review ([TAIP-17]) | URL or URI referencing the terms and conditions of the escrow |
+| agents | array of [Agent](#agent) | Yes | Review ([TAIP-17]) | Array of agents involved in the escrow. Exactly one agent MUST have role "EscrowAgent" |
 
 #### Examples
 
@@ -851,16 +851,16 @@ Requests a reversal of a settled transaction. This could be part of a dispute re
 ```
 
 ### Capture
-[TAIP-17] - Draft
+[TAIP-17] - Review
 
 Authorizes the release of escrowed funds to the beneficiary. Only agents acting for the beneficiary can send this message.
 
 | Attribute | Type | Required | Status | Description |
 |-----------|------|----------|---------|-------------|
-| @context | string | Yes | Draft ([TAIP-17]) | JSON-LD context "https://tap.rsvp/schema/1.0" |
-| @type | string | Yes | Draft ([TAIP-17]) | JSON-LD type "https://tap.rsvp/schema/1.0#Capture" |
-| amount | string | No | Draft ([TAIP-17]) | Amount to capture (decimal string). If omitted, captures full escrow amount. Must be ≤ original amount |
-| settlementAddress | string | No | Draft ([TAIP-17]) | Blockchain address for settlement. If omitted, uses address from earlier Authorize |
+| @context | string | Yes | Review ([TAIP-17]) | JSON-LD context "https://tap.rsvp/schema/1.0" |
+| @type | string | Yes | Review ([TAIP-17]) | JSON-LD type "https://tap.rsvp/schema/1.0#Capture" |
+| amount | string | No | Review ([TAIP-17]) | Amount to capture (decimal string). If omitted, captures full escrow amount. Must be ≤ original amount |
+| settlementAddress | string | No | Review ([TAIP-17]) | Blockchain address for settlement. If omitted, uses address from earlier Authorize |
 
 > **Note:** The message refers to the original Lock message via the DIDComm `thid` (thread ID) in the message envelope.
 

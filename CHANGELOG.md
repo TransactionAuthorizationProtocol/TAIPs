@@ -17,6 +17,7 @@ This changelog focuses on:
 ## [2026-05-01]
 
 ### Changed
+- **TAIP-17 Composable Escrow**: Status advanced from Draft to Review
 - **TAIP-17 Composable Escrow**: Renamed `Escrow` message type to `Lock` based on feedback from both payment and institutional users, who recognized the term as the standard name for this pattern in payments and institutional finance
   - Message type identifier `https://tap.rsvp/schema/1.0#Escrow` is now `https://tap.rsvp/schema/1.0#Lock`
   - JSON-LD `@type` value changed from `Escrow` to `Lock`
