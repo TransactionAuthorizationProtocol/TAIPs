@@ -3,10 +3,12 @@ GEM
   specs:
     addressable (2.8.6)
       public_suffix (>= 2.0.2, < 6.0)
+    base64 (0.3.0)
     chef-utils (18.8.11)
       concurrent-ruby
     colorator (1.1.0)
     concurrent-ruby (1.2.2)
+    csv (3.3.5)
     em-websocket (0.5.3)
       eventmachine (>= 0.12.9)
       http_parser.rb (~> 0)
@@ -47,6 +49,7 @@ GEM
     listen (3.8.0)
       rb-fsevent (~> 0.10, >= 0.10.3)
       rb-inotify (~> 0.9, >= 0.9.10)
+    logger (1.7.0)
     mdl (0.11.0)
       kramdown (~> 2.3)
       kramdown-parser-gfm (~> 1.1)
@@ -85,9 +88,12 @@ PLATFORMS
   arm64-darwin-24
 
 DEPENDENCIES
+  base64
+  csv
   http_parser.rb (~> 0.6.0)
   jekyll (~> 4.2.2)
   jekyll-feed (~> 0.12)
+  logger
   mdl (~> 0.11)
   minima (~> 2.5)
   tzinfo (~> 1.2)

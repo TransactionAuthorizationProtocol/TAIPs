@@ -34,5 +34,11 @@ gem "http_parser.rb", "~> 0.6.0", :platforms => [:jruby]
 
 gem "webrick", "~> 1.8"
 
+# Jekyll 4.2.x relies on stdlib `logger` API that became incompatible
+# with Ruby 3.3+. Pinning the gem restores compatibility.
+gem "logger"
+gem "csv"
+gem "base64"
+
 # Markdown linter
 gem "mdl", "~> 0.11"
