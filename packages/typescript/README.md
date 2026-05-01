@@ -183,12 +183,12 @@ const agent = arbitraries.participants.agent();
 // Generate complete TAP message bodies
 const transfer = arbitraries.messageBodies.transfer();
 const payment = arbitraries.messageBodies.payment();
-const exchange = arbitraries.messageBodies.exchange();
+const rfq = arbitraries.messageBodies.rfq();
 const quote = arbitraries.messageBodies.quote();
-const escrow = arbitraries.messageBodies.escrow();
+const lock = arbitraries.messageBodies.lock();
 
 // All message types available:
-// transfer, payment, exchange, quote, escrow, capture,
+// transfer, payment, rfq, quote, lock, capture,
 // authorize, connect, settle, reject, cancel, revert
 ```
 
@@ -409,7 +409,7 @@ The package includes TypeScript interfaces for all TAP message types:
 |--------------|-------------|----------------|
 | `Transfer` | Asset transfer requests | [TAIP-3](https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-3.md) |
 | `Payment` | Merchant payment requests | [TAIP-14](https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-14.md) |
-| `Escrow` | Conditional asset holding | [TAIP-17](https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-17.md) |
+| `Lock` | Conditional asset holding | [TAIP-17](https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-17.md) |
 | `Authorize` | Transaction authorization | [TAIP-4](https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-4.md) |
 | `Connect` | Agent connection establishment | [TAIP-15](https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-15.md) |
 | `Settle` | Settlement confirmation | [TAIP-4](https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-4.md) |

@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://taips.tap.rsvp/schemas/messages/escrow.json",
-  "title": "Escrow Message",
-  "description": "Requests an agent to hold assets in escrow on behalf of parties",
+  "$id": "https://taips.tap.rsvp/schemas/messages/lock.json",
+  "title": "Lock Message",
+  "description": "Requests an agent to hold (lock) assets in escrow on behalf of parties",
   "type": "object",
   "allOf": [
     {
@@ -11,7 +11,7 @@
   ],
   "properties": {
     "type": {
-      "const": "https://tap.rsvp/schema/1.0#Escrow"
+      "const": "https://tap.rsvp/schema/1.0#Lock"
     },
     "body": {
       "type": "object",
@@ -30,7 +30,7 @@
           "description": "JSON-LD context"
         },
         "@type": {
-          "const": "https://tap.rsvp/schema/1.0#Escrow",
+          "const": "https://tap.rsvp/schema/1.0#Lock",
           "description": "Type identifier"
         },
         "asset": {

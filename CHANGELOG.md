@@ -17,6 +17,14 @@ This changelog focuses on:
 ## [2026-05-01]
 
 ### Changed
+- **TAIP-17 Composable Escrow**: Renamed `Escrow` message type to `Lock` based on feedback from both payment and institutional users, who recognized the term as the standard name for this pattern in payments and institutional finance
+  - Message type identifier `https://tap.rsvp/schema/1.0#Escrow` is now `https://tap.rsvp/schema/1.0#Lock`
+  - JSON-LD `@type` value changed from `Escrow` to `Lock`
+  - Schema file renamed from `schemas/messages/escrow.json` to `schemas/messages/lock.json`
+  - Test vectors moved from `test-vectors/escrow/` to `test-vectors/lock/`
+  - TypeScript: `Escrow`/`EscrowMessage` types renamed to `Lock`/`LockMessage`; validators and arbitraries renamed accordingly
+  - "Composable Escrow" remains the TAIP title and the `EscrowAgent` role name is preserved; only the specific message identifier changed
+  - TAIP-18 examples and flow diagrams updated to reference `Lock` instead of `Escrow`
 - **TAIP-18 Asset Exchange**: Status advanced from Draft to Review
 - **TAIP-18 Asset Exchange**: Renamed `Exchange` message type to `RFQ` (Request for Quote) based on feedback from both payment and institutional users, who recognized the term as the standard name for this pattern in payments and institutional finance
   - Message type identifier `https://tap.rsvp/schema/1.0#Exchange` is now `https://tap.rsvp/schema/1.0#RFQ`

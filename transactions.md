@@ -4,7 +4,7 @@ title: TAP Transaction Types
 permalink: /transactions/
 ---
 
-The Transaction Authorization Protocol (TAP) supports four primary transaction message types: **Transfer**, **Payment**, **Exchange**, and **Escrow**. All enable compliant blockchain transactions, but they serve different business needs and workflows.
+The Transaction Authorization Protocol (TAP) supports four primary transaction message types: **Transfer**, **Payment**, **RFQ**, and **Lock**. All enable compliant blockchain transactions, but they serve different business needs and workflows.
 
 ## Transfer
 
@@ -48,9 +48,9 @@ The **Payment** message type extends TAP to support merchant payment scenarios w
 - **Invoice Support**: Includes comprehensive invoice functionality as defined in [TAIP-16](/TAIPs/taip-16.md), supporting detailed line items, tax information, and payment terms
 - **Policy Support**: Can include policy requirements (e.g., RequirePresentation) for customer information needed for the transaction
 
-## Exchange
+## RFQ
 
-The **Exchange** message type enables asset swaps and cross-asset quotations, facilitating conversion between different cryptocurrencies or between fiat and crypto assets.
+The **RFQ** (Request for Quote) message type enables asset swaps and cross-asset quotations, facilitating conversion between different cryptocurrencies or between fiat and crypto assets.
 
 ### Business Use Cases
 
@@ -62,16 +62,16 @@ The **Exchange** message type enables asset swaps and cross-asset quotations, fa
 
 ### Key Characteristics
 
-- **Quote-Based Model**: Uses a two-step process with Exchange request and Quote response
+- **Quote-Based Model**: Uses a two-step process with RFQ and Quote response
 - **Multi-Asset Support**: Handles arrays of source and target assets for flexible routing
 - **Rate Discovery**: Enables competitive pricing through multiple provider quotes
 - **Settlement Flexibility**: Can be combined with existing Authorize/Settle flows from [TAIP-4](/TAIPs/taip-4.md)
 - **Escrow Integration**: Can leverage escrow mechanisms from [TAIP-17](/TAIPs/taip-17.md) for counterparty risk management
 - **Provider Agnostic**: Supports both centralized liquidity providers and decentralized protocols
 
-## Escrow
+## Lock
 
-The **Escrow** message type enables third-party custody of assets with conditional release, providing security guarantees for complex transactions.
+The **Lock** message type enables third-party custody of assets with conditional release, providing security guarantees for complex transactions.
 
 ### Business Use Cases
 
@@ -94,7 +94,7 @@ The **Escrow** message type enables third-party custody of assets with condition
 
 ## Business Differences
 
-| Aspect | Transfer | Payment | Exchange | Escrow |
+| Aspect | Transfer | Payment | RFQ | Lock |
 |--------|----------|---------|----------|--------|
 | **Initiator** | Originator (sender) | Beneficiary (receiver) | Requester (either party) | Any party (typically beneficiary) |
 | **Flow Direction** | Push (send) | Pull (request) | Quote-based (negotiate) | Conditional hold (escrow) |
@@ -110,8 +110,8 @@ When implementing TAP, organizations should consider which transaction type best
 
 - **Financial Institutions** typically focus on the Transfer message type to support customer withdrawals and institutional transfers
 - **Merchants and Service Providers** benefit from implementing the Payment flow to collect payments
-- **Liquidity Providers and Exchanges** use the Exchange flow to offer asset conversion services
-- **Escrow Services and High-Value Transaction Facilitators** implement Escrow flows to provide security guarantees
+- **Liquidity Providers and Exchanges** use the RFQ flow to offer asset conversion services
+- **Escrow Services and High-Value Transaction Facilitators** implement Lock flows to provide security guarantees
 - **Full-Service Platforms** may implement all four to support various business scenarios including payments, transfers, asset exchanges, and conditional transactions
 
 For technical details on these message types, including required attributes and examples, see the [full message reference](/messages/#transaction-message).

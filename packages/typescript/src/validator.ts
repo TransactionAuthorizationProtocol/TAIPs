@@ -306,9 +306,9 @@ export const QuoteSchema = TapMessageObjectSchema.merge(z.object({
   expiresAt: ISO8601DateTimeSchema
 }));
 
-/** Escrow message body validator */
-export const EscrowSchema = TapMessageObjectSchema.merge(z.object({
-  "@type": z.literal("Escrow"),
+/** Lock message body validator */
+export const LockSchema = TapMessageObjectSchema.merge(z.object({
+  "@type": z.literal("Lock"),
   asset: CAIP19Schema.optional(),
   currency: CurrencyCodeSchema.optional(),
   amount: AmountSchema,
@@ -392,10 +392,10 @@ export const QuoteMessageSchema = DIDCommReplySchema.merge(z.object({
   body: QuoteSchema
 }));
 
-/** Escrow DIDComm message validator */
-export const EscrowMessageSchema = DIDCommMessageSchema.merge(z.object({
-  type: z.literal("https://tap.rsvp/schema/1.0#Escrow"),
-  body: EscrowSchema
+/** Lock DIDComm message validator */
+export const LockMessageSchema = DIDCommMessageSchema.merge(z.object({
+  type: z.literal("https://tap.rsvp/schema/1.0#Lock"),
+  body: LockSchema
 }));
 
 /** Capture DIDComm reply validator */
@@ -414,7 +414,7 @@ export const TAPMessageSchema = z.discriminatedUnion("type", [
   PaymentMessageSchema,
   RFQMessageSchema,
   QuoteMessageSchema,
-  EscrowMessageSchema,
+  LockMessageSchema,
   CaptureMessageSchema,
   AuthorizeMessageSchema,
   ConnectMessageSchema,
@@ -490,8 +490,8 @@ export const validateRFQMessage = (message: unknown) => RFQMessageSchema.safePar
 /** Validates Quote messages */
 export const validateQuoteMessage = (message: unknown) => QuoteMessageSchema.safeParse(message);
 
-/** Validates Escrow messages */
-export const validateEscrowMessage = (message: unknown) => EscrowMessageSchema.safeParse(message);
+/** Validates Lock messages */
+export const validateLockMessage = (message: unknown) => LockMessageSchema.safeParse(message);
 
 /** Validates Capture messages */
 export const validateCaptureMessage = (message: unknown) => CaptureMessageSchema.safeParse(message);

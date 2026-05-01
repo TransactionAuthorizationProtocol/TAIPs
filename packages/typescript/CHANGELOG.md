@@ -5,6 +5,17 @@ All notable changes to the TypeScript package are documented in this file.
 ## [2.0.0] - 2026-05-01
 
 ### Changed (Breaking)
+- **TAIP-17 Lock rename**: Renamed `Escrow` message type to `Lock` based on feedback from both payment and institutional users, who recognized the term as the standard name for this pattern in payments and institutional finance
+  - `Escrow` interface → `Lock`
+  - `EscrowMessage` interface → `LockMessage`
+  - `EscrowSchema` validator → `LockSchema`
+  - `EscrowMessageSchema` validator → `LockMessageSchema`
+  - `validateEscrowMessage` → `validateLockMessage`
+  - `arbitraries.messageBodies.escrow` → `arbitraries.messageBodies.lock`
+  - `arbitraries.messages.escrowMessage` → `arbitraries.messages.lockMessage`
+  - DIDComm `type` URI updated from `https://tap.rsvp/schema/1.0#Escrow` to `https://tap.rsvp/schema/1.0#Lock`
+  - JSON-LD `@type` value updated from `Escrow` to `Lock`
+  - The `EscrowAgent` role name (in the `agents` array) is preserved
 - **TAIP-18 RFQ rename**: Renamed `Exchange` message type to `RFQ` (Request for Quote) based on feedback from both payment and institutional users, who recognized the term as the standard name for this pattern in payments and institutional finance
   - `Exchange` interface → `RFQ`
   - `ExchangeMessage` interface → `RFQMessage`

@@ -15,7 +15,7 @@
     },
     "thid": {
       "$ref": "../common/base-types.json#/$defs/uuid",
-      "description": "Thread identifier linking to the original Escrow message"
+      "description": "Thread identifier linking to the original Lock message"
     },
     "body": {
       "type": "object",
