@@ -279,9 +279,9 @@ export const RevertSchema = TapMessageObjectSchema.merge(z.object({
   txHash: z.string().optional()
 }));
 
-/** Exchange message body validator */
-export const ExchangeSchema = TapMessageObjectSchema.merge(z.object({
-  "@type": z.literal("Exchange"),
+/** RFQ message body validator */
+export const RFQSchema = TapMessageObjectSchema.merge(z.object({
+  "@type": z.literal("RFQ"),
   fromAssets: z.array(AssetSchema).min(1),
   toAssets: z.array(AssetSchema).min(1),
   fromAmount: AmountSchema.optional(),
@@ -380,10 +380,10 @@ export const RevertMessageSchema = DIDCommReplySchema.merge(z.object({
   body: RevertSchema
 }));
 
-/** Exchange DIDComm message validator */
-export const ExchangeMessageSchema = DIDCommMessageSchema.merge(z.object({
-  type: z.literal("https://tap.rsvp/schema/1.0#Exchange"),
-  body: ExchangeSchema
+/** RFQ DIDComm message validator */
+export const RFQMessageSchema = DIDCommMessageSchema.merge(z.object({
+  type: z.literal("https://tap.rsvp/schema/1.0#RFQ"),
+  body: RFQSchema
 }));
 
 /** Quote DIDComm reply validator */
@@ -412,7 +412,7 @@ export const CaptureMessageSchema = DIDCommReplySchema.merge(z.object({
 export const TAPMessageSchema = z.discriminatedUnion("type", [
   TransferMessageSchema,
   PaymentMessageSchema,
-  ExchangeMessageSchema,
+  RFQMessageSchema,
   QuoteMessageSchema,
   EscrowMessageSchema,
   CaptureMessageSchema,
@@ -484,8 +484,8 @@ export const validateCancelMessage = (message: unknown) => CancelMessageSchema.s
 /** Validates Revert messages */
 export const validateRevertMessage = (message: unknown) => RevertMessageSchema.safeParse(message);
 
-/** Validates Exchange messages */
-export const validateExchangeMessage = (message: unknown) => ExchangeMessageSchema.safeParse(message);
+/** Validates RFQ messages */
+export const validateRFQMessage = (message: unknown) => RFQMessageSchema.safeParse(message);
 
 /** Validates Quote messages */
 export const validateQuoteMessage = (message: unknown) => QuoteMessageSchema.safeParse(message);

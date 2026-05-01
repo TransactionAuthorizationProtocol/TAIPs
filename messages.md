@@ -372,7 +372,7 @@ Initiates a payment request from a merchant to a customer.
 }
 ```
 
-### Exchange
+### RFQ
 [TAIP-18] - Draft
 
 Requests a quote for exchanging assets between different types or chains. Enables cross-asset quotes (e.g., USDC to EURC, USD to USDC).
@@ -380,28 +380,28 @@ Requests a quote for exchanging assets between different types or chains. Enable
 | Attribute | Type | Required | Status | Description |
 |-----------|------|----------|---------|-------------|
 | @context | string | Yes | Draft ([TAIP-18]) | JSON-LD context "https://tap.rsvp/schema/1.0" |
-| @type | string | Yes | Draft ([TAIP-18]) | JSON-LD type "https://tap.rsvp/schema/1.0#Exchange" |
+| @type | string | Yes | Draft ([TAIP-18]) | JSON-LD type "https://tap.rsvp/schema/1.0#RFQ" |
 | fromAssets | array of string | Yes | Draft ([TAIP-18]) | Available source assets (CAIP-19, DTI, or ISO-4217 currency codes) |
 | toAssets | array of string | Yes | Draft ([TAIP-18]) | Desired target assets (CAIP-19, DTI, or ISO-4217 currency codes) |
 | fromAmount | string | No | Draft ([TAIP-18]) | Amount of source asset to exchange. Either fromAmount or toAmount must be provided |
 | toAmount | string | No | Draft ([TAIP-18]) | Amount of target asset desired. Either fromAmount or toAmount must be provided |
 | requester | [Party](#party) | Yes | Draft ([TAIP-18]) | Party requesting the exchange |
-| provider | [Party](#party) | No | Draft ([TAIP-18]) | Optional preferred liquidity provider. When omitted, Exchange can be broadcast to multiple providers |
-| agents | array of [Agent](#agent) | Yes | Draft ([TAIP-18]) | Array of agents involved in the exchange request |
+| provider | [Party](#party) | No | Draft ([TAIP-18]) | Optional preferred liquidity provider. When omitted, RFQ can be broadcast to multiple providers |
+| agents | array of [Agent](#agent) | Yes | Draft ([TAIP-18]) | Array of agents involved in the RFQ |
 | policies | array of [Policy](#policy) | No | Draft ([TAIP-18]) | Optional compliance or presentation requirements |
 
 #### Example
 ```json
 {
-  "id": "exchange-request-123",
-  "type": "https://tap.rsvp/schema/1.0#Exchange",
+  "id": "rfq-123",
+  "type": "https://tap.rsvp/schema/1.0#RFQ",
   "from": "did:web:wallet.example",
   "to": ["did:web:lp.example"],
   "created_time": 1719226800,
   "expires_time": 1719313200,
   "body": {
     "@context": "https://tap.rsvp/schema/1.0",
-    "@type": "https://tap.rsvp/schema/1.0#Exchange",
+    "@type": "https://tap.rsvp/schema/1.0#RFQ",
     "fromAssets": ["eip155:1/erc20:0xA0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"],
     "toAssets": ["eip155:1/erc20:0xB00b00b00b00b00b00b00b00b00b00b00b00b00b"],
     "fromAmount": "1000.00",
@@ -434,7 +434,7 @@ Requests a quote for exchanging assets between different types or chains. Enable
 ### Quote
 [TAIP-18] - Draft
 
-Response to an Exchange request providing pricing and terms. Sent by liquidity providers or orchestrators with specific rates.
+Response to an RFQ providing pricing and terms. Sent by liquidity providers or orchestrators with specific rates.
 
 | Attribute | Type | Required | Status | Description |
 |-----------|------|----------|---------|-------------|
@@ -455,7 +455,7 @@ Response to an Exchange request providing pricing and terms. Sent by liquidity p
   "type": "https://tap.rsvp/schema/1.0#Quote",
   "from": "did:web:lp.example",
   "to": ["did:web:wallet.example"],
-  "thid": "exchange-request-123",
+  "thid": "rfq-123",
   "created_time": 1719226850,
   "body": {
     "@context": "https://tap.rsvp/schema/1.0",

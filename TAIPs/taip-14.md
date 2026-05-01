@@ -5,7 +5,7 @@ status: Review
 type: Standard
 author: Pelle Braendgaard <pelle@notabene.id>
 created: 2024-03-21
-updated: 2025-09-05
+updated: 2026-05-01
 description: Defines a merchant-initiated Payment message standard for requesting blockchain payments with specified amounts in either crypto assets or fiat currencies. Enables selective disclosure of customer information for compliance and business purposes while facilitating standard e-commerce and invoice payment flows with privacy protection.
 requires: 2, 3, 4, 6, 7, 8, 9, 16, 18
 ---
@@ -38,7 +38,7 @@ A **Payment** is a [DIDComm] message (per [TAIP-2]) initiated by the merchant's 
 - **`asset`** – *Optional*, **string** ([CAIP-19] or [DTI] identifier) for the specific cryptocurrency being requested. Must be a blockchain asset identifier. Either `asset` OR `currency` is required (one must be present); if both are given, they should be consistent, with `asset` having precedence (the wallet should send in the asset specified, not based on currency).
 - **`currency`** – *Optional*, **string** (ISO 4217 currency code, e.g. "USD" or "EUR") for fiat-denominated payments. Either `asset` OR `currency` is required (one must be present). If `currency` is present, a wallet might not know which crypto asset the merchant prefers to settle this fiat amount; this is addressed by the `supportedAssets` field.
 - **`supportedAssets`** – *Optional*, **array of strings or objects** ([CAIP-19] or [DTI] asset identifiers, or pricing objects). If `currency` is given (fiat-denominated request), this field can list which crypto assets are acceptable to settle that currency amount. Each entry can be either:
-  - **String format**: A simple asset identifier (e.g., `"eip155:1/erc20:0xA0b86991..."`) for assets with ~1:1 exchange rates like stablecoins. Additional price negotiation may be needed offline or via Exchange/Quote messages from [TAIP-18].
+  - **String format**: A simple asset identifier (e.g., `"eip155:1/erc20:0xA0b86991..."`) for assets with ~1:1 exchange rates like stablecoins. Additional price negotiation may be needed offline or via RFQ/Quote messages from [TAIP-18].
   - **Object format**: A pricing object with `asset` (required [CAIP-19], [DTI] identifier, or [ISO-4217] currency code), `amount` (required string decimal representing how much of this asset or currency is needed), and optional `expires` (ISO 8601 timestamp when this exchange rate expires). For example: `{"asset": "eip155:1:0x...", "amount": "0.0004", "expires": "2025-07-30T15:00:00Z"}` indicates 0.0004 of the specified crypto asset is needed, or `{"asset": "EUR", "amount": "230.50", "expires": "2025-07-30T15:00:00Z"}` indicates €230.50 is needed to settle a USD invoice, with this rate valid until the expiration time.
   
   If `supportedAssets` is omitted for a fiat request, it implies the customer's wallet may choose any asset to settle that amount, subject to the merchant and wallet's out-of-band agreement or policy. When using object format, if `expires` is omitted, the rate follows the Payment's overall `expiry` timestamp.
@@ -216,7 +216,7 @@ The **AuthorizationRequired** message includes an `authorizationUrl` field point
 
 ### Composability
 
-Most simple payments involving a single blockchain and a single token transfer can be implemented using the `Payment` -> `Authorize` -> `Authorize` -> `Settle` flow. More complex payments may require asset conversion between different stablecoins or currencies. These scenarios can be handled using `Exchange` and `Quote` messages from [TAIP-18], with the Exchange referring to the parent Payment through the `pthid` field (see [TAIP-2]).
+Most simple payments involving a single blockchain and a single token transfer can be implemented using the `Payment` -> `Authorize` -> `Authorize` -> `Settle` flow. More complex payments may require asset conversion between different stablecoins or currencies. These scenarios can be handled using `RFQ` and `Quote` messages from [TAIP-18], with the RFQ referring to the parent Payment through the `pthid` field (see [TAIP-2]).
 
 ```mermaid
 sequenceDiagram
@@ -228,7 +228,7 @@ sequenceDiagram
     PSP->>CustomerWallet: Payment (USDT, 1000.00)
     Note over CustomerWallet: Customer only has EURC
     
-    CustomerWallet->>LiquidityProvider: Exchange (EURC → USDT, pthid: payment-id)
+    CustomerWallet->>LiquidityProvider: RFQ (EURC → USDT, pthid: payment-id)
     LiquidityProvider-->>CustomerWallet: Quote (908.50 EURC → 1000.00 USDT)
     
     CustomerWallet-->>LiquidityProvider: Authorize (accept quote)

@@ -2,6 +2,20 @@
 
 All notable changes to the TypeScript package are documented in this file.
 
+## [2.0.0] - 2026-05-01
+
+### Changed (Breaking)
+- **TAIP-18 RFQ rename**: Renamed `Exchange` message type to `RFQ` (Request for Quote) based on feedback from both payment and institutional users, who recognized the term as the standard name for this pattern in payments and institutional finance
+  - `Exchange` interface → `RFQ`
+  - `ExchangeMessage` interface → `RFQMessage`
+  - `ExchangeSchema` validator → `RFQSchema`
+  - `ExchangeMessageSchema` validator → `RFQMessageSchema`
+  - `validateExchangeMessage` → `validateRFQMessage`
+  - `arbitraries.messageBodies.exchange` → `arbitraries.messageBodies.rfq`
+  - `arbitraries.messages.exchangeMessage` → `arbitraries.messages.rfqMessage`
+  - DIDComm `type` URI updated from `https://tap.rsvp/schema/1.0#Exchange` to `https://tap.rsvp/schema/1.0#RFQ`
+  - JSON-LD `@type` value updated from `Exchange` to `RFQ`
+
 ## [1.14.0] - 2025-11-23
 
 ### Changed
