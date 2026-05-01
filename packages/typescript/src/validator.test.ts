@@ -38,7 +38,7 @@ import {
   // Message validators
   TransferSchema,
   PaymentSchema,
-  ExchangeSchema,
+  RFQSchema,
   QuoteSchema,
   EscrowSchema,
   CaptureSchema,
@@ -52,7 +52,7 @@ import {
   // DIDComm wrapped validators
   TransferMessageSchema,
   PaymentMessageSchema,
-  ExchangeMessageSchema,
+  RFQMessageSchema,
   QuoteMessageSchema,
   EscrowMessageSchema,
   CaptureMessageSchema,
@@ -70,7 +70,7 @@ import {
   isTAPMessage,
   validateTransferMessage,
   validatePaymentMessage,
-  validateExchangeMessage,
+  validateRFQMessage,
   validateQuoteMessage,
   validateEscrowMessage,
   validateCaptureMessage,
@@ -494,32 +494,32 @@ describe('TAP Message Validators', () => {
     });
   });
 
-  describe('ExchangeSchema', () => {
-    it('should validate exchange with fromAmount', () => {
-      const exchange = {
+  describe('RFQSchema', () => {
+    it('should validate RFQ with fromAmount', () => {
+      const rfq = {
         "@context": "https://tap.rsvp/schema/1.0",
-        "@type": "Exchange",
+        "@type": "RFQ",
         fromAssets: ["USD"],
         toAssets: ["eip155:1/erc20:0xA0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"],
         fromAmount: "1000.00",
         requester: validPerson,
         agents: [validAgent]
       };
-      expect(ExchangeSchema.safeParse(exchange).success).toBe(true);
+      expect(RFQSchema.safeParse(rfq).success).toBe(true);
     });
 
-    it('should validate generated exchange messages', () => {
+    it('should validate generated RFQ messages', () => {
       fc.assert(
-        fc.property(arbitraries.messageBodies.exchange(), (exchange) => {
-          expect(ExchangeSchema.safeParse(exchange).success).toBe(true);
+        fc.property(arbitraries.messageBodies.rfq(), (rfq) => {
+          expect(RFQSchema.safeParse(rfq).success).toBe(true);
         })
       );
     });
 
-    it('should validate exchange with toAmount', () => {
-      const exchange = {
+    it('should validate RFQ with toAmount', () => {
+      const rfq = {
         "@context": "https://tap.rsvp/schema/1.0",
-        "@type": "Exchange",
+        "@type": "RFQ",
         fromAssets: ["USD"],
         toAssets: ["EUR"],
         toAmount: "900.00",
@@ -527,45 +527,45 @@ describe('TAP Message Validators', () => {
         provider: validPerson,
         agents: [validAgent]
       };
-      expect(ExchangeSchema.safeParse(exchange).success).toBe(true);
+      expect(RFQSchema.safeParse(rfq).success).toBe(true);
     });
 
-    it('should validate exchange with multiple assets', () => {
-      const exchange = {
+    it('should validate RFQ with multiple assets', () => {
+      const rfq = {
         "@context": "https://tap.rsvp/schema/1.0",
-        "@type": "Exchange",
+        "@type": "RFQ",
         fromAssets: ["USD", "EUR"],
         toAssets: ["eip155:1/erc20:0xA0b86991c6218b36c1d19d4a2e9eb0ce3606eb48", "eip155:1/erc20:0x6b175474e89094c44da98b954eedeac495271d0f"],
         fromAmount: "1000.00",
         requester: validPerson,
         agents: [validAgent]
       };
-      expect(ExchangeSchema.safeParse(exchange).success).toBe(true);
+      expect(RFQSchema.safeParse(rfq).success).toBe(true);
     });
 
     it('should require either fromAmount or toAmount', () => {
-      const exchange = {
+      const rfq = {
         "@context": "https://tap.rsvp/schema/1.0",
-        "@type": "Exchange",
+        "@type": "RFQ",
         fromAssets: ["USD"],
         toAssets: ["EUR"],
         requester: validPerson,
         agents: [validAgent]
       };
-      expect(ExchangeSchema.safeParse(exchange).success).toBe(false);
+      expect(RFQSchema.safeParse(rfq).success).toBe(false);
     });
 
     it('should require at least one fromAsset and toAsset', () => {
-      const exchange = {
+      const rfq = {
         "@context": "https://tap.rsvp/schema/1.0",
-        "@type": "Exchange",
+        "@type": "RFQ",
         fromAssets: [],
         toAssets: ["EUR"],
         fromAmount: "1000.00",
         requester: validPerson,
         agents: [validAgent]
       };
-      expect(ExchangeSchema.safeParse(exchange).success).toBe(false);
+      expect(RFQSchema.safeParse(rfq).success).toBe(false);
     });
   });
 
@@ -756,9 +756,9 @@ describe('DIDComm Message Validators', () => {
     agents: [{ "@id": "did:example:agent", for: "did:example:alice", name: "Agent" }]
   };
 
-  const validExchangeBody = {
+  const validRFQBody = {
     "@context": "https://tap.rsvp/schema/1.0",
-    "@type": "Exchange",
+    "@type": "RFQ",
     fromAssets: ["USD"],
     toAssets: ["EUR"],
     fromAmount: "1000.00",
@@ -830,23 +830,23 @@ describe('DIDComm Message Validators', () => {
     });
   });
 
-  describe('ExchangeMessageSchema', () => {
-    it('should validate valid exchange messages', () => {
+  describe('RFQMessageSchema', () => {
+    it('should validate valid RFQ messages', () => {
       const message = {
         id: "01234567-89ab-4def-a123-456789abcdef",
-        type: "https://tap.rsvp/schema/1.0#Exchange",
+        type: "https://tap.rsvp/schema/1.0#RFQ",
         from: "did:example:sender",
         to: ["did:example:receiver"],
         created_time: Date.now(),
-        body: validExchangeBody
+        body: validRFQBody
       };
-      expect(ExchangeMessageSchema.safeParse(message).success).toBe(true);
+      expect(RFQMessageSchema.safeParse(message).success).toBe(true);
     });
 
-    it('should validate generated exchange messages', () => {
+    it('should validate generated RFQ messages', () => {
       fc.assert(
-        fc.property(arbitraries.messages.exchangeMessage(), (message) => {
-          expect(ExchangeMessageSchema.safeParse(message).success).toBe(true);
+        fc.property(arbitraries.messages.rfqMessage(), (message) => {
+          expect(RFQMessageSchema.safeParse(message).success).toBe(true);
         })
       );
     });
@@ -858,9 +858,9 @@ describe('DIDComm Message Validators', () => {
         from: "did:example:sender",
         to: ["did:example:receiver"],
         created_time: Date.now(),
-        body: validExchangeBody
+        body: validRFQBody
       };
-      expect(ExchangeMessageSchema.safeParse(message).success).toBe(false);
+      expect(RFQMessageSchema.safeParse(message).success).toBe(false);
     });
   });
 
@@ -1007,15 +1007,15 @@ describe('TAPMessageSchema (Discriminated Union)', () => {
       }
     };
 
-    const exchangeMessage = {
+    const rfqMessage = {
       id: "12345678-9abc-4def-a123-456789abcdef",
-      type: "https://tap.rsvp/schema/1.0#Exchange",
+      type: "https://tap.rsvp/schema/1.0#RFQ",
       from: "did:example:requester",
       to: ["did:example:provider"],
       created_time: Date.now(),
       body: {
         "@context": "https://tap.rsvp/schema/1.0",
-        "@type": "Exchange",
+        "@type": "RFQ",
         fromAssets: ["USD"],
         toAssets: ["EUR"],
         fromAmount: "1000.00",
@@ -1057,7 +1057,7 @@ describe('TAPMessageSchema (Discriminated Union)', () => {
     };
 
     expect(TAPMessageSchema.safeParse(transferMessage).success).toBe(true);
-    expect(TAPMessageSchema.safeParse(exchangeMessage).success).toBe(true);
+    expect(TAPMessageSchema.safeParse(rfqMessage).success).toBe(true);
     expect(TAPMessageSchema.safeParse(escrowMessage).success).toBe(true);
     expect(TAPMessageSchema.safeParse(authorizeMessage).success).toBe(true);
   });
@@ -1163,15 +1163,15 @@ describe('Validation Functions', () => {
   });
 
   describe('Message-specific validators', () => {
-    const validExchangeMessage = {
+    const validRFQMessage = {
       id: "12345678-9abc-4def-a123-456789abcdef",
-      type: "https://tap.rsvp/schema/1.0#Exchange",
+      type: "https://tap.rsvp/schema/1.0#RFQ",
       from: "did:example:requester",
       to: ["did:example:provider"],
       created_time: Date.now(),
       body: {
         "@context": "https://tap.rsvp/schema/1.0",
-        "@type": "Exchange",
+        "@type": "RFQ",
         fromAssets: ["USD"],
         toAssets: ["EUR"],
         fromAmount: "1000.00",
@@ -1238,8 +1238,8 @@ describe('Validation Functions', () => {
       expect(result.success).toBe(true);
     });
 
-    it('should validate exchange messages', () => {
-      const result = validateExchangeMessage(validExchangeMessage);
+    it('should validate RFQ messages', () => {
+      const result = validateRFQMessage(validRFQMessage);
       expect(result.success).toBe(true);
     });
 
@@ -1264,8 +1264,8 @@ describe('Validation Functions', () => {
       expect(result.success).toBe(false);
     });
 
-    it('should reject non-exchange messages for exchange validator', () => {
-      const result = validateExchangeMessage(validMessage);
+    it('should reject non-RFQ messages for RFQ validator', () => {
+      const result = validateRFQMessage(validMessage);
       expect(result.success).toBe(false);
     });
 

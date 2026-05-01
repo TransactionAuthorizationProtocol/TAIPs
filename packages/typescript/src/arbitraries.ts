@@ -18,7 +18,7 @@ import type {
   Agent,
   Transfer,
   Payment,
-  Exchange,
+  RFQ,
   Quote,
   Escrow,
   Capture,
@@ -30,7 +30,7 @@ import type {
   Revert,
   TransferMessage,
   PaymentMessage,
-  ExchangeMessage,
+  RFQMessage,
   QuoteMessage,
   EscrowMessage,
   CaptureMessage,
@@ -263,11 +263,11 @@ export const payment = (): fc.Arbitrary<Payment> =>
     purposeCode: fc.option(fc.constantFrom("TRAD", "SALA", "RENT", "INTC", "SUPP"), { nil: undefined })
   });
 
-export const exchange = (): fc.Arbitrary<Exchange> =>
+export const rfq = (): fc.Arbitrary<RFQ> =>
   fc.oneof(
     fc.record({
       "@context": fc.constant("https://tap.rsvp/schema/1.0" as const),
-      "@type": fc.constant("Exchange" as const),
+      "@type": fc.constant("RFQ" as const),
       fromAssets: fc.array(fc.oneof(caip19(), isoCurrency()), { minLength: 1, maxLength: 5 }),
       toAssets: fc.array(fc.oneof(caip19(), isoCurrency()), { minLength: 1, maxLength: 5 }),
       fromAmount: amount(),
@@ -277,7 +277,7 @@ export const exchange = (): fc.Arbitrary<Exchange> =>
     }),
     fc.record({
       "@context": fc.constant("https://tap.rsvp/schema/1.0" as const),
-      "@type": fc.constant("Exchange" as const),
+      "@type": fc.constant("RFQ" as const),
       fromAssets: fc.array(fc.oneof(caip19(), isoCurrency()), { minLength: 1, maxLength: 5 }),
       toAssets: fc.array(fc.oneof(caip19(), isoCurrency()), { minLength: 1, maxLength: 5 }),
       toAmount: amount(),
@@ -428,14 +428,14 @@ export const paymentMessage = (): fc.Arbitrary<PaymentMessage> =>
     thid: fc.option(uuid(), { nil: undefined })
   });
 
-export const exchangeMessage = (): fc.Arbitrary<ExchangeMessage> =>
+export const rfqMessage = (): fc.Arbitrary<RFQMessage> =>
   fc.record({
     id: uuid(),
-    type: fc.constant("https://tap.rsvp/schema/1.0#Exchange" as const),
+    type: fc.constant("https://tap.rsvp/schema/1.0#RFQ" as const),
     from: did(),
     to: fc.array(did(), { minLength: 1, maxLength: 1 }),
     created_time: fc.integer({ min: Date.now() - 86400000, max: Date.now() }),
-    body: exchange(),
+    body: rfq(),
     thid: fc.option(uuid(), { nil: undefined })
   });
 
@@ -541,8 +541,8 @@ export const revertMessage = (): fc.Arbitrary<RevertMessage> =>
 export const tapMessage = (): fc.Arbitrary<TAPMessage> =>
   fc.oneof(
     transferMessage(),
-    paymentMessage(), 
-    exchangeMessage(),
+    paymentMessage(),
+    rfqMessage(),
     quoteMessage(),
     escrowMessage(),
     captureMessage(),
@@ -584,7 +584,7 @@ export const arbitraries = {
   messageBodies: {
     transfer: () => transfer(),
     payment: () => payment(),
-    exchange: () => exchange(),
+    rfq: () => rfq(),
     quote: () => quote(),
     escrow: () => escrow(),
     capture: () => capture(),
@@ -600,7 +600,7 @@ export const arbitraries = {
   messages: {
     transferMessage: () => transferMessage(),
     paymentMessage: () => paymentMessage(),
-    exchangeMessage: () => exchangeMessage(),
+    rfqMessage: () => rfqMessage(),
     quoteMessage: () => quoteMessage(),
     escrowMessage: () => escrowMessage(),
     captureMessage: () => captureMessage(),

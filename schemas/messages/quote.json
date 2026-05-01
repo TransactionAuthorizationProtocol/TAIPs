@@ -75,7 +75,7 @@
             "$ref": "../data-structures/agent.json"
           },
           "minItems": 1,
-          "description": "Agents involved in the quote (must include all from original Exchange plus provider agents)"
+          "description": "Agents involved in the quote (must include all from original RFQ plus provider agents)"
         },
         "expiresAt": {
           "$ref": "../common/base-types.json#/$defs/iso8601DateTime",

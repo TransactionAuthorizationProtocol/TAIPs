@@ -5,8 +5,8 @@ status: Draft
 type: Standard
 author: Tarek Mohammad <tarek.mohammad@notabene.id>, Pelle Braendgaard <pelle@notabene.id>
 created: 2025-07-20
-updated: 2025-08-23
-description: Defines Exchange and Quote message types for requesting and executing token swaps and price quotations. Enables cross-asset quotes, swap route approval, and settlement with minimal trust assumptions while maintaining composability with existing TAP messages.
+updated: 2026-05-01
+description: Defines RFQ and Quote message types for requesting and executing token swaps and price quotations. Enables cross-asset quotes, swap route approval, and settlement with minimal trust assumptions while maintaining composability with existing TAP messages.
 requires: 2, 3, 4, 5, 6, 7, 8, 9, 14, 17
 ---
 
@@ -18,7 +18,7 @@ A standard for requesting and executing asset exchanges and price quotations for
 
 ## Abstract
 
-TAIP-18 introduces an Exchange message format for initiating cross-asset quotes (e.g., from USDC to EURC, USD to USDC, or across chains) and defines optional settlement support for accepted quotes. It is designed for composability with existing TAP messages like Payment ([TAIP-14]) and Transfer ([TAIP-3]). TAIP-18 formalizes the message exchange required to:
+TAIP-18 introduces an RFQ (Request for Quote) message format for initiating cross-asset quotes (e.g., from USDC to EURC, USD to USDC, or across chains) and defines optional settlement support for accepted quotes. It is designed for composability with existing TAP messages like Payment ([TAIP-14]) and Transfer ([TAIP-3]). TAIP-18 formalizes the message exchange required to:
 
 * Quote and approve stablecoin swaps
 * Discover on-/off-ramp pricing
@@ -41,21 +41,21 @@ TAIP-18 solves this by creating a compliant, composable quote & swap framework t
 
 ## Specification
 
-TAIP-18 defines two new message types for quote negotiation (`Exchange` and `Quote`) and reuses existing [TAIP-4] messages (`Authorize` and `Settle`) for quote acceptance and swap settlement:
+TAIP-18 defines two new message types for quote negotiation (`RFQ` and `Quote`) and reuses existing [TAIP-4] messages (`Authorize` and `Settle`) for quote acceptance and swap settlement:
 
-### 1. `Exchange`
+### 1. `RFQ`
 
-An **Exchange** is a [DIDComm] message (per [TAIP-2]) sent by the party initiating an exchange request. Like all TAP messages, it follows the DIDComm v2 message structure with the TAP-specific body format.
+An **RFQ** (Request for Quote) is a [DIDComm] message (per [TAIP-2]) sent by the party initiating a quote request. Like all TAP messages, it follows the DIDComm v2 message structure with the TAP-specific body format.
 
-The exchange request identifies the parties involved in the potential transaction and the agents acting on their behalf. The `requester` party represents the entity seeking the exchange. The optional `provider` party represents a specific liquidity provider being engaged; when omitted, the Exchange message can be broadcast through a centralized service or sent to multiple providers who can each choose to respond with a Quote. The `agents` array lists all software agents involved in processing this exchange request, including their roles and the parties they represent.
+The RFQ identifies the parties involved in the potential transaction and the agents acting on their behalf. The `requester` party represents the entity seeking the exchange. The optional `provider` party represents a specific liquidity provider being engaged; when omitted, the RFQ message can be broadcast through a centralized service or sent to multiple providers who can each choose to respond with a Quote. The `agents` array lists all software agents involved in processing this RFQ, including their roles and the parties they represent.
 
-The Exchange message supports multiple assets in both `fromAssets` and `toAssets` arrays, enabling complex exchange scenarios. For example, when responding to a Payment request ([TAIP-14]) that lists multiple EUR stablecoins as supportedAssets, but the customer only has USD stablecoins available, they can list their available USD tokens in `fromAssets` and the merchant's supported EUR tokens in `toAssets`, allowing providers to quote cross-currency exchanges.
+The RFQ message supports multiple assets in both `fromAssets` and `toAssets` arrays, enabling complex exchange scenarios. For example, when responding to a Payment request ([TAIP-14]) that lists multiple EUR stablecoins as supportedAssets, but the customer only has USD stablecoins available, they can list their available USD tokens in `fromAssets` and the merchant's supported EUR tokens in `toAssets`, allowing providers to quote cross-currency exchanges.
 
 The DIDComm message envelope contains:
 
 - **`from`** – REQUIRED [DID] of the initiating agent
 - **`to`** – REQUIRED Array containing [DID] of the liquidity providers or orchestrators
-- **`type`** – REQUIRED Message type: `"https://tap.rsvp/schema/1.0#Exchange"`
+- **`type`** – REQUIRED Message type: `"https://tap.rsvp/schema/1.0#RFQ"`
 - **`id`** – REQUIRED Unique message identifier
 - **`thid`** – OPTIONAL Thread identifier for related messages (e.g., a Payment from [TAIP-14])
 - **`created_time`** – REQUIRED Message creation timestamp
@@ -64,21 +64,21 @@ The DIDComm message envelope contains:
 The message `body` contains:
 
 - **`@context`** – REQUIRED JSON-LD context: `"https://tap.rsvp/schema/1.0"`
-- **`@type`** – REQUIRED Type identifier: `"https://tap.rsvp/schema/1.0#Exchange"`
+- **`@type`** – REQUIRED Type identifier: `"https://tap.rsvp/schema/1.0#RFQ"`
 - **`fromAssets`** – REQUIRED Array of [CAIP-19], DTI, or [ISO-4217] currency codes for available source assets
 - **`toAssets`** – REQUIRED Array of [CAIP-19], DTI, or [ISO-4217] currency codes for desired target assets
 - **`fromAmount`** – CONDITIONAL Amount of source asset to exchange (string decimal). Either `fromAmount` or `toAmount` must be provided
 - **`toAmount`** – CONDITIONAL Amount of target asset desired (string decimal). Either `fromAmount` or `toAmount` must be provided
 - **`requester`** – REQUIRED The party requesting the exchange (Party object per [TAIP-6])
-- **`provider`** – OPTIONAL The preferred liquidity provider party (Party object per [TAIP-6]). When omitted, the Exchange message can be broadcast to multiple providers
-- **`agents`** – REQUIRED Array of agents involved in the exchange request per [TAIP-5]
+- **`provider`** – OPTIONAL The preferred liquidity provider party (Party object per [TAIP-6]). When omitted, the RFQ message can be broadcast to multiple providers
+- **`agents`** – REQUIRED Array of agents involved in the RFQ per [TAIP-5]
 - **`policies`** – OPTIONAL Compliance or presentation requirements per [TAIP-7]
 
 ### 2. `Quote`
 
-A **Quote** is a [DIDComm] message sent by the liquidity provider or orchestrator in response to an Exchange request.
+A **Quote** is a [DIDComm] message sent by the liquidity provider or orchestrator in response to an RFQ.
 
-The quote response includes the `provider` party information and an updated `agents` array. The agents array must contain all agents from the original Exchange request plus any additional agents representing the provider. This ensures full traceability of all parties and agents involved in the potential transaction.
+The quote response includes the `provider` party information and an updated `agents` array. The agents array must contain all agents from the original RFQ plus any additional agents representing the provider. This ensures full traceability of all parties and agents involved in the potential transaction.
 
 The DIDComm message envelope contains:
 
@@ -86,7 +86,7 @@ The DIDComm message envelope contains:
 - **`to`** – REQUIRED Array containing [DID] of the original requester
 - **`type`** – REQUIRED Message type: `"https://tap.rsvp/schema/1.0#Quote"`
 - **`id`** – REQUIRED Unique message identifier
-- **`thid`** – REQUIRED Thread identifier linking to the original Exchange request
+- **`thid`** – REQUIRED Thread identifier linking to the original RFQ
 - **`created_time`** – REQUIRED Message creation timestamp
 
 The message `body` contains:
@@ -98,7 +98,7 @@ The message `body` contains:
 - **`fromAmount`** – REQUIRED Amount of source asset to be exchanged (string decimal)
 - **`toAmount`** – REQUIRED Amount of target asset to be received (string decimal)
 - **`provider`** – REQUIRED The liquidity provider party (Party object per [TAIP-6])
-- **`agents`** – REQUIRED Array of agents involved in the quote per [TAIP-5]. Must include all agents from the original Exchange request plus any provider agents
+- **`agents`** – REQUIRED Array of agents involved in the quote per [TAIP-5]. Must include all agents from the original RFQ plus any provider agents
 - **`expires`** – REQUIRED ISO 8601 timestamp when quote expires
 
 ### 3. Authorization and Settlement
@@ -125,21 +125,21 @@ When the swap is executed, the liquidity provider sends a `Settle` message (per 
 
 ## Example Messages
 
-### Exchange Example
+### RFQ Example
 
 This example shows a complete DIDComm message requesting an exchange from USDC to EURC:
 
 ```json
 {
-  "id": "exchange-request-123",
-  "type": "https://tap.rsvp/schema/1.0#Exchange",
+  "id": "rfq-123",
+  "type": "https://tap.rsvp/schema/1.0#RFQ",
   "from": "did:web:wallet.example",
   "to": ["did:web:lp.example", "did:web:lp2.example"],
   "created_time": 1719226800,
   "expires_time": 1719313200,
   "body": {
     "@context": "https://tap.rsvp/schema/1.0",
-    "@type": "https://tap.rsvp/schema/1.0#Exchange",
+    "@type": "https://tap.rsvp/schema/1.0#RFQ",
     "fromAssets": ["eip155:1/erc20:0xA0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"],
     "toAssets": ["eip155:1/erc20:0xB00b00b00b00b00b00b00b00b00b00b00b00b00b"],
     "fromAmount": "1000.00",
@@ -173,7 +173,7 @@ This example shows a complete DIDComm message requesting an exchange from USDC t
   "type": "https://tap.rsvp/schema/1.0#Quote",
   "from": "did:web:lp.example",
   "to": ["did:web:wallet.example"],
-  "thid": "exchange-request-123",
+  "thid": "rfq-123",
   "created_time": 1719226850,
   "body": {
     "@context": "https://tap.rsvp/schema/1.0",
@@ -248,18 +248,18 @@ This example shows swap settlement using the standard `Settle` message from [TAI
 
 ### Example: Fiat to Crypto Quote
 
-This example shows an exchange request from USD fiat to USDC stablecoin:
+This example shows an RFQ from USD fiat to USDC stablecoin:
 
 ```json
 {
-  "id": "fiat-exchange-request-111",
-  "type": "https://tap.rsvp/schema/1.0#Exchange",
+  "id": "fiat-rfq-111",
+  "type": "https://tap.rsvp/schema/1.0#RFQ",
   "from": "did:web:user.wallet",
   "to": ["did:web:onramp.provider"],
   "created_time": 1719230000,
   "body": {
     "@context": "https://tap.rsvp/schema/1.0",
-    "@type": "https://tap.rsvp/schema/1.0#Exchange",
+    "@type": "https://tap.rsvp/schema/1.0#RFQ",
     "fromAssets": ["USD"],
     "toAssets": ["eip155:1/erc20:0xA0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"],
     "fromAmount": "1000.00",
@@ -293,7 +293,7 @@ Response:
   "type": "https://tap.rsvp/schema/1.0#Quote",
   "from": "did:web:onramp.provider",
   "to": ["did:web:user.wallet"],
-  "thid": "fiat-exchange-request-111",
+  "thid": "fiat-rfq-111",
   "created_time": 1719230050,
   "body": {
     "@context": "https://tap.rsvp/schema/1.0",
@@ -322,20 +322,20 @@ Response:
 }
 ```
 
-### Example: Broadcast Exchange Request
+### Example: Broadcast RFQ
 
-This example shows an Exchange request broadcast to multiple providers without specifying a particular provider. The requester has USDC and USDT on Ethereum mainnet available and wants to exchange for either USDC or USDT on Polygon:
+This example shows an RFQ broadcast to multiple providers without specifying a particular provider. The requester has USDC and USDT on Ethereum mainnet available and wants to exchange for either USDC or USDT on Polygon:
 
 ```json
 {
-  "id": "broadcast-exchange-456",
-  "type": "https://tap.rsvp/schema/1.0#Exchange",
+  "id": "broadcast-rfq-456",
+  "type": "https://tap.rsvp/schema/1.0#RFQ",
   "from": "did:web:wallet.example",
   "to": ["did:web:exchange.platform", "did:web:lp1.example", "did:web:lp2.example"],
   "created_time": 1719228000,
   "body": {
     "@context": "https://tap.rsvp/schema/1.0",
-    "@type": "https://tap.rsvp/schema/1.0#Exchange",
+    "@type": "https://tap.rsvp/schema/1.0#RFQ",
     "fromAssets": [
       "eip155:1/erc20:0xA0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
       "eip155:1/erc20:0xdAC17F958D2ee523a2206206994597C13D831ec7"
@@ -409,18 +409,18 @@ Note how the Escrow message:
 
 ### Example: Cross-Currency FX Quote
 
-This example shows a pure FX exchange request between fiat currencies:
+This example shows a pure FX RFQ between fiat currencies:
 
 ```json
 {
-  "id": "fx-exchange-request-333",
-  "type": "https://tap.rsvp/schema/1.0#Exchange",
+  "id": "fx-rfq-333",
+  "type": "https://tap.rsvp/schema/1.0#RFQ",
   "from": "did:web:bank.example",
   "to": ["did:web:fx.provider"],
   "created_time": 1719231000,
   "body": {
     "@context": "https://tap.rsvp/schema/1.0",
-    "@type": "https://tap.rsvp/schema/1.0#Exchange",
+    "@type": "https://tap.rsvp/schema/1.0#RFQ",
     "fromAssets": ["USD"],
     "toAssets": ["EUR"],
     "fromAmount": "1000.00",
@@ -454,7 +454,7 @@ The following state diagram shows the possible states and transitions for an exc
 
 ```mermaid
 stateDiagram-v2
-    [*] --> Requested : Exchange
+    [*] --> Requested : RFQ
     Requested --> Quoted : Quote received
     Quoted --> Authorized : Authorize sent
     Authorized --> EscrowRequested : Escrow received (optional)
@@ -480,7 +480,7 @@ sequenceDiagram
     participant Provider as Provider Agent
     participant Blockchain
 
-    Requester->>Provider: Exchange (USDC → EURC)
+    Requester->>Provider: RFQ (USDC → EURC)
     Provider->>Requester: Quote (rates & amounts)
     Note over Requester: User reviews quote
     Requester->>Provider: Authorize (accept quote)
@@ -506,7 +506,7 @@ sequenceDiagram
     participant Escrow as Escrow Agent
     participant Blockchain
 
-    Requester->>Provider: Exchange (USDC → EURC)
+    Requester->>Provider: RFQ (USDC → EURC)
     Provider->>Requester: Quote (rates & amounts)
     Note over Requester: User reviews quote
     Requester->>Provider: Authorize (accept quote)
@@ -547,7 +547,7 @@ sequenceDiagram
     participant EscrowB as Escrow Agent B
     participant Blockchain
 
-    Requester->>Provider: Exchange (USDC → EURC)
+    Requester->>Provider: RFQ (USDC → EURC)
     Provider->>Requester: Quote (rates & amounts)
     Requester->>Provider: Authorize (accept quote)
 
@@ -592,9 +592,9 @@ sequenceDiagram
     participant LP3 as Provider 3
     participant Blockchain
 
-    Requester->>LP1: Exchange (multiple assets)
-    Requester->>LP2: Exchange (multiple assets)
-    Requester->>LP3: Exchange (multiple assets)
+    Requester->>LP1: RFQ (multiple assets)
+    Requester->>LP2: RFQ (multiple assets)
+    Requester->>LP3: RFQ (multiple assets)
 
     LP1->>Requester: Quote (rate: 0.91)
     LP2->>Requester: Quote (rate: 0.92)

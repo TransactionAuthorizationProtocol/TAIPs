@@ -1109,7 +1109,7 @@ export type Policies =
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-14.md | TAIP-14: Payment Request}
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-17.md | TAIP-17: Escrow}
  */
-export type Transactions = Transfer | Payment | Exchange | Escrow;
+export type Transactions = Transfer | Payment | RFQ | Escrow;
 
 /**
  * Transfer Message
@@ -1332,15 +1332,15 @@ export interface Payment extends TapMessageObject<"Payment"> {
 }
 
 /**
- * Exchange Message
+ * RFQ (Request for Quote) Message
  * Requests a quote for exchanging assets between different types or chains.
  * Used to request cross-asset quotes (e.g., USDC to EURC, USD to USDC).
  *
  * @example
  * ```typescript
- * const exchange: Exchange = {
+ * const rfq: RFQ = {
  *   "@context": "https://tap.rsvp/schema/1.0",
- *   "@type": "Exchange",
+ *   "@type": "RFQ",
  *   fromAssets: ["eip155:1/erc20:0xA0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"], // USDC
  *   toAssets: ["eip155:1/erc20:0x1aBaEA1f7C830bD89Acc67eC4af516284b1bC33c"], // EURC
  *   fromAmount: "1000.00",
@@ -1359,7 +1359,7 @@ export interface Payment extends TapMessageObject<"Payment"> {
  *
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-18.md | TAIP-18: Asset Exchange}
  */
-export interface Exchange extends TapMessageObject<"Exchange"> {
+export interface RFQ extends TapMessageObject<"RFQ"> {
   /**
    * Array of available source assets
    * Can include CAIP-19, DTI, or ISO-4217 currency codes
@@ -1394,12 +1394,12 @@ export interface Exchange extends TapMessageObject<"Exchange"> {
 
   /**
    * Optional preferred liquidity provider
-   * When omitted, the Exchange can be broadcast to multiple providers
+   * When omitted, the RFQ can be broadcast to multiple providers
    */
   provider?: Party;
 
   /**
-   * List of agents involved in the exchange request
+   * List of agents involved in the RFQ
    * Must include agent acting for the requester
    */
   agents: Agent[];
@@ -1413,7 +1413,7 @@ export interface Exchange extends TapMessageObject<"Exchange"> {
 
 /**
  * Quote Message
- * Response to an Exchange request providing pricing and terms.
+ * Response to an RFQ providing pricing and terms.
  * Sent by liquidity providers or orchestrators with specific rates.
  *
  * @example
@@ -1474,7 +1474,7 @@ export interface Quote extends TapMessageObject<"Quote"> {
 
   /**
    * List of agents involved in the quote
-   * Must include all agents from the original Exchange request plus provider agents
+   * Must include all agents from the original RFQ plus provider agents
    */
   agents: Agent[];
 
@@ -2056,14 +2056,14 @@ export interface PaymentMessage extends DIDCommMessage<Payment> {
 }
 
 /**
- * Exchange Message Wrapper
- * DIDComm envelope for an Exchange message.
+ * RFQ Message Wrapper
+ * DIDComm envelope for an RFQ (Request for Quote) message.
  *
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-2.md | TAIP-2: Message Format}
  * @see {@link https://github.com/TransactionAuthorizationProtocol/TAIPs/blob/main/TAIPs/taip-18.md | TAIP-18: Asset Exchange}
  */
-export interface ExchangeMessage extends DIDCommMessage<Exchange> {
-  type: "https://tap.rsvp/schema/1.0#Exchange";
+export interface RFQMessage extends DIDCommMessage<RFQ> {
+  type: "https://tap.rsvp/schema/1.0#RFQ";
 }
 
 /**
@@ -2427,7 +2427,7 @@ export interface PresentationMessage
 export type TAPMessage =
   | TransferMessage
   | PaymentMessage
-  | ExchangeMessage
+  | RFQMessage
   | QuoteMessage
   | AuthorizeMessage
   | SettleMessage
@@ -2464,7 +2464,7 @@ export type TAPMessage =
  * - TAIP-4: Authorization Flow → {@link Authorize}, {@link Settle}, {@link Reject}, {@link Cancel}, {@link Revert}, {@link AuthorizationRequired}
  * - TAIP-14: Payment Request → {@link Payment}, {@link PaymentMessage}
  * - TAIP-17: Composable Escrow → {@link Escrow}, {@link Capture}, {@link EscrowMessage}, {@link CaptureMessage}
- * - TAIP-18: Asset Exchange → {@link Exchange}, {@link Quote}, {@link ExchangeMessage}, {@link QuoteMessage}
+ * - TAIP-18: Asset Exchange → {@link RFQ}, {@link Quote}, {@link RFQMessage}, {@link QuoteMessage}
  *
  * **Participant Management:**
  * - TAIP-5: Agents → {@link Agent}, {@link UpdateAgent}, {@link AddAgents}, {@link ReplaceAgent}, {@link RemoveAgent}

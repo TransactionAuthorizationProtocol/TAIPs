@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://taips.tap.rsvp/schemas/messages/exchange.json",
-  "title": "Exchange Message",
-  "description": "Asset exchange request message per TAIP-18",
+  "$id": "https://taips.tap.rsvp/schemas/messages/rfq.json",
+  "title": "RFQ Message",
+  "description": "Request for Quote (RFQ) message per TAIP-18",
   "type": "object",
   "allOf": [
     {
@@ -11,7 +11,7 @@
   ],
   "properties": {
     "type": {
-      "const": "https://tap.rsvp/schema/1.0#Exchange"
+      "const": "https://tap.rsvp/schema/1.0#RFQ"
     },
     "body": {
       "type": "object",
@@ -29,7 +29,7 @@
           "const": "https://tap.rsvp/schema/1.0"
         },
         "@type": {
-          "const": "https://tap.rsvp/schema/1.0#Exchange"
+          "const": "https://tap.rsvp/schema/1.0#RFQ"
         },
         "fromAssets": {
           "type": "array",
@@ -95,7 +95,7 @@
             "$ref": "../data-structures/agent.json"
           },
           "minItems": 1,
-          "description": "Agents involved in the exchange request"
+          "description": "Agents involved in the RFQ"
         },
         "policies": {
           "type": "array",
