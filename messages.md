@@ -12,6 +12,8 @@ permalink: /messages/
 - [Transaction Message](#transaction-message)
   - [Transfer](#transfer)
   - [Payment](#payment)
+  - [RFQ](#rfq)
+  - [Quote](#quote)
   - [Lock](#lock)
 - [Authorization Flow Messages](#authorization-flow-messages)
   - [AuthorizationRequired](#authorizationrequired)

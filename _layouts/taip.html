@@ -80,66 +80,70 @@ Process content to remove the copyright section
 
 <style>
   .taip-metadata {
-    background-color: var(--color-sidebar);
-    border-radius: 0.5rem;
-    padding: 1.25rem;
+    background-color: rgba(0,47,13,.02);
+    border: 1px solid var(--border-soft);
+    border-radius: 10px;
+    padding: 1.25rem 1.5rem;
     margin-bottom: 2rem;
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 1rem;
-    border: 1px solid var(--color-border);
+    gap: 1rem 1.5rem;
   }
-  
+
   .metadata-item {
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.25rem;
+    font-size: 0.9375rem;
+    color: var(--tap-ink-2);
   }
-  
+
   .metadata-item strong {
-    font-weight: 600;
-    font-family: var(--font-heading);
+    font-weight: 700;
+    font-family: var(--font-sans);
+    color: var(--tap-ink);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 0.25rem;
   }
-  
-  .taip-content {
-    margin-top: 2rem;
-  }
-  
+
+  .taip-content { margin-top: 2rem; }
+
   .taip-content h2.hidden,
-  .taip-content h2.hidden + p {
-    display: none;
-  }
-  
+  .taip-content h2.hidden + p { display: none; }
+
   .toc {
-    background-color: var(--color-secondary-bg);
-    border-radius: 0.5rem;
-    padding: 1.25rem;
+    background-color: var(--tap-wash);
+    border: 1px solid var(--border-soft);
+    border-radius: 10px;
+    padding: 1.25rem 1.5rem;
     margin-bottom: 2rem;
-    border: 1px solid var(--color-border);
   }
-  
+
   .toc h2 {
     margin-top: 0;
     border-bottom: none;
-    font-size: 1.25rem;
-    color: var(--color-secondary-fg);
-  }
-  
-  .toc ul {
-    margin-bottom: 0;
-  }
-  
-  .anchor-link {
-    color: var(--color-primary);
-    opacity: 0.5;
-    transition: opacity 0.2s;
-  }
-  
-  .anchor-link:hover {
-    opacity: 1;
+    font-size: 0.875rem;
+    font-family: var(--font-sans);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--tap-ink);
+    padding-bottom: 0;
   }
 
-  .license-section {
-    margin-top: 3rem;
+  .toc ul { margin-bottom: 0; }
+
+  .anchor-link {
+    color: var(--tap-accent);
+    opacity: 0.45;
+    transition: opacity 0.2s;
+    text-decoration: none;
   }
+
+  .anchor-link:hover { opacity: 1; }
+
+  .license-section { margin-top: 3rem; }
 </style>
 
 <h2>Citation</h2>

@@ -5,13 +5,18 @@ title: Home
 
 <div class="home-content">
   <header class="hero">
-    <h1>Transaction Authorization Protocol</h1>
-    <p class="lead">A framework for secure, compliant, and flexible blockchain transaction authorization</p>
+    <div class="tap-eyebrow">Transaction Authorization Protocol</div>
+    <h1>The open authorization layer for blockchain transactions.</h1>
+    <p class="lead">Identity, compliance, and multi-party authorization &mdash; before anything settles onchain.</p>
+    <div class="tap-chip">
+      <span class="tap-chip-dot"></span>
+      Open protocol &middot; CC BY-SA 4.0
+    </div>
   </header>
 
   <section class="intro">
-    <p>The Transaction Authorization Protocol (TAP) enables secure, compliant, and flexible transaction authorization between parties before settlement on a blockchain. TAP creates a separate "authorization layer" that operates independently from the blockchain "settlement layer," allowing participants to exchange necessary information, perform risk assessments, and implement compliance checks before funds move.</p>
-    
+    <p>The Transaction Authorization Protocol (TAP) enables secure, compliant, and flexible transaction authorization between parties before settlement on a blockchain. TAP creates a separate <strong>authorization layer</strong> that operates independently from the blockchain <strong>settlement layer</strong>, allowing participants to exchange necessary information, perform risk assessments, and implement compliance checks before funds move.</p>
+
     <div class="cta-buttons">
       <a href="https://hubs.ly/Q03FRgly0" class="button">Read the Whitepaper</a>
       <a href="{{ '/messages/' | relative_url }}" class="button button-secondary">View TAP Messages</a>
@@ -70,112 +75,162 @@ title: Home
 
 <style>
   .hero {
-    margin-bottom: 1.5rem;
+    margin-bottom: 2rem;
     padding-bottom: 1rem;
   }
-  
+
+  .hero .tap-eyebrow {
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--tap-ink);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 1.25rem;
+  }
+
+  .hero .tap-eyebrow::before {
+    content: '';
+    display: inline-block;
+    width: 18px;
+    height: 2px;
+    background: var(--tap-accent);
+  }
+
   .hero h1 {
-    font-size: 2.5rem;
-    margin-bottom: 1rem;
-    color: var(--color-text);
+    font-family: var(--font-heading);
+    font-size: 3rem;
+    font-weight: 400;
+    letter-spacing: -0.035em;
+    line-height: 1.05;
+    margin: 0 0 1.25rem;
+    color: var(--tap-ink);
+    max-width: 780px;
   }
-  
+
   .lead {
+    font-family: var(--font-sans);
     font-size: 1.25rem;
-    color: var(--color-text-light);
-    margin-bottom: 2rem;
+    line-height: 1.45;
+    letter-spacing: -0.02em;
+    color: var(--tap-ink-2);
+    margin-bottom: 1.5rem;
+    max-width: 680px;
   }
-  
+
+  .tap-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    border-radius: 999px;
+    background: rgba(0,47,13,.06);
+    color: var(--tap-ink);
+    font-family: var(--font-sans);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+
+  .tap-chip-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--tap-accent);
+  }
+
   .cta-buttons {
     display: flex;
     gap: 1rem;
-    margin: 2rem 0;
+    margin: 2rem 0 2.5rem;
+    flex-wrap: wrap;
   }
-  
-  .button {
-    display: inline-block;
-    padding: 0.75rem 1.5rem;
-    background-color: var(--color-primary);
-    color: var(--color-text);
-    border-radius: 0.375rem;
+
+  .intro, .taips-section { margin-bottom: 3rem; }
+
+  .taips-section h2 {
+    font-size: 1.75rem;
     font-weight: 500;
-    text-decoration: none;
-    transition: background-color 0.2s, transform 0.2s;
-    font-family: var(--font-heading);
+    letter-spacing: -0.03em;
   }
-  
-  .button:hover {
-    background-color: var(--color-primary-light);
-    text-decoration: none;
-    transform: translateY(-2px);
+
+  .taips-section h3 {
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--tap-ink);
+    margin-top: 2.5rem;
+    margin-bottom: 1.25rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
   }
-  
-  .button-secondary {
-    background-color: var(--color-secondary-bg);
-    color: var(--color-secondary-fg);
-    border: 1px solid var(--color-primary);
+
+  .taips-section h3::before {
+    content: '';
+    display: inline-block;
+    width: 18px;
+    height: 2px;
+    background: var(--tap-accent);
   }
-  
-  .button-secondary:hover {
-    background-color: var(--color-secondary-bg);
-    opacity: 0.9;
-  }
-  
-  .intro, .taips-section {
-    margin-bottom: 3rem;
-  }
-  
+
   .taips-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 1.5rem;
-    margin-top: 1.5rem;
+    gap: 1.25rem;
+    margin-top: 1.25rem;
   }
-  
+
   .taip-card {
-    background-color: var(--color-sidebar);
-    border-radius: 0.5rem;
+    background: rgba(0,47,13,.02);
+    border: 1px solid var(--border-soft);
+    border-radius: 10px;
     padding: 1.5rem;
-    transition: transform 0.2s, box-shadow 0.2s;
-    border: 1px solid var(--color-border);
+    transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
   }
-  
+
   .taip-card:hover {
     transform: translateY(-3px);
-    box-shadow: 0 4px 12px rgba(65, 224, 41, 0.1);
-    border-color: var(--color-primary);
+    border-color: var(--tap-accent);
+    box-shadow: 0 12px 24px -16px rgba(0,47,13,.18);
   }
-  
+
   .taip-card h4 {
-    margin-top: 0;
-    margin-bottom: 0.75rem;
-  }
-  
-  .taip-card h4 a {
-    color: var(--color-text);
-  }
-  
-  .taip-card h4 a:hover {
-    color: var(--color-primary);
-  }
-  
-  .more-link {
-    text-align: center;
-    margin-top: 2rem;
-  }
-  
-  .view-all {
-    display: inline-block;
-    padding: 0.5rem 1rem;
-    border: 1px solid var(--color-border);
-    border-radius: 0.375rem;
-    font-weight: 500;
+    margin: 0 0 0.25rem;
     font-family: var(--font-heading);
-    transition: all 0.2s;
+    font-weight: 500;
+    font-size: 1.05rem;
+    letter-spacing: -0.02em;
+    line-height: 1.25;
   }
-  
-  .view-all:hover {
-    border-color: var(--color-primary);
-    background-color: var(--color-secondary-bg);
+
+  .taip-card h4 a {
+    color: var(--tap-ink);
+    text-decoration: none;
+  }
+
+  .taip-card h4 a:hover {
+    color: var(--tap-ink);
+    opacity: .75;
+    text-decoration: none;
+  }
+
+  .taip-card p {
+    margin: 0.25rem 0 0;
+    font-size: 0.9375rem;
+    color: var(--tap-ink-2);
+    line-height: 1.5;
+  }
+
+  .taip-card .status-pill {
+    align-self: flex-start;
   }
 </style>

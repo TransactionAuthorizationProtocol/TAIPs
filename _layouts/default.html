@@ -8,6 +8,7 @@
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔄</text></svg>">
   <!-- Mermaid.js for diagrams -->
   <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <script src="{{ '/assets/js/mermaid-theme.js' | relative_url }}" defer></script>
   
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-DFQHXTJQ91"></script>
@@ -23,7 +24,16 @@
   <div class="wrapper">
     <aside class="sidebar">
       <div class="header">
-        <a href="{{ '/' | relative_url }}" class="logo" style="font-size: 1.8rem; font-weight: 700;">TAP</a>
+        <a href="{{ '/' | relative_url }}" class="logo" aria-label="TAP — Transaction Authorization Protocol">
+          <svg width="28" height="28" viewBox="0 0 28 28" aria-hidden="true">
+            <rect x="2"    y="5" width="7" height="7" fill="#002F0D"/>
+            <rect x="10.5" y="5" width="7" height="7" fill="#00C2B8"/>
+            <rect x="19"   y="5" width="7" height="7" fill="#002F0D"/>
+            <path d="M5.5 16 L5.5 22 L22.5 22 L22.5 16" stroke="#002F0D" stroke-width="2" fill="none"/>
+            <circle cx="14" cy="22" r="2.5" fill="#00C2B8"/>
+          </svg>
+          <span class="logo-word">tap</span>
+        </a>
         <button class="mobile-menu-toggle" aria-label="Toggle mobile menu">☰</button>
       </div>
       
@@ -123,35 +133,5 @@
     });
   </script>
 
-  <!-- Initialize Mermaid diagrams -->
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      mermaid.initialize({
-        startOnLoad: true,
-        theme: 'default',
-        securityLevel: 'loose',
-        fontFamily: 'var(--font-sans)',
-        flowchart: {
-          curve: 'linear',
-          useMaxWidth: true
-        }
-      });
-      
-      // Process pre code blocks with language-mermaid class
-      document.querySelectorAll('pre code.language-mermaid').forEach(function(el) {
-        // Create a div for mermaid
-        const mermaidDiv = document.createElement('div');
-        mermaidDiv.className = 'mermaid';
-        mermaidDiv.innerHTML = el.textContent;
-        
-        // Replace the pre element with our mermaid div
-        const pre = el.parentElement;
-        pre.parentElement.replaceChild(mermaidDiv, pre);
-      });
-      
-      // Render mermaid
-      mermaid.init(undefined, document.querySelectorAll('.mermaid'));
-    });
-  </script>
 </body>
 </html>
