@@ -435,6 +435,7 @@ const transfer: Transfer = {
 - **TAP Specification**: [TAIPs Documentation](./index.html)
 - **Message Reference**: [Message Types and Data Structures](./messages.html)
 - **GitHub Repository**: [TransactionAuthorizationProtocol/TAIPs](https://github.com/TransactionAuthorizationProtocol/TAIPs)
+- **TypeScript Library**: [TransactionAuthorizationProtocol/tap-ts](https://github.com/TransactionAuthorizationProtocol/tap-ts)
 - **NPM Package**: [@taprsvp/types](https://www.npmjs.com/package/@taprsvp/types)
 - **TAP Website**: [tap.rsvp](https://tap.rsvp)
 
