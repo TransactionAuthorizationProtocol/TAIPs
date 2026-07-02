@@ -47,6 +47,7 @@ The purpose of TAIPs is to provide the community with a means to propose enhance
 | 19   | [ISO 20022 Message Mapping](./TAIPs/taip-19.md)                        |
 | 20   | [On-Chain Transfer Correlation via Memo Hash](./TAIPs/taip-20.md)      |
 
+
 ## Implementation Resources
 
 ### JSON Schemas

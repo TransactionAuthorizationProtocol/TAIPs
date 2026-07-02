@@ -1,0 +1,14 @@
+{
+  "id": "cancel-101",
+  "type": "https://tap.rsvp/schema/1.0#Cancel",
+  "from": "did:web:vasp-a.example",
+  "to": ["did:web:vasp-b.example"],
+  "thid": "conn-123e4567-e89b-12d3-a456-426614174000",
+  "created_time": 1706227320,
+  "body": {
+    "@context": "https://tap.rsvp/schema/1.0",
+    "@type": "https://tap.rsvp/schema/1.0#Cancel",
+    "by": "did:web:vasp-a.example",
+    "reason": "Business relationship ended"
+  }
+}

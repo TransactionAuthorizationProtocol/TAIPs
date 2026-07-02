@@ -7,6 +7,7 @@
   "message": {
     "id": "123e4567-e89b-12d3-a456-426614174001",
     "type": "https://tap.rsvp/schema/1.0#Connect",
+    "connectionTypes": ["transaction"],
     "from": "did:web:b2b-service.example",
     "to": ["did:web:vasp.example"],
     "created_time": 1516269022,
