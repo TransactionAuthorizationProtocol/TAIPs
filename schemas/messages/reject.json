@@ -26,6 +26,11 @@
         "reason": {
           "type": "string",
           "description": "Optional human-readable reason for rejection"
+        },
+        "code": {
+          "type": "string",
+          "pattern": "^[A-Z0-9]{4}$",
+          "description": "Optional machine-readable reason: an ISO 20022 ExternalStatusReason1Code value (TAIP-4). Receivers ignore a code they do not recognise."
         }
       },
       "additionalProperties": false

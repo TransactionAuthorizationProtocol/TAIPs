@@ -5,7 +5,7 @@ status: Draft
 type: Standard
 author: Pelle Braendgaard <pelle@notabene.id>
 created: 2025-11-25
-updated: 2025-11-25
+updated: 2026-09-30
 description: Defines bidirectional mappings between ISO 20022 payment messages (PAIN, PACS, CAMT) and TAP messages, enabling interoperability between traditional financial messaging and blockchain transaction authorization.
 requires: 2, 3, 4, 5, 6, 13, 14, 15, 16
 ---
@@ -172,7 +172,7 @@ When mapping ISO 20022 account identifiers to TAP:
 | AcceptedTechnicalValidation | ACTC | Authorize | Technical checks passed |
 | AcceptedSettlementInProgress | ACSP | Settle | Settlement initiated |
 | AcceptedSettlementCompleted | ACSC | Settle | Include `settlementId` |
-| Rejected | RJCT | Reject | Include reason code |
+| Rejected | RJCT | Reject | `StsRsnInf/Rsn/Cd` → Reject `code` |
 | Cancelled | CANC | Cancel | Cancelled by party |
 | Pending | PDNG | AuthorizationRequired | Awaiting action |
 
@@ -184,7 +184,7 @@ When mapping ISO 20022 account identifiers to TAP:
 | Authorize + settlementAddress | ACSP | Ready for settlement |
 | Settle | ACSC | With `settlementId` |
 | Settle (pending) | ACSP | Without `settlementId` |
-| Reject | RJCT | Include mapped reason |
+| Reject | RJCT | Reject `code` → `StsRsnInf/Rsn/Cd` |
 | Cancel | CANC | - |
 
 ### Detailed Field Mappings
@@ -491,6 +491,16 @@ When generating ISO 20022 messages from TAP flows:
 | `thid` | `OrgnlGrpInfAndSts/OrgnlMsgId` | Original message reference |
 | *(Settle)* | `TxInfAndSts/TxSts` | ACSC |
 | `settlementId` | `TxInfAndSts/OrgnlTxRef/PmtTpInf` | Settlement reference |
+
+#### TAIP-4 Reject → pacs.002
+
+| TAP Field | ISO 20022 Path | Notes |
+|-----------|----------------|-------|
+| DIDComm `id` | `GrpHdr/MsgId` | Status message ID |
+| `thid` | `OrgnlGrpInfAndSts/OrgnlMsgId` | Original message reference |
+| *(Reject)* | `TxInfAndSts/TxSts` | RJCT |
+| `code` | `TxInfAndSts/StsRsnInf/Rsn/Cd` | ISO 20022 `ExternalStatusReason1Code`, passed through unchanged |
+| `reason` | `TxInfAndSts/StsRsnInf/AddtlInf` | Human-readable text |
 
 ### Service Provider DID Resolution
 

@@ -14,6 +14,15 @@ This changelog focuses on:
 - Protocol structural changes
 - Breaking changes
 
+## [2026-09-30]
+
+### Added
+- **TAIP-4 Reject `code`**: optional machine-readable reason next to the free-text `reason`
+  - Values are ISO 20022 `ExternalStatusReason1Code` codes, listed in a code table in TAIP-4; the first is `AC03` (the rejecting agent does not hold the settlement address)
+  - Senders use only listed codes; receivers treat an unknown code as absent
+  - `schemas/messages/reject.json` accepts `code` (four uppercase letters or digits); test vectors `reject/valid-with-code.json` and `reject/invalid-code-format.json`
+- **TAIP-19**: added the TAIP-4 Reject → pacs.002 mapping (`code` → `StsRsnInf/Rsn/Cd`, `reason` → `StsRsnInf/AddtlInf`)
+
 ## [2026-05-01]
 
 ### Changed

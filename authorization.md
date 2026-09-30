@@ -50,6 +50,7 @@ The Reject message indicates the beneficiary cannot approve the transaction. A c
 **Business Implications**:
 - Stops the transaction flow, preventing non-compliant transactions
 - Requires a specific reason to support remediation efforts
+- May carry a machine-readable `code` (an ISO 20022 status reason, [TAIP-4](/TAIPs/taip-4)) that the originator can act on without parsing the reason
 - Creates a compliance record of rejection and reasoning
 
 ```mermaid
