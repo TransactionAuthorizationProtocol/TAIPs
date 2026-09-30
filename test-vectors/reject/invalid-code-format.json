@@ -1,0 +1,36 @@
+{
+  "description": "Reject message with a malformed reason code",
+  "purpose": "Validate that a code which is not a four-character ISO 20022 status reason code is rejected",
+  "shouldPass": false,
+  "version": "1.0.0",
+  "taips": [
+    "taip-2",
+    "taip-4"
+  ],
+  "message": {
+    "from": "did:web:beneficiary.vasp",
+    "type": "https://tap.rsvp/schema/1.0#Reject",
+    "id": "1122334455",
+    "thid": "1234567890",
+    "to": [
+      "did:web:originator.vasp"
+    ],
+    "created_time": 1516269022,
+    "expires_time": 1516385931,
+    "body": {
+      "@context": "https://tap.rsvp/schema/1.0",
+      "@type": "https://tap.rsvp/schema/1.0#Reject",
+      "reason": "Blockchain address is not ours",
+      "code": "address-not-ours"
+    }
+  },
+  "expectedResult": {
+    "valid": false,
+    "errors": [
+      {
+        "field": "body.code",
+        "message": "Must be a four-character ISO 20022 ExternalStatusReason1Code"
+      }
+    ]
+  }
+}

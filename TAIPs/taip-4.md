@@ -5,7 +5,7 @@ author: Pelle Braendgaard <pelle@notabene.id>, Andrés Junge <andres@notabene.id
 status: Last Call
 type: Standard
 created: 2024-01-12
-updated: 2025-08-03
+updated: 2026-09-30
 description: A protocol framework enabling off-chain authorization of blockchain transactions through DID-based agents before settlement. Separates transaction ordering, authorization, and settlement into distinct phases to address compliance, risk management, and operational challenges without changing permissionless blockchain characteristics.
 discussions-to: https://github.com/TransactionAuthorizationProtocol/TAIPs/pull/6
 requires: 2, 5
@@ -221,6 +221,27 @@ Any agent can always reject a transaction. This does not mean another agent will
 - `@context` - REQUIRED the JSON-LD context `https://tap.rsvp/schema/1.0`
 - `@type` - REQUIRED the JSON-LD type `https://tap.rsvp/schema/1.0#Reject`
 - `reason` - OPTIONAL Human readable message describing why the transaction was rejected
+- `code` - OPTIONAL Machine-readable reason for the rejection: an [ISO 20022] `ExternalStatusReason1Code` value from the list below
+
+`reason` is for people; a receiving agent SHOULD NOT parse it. `code` is what a receiving agent acts on.
+The codes come from the ISO 20022 status reason list, the same list [TAIP-19] maps a `Reject` onto (`pacs.002` status `RJCT`), so a gateway can pass a code between TAP and ISO 20022 without translating it.
+
+| Code | ISO 20022 name | Meaning in TAP |
+|------|----------------|----------------|
+| `AC03` | InvalidCreditorAccountNumber | The rejecting agent does not hold the transaction's settlement address. |
+
+A sending agent MUST only use a code from this table, and SHOULD also send `reason`.
+A receiving agent MUST treat a code it does not recognise as if no code were present: it still processes the `Reject`, and does not reject the message for carrying an unknown code.
+Codes are added to this table by amending this TAIP.
+
+```json
+{
+  "@context": "https://tap.rsvp/schema/1.0",
+  "@type": "https://tap.rsvp/schema/1.0#Reject",
+  "reason": "Blockchain address is not ours",
+  "code": "AC03"
+}
+```
 
 The following shows a simple rejection of a Transfer by the Beneficiary Agent.
 
@@ -507,6 +528,8 @@ The only potential PII that could be shared and leaked through this flow are pub
 [TAIP-6]: ./taip-6
 [TAIP-7]: ./taip-7
 [TAIP-14]: ./taip-14
+[TAIP-19]: ./taip-19
+[ISO 20022]: <https://www.iso20022.org/catalogue-messages/additional-content-messages/external-code-sets>
 [CAIP-10]: <https://chainagnostic.org/CAIPs/caip-10>
 [CAIP-19]: <https://chainagnostic.org/CAIPs/caip-19>
 [RFC 8905]: <https://datatracker.ietf.org/doc/rfc8905/>
