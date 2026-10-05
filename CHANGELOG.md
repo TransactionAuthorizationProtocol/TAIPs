@@ -14,6 +14,11 @@ This changelog focuses on:
 - Protocol structural changes
 - Breaking changes
 
+## [2026-10-05]
+
+### Added
+- **TAIP-4 Reject `code` `BE01`** (InconsistentWithEndCustomer): the party details in the transaction do not match the rejecting agent's records for its customer, such as a beneficiary name that does not match the account holder
+
 ## [2026-09-30]
 
 ### Added

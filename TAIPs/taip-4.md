@@ -5,7 +5,7 @@ author: Pelle Braendgaard <pelle@notabene.id>, Andrés Junge <andres@notabene.id
 status: Last Call
 type: Standard
 created: 2024-01-12
-updated: 2026-09-30
+updated: 2026-10-05
 description: A protocol framework enabling off-chain authorization of blockchain transactions through DID-based agents before settlement. Separates transaction ordering, authorization, and settlement into distinct phases to address compliance, risk management, and operational challenges without changing permissionless blockchain characteristics.
 discussions-to: https://github.com/TransactionAuthorizationProtocol/TAIPs/pull/6
 requires: 2, 5
@@ -229,6 +229,7 @@ The codes come from the ISO 20022 status reason list, the same list [TAIP-19] ma
 | Code | ISO 20022 name | Meaning in TAP |
 |------|----------------|----------------|
 | `AC03` | InvalidCreditorAccountNumber | The rejecting agent does not hold the transaction's settlement address. |
+| `BE01` | InconsistentWithEndCustomer | The party details in the transaction do not match the rejecting agent's records for its customer, such as a beneficiary name that does not match the account holder. |
 
 A sending agent MUST only use a code from this table, and SHOULD also send `reason`.
 A receiving agent MUST treat a code it does not recognise as if no code were present: it still processes the `Reject`, and does not reject the message for carrying an unknown code.
