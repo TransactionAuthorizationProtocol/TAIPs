@@ -752,7 +752,7 @@ Rejects a proposed transfer.
 | @context | string | Yes | Review ([TAIP-4]) | JSON-LD context "https://tap.rsvp/schema/1.0" |
 | @type | string | Yes | Review ([TAIP-4]) | JSON-LD type "https://tap.rsvp/schema/1.0#Reject" |
 | reason | string | Yes | Review ([TAIP-4]) | Reason for rejection |
-| code | string | No | Review ([TAIP-4]) | Machine-readable reason: an ISO 20022 `ExternalStatusReason1Code` from the TAIP-4 code table (e.g. `AC03`, settlement address not held by the rejecting agent) |
+| code | string | No | Review ([TAIP-4]) | Machine-readable reason: an ISO 20022 `ExternalStatusReason1Code` from the TAIP-4 code table (e.g. `AC03`, settlement address not held by the rejecting agent; `BE01`, party details do not match the rejecting agent's customer) |
 
 > **Note:** The message refers to the original Transfer message via the DIDComm `thid` (thread ID) in the message envelope.
 
